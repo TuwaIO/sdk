@@ -4,6 +4,76 @@
 [![License](https://img.shields.io/npm/l/@tuwaio/quasar-sdk.svg)](./LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/TuwaIO/sdk/release.yml?branch=main)](https://github.com/TuwaIO/sdk/actions)
 
+> The official server-side Node.js & Edge SDK for the **TUWA Quasar Cloud**.
+
+## Installation
+
+```bash
+pnpm add @tuwaio/quasar-sdk
+```
+
+### Peer Dependencies
+
+| Package              | Version   |
+| -------------------- | --------- |
+| `@tuwaio/pulsar-core` | `>=0.5.1` |
+| `ofetch`             | `>=1.5.1` |
+
+## Quick Start
+
+```typescript
+import { Quasar } from '@tuwaio/quasar-sdk';
+
+const quasar = new Quasar({ secretKey: 'sk_live_your_secret_key' });
+
+// Sync a pending transaction
+const { txKey } = await quasar.pulsar.syncCreate(tx);
+
+// Update status
+await quasar.pulsar.syncUpdate(txKey, { status: 'confirmed' });
+
+// Query history
+const history = await quasar.pulsar.getHistory({ chainId: 1 });
+```
+
+## Modules
+
+### Pulsar — `quasar.pulsar`
+
+| Method | Description |
+| --- | --- |
+| `syncCreate(tx)` | Sync a new pending transaction to the cloud |
+| `syncUpdate(txKey, patches)` | Update an existing transaction's status or fields |
+| `getHistory(query?)` | Retrieve paginated transaction history |
+
+## Error Handling
+
+```typescript
+import { QuasarSDKError } from '@tuwaio/quasar-sdk';
+
+try {
+  await quasar.pulsar.getHistory();
+} catch (err) {
+  if (err instanceof QuasarSDKError) {
+    console.error(err.status);        // HTTP status code
+    console.error(err.message);       // Formatted error message
+    console.error(err.originalError); // Raw fetch error
+  }
+}
+```
+
+## Configuration
+
+| Property    | Type     | Required | Default               | Description |
+| ----------- | -------- | -------- | --------------------- | ----------- |
+| `secretKey` | `string` | ✅       | —                     | Server-side API key (`sk_live_*`) |
+| `baseUrl`   | `string` | ❌       | `https://api.tuwa.io` | API base URL |
+| `timeout`   | `number` | ❌       | `10000`               | Request timeout (ms) |
+
+## Documentation
+
+Full API reference: [sdk.docs.tuwa.io](https://sdk.docs.tuwa.io/)
+
 ---
 
 ## 🤝 Contributing & Support

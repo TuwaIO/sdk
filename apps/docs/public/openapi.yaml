@@ -1,0 +1,13 @@
+openapi: 3.1.0
+info:
+  title: Quasar Engine API
+  version: 1.0.0
+servers:
+  - url: https://api.tuwa.io
+paths:
+  /api/v1/engine/tx-sync:
+    post:
+      summary: Sync Transaction
+      responses:
+        '200':
+          description: OK

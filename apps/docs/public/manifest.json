@@ -1,0 +1,17 @@
+{
+  "name": "TUWA SDK Documentation",
+  "short_name": "TUWA SDK  Documentation",
+  "description": "The official documentation for SDK of the TUWA Ecosystem.",
+  "iconPath": "icon0.svg",
+  "icons": [
+    {
+      "iconPath": "icon0.svg",
+      "sizes": "32x32",
+      "type": "image/svg"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

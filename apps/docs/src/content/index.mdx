@@ -1,0 +1,62 @@
+# Introduction
+
+Welcome to the **TUWA SDK** documentation — the official server-side SDK for the **Quasar Cloud**.
+
+## What is Quasar SDK?
+
+`@tuwaio/quasar-sdk` is a type-safe Node.js & Edge SDK for interacting with the TUWA Quasar Cloud API. It provides a clean, modular interface for blockchain transaction lifecycle management — syncing, updating, and querying transactions across multiple chains.
+
+## Key Features
+
+- 🔐 **Iron Dome Protocol** — every request is authenticated via secret key headers
+- 📦 **Dual module format** — ships as ESM and CJS
+- 🧩 **Modular architecture** — domain modules (Pulsar) with room to grow
+- 🔒 **Server-side only** — your secret keys never leak to the browser
+- 📖 **Auto-generated API reference** — TypeDoc annotations powering this docs site
+
+## Quick Start
+
+```typescript
+import { Quasar } from '@tuwaio/quasar-sdk';
+
+const quasar = new Quasar({
+  secretKey: 'sk_live_your_secret_key',
+});
+
+// Sync a pending transaction
+const { txKey } = await quasar.pulsar.syncCreate({
+  hash: '0xabc...',
+  chainId: 1,
+  status: 'pending',
+  from: '0x123...',
+  to: '0x456...',
+});
+
+// Update its status
+await quasar.pulsar.syncUpdate(txKey, { status: 'confirmed' });
+
+// Query history
+const history = await quasar.pulsar.getHistory({
+  page: 1,
+  limit: 20,
+  status: 'confirmed',
+});
+```
+
+## Installation
+
+```bash
+pnpm add @tuwaio/quasar-sdk
+```
+
+Peer dependencies: `@tuwaio/pulsar-core` (≥0.5.1) and `ofetch` (≥1.5.1).
+
+## Next Steps
+
+- Browse the **[API Reference](/apiReference)** for full type documentation
+- View the **[Scalar API Viewer](/scalar)** for endpoint exploration
+- Check the **[GitHub Repository](https://github.com/TuwaIO/sdk)** for source code
+
+---
+
+**Built with ❤️ by the [TUWA Team](https://github.com/TuwaIO)**
