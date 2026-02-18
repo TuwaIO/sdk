@@ -1,0 +1,4 @@
+@import 'nextra-theme-docs/style.css';
+@import '@tuwaio/docs-ui/dist/index.css';
+@import 'tailwindcss';
+@import '@scalar/api-reference-react/style.css';
