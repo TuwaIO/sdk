@@ -12,6 +12,6 @@ export default defineConfig([
     minify: true,
     clean: true,
     dts: true,
-    external: [...Object.keys(pkg.devDependencies || {})],
+    external: [...Object.keys(pkg.peerDependencies || {}), ...Object.keys(pkg.devDependencies || {})],
   },
 ]);
