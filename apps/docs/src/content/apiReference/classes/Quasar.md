@@ -4,7 +4,27 @@
 
 # Quasar
 
-Defined in: [packages/quasar-sdk/src/index.ts:5](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/index.ts#L5)
+Defined in: [packages/quasar-sdk/src/index.ts:44](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/index.ts#L44)
+
+Main entry point for the Quasar SDK.
+
+Initializes the internal HTTP client with your secret key
+and exposes domain-specific modules for interacting with the Quasar Cloud API.
+
+## Example
+
+```typescript
+import { Quasar } from '@tuwaio/quasar-sdk';
+
+const quasar = new Quasar({
+  secretKey: 'sk_live_your_secret_key',
+  baseUrl: 'https://api.tuwa.io',
+  timeout: 15000,
+});
+
+// Access the Pulsar transaction engine
+const { txKey } = await quasar.pulsar.syncCreate(tx);
+```
 
 ## Constructors
 
@@ -12,7 +32,9 @@ Defined in: [packages/quasar-sdk/src/index.ts:5](https://github.com/TuwaIO/sdk/b
 
 > **new Quasar**(`config`): `Quasar`
 
-Defined in: [packages/quasar-sdk/src/index.ts:14](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/index.ts#L14)
+Defined in: [packages/quasar-sdk/src/index.ts:64](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/index.ts#L64)
+
+Creates a new Quasar SDK instance.
 
 #### Parameters
 
@@ -20,17 +42,29 @@ Defined in: [packages/quasar-sdk/src/index.ts:14](https://github.com/TuwaIO/sdk/
 
 [`QuasarConfig`](../interfaces/QuasarConfig.md)
 
+SDK configuration. See [QuasarConfig](../interfaces/QuasarConfig.md) for available options.
+
 #### Returns
 
 `Quasar`
+
+#### Throws
+
+If `config.secretKey` is missing.
 
 ## Properties
 
 ### pulsar
 
-> `readonly` **pulsar**: `PulsarModule`
+> `readonly` **pulsar**: [`PulsarModule`](PulsarModule.md)
 
-Defined in: [packages/quasar-sdk/src/index.ts:12](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/index.ts#L12)
+Defined in: [packages/quasar-sdk/src/index.ts:56](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/index.ts#L56)
 
-Access the Pulsar Transaction Engine.
-Use this to sync transaction states and retrieve history.
+The Pulsar Transaction Engine module.
+
+Use this to sync transaction states to the Quasar Cloud
+and retrieve paginated transaction history.
+
+#### See
+
+[PulsarModule](PulsarModule.md)

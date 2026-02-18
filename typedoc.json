@@ -13,6 +13,11 @@
   "cleanOutputDir": true,
   "categorizeByGroup": true,
   "hideBreadcrumbs": true,
+  "externalSymbolLinkMappings": {
+    "@tuwaio/quasar-sdk": {
+      "QuasarClient": "#"
+    }
+  },
   "pageTitleTemplates": {
     "member": "{name}"
   }

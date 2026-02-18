@@ -4,7 +4,22 @@
 
 # HistoryQuery
 
-Defined in: [packages/quasar-sdk/src/types.ts:23](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L23)
+Defined in: [packages/quasar-sdk/src/types.ts:62](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L62)
+
+Query parameters for filtering transaction history.
+
+All fields are optional — omitted fields apply no filter.
+
+## Example
+
+```typescript
+const query: HistoryQuery = {
+  page: 2,
+  limit: 25,
+  chainId: 1,
+  status: 'confirmed',
+};
+```
 
 ## Properties
 
@@ -12,7 +27,9 @@ Defined in: [packages/quasar-sdk/src/types.ts:23](https://github.com/TuwaIO/sdk/
 
 > `optional` **chainId**: `string` \| `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:26](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L26)
+Defined in: [packages/quasar-sdk/src/types.ts:80](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L80)
+
+Filter by blockchain chain ID (e.g. `1` for Ethereum Mainnet, `'solana'` for Solana).
 
 ***
 
@@ -20,7 +37,13 @@ Defined in: [packages/quasar-sdk/src/types.ts:26](https://github.com/TuwaIO/sdk/
 
 > `optional` **limit**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:25](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L25)
+Defined in: [packages/quasar-sdk/src/types.ts:75](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L75)
+
+Maximum number of results per page.
+
+#### Default Value
+
+`10`
 
 ***
 
@@ -28,7 +51,13 @@ Defined in: [packages/quasar-sdk/src/types.ts:25](https://github.com/TuwaIO/sdk/
 
 > `optional` **page**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:24](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L24)
+Defined in: [packages/quasar-sdk/src/types.ts:68](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L68)
+
+Page number for pagination (1-indexed).
+
+#### Default Value
+
+`1`
 
 ***
 
@@ -36,7 +65,9 @@ Defined in: [packages/quasar-sdk/src/types.ts:24](https://github.com/TuwaIO/sdk/
 
 > `optional` **status**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:27](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L27)
+Defined in: [packages/quasar-sdk/src/types.ts:85](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L85)
+
+Filter by transaction status (e.g. `'pending'`, `'confirmed'`, `'failed'`).
 
 ***
 
@@ -44,4 +75,6 @@ Defined in: [packages/quasar-sdk/src/types.ts:27](https://github.com/TuwaIO/sdk/
 
 > `optional` **txKey**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:28](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L28)
+Defined in: [packages/quasar-sdk/src/types.ts:90](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L90)
+
+Filter by a specific transaction key (unique identifier assigned by Quasar).

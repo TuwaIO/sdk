@@ -4,7 +4,26 @@
 
 # QuasarSDKError
 
-Defined in: [packages/quasar-sdk/src/core/client.ts:5](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/core/client.ts#L5)
+Defined in: [packages/quasar-sdk/src/core/client.ts:31](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/core/client.ts#L31)
+
+Custom error class for all Quasar SDK API failures.
+
+Wraps the underlying HTTP error with a structured format including
+status code, human-readable message, and the original error reference.
+
+## Example
+
+```typescript
+try {
+  await quasar.pulsar.getHistory();
+} catch (err) {
+  if (err instanceof QuasarSDKError) {
+    console.error(err.status);        // e.g. 401
+    console.error(err.message);       // "[Quasar SDK] Request Failed (401): Unauthorized"
+    console.error(err.originalError); // Raw FetchError from ofetch
+  }
+}
+```
 
 ## Extends
 
@@ -16,7 +35,9 @@ Defined in: [packages/quasar-sdk/src/core/client.ts:5](https://github.com/TuwaIO
 
 > **new QuasarSDKError**(`message`, `status`, `originalError`): `QuasarSDKError`
 
-Defined in: [packages/quasar-sdk/src/core/client.ts:9](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/core/client.ts#L9)
+Defined in: [packages/quasar-sdk/src/core/client.ts:45](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/core/client.ts#L45)
+
+Creates a new QuasarSDKError instance.
 
 #### Parameters
 
@@ -24,13 +45,19 @@ Defined in: [packages/quasar-sdk/src/core/client.ts:9](https://github.com/TuwaIO
 
 `string`
 
+Formatted error message with SDK prefix and status.
+
 ##### status
+
+HTTP status code, or `undefined` if unavailable.
 
 `number` | `undefined`
 
 ##### originalError
 
 `Error`
+
+The raw error from the HTTP layer.
 
 #### Returns
 
@@ -82,7 +109,9 @@ Defined in: node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/li
 
 > `readonly` **originalError**: `Error`
 
-Defined in: [packages/quasar-sdk/src/core/client.ts:7](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/core/client.ts#L7)
+Defined in: [packages/quasar-sdk/src/core/client.ts:36](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/core/client.ts#L36)
+
+The original error thrown by the HTTP client.
 
 ***
 
@@ -102,7 +131,9 @@ Defined in: node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/li
 
 > `readonly` **status**: `number` \| `undefined`
 
-Defined in: [packages/quasar-sdk/src/core/client.ts:6](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/core/client.ts#L6)
+Defined in: [packages/quasar-sdk/src/core/client.ts:33](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/core/client.ts#L33)
+
+HTTP status code returned by the API, if available.
 
 ***
 

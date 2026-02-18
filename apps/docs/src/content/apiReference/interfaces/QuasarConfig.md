@@ -4,7 +4,19 @@
 
 # QuasarConfig
 
-Defined in: [packages/quasar-sdk/src/types.ts:3](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L3)
+Defined in: [packages/quasar-sdk/src/types.ts:22](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L22)
+
+Configuration options for initializing the [Quasar](../classes/Quasar.md) SDK client.
+
+## Example
+
+```typescript
+const config: QuasarConfig = {
+  secretKey: 'sk_live_abc123...',
+  baseUrl: 'https://api.tuwa.io',
+  timeout: 15000,
+};
+```
 
 ## Properties
 
@@ -12,10 +24,13 @@ Defined in: [packages/quasar-sdk/src/types.ts:3](https://github.com/TuwaIO/sdk/b
 
 > `optional` **baseUrl**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:14](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L14)
+Defined in: [packages/quasar-sdk/src/types.ts:37](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L37)
 
-The base URL of the Quasar API.
-Defaults to 'https://api.tuwa.io' (or your production URL).
+The base URL of the Quasar Cloud API.
+
+#### Default Value
+
+`'https://api.tuwa.io'`
 
 ***
 
@@ -23,10 +38,14 @@ Defaults to 'https://api.tuwa.io' (or your production URL).
 
 > **secretKey**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:8](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L8)
+Defined in: [packages/quasar-sdk/src/types.ts:30](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L30)
 
-Your secret API key starting with 'sk_live_'.
-This MUST be kept secure on the server side.
+Your secret API key starting with `sk_live_`.
+
+#### Remarks
+
+This key authenticates every request through the Iron Dome security perimeter.
+It **MUST** be kept secure on the server side — never expose it in client bundles.
 
 ***
 
@@ -34,7 +53,10 @@ This MUST be kept secure on the server side.
 
 > `optional` **timeout**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:20](https://github.com/TuwaIO/sdk/blob/dbab468f283e6a76cd08b2bb6516e1029ef1f854/packages/quasar-sdk/src/types.ts#L20)
+Defined in: [packages/quasar-sdk/src/types.ts:44](https://github.com/TuwaIO/sdk/blob/0000694765ab14f9bb45e23f43a0ca36504c440d/packages/quasar-sdk/src/types.ts#L44)
 
 Request timeout in milliseconds.
-Defaults to 10000ms.
+
+#### Default Value
+
+`10000`
