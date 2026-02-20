@@ -5,6 +5,7 @@
  * and retrieving paginated transaction history.
  */
 
+import { PULSAR_HISTORY_ENDPOINT, PULSAR_SYNC_ENDPOINT } from '../../constants';
 import type { QuasarClient } from '../../core/client';
 import type { HistoryQuery, PaginatedResult, Transaction, UpdatableTransactionFields } from '../../types';
 
@@ -63,7 +64,7 @@ export class PulsarModule {
    * ```
    */
   async syncCreate(tx: Transaction): Promise<{ success: true; txKey: string }> {
-    return this.client.request('/api/v1/engine/tx-sync', {
+    return this.client.request(PULSAR_SYNC_ENDPOINT, {
       method: 'POST',
       body: tx,
     });
@@ -88,7 +89,7 @@ export class PulsarModule {
    * ```
    */
   async syncUpdate(txKey: string, patches: UpdatableTransactionFields): Promise<{ success: true }> {
-    return this.client.request('/api/v1/engine/tx-sync', {
+    return this.client.request(PULSAR_SYNC_ENDPOINT, {
       method: 'PATCH',
       body: { txKey, ...patches },
     });
@@ -119,7 +120,7 @@ export class PulsarModule {
    * ```
    */
   async getHistory(query: HistoryQuery = {}): Promise<PaginatedResult<Transaction>> {
-    return this.client.request('/api/v1/engine/txs-history', {
+    return this.client.request(PULSAR_HISTORY_ENDPOINT, {
       method: 'GET',
       query: {
         page: query.page ?? 1,

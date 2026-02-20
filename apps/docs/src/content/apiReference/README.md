@@ -29,3 +29,9 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 - [Transaction](type-aliases/Transaction.md)
 - [UpdatableTransactionFields](type-aliases/UpdatableTransactionFields.md)
+
+## Variables
+
+- [BASE\_API\_URL](variables/BASE_API_URL.md)
+- [PULSAR\_HISTORY\_ENDPOINT](variables/PULSAR_HISTORY_ENDPOINT.md)
+- [PULSAR\_SYNC\_ENDPOINT](variables/PULSAR_SYNC_ENDPOINT.md)

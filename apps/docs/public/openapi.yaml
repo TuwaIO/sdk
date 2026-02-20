@@ -1,13 +1,633 @@
 openapi: 3.1.0
 info:
-  title: Quasar Engine API
+  title: Quasar Cloud API
   version: 1.0.0
+  description: The Quasar Cloud API powers the TUWA SDK, providing endpoints for blockchain transaction lifecycle
+    management — syncing, updating, and querying transactions across EVM, Solana, and Starknet chains. All requests are
+    authenticated through the Iron Dome security perimeter.
+  contact:
+    name: TUWA Team
+    url: https://github.com/TuwaIO
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
 servers:
   - url: https://api.tuwa.io
+    description: Production
+tags:
+  - name: Pulsar Engine
+    description: Transaction sync and history endpoints.
+components:
+  securitySchemes:
+    IronDomeAuth:
+      type: apiKey
+      in: header
+      name: x-tuwa-secret-key
+      description: Server-side secret key starting with `sk_live_`. Passed through the Iron Dome security perimeter.
+  schemas:
+    TuwaErrorState:
+      type: object
+      properties:
+        message:
+          type: string
+        raw:
+          type: object
+          additionalProperties: {}
+      required:
+        - message
+        - raw
+      description: Error details if the transaction failed.
+    TransactionStatus:
+      type: string
+      enum:
+        - Failed
+        - Success
+        - Replaced
+      description: Terminal status of a processed transaction.
+    TransactionTracker:
+      type: string
+      enum:
+        - ethereum
+        - safe
+        - gelato
+        - solana
+      description: The tracking strategy used for monitoring the transaction.
+    EvmTransaction:
+      type: object
+      properties:
+        chainId:
+          anyOf:
+            - type: number
+            - type: string
+          description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
+        connectorType:
+          type: string
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        description:
+          anyOf:
+            - type: string
+            - type: array
+              prefixItems:
+                - type: string
+                - type: string
+                - type: string
+                - type: string
+          description: User-facing description. Single string or [pending, success, error, replaced].
+        error:
+          $ref: "#/components/schemas/TuwaErrorState"
+        finishedTimestamp:
+          type: number
+          description: On-chain timestamp (seconds) when finalized.
+        from:
+          type: string
+          description: Sender's wallet address.
+        isError:
+          type: boolean
+          description: Whether the transaction is in a failed state.
+        isTrackedModalOpen:
+          type: boolean
+        localTimestamp:
+          type: number
+          description: Local timestamp (seconds) when initiated by user.
+        payload:
+          type: object
+          additionalProperties: {}
+          description: Arbitrary custom data associated with the transaction.
+        pending:
+          type: boolean
+          description: Whether the transaction is awaiting on-chain confirmation.
+        status:
+          $ref: "#/components/schemas/TransactionStatus"
+        title:
+          anyOf:
+            - type: string
+            - type: array
+              prefixItems:
+                - type: string
+                - type: string
+                - type: string
+                - type: string
+          description: User-facing title. Single string or [pending, success, error, replaced].
+        tracker:
+          $ref: "#/components/schemas/TransactionTracker"
+        txKey:
+          type: string
+          description: Unique transaction identifier assigned by Quasar.
+        type:
+          type: string
+          description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
+        adapter:
+          type: string
+          enum:
+            - evm
+        hash:
+          type: string
+          pattern: ^0x[a-fA-F0-9]*$
+          description: On-chain transaction hash (0x-prefixed).
+        input:
+          type: string
+          pattern: ^0x[a-fA-F0-9]*$
+          description: Contract interaction data payload (0x-prefixed).
+        maxFeePerGas:
+          type: string
+          description: EIP-1559 max fee per gas (wei).
+        maxPriorityFeePerGas:
+          type: string
+          description: EIP-1559 max priority fee per gas (wei).
+        nonce:
+          type: number
+          description: Transaction nonce.
+        replacedTxHash:
+          type: string
+          pattern: ^0x[a-fA-F0-9]*$
+          description: Hash of the transaction this one replaced.
+        to:
+          type: string
+          pattern: ^0x[a-fA-F0-9]*$
+          description: Recipient's address or contract address.
+        value:
+          type: string
+          description: Native currency amount in wei.
+      required:
+        - chainId
+        - connectorType
+        - from
+        - localTimestamp
+        - pending
+        - tracker
+        - txKey
+        - type
+        - adapter
+    SolanaTransaction:
+      type: object
+      properties:
+        chainId:
+          anyOf:
+            - type: number
+            - type: string
+          description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
+        connectorType:
+          type: string
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        description:
+          anyOf:
+            - type: string
+            - type: array
+              prefixItems:
+                - type: string
+                - type: string
+                - type: string
+                - type: string
+          description: User-facing description. Single string or [pending, success, error, replaced].
+        error:
+          $ref: "#/components/schemas/TuwaErrorState"
+        finishedTimestamp:
+          type: number
+          description: On-chain timestamp (seconds) when finalized.
+        from:
+          type: string
+          description: Sender's wallet address.
+        isError:
+          type: boolean
+          description: Whether the transaction is in a failed state.
+        isTrackedModalOpen:
+          type: boolean
+        localTimestamp:
+          type: number
+          description: Local timestamp (seconds) when initiated by user.
+        payload:
+          type: object
+          additionalProperties: {}
+          description: Arbitrary custom data associated with the transaction.
+        pending:
+          type: boolean
+          description: Whether the transaction is awaiting on-chain confirmation.
+        status:
+          $ref: "#/components/schemas/TransactionStatus"
+        title:
+          anyOf:
+            - type: string
+            - type: array
+              prefixItems:
+                - type: string
+                - type: string
+                - type: string
+                - type: string
+          description: User-facing title. Single string or [pending, success, error, replaced].
+        tracker:
+          $ref: "#/components/schemas/TransactionTracker"
+        txKey:
+          type: string
+          description: Unique transaction identifier assigned by Quasar.
+        type:
+          type: string
+          description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
+        adapter:
+          type: string
+          enum:
+            - solana
+        confirmations:
+          anyOf:
+            - type: number
+            - type: string
+            - type: "null"
+            - type: "null"
+          description: Number of confirmations or finality status.
+        fee:
+          type: number
+          description: Transaction fee in lamports.
+        instructions:
+          type: array
+          items: {}
+          description: Transaction instructions.
+        recentBlockhash:
+          type: string
+          description: Recent blockhash used.
+        rpcUrl:
+          type: string
+          description: RPC URL used for submission.
+        slot:
+          type: number
+          description: Slot in which the transaction was processed.
+      required:
+        - chainId
+        - connectorType
+        - from
+        - localTimestamp
+        - pending
+        - tracker
+        - txKey
+        - type
+        - adapter
+    StarknetTransaction:
+      type: object
+      properties:
+        chainId:
+          anyOf:
+            - type: number
+            - type: string
+          description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
+        connectorType:
+          type: string
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        description:
+          anyOf:
+            - type: string
+            - type: array
+              prefixItems:
+                - type: string
+                - type: string
+                - type: string
+                - type: string
+          description: User-facing description. Single string or [pending, success, error, replaced].
+        error:
+          $ref: "#/components/schemas/TuwaErrorState"
+        finishedTimestamp:
+          type: number
+          description: On-chain timestamp (seconds) when finalized.
+        from:
+          type: string
+          description: Sender's wallet address.
+        isError:
+          type: boolean
+          description: Whether the transaction is in a failed state.
+        isTrackedModalOpen:
+          type: boolean
+        localTimestamp:
+          type: number
+          description: Local timestamp (seconds) when initiated by user.
+        payload:
+          type: object
+          additionalProperties: {}
+          description: Arbitrary custom data associated with the transaction.
+        pending:
+          type: boolean
+          description: Whether the transaction is awaiting on-chain confirmation.
+        status:
+          $ref: "#/components/schemas/TransactionStatus"
+        title:
+          anyOf:
+            - type: string
+            - type: array
+              prefixItems:
+                - type: string
+                - type: string
+                - type: string
+                - type: string
+          description: User-facing title. Single string or [pending, success, error, replaced].
+        tracker:
+          $ref: "#/components/schemas/TransactionTracker"
+        txKey:
+          type: string
+          description: Unique transaction identifier assigned by Quasar.
+        type:
+          type: string
+          description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
+        adapter:
+          type: string
+          enum:
+            - starknet
+        actualFee:
+          type: object
+          properties:
+            amount:
+              type: string
+            unit:
+              type: string
+          required:
+            - amount
+            - unit
+          description: Actual fee paid for the transaction.
+        contractAddress:
+          type: string
+          description: Contract address interacted with.
+      required:
+        - chainId
+        - connectorType
+        - from
+        - localTimestamp
+        - pending
+        - tracker
+        - txKey
+        - type
+        - adapter
+    Transaction:
+      oneOf:
+        - $ref: "#/components/schemas/EvmTransaction"
+        - $ref: "#/components/schemas/SolanaTransaction"
+        - $ref: "#/components/schemas/StarknetTransaction"
+      discriminator:
+        propertyName: adapter
+        mapping:
+          evm: "#/components/schemas/EvmTransaction"
+          solana: "#/components/schemas/SolanaTransaction"
+          starknet: "#/components/schemas/StarknetTransaction"
+      description: A blockchain transaction tracked by Pulsar. Discriminated by `adapter` field.
+    CreateTransactionRequest:
+      oneOf:
+        - $ref: "#/components/schemas/EvmTransaction"
+        - $ref: "#/components/schemas/SolanaTransaction"
+        - $ref: "#/components/schemas/StarknetTransaction"
+      discriminator:
+        propertyName: adapter
+        mapping:
+          evm: "#/components/schemas/EvmTransaction"
+          solana: "#/components/schemas/SolanaTransaction"
+          starknet: "#/components/schemas/StarknetTransaction"
+      description: Request body for syncing a new pending transaction to the cloud.
+    UpdateTransactionRequest:
+      type: object
+      properties:
+        txKey:
+          type: string
+          description: The unique transaction key to update.
+        to:
+          type: string
+          pattern: ^0x[a-fA-F0-9]*$
+        nonce:
+          type: number
+        pending:
+          type: boolean
+        hash:
+          type: string
+          pattern: ^0x[a-fA-F0-9]*$
+        status:
+          $ref: "#/components/schemas/TransactionStatus"
+        replacedTxHash:
+          type: string
+          pattern: ^0x[a-fA-F0-9]*$
+        error:
+          $ref: "#/components/schemas/TuwaErrorState"
+        finishedTimestamp:
+          type: number
+        isTrackedModalOpen:
+          type: boolean
+        isError:
+          type: boolean
+        maxPriorityFeePerGas:
+          type: string
+        maxFeePerGas:
+          type: string
+        input:
+          type: string
+          pattern: ^0x[a-fA-F0-9]*$
+        value:
+          type: string
+        slot:
+          type: number
+        confirmations:
+          anyOf:
+            - type: number
+            - type: string
+            - type: "null"
+            - type: "null"
+        fee:
+          type: number
+        instructions:
+          type: array
+          items: {}
+        recentBlockhash:
+          type: string
+        rpcUrl:
+          type: string
+      required:
+        - txKey
+      description: Request body for updating an existing transaction. Only `txKey` is required; all other fields are optional
+        patches.
+    SuccessCreateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        txKey:
+          type: string
+          description: The unique key assigned to the synced transaction.
+      required:
+        - success
+        - txKey
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+      required:
+        - success
+    PaginatedHistoryResponse:
+      type: object
+      properties:
+        docs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+          description: Array of transaction documents for the current page.
+        totalDocs:
+          type: number
+          description: Total matching documents across all pages.
+        totalPages:
+          type: number
+          description: Total number of pages.
+        page:
+          type: number
+          description: Current page number (1-indexed).
+        hasNextPage:
+          type: boolean
+          description: Whether a next page exists.
+        hasPrevPage:
+          type: boolean
+          description: Whether a previous page exists.
+      required:
+        - docs
+        - totalDocs
+        - totalPages
+        - page
+        - hasNextPage
+        - hasPrevPage
+      description: Paginated response containing transaction history.
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Human-readable error message.
+      required:
+        - error
+  parameters: {}
 paths:
-  /api/v1/engine/tx-sync:
+  /api/v1/engine/pulsar/sync:
     post:
-      summary: Sync Transaction
+      summary: Sync a new pending transaction
+      description: Creates a new transaction entry in the Quasar Cloud. The full transaction object is required.
+      tags:
+        - Pulsar Engine
+      security:
+        - IronDomeAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTransactionRequest"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Transaction synced successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessCreateResponse"
+        "401":
+          description: Authentication failed — invalid or missing secret key.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden — key lacks required scope.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error — malformed request body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      summary: Update an existing transaction
+      description: Updates one or more mutable fields of an existing transaction identified by `txKey`.
+      tags:
+        - Pulsar Engine
+      security:
+        - IronDomeAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTransactionRequest"
+      responses:
+        "200":
+          description: Transaction updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Authentication failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Transaction not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/engine/pulsar/history:
+    get:
+      summary: Retrieve transaction history
+      description: Returns paginated transaction history with optional filters for chain, status, and specific transaction key.
+      tags:
+        - Pulsar Engine
+      security:
+        - IronDomeAuth: []
+      parameters:
+        - schema:
+            type:
+              - number
+              - "null"
+            default: 1
+            description: Page number (1-indexed).
+            example: 1
+          required: false
+          name: page
+          in: query
+        - schema:
+            type:
+              - number
+              - "null"
+            default: 10
+            description: Results per page.
+            example: 10
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            description: Filter by chain ID.
+            example: "1"
+          required: false
+          name: chainId
+          in: query
+        - schema:
+            type: string
+            description: Filter by transaction status.
+            example: Success
+          required: false
+          name: status
+          in: query
+        - schema:
+            type: string
+            description: Filter by specific transaction key.
+          required: false
+          name: txKey
+          in: query
+      responses:
+        "200":
+          description: Paginated transaction history.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedHistoryResponse"
+        "401":
+          description: Authentication failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+webhooks: {}

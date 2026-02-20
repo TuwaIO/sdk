@@ -7,6 +7,7 @@
 
 import { type FetchError, type FetchOptions, ofetch } from 'ofetch';
 
+import { BASE_API_URL } from '../constants';
 import { QuasarConfig } from '../types';
 
 /**
@@ -83,7 +84,7 @@ export class QuasarClient {
       throw new Error('[Quasar SDK] Missing API Key. Provide a secretKey starting with sk_live_.');
     }
     this.secretKey = config.secretKey;
-    this.baseUrl = config.baseUrl || 'https://api.tuwa.io';
+    this.baseUrl = config.baseUrl || BASE_API_URL;
     this.timeout = config.timeout || 10000;
   }
 
