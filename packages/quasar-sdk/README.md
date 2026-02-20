@@ -9,7 +9,8 @@
 ## Installation
 
 ```bash
-pnpm add @tuwaio/quasar-sdk
+# Using pnpm (recommended), but you can use npm, yarn or bun as well
+pnpm add @tuwaio/quasar-sdk ofetch
 ```
 
 ### Peer Dependencies
