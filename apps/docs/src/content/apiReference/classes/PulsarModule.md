@@ -4,7 +4,7 @@
 
 # PulsarModule
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:36](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/modules/pulsar/index.ts#L36)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:36](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/modules/pulsar/index.ts#L36)
 
 Pulsar module — the transaction engine interface for Quasar Cloud.
 
@@ -37,7 +37,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 > **new PulsarModule**(`client`): `PulsarModule`
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:43](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/modules/pulsar/index.ts#L43)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:43](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/modules/pulsar/index.ts#L43)
 
 **`Internal`**
 
@@ -61,7 +61,7 @@ The internal [QuasarClient](#) instance for making authenticated API calls.
 
 > **getHistory**(`query?`): `Promise`\<[`PaginatedResult`](../interfaces/PaginatedResult.md)\<[`Transaction`](../type-aliases/Transaction.md)\>\>
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:122](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/modules/pulsar/index.ts#L122)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:97](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/modules/pulsar/index.ts#L97)
 
 Retrieves paginated transaction history from the Quasar Cloud.
 
@@ -107,7 +107,7 @@ for (const tx of result.docs) {
 
 > **syncCreate**(`tx`): `Promise`\<\{ `success`: `true`; `txKey`: `string`; \}\>
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:66](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/modules/pulsar/index.ts#L66)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:66](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/modules/pulsar/index.ts#L66)
 
 Syncs a newly created pending transaction to the Quasar Cloud.
 
@@ -141,50 +141,5 @@ const { txKey } = await quasar.pulsar.syncCreate({
   status: 'pending',
   from: '0x123...',
   to: '0x456...',
-});
-```
-
-***
-
-### syncUpdate()
-
-> **syncUpdate**(`txKey`, `patches`): `Promise`\<\{ `success`: `true`; \}\>
-
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:91](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/modules/pulsar/index.ts#L91)
-
-Updates an existing transaction's status or mutable fields.
-
-Sends a PATCH request to the `tx-sync` endpoint with the transaction key
-and the fields to update.
-
-#### Parameters
-
-##### txKey
-
-`string`
-
-The unique transaction key assigned by Quasar during [syncCreate](#synccreate).
-
-##### patches
-
-[`UpdatableTransactionFields`](../type-aliases/UpdatableTransactionFields.md)
-
-An object containing the fields to update (e.g. `status`, `blockNumber`).
-
-#### Returns
-
-`Promise`\<\{ `success`: `true`; \}\>
-
-An object containing `success: true` on successful update.
-
-#### Throws
-
-On authentication failure, invalid txKey, or network issue.
-
-#### Example
-
-```typescript
-await quasar.pulsar.syncUpdate('tx_abc123', {
-  status: 'confirmed',
 });
 ```

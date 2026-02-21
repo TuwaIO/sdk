@@ -291,39 +291,6 @@ registry.registerPath({
 });
 
 registry.registerPath({
-  method: 'patch',
-  path: PULSAR_SYNC_ENDPOINT,
-  summary: 'Update an existing transaction',
-  description: 'Updates one or more mutable fields of an existing transaction identified by `txKey`.',
-  tags: ['Pulsar Engine'],
-  security: [{ [ironDomeAuth.name]: [] }],
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: UpdateTransactionRequestSchema,
-        },
-      },
-      required: true,
-    },
-  },
-  responses: {
-    200: {
-      description: 'Transaction updated successfully.',
-      content: { 'application/json': { schema: SuccessResponseSchema } },
-    },
-    401: {
-      description: 'Authentication failed.',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
-    },
-    404: {
-      description: 'Transaction not found.',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
-    },
-  },
-});
-
-registry.registerPath({
   method: 'get',
   path: PULSAR_HISTORY_ENDPOINT,
   summary: 'Retrieve transaction history',

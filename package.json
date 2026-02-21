@@ -32,7 +32,7 @@
     }
   ],
   "devDependencies": {
-    "@tuwaio/pulsar-core": "1.0.0-fix-remote-alpha.2.3ed5f1e",
+    "@tuwaio/pulsar-core": "1.0.0-fix-remote-alpha.3.7a35efe",
     "@tuwaio/orbit-core": "^0.2.7",
     "@types/node": "^25.3.0",
     "@asteasolutions/zod-to-openapi": "^7.3.0",

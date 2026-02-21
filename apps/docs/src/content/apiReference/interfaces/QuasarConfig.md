@@ -4,7 +4,7 @@
 
 # QuasarConfig
 
-Defined in: [packages/quasar-sdk/src/types.ts:22](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/types.ts#L22)
+Defined in: [packages/quasar-sdk/src/types.ts:22](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/types.ts#L22)
 
 Configuration options for initializing the [Quasar](../classes/Quasar.md) SDK client.
 
@@ -24,7 +24,7 @@ const config: QuasarConfig = {
 
 > `optional` **baseUrl**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:37](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/types.ts#L37)
+Defined in: [packages/quasar-sdk/src/types.ts:37](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/types.ts#L37)
 
 The base URL of the Quasar Cloud API.
 
@@ -38,7 +38,7 @@ The base URL of the Quasar Cloud API.
 
 > **secretKey**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:30](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/types.ts#L30)
+Defined in: [packages/quasar-sdk/src/types.ts:30](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/types.ts#L30)
 
 Your secret API key starting with `sk_live_`.
 
@@ -53,7 +53,7 @@ It **MUST** be kept secure on the server side — never expose it in client bund
 
 > `optional` **timeout**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:44](https://github.com/TuwaIO/sdk/blob/32138154b3282b03f5cfe2de623cd732cd3ee087/packages/quasar-sdk/src/types.ts#L44)
+Defined in: [packages/quasar-sdk/src/types.ts:44](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/types.ts#L44)
 
 Request timeout in milliseconds.
 

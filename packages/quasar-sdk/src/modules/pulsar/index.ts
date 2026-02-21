@@ -7,7 +7,7 @@
 
 import { PULSAR_HISTORY_ENDPOINT, PULSAR_SYNC_ENDPOINT } from '../../constants';
 import type { QuasarClient } from '../../core/client';
-import type { HistoryQuery, PaginatedResult, Transaction, UpdatableTransactionFields } from '../../types';
+import type { HistoryQuery, PaginatedResult, Transaction } from '../../types';
 
 /**
  * Pulsar module — the transaction engine interface for Quasar Cloud.
@@ -67,31 +67,6 @@ export class PulsarModule {
     return this.client.request(PULSAR_SYNC_ENDPOINT, {
       method: 'POST',
       body: tx,
-    });
-  }
-
-  /**
-   * Updates an existing transaction's status or mutable fields.
-   *
-   * Sends a PATCH request to the `tx-sync` endpoint with the transaction key
-   * and the fields to update.
-   *
-   * @param txKey - The unique transaction key assigned by Quasar during {@link syncCreate}.
-   * @param patches - An object containing the fields to update (e.g. `status`, `blockNumber`).
-   * @returns An object containing `success: true` on successful update.
-   * @throws {QuasarSDKError} On authentication failure, invalid txKey, or network issue.
-   *
-   * @example
-   * ```typescript
-   * await quasar.pulsar.syncUpdate('tx_abc123', {
-   *   status: 'confirmed',
-   * });
-   * ```
-   */
-  async syncUpdate(txKey: string, patches: UpdatableTransactionFields): Promise<{ success: true }> {
-    return this.client.request(PULSAR_SYNC_ENDPOINT, {
-      method: 'PATCH',
-      body: { txKey, ...patches },
     });
   }
 
