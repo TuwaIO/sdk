@@ -88,6 +88,11 @@ export interface HistoryQuery {
    * Filter by a specific transaction key (unique identifier assigned by Quasar).
    */
   txKey?: string;
+
+  /**
+   * Filter by a specific app name.
+   */
+  appName?: string;
 }
 
 /**

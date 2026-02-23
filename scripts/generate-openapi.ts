@@ -78,6 +78,7 @@ const HexStringSchema = z
 
 // --- Base Transaction ---
 const BaseTransactionSchema = z.object({
+  appName: z.string().optional(),
   chainId: z
     .union([z.number(), z.string()])
     .openapi({ description: 'Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).' }),

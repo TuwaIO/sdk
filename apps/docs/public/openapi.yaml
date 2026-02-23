@@ -55,6 +55,8 @@ components:
     EvmTransaction:
       type: object
       properties:
+        appName:
+          type: string
         chainId:
           anyOf:
             - type: number
@@ -161,6 +163,8 @@ components:
     SolanaTransaction:
       type: object
       properties:
+        appName:
+          type: string
         chainId:
           anyOf:
             - type: number
@@ -262,6 +266,8 @@ components:
     StarknetTransaction:
       type: object
       properties:
+        appName:
+          type: string
         chainId:
           anyOf:
             - type: number

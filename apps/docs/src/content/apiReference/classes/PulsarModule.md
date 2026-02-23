@@ -4,7 +4,7 @@
 
 # PulsarModule
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:36](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/modules/pulsar/index.ts#L36)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:36](https://github.com/TuwaIO/sdk/blob/f832f9550fc9f6dbd72698a88a3a7100d3a5db26/packages/quasar-sdk/src/modules/pulsar/index.ts#L36)
 
 Pulsar module — the transaction engine interface for Quasar Cloud.
 
@@ -37,7 +37,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 > **new PulsarModule**(`client`): `PulsarModule`
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:43](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/modules/pulsar/index.ts#L43)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:43](https://github.com/TuwaIO/sdk/blob/f832f9550fc9f6dbd72698a88a3a7100d3a5db26/packages/quasar-sdk/src/modules/pulsar/index.ts#L43)
 
 **`Internal`**
 
@@ -61,7 +61,7 @@ The internal [QuasarClient](#) instance for making authenticated API calls.
 
 > **getHistory**(`query?`): `Promise`\<[`PaginatedResult`](../interfaces/PaginatedResult.md)\<[`Transaction`](../type-aliases/Transaction.md)\>\>
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:97](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/modules/pulsar/index.ts#L97)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:101](https://github.com/TuwaIO/sdk/blob/f832f9550fc9f6dbd72698a88a3a7100d3a5db26/packages/quasar-sdk/src/modules/pulsar/index.ts#L101)
 
 Retrieves paginated transaction history from the Quasar Cloud.
 
@@ -105,9 +105,9 @@ for (const tx of result.docs) {
 
 ### syncCreate()
 
-> **syncCreate**(`tx`): `Promise`\<\{ `success`: `true`; `txKey`: `string`; \}\>
+> **syncCreate**(`tx`, `appName?`): `Promise`\<\{ `success`: `true`; `txKey`: `string`; \}\>
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:66](https://github.com/TuwaIO/sdk/blob/4500c640df3b8017f3e8676e234bb99e89959e0f/packages/quasar-sdk/src/modules/pulsar/index.ts#L66)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:67](https://github.com/TuwaIO/sdk/blob/f832f9550fc9f6dbd72698a88a3a7100d3a5db26/packages/quasar-sdk/src/modules/pulsar/index.ts#L67)
 
 Syncs a newly created pending transaction to the Quasar Cloud.
 
@@ -121,6 +121,12 @@ The server assigns a unique `txKey` that can be used for subsequent updates.
 [`Transaction`](../type-aliases/Transaction.md)
 
 The complete transaction object to sync.
+
+##### appName?
+
+`string`
+
+The application name for filtering by.
 
 #### Returns
 

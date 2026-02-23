@@ -49,6 +49,7 @@ export class PulsarModule {
    * The server assigns a unique `txKey` that can be used for subsequent updates.
    *
    * @param tx - The complete transaction object to sync.
+   * @param appName - The application name for filtering by.
    * @returns An object containing `success: true` and the assigned `txKey`.
    * @throws {QuasarSDKError} On authentication failure, validation error, or network issue.
    *
@@ -63,10 +64,13 @@ export class PulsarModule {
    * });
    * ```
    */
-  async syncCreate(tx: Transaction): Promise<{ success: true; txKey: string }> {
+  async syncCreate(tx: Transaction, appName?: string): Promise<{ success: true; txKey: string }> {
     return this.client.request(PULSAR_SYNC_ENDPOINT, {
       method: 'POST',
-      body: tx,
+      body: {
+        ...tx,
+        appName,
+      },
     });
   }
 
@@ -103,6 +107,7 @@ export class PulsarModule {
         chainId: query.chainId,
         status: query.status,
         txKey: query.txKey,
+        appName: query.appName,
       },
     });
   }
