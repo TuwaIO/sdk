@@ -25,33 +25,18 @@ components:
       name: x-tuwa-secret-key
       description: Server-side secret key starting with `sk_live_`. Passed through the Iron Dome security perimeter.
   schemas:
-    TuwaErrorState:
-      type: object
-      properties:
-        message:
-          type: string
-        raw:
-          type: object
-          additionalProperties: {}
-      required:
-        - message
-        - raw
-      description: Error details if the transaction failed.
-    TransactionStatus:
-      type: string
-      enum:
-        - Failed
-        - Success
-        - Replaced
-      description: Terminal status of a processed transaction.
-    TransactionTracker:
-      type: string
-      enum:
-        - ethereum
-        - safe
-        - gelato
-        - solana
-      description: The tracking strategy used for monitoring the transaction.
+    Transaction:
+      oneOf:
+        - $ref: "#/components/schemas/EvmTransaction"
+        - $ref: "#/components/schemas/SolanaTransaction"
+        - $ref: "#/components/schemas/StarknetTransaction"
+      discriminator:
+        propertyName: adapter
+        mapping:
+          evm: "#/components/schemas/EvmTransaction"
+          solana: "#/components/schemas/SolanaTransaction"
+          starknet: "#/components/schemas/StarknetTransaction"
+      description: A blockchain transaction tracked by Pulsar. Discriminated by `adapter` field.
     EvmTransaction:
       type: object
       properties:
@@ -160,6 +145,33 @@ components:
         - txKey
         - type
         - adapter
+    TuwaErrorState:
+      type: object
+      properties:
+        message:
+          type: string
+        raw:
+          type: object
+          additionalProperties: {}
+      required:
+        - message
+        - raw
+      description: Error details if the transaction failed.
+    TransactionStatus:
+      type: string
+      enum:
+        - Failed
+        - Success
+        - Replaced
+      description: Terminal status of a processed transaction.
+    TransactionTracker:
+      type: string
+      enum:
+        - ethereum
+        - safe
+        - gelato
+        - solana
+      description: The tracking strategy used for monitoring the transaction.
     SolanaTransaction:
       type: object
       properties:
@@ -234,7 +246,6 @@ components:
           anyOf:
             - type: number
             - type: string
-            - type: "null"
             - type: "null"
           description: Number of confirmations or finality status.
         fee:
@@ -357,18 +368,6 @@ components:
         - txKey
         - type
         - adapter
-    Transaction:
-      oneOf:
-        - $ref: "#/components/schemas/EvmTransaction"
-        - $ref: "#/components/schemas/SolanaTransaction"
-        - $ref: "#/components/schemas/StarknetTransaction"
-      discriminator:
-        propertyName: adapter
-        mapping:
-          evm: "#/components/schemas/EvmTransaction"
-          solana: "#/components/schemas/SolanaTransaction"
-          starknet: "#/components/schemas/StarknetTransaction"
-      description: A blockchain transaction tracked by Pulsar. Discriminated by `adapter` field.
     CreateTransactionRequest:
       oneOf:
         - $ref: "#/components/schemas/EvmTransaction"
@@ -425,7 +424,6 @@ components:
           anyOf:
             - type: number
             - type: string
-            - type: "null"
             - type: "null"
         fee:
           type: number
@@ -559,6 +557,7 @@ paths:
             description: Page number (1-indexed).
             example: 1
           required: false
+          description: Page number (1-indexed).
           name: page
           in: query
         - schema:
@@ -569,6 +568,7 @@ paths:
             description: Results per page.
             example: 10
           required: false
+          description: Results per page.
           name: limit
           in: query
         - schema:
@@ -576,6 +576,7 @@ paths:
             description: Filter by chain ID.
             example: "1"
           required: false
+          description: Filter by chain ID.
           name: chainId
           in: query
         - schema:
@@ -583,12 +584,14 @@ paths:
             description: Filter by transaction status.
             example: Success
           required: false
+          description: Filter by transaction status.
           name: status
           in: query
         - schema:
             type: string
             description: Filter by specific transaction key.
           required: false
+          description: Filter by specific transaction key.
           name: txKey
           in: query
       responses:
