@@ -108,6 +108,7 @@ export class PulsarModule {
         status: query.status,
         txKey: query.txKey,
         appName: query.appName,
+        walletAddress: query.walletAddress,
       },
     });
   }

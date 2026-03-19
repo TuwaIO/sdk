@@ -93,6 +93,11 @@ export interface HistoryQuery {
    * Filter by a specific app name.
    */
   appName?: string;
+
+  /**
+   * Filter by a specific wallet address.
+   */
+  walletAddress?: string;
 }
 
 /**
