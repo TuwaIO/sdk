@@ -501,7 +501,7 @@ components:
         - error
   parameters: {}
 paths:
-  /api/v1/engine/pulsar/sync:
+  /v1/engine/pulsar/sync:
     post:
       summary: Sync a new pending transaction
       description: Creates a new transaction entry in the Quasar Cloud. The full transaction object is required.
@@ -540,7 +540,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /api/v1/engine/pulsar/history:
+  /v1/engine/pulsar/history:
     get:
       summary: Retrieve transaction history
       description: Returns paginated transaction history with optional filters for chain, status, and specific transaction key.
