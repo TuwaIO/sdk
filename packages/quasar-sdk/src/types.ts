@@ -14,6 +14,7 @@ import type { Transaction, UpdatableTransactionFields } from '@tuwaio/pulsar-cor
  * ```typescript
  * const config: QuasarConfig = {
  *   secretKey: 'sk_live_abc123...',
+ *   internalSecret: 'int_secret_abc123...',
  *   baseUrl: 'https://api.tuwa.io',
  *   timeout: 15000,
  * };
@@ -28,6 +29,15 @@ export interface QuasarConfig {
    * It **MUST** be kept secure on the server side — never expose it in client bundles.
    */
   secretKey: string;
+
+  /**
+   * Optional internal secret sent as `x-internal-secret` header on every request.
+   *
+   * @remarks
+   * If provided, the SDK automatically includes it in outgoing requests.
+   * If omitted, the header is not added.
+   */
+  internalSecret?: string;
 
   /**
    * The base URL of the Quasar Cloud API.

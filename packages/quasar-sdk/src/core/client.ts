@@ -55,7 +55,8 @@ export class QuasarSDKError extends Error {
  * Internal HTTP client for the Quasar Cloud API.
  *
  * Manages authenticated requests by injecting the `x-tuwa-secret-key` header
- * into every outgoing request. Uses `ofetch` as the transport layer.
+ * into every outgoing request. Optionally injects `x-internal-secret`
+ * when it is provided in the SDK config. Uses `ofetch` as the transport layer.
  *
  * @remarks
  * This class is not exported from the public API surface.
@@ -66,6 +67,9 @@ export class QuasarSDKError extends Error {
 export class QuasarClient {
   /** The secret API key used for authentication. */
   private readonly secretKey: string;
+
+  /** Optional internal secret sent as `x-internal-secret` when provided. */
+  private readonly internalSecret?: string;
 
   /** The base URL for all API requests. */
   private readonly baseUrl: string;
@@ -83,7 +87,9 @@ export class QuasarClient {
     if (!config.secretKey) {
       throw new Error('[Quasar SDK] Missing API Key. Provide a secretKey starting with sk_live_.');
     }
+
     this.secretKey = config.secretKey;
+    this.internalSecret = config.internalSecret;
     this.baseUrl = config.baseUrl || BASE_API_URL;
     this.timeout = config.timeout || 10000;
   }
@@ -92,7 +98,8 @@ export class QuasarClient {
    * Sends an authenticated request to the Quasar Cloud API.
    *
    * Automatically injects Iron Dome headers (`x-tuwa-secret-key`, `Content-Type`)
-   * and wraps all transport errors into {@link QuasarSDKError}.
+   * and optionally injects `x-internal-secret` when the SDK was configured with it.
+   * Wraps all transport errors into {@link QuasarSDKError}.
    *
    * @typeParam T - Expected response body type.
    * @param path - API endpoint path (e.g. `/api/v1/engine/tx-sync`).
@@ -110,6 +117,7 @@ export class QuasarClient {
         headers: {
           'Content-Type': 'application/json',
           'x-tuwa-secret-key': this.secretKey,
+          ...(this.internalSecret ? { 'x-internal-secret': this.internalSecret } : {}),
           ...options.headers,
         },
       });
