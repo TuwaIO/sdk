@@ -40,13 +40,13 @@
     }
   ],
   "peerDependencies": {
-    "@tuwaio/pulsar-core": ">=0.5.1",
+    "@tuwaio/pulsar-core": ">=0.6.0",
     "ofetch": ">=1.5.1"
   },
   "devDependencies": {
-    "@tuwaio/pulsar-core": "^0.5.1",
+    "@tuwaio/pulsar-core": "^0.6.0",
     "ofetch": "^1.5.1",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }

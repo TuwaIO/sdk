@@ -82,9 +82,6 @@ const BaseTransactionSchema = z.object({
   chainId: z
     .union([z.number(), z.string()])
     .openapi({ description: 'Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).' }),
-  connectorType: z
-    .string()
-    .openapi({ description: 'Connector used to sign the transaction (e.g. "injected", "walletConnect").' }),
   description: z
     .union([z.string(), z.tuple([z.string(), z.string(), z.string(), z.string()])])
     .optional()
@@ -107,6 +104,15 @@ const BaseTransactionSchema = z.object({
   tracker: TransactionTrackerSchema,
   txKey: z.string().openapi({ description: 'Unique transaction identifier assigned by Quasar.' }),
   type: z.string().openapi({ description: 'Application-specific transaction category (e.g. "SWAP", "APPROVE").' }),
+  connectorType: z
+    .string()
+    .openapi({ description: 'Connector used to sign the transaction (e.g. "injected", "walletConnect").' }),
+  requiredConfirmations: z.number().optional().openapi({ description: 'Number of confirmations required.' }),
+  confirmations: z
+    .union([z.number(), z.string(), z.null()])
+    .optional()
+    .openapi({ description: 'Number of confirmations or finality status.' }),
+  rpcUrl: z.string().optional().openapi({ description: 'RPC URL used for submission.' }),
 });
 
 // PHANTOM TYPE CHECK: Enforces 1:1 alignment with pulsar-core BaseTransaction
@@ -133,14 +139,9 @@ const _checkEvmTx: z.ZodType<EvmTransaction> = EvmTransactionSchema;
 // --- Solana Transaction ---
 const SolanaTransactionSchema = BaseTransactionSchema.extend({
   adapter: z.literal(OrbitAdapter.SOLANA),
-  confirmations: z
-    .union([z.number(), z.string(), z.null()])
-    .optional()
-    .openapi({ description: 'Number of confirmations or finality status.' }),
   fee: z.number().optional().openapi({ description: 'Transaction fee in lamports.' }),
   instructions: z.array(z.unknown()).optional().openapi({ description: 'Transaction instructions.' }),
   recentBlockhash: z.string().optional().openapi({ description: 'Recent blockhash used.' }),
-  rpcUrl: z.string().optional().openapi({ description: 'RPC URL used for submission.' }),
   slot: z.number().optional().openapi({ description: 'Slot in which the transaction was processed.' }),
 }).openapi('SolanaTransaction');
 
@@ -199,9 +200,10 @@ const UpdateTransactionRequestSchema: z.ZodType<UpdatableTransactionFields> = z
     maxFeePerGas: z.string().optional(),
     input: HexStringSchema.optional(),
     value: z.string().optional(),
+    confirmations: z.union([z.number(), z.string(), z.null()]).optional(),
+    requiredConfirmations: z.number().optional(),
     // Updatable Solana fields
     slot: z.number().optional(),
-    confirmations: z.union([z.number(), z.string(), z.null()]).optional(),
     fee: z.number().optional(),
     instructions: z.array(z.unknown()).optional(),
     recentBlockhash: z.string().optional(),

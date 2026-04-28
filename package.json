@@ -4,7 +4,7 @@
   "private": true,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@10.33.2",
   "description": "The official server-side Node.js & Edge SDK for the TUWA Ecosystem.",
   "scripts": {
     "build": "pnpm --filter \"./packages/**\" build",
@@ -31,33 +31,40 @@
       "url": "https://github.com/Argeare5"
     }
   ],
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "typescript": "6.x"
+      }
+    }
+  },
   "devDependencies": {
-    "@tuwaio/pulsar-core": "1.0.0-fix-remote-alpha.3.7a35efe",
-    "@tuwaio/orbit-core": "^0.2.7",
-    "@types/node": "^25.3.3",
-    "@asteasolutions/zod-to-openapi": "^8.4.3",
+    "@tuwaio/pulsar-core": "^0.6.0",
+    "@tuwaio/orbit-core": "^0.2.8",
+    "@types/node": "^25.6.0",
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@eslint/js": "^10.0.1",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/release-notes-generator": "^14.1.0",
-    "eslint": "^10.0.2",
+    "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "globals": "^17.4.0",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "globals": "^17.5.0",
     "husky": "^9.1.7",
-    "prettier": "^3.8.1",
-    "prettier-plugin-tailwindcss": "^0.7.2",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "semantic-release": "^25.0.3",
     "tsx": "^4.21.0",
-    "typedoc": "^0.28.17",
-    "typedoc-plugin-markdown": "^4.10.0",
+    "typedoc": "^0.28.19",
+    "typedoc-plugin-markdown": "^4.11.0",
     "typedoc-plugin-react": "^0.1.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1",
-    "yaml": "^2.8.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.1",
+    "yaml": "^2.8.3",
     "zod": "^4.3.6"
   }
 }

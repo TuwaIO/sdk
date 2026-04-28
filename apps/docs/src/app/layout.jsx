@@ -12,8 +12,7 @@ export const metadata = {
     default: 'TUWA SDK Documentation',
     template: '%s – TUWA SDK',
   },
-  description:
-    'The official documentation for SDK of the TUWA Ecosystem.',
+  description: 'The official documentation for SDK of the TUWA Ecosystem.',
 
   keywords: [
     'headless',

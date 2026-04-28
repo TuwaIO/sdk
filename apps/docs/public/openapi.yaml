@@ -47,9 +47,6 @@ components:
             - type: number
             - type: string
           description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
-        connectorType:
-          type: string
-          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
         description:
           anyOf:
             - type: string
@@ -103,6 +100,21 @@ components:
         type:
           type: string
           description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
+        connectorType:
+          type: string
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        requiredConfirmations:
+          type: number
+          description: Number of confirmations required.
+        confirmations:
+          anyOf:
+            - type: number
+            - type: string
+            - type: "null"
+          description: Number of confirmations or finality status.
+        rpcUrl:
+          type: string
+          description: RPC URL used for submission.
         adapter:
           type: string
           enum:
@@ -137,13 +149,13 @@ components:
           description: Native currency amount in wei.
       required:
         - chainId
-        - connectorType
         - from
         - localTimestamp
         - pending
         - tracker
         - txKey
         - type
+        - connectorType
         - adapter
     TuwaErrorState:
       type: object
@@ -182,9 +194,6 @@ components:
             - type: number
             - type: string
           description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
-        connectorType:
-          type: string
-          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
         description:
           anyOf:
             - type: string
@@ -238,16 +247,25 @@ components:
         type:
           type: string
           description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
-        adapter:
+        connectorType:
           type: string
-          enum:
-            - solana
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        requiredConfirmations:
+          type: number
+          description: Number of confirmations required.
         confirmations:
           anyOf:
             - type: number
             - type: string
             - type: "null"
           description: Number of confirmations or finality status.
+        rpcUrl:
+          type: string
+          description: RPC URL used for submission.
+        adapter:
+          type: string
+          enum:
+            - solana
         fee:
           type: number
           description: Transaction fee in lamports.
@@ -258,21 +276,18 @@ components:
         recentBlockhash:
           type: string
           description: Recent blockhash used.
-        rpcUrl:
-          type: string
-          description: RPC URL used for submission.
         slot:
           type: number
           description: Slot in which the transaction was processed.
       required:
         - chainId
-        - connectorType
         - from
         - localTimestamp
         - pending
         - tracker
         - txKey
         - type
+        - connectorType
         - adapter
     StarknetTransaction:
       type: object
@@ -284,9 +299,6 @@ components:
             - type: number
             - type: string
           description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
-        connectorType:
-          type: string
-          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
         description:
           anyOf:
             - type: string
@@ -340,6 +352,21 @@ components:
         type:
           type: string
           description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
+        connectorType:
+          type: string
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        requiredConfirmations:
+          type: number
+          description: Number of confirmations required.
+        confirmations:
+          anyOf:
+            - type: number
+            - type: string
+            - type: "null"
+          description: Number of confirmations or finality status.
+        rpcUrl:
+          type: string
+          description: RPC URL used for submission.
         adapter:
           type: string
           enum:
@@ -360,13 +387,13 @@ components:
           description: Contract address interacted with.
       required:
         - chainId
-        - connectorType
         - from
         - localTimestamp
         - pending
         - tracker
         - txKey
         - type
+        - connectorType
         - adapter
     CreateTransactionRequest:
       oneOf:
@@ -418,13 +445,15 @@ components:
           pattern: ^0x[a-fA-F0-9]*$
         value:
           type: string
-        slot:
-          type: number
         confirmations:
           anyOf:
             - type: number
             - type: string
             - type: "null"
+        requiredConfirmations:
+          type: number
+        slot:
+          type: number
         fee:
           type: number
         instructions:
