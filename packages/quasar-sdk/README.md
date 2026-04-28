@@ -9,15 +9,16 @@
 ## Installation
 
 ```bash
-pnpm add @tuwaio/quasar-sdk
+# Using pnpm (recommended), but you can use npm, yarn or bun as well
+pnpm add @tuwaio/quasar-sdk ofetch
 ```
 
 ### Peer Dependencies
 
-| Package              | Version   |
-| -------------------- | --------- |
-| `@tuwaio/pulsar-core` | `>=0.5.1` |
-| `ofetch`             | `>=1.5.1` |
+| Package               | Version   |
+| --------------------- | --------- |
+| `@tuwaio/pulsar-core` | `>=0.6.0` |
+| `ofetch`              | `>=1.5.1` |
 
 ## Quick Start
 
@@ -27,7 +28,7 @@ import { Quasar } from '@tuwaio/quasar-sdk';
 const quasar = new Quasar({ secretKey: 'sk_live_your_secret_key' });
 
 // Sync a pending transaction
-const { txKey } = await quasar.pulsar.syncCreate(tx);
+const { txKey } = await quasar.pulsar.syncCreate(tx, 'My Application');
 
 // Update status
 await quasar.pulsar.syncUpdate(txKey, { status: 'confirmed' });
@@ -40,11 +41,11 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 ### Pulsar — `quasar.pulsar`
 
-| Method | Description |
-| --- | --- |
-| `syncCreate(tx)` | Sync a new pending transaction to the cloud |
+| Method                       | Description                                       |
+| ---------------------------- | ------------------------------------------------- |
+| `syncCreate(tx, appName?)`   | Sync a new pending transaction to the cloud       |
 | `syncUpdate(txKey, patches)` | Update an existing transaction's status or fields |
-| `getHistory(query?)` | Retrieve paginated transaction history |
+| `getHistory(query?)`         | Retrieve paginated transaction history            |
 
 ## Error Handling
 
@@ -55,8 +56,8 @@ try {
   await quasar.pulsar.getHistory();
 } catch (err) {
   if (err instanceof QuasarSDKError) {
-    console.error(err.status);        // HTTP status code
-    console.error(err.message);       // Formatted error message
+    console.error(err.status); // HTTP status code
+    console.error(err.message); // Formatted error message
     console.error(err.originalError); // Raw fetch error
   }
 }
@@ -64,11 +65,11 @@ try {
 
 ## Configuration
 
-| Property    | Type     | Required | Default               | Description |
-| ----------- | -------- | -------- | --------------------- | ----------- |
+| Property    | Type     | Required | Default               | Description                       |
+| ----------- | -------- | -------- | --------------------- | --------------------------------- |
 | `secretKey` | `string` | ✅       | —                     | Server-side API key (`sk_live_*`) |
-| `baseUrl`   | `string` | ❌       | `https://api.tuwa.io` | API base URL |
-| `timeout`   | `number` | ❌       | `10000`               | Request timeout (ms) |
+| `baseUrl`   | `string` | ❌       | `https://api.tuwa.io` | API base URL                      |
+| `timeout`   | `number` | ❌       | `10000`               | Request timeout (ms)              |
 
 ## Documentation
 

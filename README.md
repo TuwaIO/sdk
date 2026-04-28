@@ -61,10 +61,10 @@ yarn add @tuwaio/quasar-sdk
 
 The SDK requires the following peer dependencies:
 
-| Package              | Version   |
-| -------------------- | --------- |
+| Package               | Version   |
+| --------------------- | --------- |
 | `@tuwaio/pulsar-core` | `>=0.5.1` |
-| `ofetch`             | `>=1.5.1` |
+| `ofetch`              | `>=1.5.1` |
 
 ---
 
@@ -115,11 +115,11 @@ const quasar = new Quasar(config: QuasarConfig);
 
 The transaction engine interface for the Quasar Cloud.
 
-| Method | Description |
-| --- | --- |
-| `syncCreate(tx)` | Sync a new pending transaction to the cloud |
-| `syncUpdate(txKey, patches)` | Update an existing transaction's status or fields |
-| `getHistory(query?)` | Retrieve paginated transaction history with filters |
+| Method                       | Description                                         |
+| ---------------------------- | --------------------------------------------------- |
+| `syncCreate(tx)`             | Sync a new pending transaction to the cloud         |
+| `syncUpdate(txKey, patches)` | Update an existing transaction's status or fields   |
+| `getHistory(query?)`         | Retrieve paginated transaction history with filters |
 
 ### Error Handling
 
@@ -132,8 +132,8 @@ try {
   await quasar.pulsar.getHistory();
 } catch (err) {
   if (err instanceof QuasarSDKError) {
-    console.error(err.status);        // HTTP status code
-    console.error(err.message);       // Formatted error message
+    console.error(err.status); // HTTP status code
+    console.error(err.message); // Formatted error message
     console.error(err.originalError); // Raw fetch error
   }
 }
@@ -143,11 +143,11 @@ try {
 
 ## Configuration
 
-| Property    | Type     | Required | Default                | Description |
-| ----------- | -------- | -------- | ---------------------- | ----------- |
-| `secretKey` | `string` | ✅       | —                      | Server-side API key (`sk_live_*`) |
-| `baseUrl`   | `string` | ❌       | `https://api.tuwa.io`  | Quasar API base URL |
-| `timeout`   | `number` | ❌       | `10000`                | Request timeout in milliseconds |
+| Property    | Type     | Required | Default               | Description                       |
+| ----------- | -------- | -------- | --------------------- | --------------------------------- |
+| `secretKey` | `string` | ✅       | —                     | Server-side API key (`sk_live_*`) |
+| `baseUrl`   | `string` | ❌       | `https://api.tuwa.io` | Quasar API base URL               |
+| `timeout`   | `number` | ❌       | `10000`               | Request timeout in milliseconds   |
 
 ---
 

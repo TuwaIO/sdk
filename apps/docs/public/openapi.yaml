@@ -25,44 +25,28 @@ components:
       name: x-tuwa-secret-key
       description: Server-side secret key starting with `sk_live_`. Passed through the Iron Dome security perimeter.
   schemas:
-    TuwaErrorState:
-      type: object
-      properties:
-        message:
-          type: string
-        raw:
-          type: object
-          additionalProperties: {}
-      required:
-        - message
-        - raw
-      description: Error details if the transaction failed.
-    TransactionStatus:
-      type: string
-      enum:
-        - Failed
-        - Success
-        - Replaced
-      description: Terminal status of a processed transaction.
-    TransactionTracker:
-      type: string
-      enum:
-        - ethereum
-        - safe
-        - gelato
-        - solana
-      description: The tracking strategy used for monitoring the transaction.
+    Transaction:
+      oneOf:
+        - $ref: "#/components/schemas/EvmTransaction"
+        - $ref: "#/components/schemas/SolanaTransaction"
+        - $ref: "#/components/schemas/StarknetTransaction"
+      discriminator:
+        propertyName: adapter
+        mapping:
+          evm: "#/components/schemas/EvmTransaction"
+          solana: "#/components/schemas/SolanaTransaction"
+          starknet: "#/components/schemas/StarknetTransaction"
+      description: A blockchain transaction tracked by Pulsar. Discriminated by `adapter` field.
     EvmTransaction:
       type: object
       properties:
+        appName:
+          type: string
         chainId:
           anyOf:
             - type: number
             - type: string
           description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
-        connectorType:
-          type: string
-          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
         description:
           anyOf:
             - type: string
@@ -116,6 +100,21 @@ components:
         type:
           type: string
           description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
+        connectorType:
+          type: string
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        requiredConfirmations:
+          type: number
+          description: Number of confirmations required.
+        confirmations:
+          anyOf:
+            - type: number
+            - type: string
+            - type: "null"
+          description: Number of confirmations or finality status.
+        rpcUrl:
+          type: string
+          description: RPC URL used for submission.
         adapter:
           type: string
           enum:
@@ -150,25 +149,51 @@ components:
           description: Native currency amount in wei.
       required:
         - chainId
-        - connectorType
         - from
         - localTimestamp
         - pending
         - tracker
         - txKey
         - type
+        - connectorType
         - adapter
+    TuwaErrorState:
+      type: object
+      properties:
+        message:
+          type: string
+        raw:
+          type: object
+          additionalProperties: {}
+      required:
+        - message
+        - raw
+      description: Error details if the transaction failed.
+    TransactionStatus:
+      type: string
+      enum:
+        - Failed
+        - Success
+        - Replaced
+      description: Terminal status of a processed transaction.
+    TransactionTracker:
+      type: string
+      enum:
+        - ethereum
+        - safe
+        - gelato
+        - solana
+      description: The tracking strategy used for monitoring the transaction.
     SolanaTransaction:
       type: object
       properties:
+        appName:
+          type: string
         chainId:
           anyOf:
             - type: number
             - type: string
           description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
-        connectorType:
-          type: string
-          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
         description:
           anyOf:
             - type: string
@@ -222,17 +247,25 @@ components:
         type:
           type: string
           description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
-        adapter:
+        connectorType:
           type: string
-          enum:
-            - solana
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        requiredConfirmations:
+          type: number
+          description: Number of confirmations required.
         confirmations:
           anyOf:
             - type: number
             - type: string
             - type: "null"
-            - type: "null"
           description: Number of confirmations or finality status.
+        rpcUrl:
+          type: string
+          description: RPC URL used for submission.
+        adapter:
+          type: string
+          enum:
+            - solana
         fee:
           type: number
           description: Transaction fee in lamports.
@@ -243,33 +276,29 @@ components:
         recentBlockhash:
           type: string
           description: Recent blockhash used.
-        rpcUrl:
-          type: string
-          description: RPC URL used for submission.
         slot:
           type: number
           description: Slot in which the transaction was processed.
       required:
         - chainId
-        - connectorType
         - from
         - localTimestamp
         - pending
         - tracker
         - txKey
         - type
+        - connectorType
         - adapter
     StarknetTransaction:
       type: object
       properties:
+        appName:
+          type: string
         chainId:
           anyOf:
             - type: number
             - type: string
           description: Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).
-        connectorType:
-          type: string
-          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
         description:
           anyOf:
             - type: string
@@ -323,6 +352,21 @@ components:
         type:
           type: string
           description: Application-specific transaction category (e.g. "SWAP", "APPROVE").
+        connectorType:
+          type: string
+          description: Connector used to sign the transaction (e.g. "injected", "walletConnect").
+        requiredConfirmations:
+          type: number
+          description: Number of confirmations required.
+        confirmations:
+          anyOf:
+            - type: number
+            - type: string
+            - type: "null"
+          description: Number of confirmations or finality status.
+        rpcUrl:
+          type: string
+          description: RPC URL used for submission.
         adapter:
           type: string
           enum:
@@ -343,26 +387,14 @@ components:
           description: Contract address interacted with.
       required:
         - chainId
-        - connectorType
         - from
         - localTimestamp
         - pending
         - tracker
         - txKey
         - type
+        - connectorType
         - adapter
-    Transaction:
-      oneOf:
-        - $ref: "#/components/schemas/EvmTransaction"
-        - $ref: "#/components/schemas/SolanaTransaction"
-        - $ref: "#/components/schemas/StarknetTransaction"
-      discriminator:
-        propertyName: adapter
-        mapping:
-          evm: "#/components/schemas/EvmTransaction"
-          solana: "#/components/schemas/SolanaTransaction"
-          starknet: "#/components/schemas/StarknetTransaction"
-      description: A blockchain transaction tracked by Pulsar. Discriminated by `adapter` field.
     CreateTransactionRequest:
       oneOf:
         - $ref: "#/components/schemas/EvmTransaction"
@@ -413,14 +445,15 @@ components:
           pattern: ^0x[a-fA-F0-9]*$
         value:
           type: string
-        slot:
-          type: number
         confirmations:
           anyOf:
             - type: number
             - type: string
             - type: "null"
-            - type: "null"
+        requiredConfirmations:
+          type: number
+        slot:
+          type: number
         fee:
           type: number
         instructions:
@@ -497,7 +530,7 @@ components:
         - error
   parameters: {}
 paths:
-  /api/v1/engine/pulsar/sync:
+  /v1/engine/pulsar/sync:
     post:
       summary: Sync a new pending transaction
       description: Creates a new transaction entry in the Quasar Cloud. The full transaction object is required.
@@ -536,39 +569,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-    patch:
-      summary: Update an existing transaction
-      description: Updates one or more mutable fields of an existing transaction identified by `txKey`.
-      tags:
-        - Pulsar Engine
-      security:
-        - IronDomeAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateTransactionRequest"
-      responses:
-        "200":
-          description: Transaction updated successfully.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
-          description: Authentication failed.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Transaction not found.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  /api/v1/engine/pulsar/history:
+  /v1/engine/pulsar/history:
     get:
       summary: Retrieve transaction history
       description: Returns paginated transaction history with optional filters for chain, status, and specific transaction key.
@@ -585,6 +586,7 @@ paths:
             description: Page number (1-indexed).
             example: 1
           required: false
+          description: Page number (1-indexed).
           name: page
           in: query
         - schema:
@@ -595,6 +597,7 @@ paths:
             description: Results per page.
             example: 10
           required: false
+          description: Results per page.
           name: limit
           in: query
         - schema:
@@ -602,6 +605,7 @@ paths:
             description: Filter by chain ID.
             example: "1"
           required: false
+          description: Filter by chain ID.
           name: chainId
           in: query
         - schema:
@@ -609,12 +613,14 @@ paths:
             description: Filter by transaction status.
             example: Success
           required: false
+          description: Filter by transaction status.
           name: status
           in: query
         - schema:
             type: string
             description: Filter by specific transaction key.
           required: false
+          description: Filter by specific transaction key.
           name: txKey
           in: query
       responses:
