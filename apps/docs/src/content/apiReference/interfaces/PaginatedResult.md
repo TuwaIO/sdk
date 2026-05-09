@@ -4,7 +4,7 @@
 
 # PaginatedResult\<T\>
 
-Defined in: [packages/quasar-sdk/src/types.ts:126](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L126)
+Defined in: [packages/quasar-sdk/src/types.ts:126](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L126)
 
 Generic wrapper for paginated API responses.
 
@@ -31,7 +31,7 @@ The type of each document in the result set.
 
 > **docs**: `T`[]
 
-Defined in: [packages/quasar-sdk/src/types.ts:128](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L128)
+Defined in: [packages/quasar-sdk/src/types.ts:128](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L128)
 
 Array of documents for the current page.
 
@@ -41,7 +41,7 @@ Array of documents for the current page.
 
 > **hasNextPage**: `boolean`
 
-Defined in: [packages/quasar-sdk/src/types.ts:140](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L140)
+Defined in: [packages/quasar-sdk/src/types.ts:140](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L140)
 
 Whether a subsequent page exists.
 
@@ -51,7 +51,7 @@ Whether a subsequent page exists.
 
 > **hasPrevPage**: `boolean`
 
-Defined in: [packages/quasar-sdk/src/types.ts:143](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L143)
+Defined in: [packages/quasar-sdk/src/types.ts:143](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L143)
 
 Whether a previous page exists.
 
@@ -61,7 +61,7 @@ Whether a previous page exists.
 
 > **page**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:137](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L137)
+Defined in: [packages/quasar-sdk/src/types.ts:137](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L137)
 
 Current page number (1-indexed).
 
@@ -71,7 +71,7 @@ Current page number (1-indexed).
 
 > **totalDocs**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:131](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L131)
+Defined in: [packages/quasar-sdk/src/types.ts:131](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L131)
 
 Total number of documents matching the query across all pages.
 
@@ -81,6 +81,6 @@ Total number of documents matching the query across all pages.
 
 > **totalPages**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:134](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L134)
+Defined in: [packages/quasar-sdk/src/types.ts:134](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L134)
 
 Total number of available pages.

@@ -4,7 +4,7 @@
   "private": true,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.0.9",
   "description": "The official server-side Node.js & Edge SDK for the TUWA Ecosystem.",
   "scripts": {
     "build": "pnpm --filter \"./packages/**\" build",
@@ -39,21 +39,21 @@
     }
   },
   "devDependencies": {
-    "@tuwaio/pulsar-core": "^0.6.0",
+    "@tuwaio/pulsar-core": "^0.6.1",
     "@tuwaio/orbit-core": "^0.2.8",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.6.2",
     "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@eslint/js": "^10.0.1",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.1.0",
-    "@semantic-release/release-notes-generator": "^14.1.0",
-    "eslint": "^10.2.1",
+    "@semantic-release/release-notes-generator": "^14.1.1",
+    "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-simple-import-sort": "^13.0.0",
-    "globals": "^17.5.0",
+    "globals": "^17.6.0",
     "husky": "^9.1.7",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
@@ -63,8 +63,8 @@
     "typedoc-plugin-markdown": "^4.11.0",
     "typedoc-plugin-react": "^0.1.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.1",
-    "yaml": "^2.8.3",
-    "zod": "^4.3.6"
+    "typescript-eslint": "^8.59.2",
+    "yaml": "^2.8.4",
+    "zod": "^4.4.3"
   }
 }

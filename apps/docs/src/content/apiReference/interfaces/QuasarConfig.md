@@ -4,7 +4,7 @@
 
 # QuasarConfig
 
-Defined in: [packages/quasar-sdk/src/types.ts:23](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L23)
+Defined in: [packages/quasar-sdk/src/types.ts:23](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L23)
 
 Configuration options for initializing the [Quasar](../classes/Quasar.md) SDK client.
 
@@ -25,7 +25,7 @@ const config: QuasarConfig = {
 
 > `optional` **baseUrl?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:47](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L47)
+Defined in: [packages/quasar-sdk/src/types.ts:47](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L47)
 
 The base URL of the Quasar Cloud API.
 
@@ -39,7 +39,7 @@ The base URL of the Quasar Cloud API.
 
 > `optional` **internalSecret?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:40](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L40)
+Defined in: [packages/quasar-sdk/src/types.ts:40](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L40)
 
 Optional internal secret sent as `x-internal-secret` header on every request.
 
@@ -54,7 +54,7 @@ If omitted, the header is not added.
 
 > **secretKey**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:31](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L31)
+Defined in: [packages/quasar-sdk/src/types.ts:31](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L31)
 
 Your secret API key starting with `sk_live_`.
 
@@ -69,7 +69,7 @@ It **MUST** be kept secure on the server side — never expose it in client bund
 
 > `optional` **timeout?**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:54](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/types.ts#L54)
+Defined in: [packages/quasar-sdk/src/types.ts:54](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/types.ts#L54)
 
 Request timeout in milliseconds.
 

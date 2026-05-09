@@ -4,7 +4,7 @@
 
 # Quasar
 
-Defined in: [packages/quasar-sdk/src/index.ts:44](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/index.ts#L44)
+Defined in: [packages/quasar-sdk/src/index.ts:44](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/index.ts#L44)
 
 Main entry point for the Quasar SDK.
 
@@ -32,7 +32,7 @@ const { txKey } = await quasar.pulsar.syncCreate(tx);
 
 > **new Quasar**(`config`): `Quasar`
 
-Defined in: [packages/quasar-sdk/src/index.ts:64](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/index.ts#L64)
+Defined in: [packages/quasar-sdk/src/index.ts:64](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/index.ts#L64)
 
 Creates a new Quasar SDK instance.
 
@@ -58,7 +58,7 @@ If `config.secretKey` is missing.
 
 > `readonly` **pulsar**: [`PulsarModule`](PulsarModule.md)
 
-Defined in: [packages/quasar-sdk/src/index.ts:56](https://github.com/TuwaIO/sdk/blob/c2625042fd8efe75112dc2e68c7dae1f6227d865/packages/quasar-sdk/src/index.ts#L56)
+Defined in: [packages/quasar-sdk/src/index.ts:56](https://github.com/TuwaIO/sdk/blob/86c91658ce8dc11eb9cfeca067985f546573be5b/packages/quasar-sdk/src/index.ts#L56)
 
 The Pulsar Transaction Engine module.
 
