@@ -27,8 +27,8 @@ importers:
         specifier: ^0.2.8
         version: 0.2.8
       '@tuwaio/pulsar-core':
-        specifier: ^0.6.1
-        version: 0.6.1(@tuwaio/orbit-core@0.2.8)(dayjs@1.11.19)(immer@11.1.4)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6)))
+        specifier: ^0.6.2
+        version: 0.6.2(@tuwaio/orbit-core@0.2.8)(dayjs@1.11.19)(immer@11.1.4)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6)))
       '@types/node':
         specifier: ^25.6.2
         version: 25.6.2
@@ -154,8 +154,8 @@ importers:
   packages/quasar-sdk:
     devDependencies:
       '@tuwaio/pulsar-core':
-        specifier: ^0.6.1
-        version: 0.6.1(@tuwaio/orbit-core@0.2.8)(dayjs@1.11.19)(immer@11.1.4)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6)))
+        specifier: ^0.6.2
+        version: 0.6.2(@tuwaio/orbit-core@0.2.8)(dayjs@1.11.19)(immer@11.1.4)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6)))
       ofetch:
         specifier: ^1.5.1
         version: 1.5.1
@@ -1793,8 +1793,8 @@ packages:
   '@tuwaio/orbit-core@0.2.8':
     resolution: {integrity: sha512-PF/OaKhivvddjP6W0a3n8lM0CjrlGx+Qt6qUt8VAeQYmeaLWnOJAtLBb0C/OA8MTpasqA3xFfEsgzRC0jpgrCA==}
 
-  '@tuwaio/pulsar-core@0.6.1':
-    resolution: {integrity: sha512-G6pCGwxv+HoFu3oS+n38TU5WRzN2PruHfF+XNwAyiryqFd/yC5h13puUKuIRsLMgNvB9avHq2wPShOcBHlsFSg==}
+  '@tuwaio/pulsar-core@0.6.2':
+    resolution: {integrity: sha512-kP9U0ZZhpb/8KRjQaZ8g1NsRrgdsxQDgMf5q/j7PXoiVknikDuNaKf6KKVNQp/NiEhExvrBQvqLhzFi6nD9HSA==}
     peerDependencies:
       '@tuwaio/orbit-core': '>=0.2.8'
       dayjs: 1.x.x
@@ -1944,9 +1944,6 @@ packages:
 
   '@types/node@25.2.3':
     resolution: {integrity: sha512-m0jEgYlYz+mDJZ2+F4v8D1AyQb+QzsNqRuI7xg1VQX/KlKS0qT9r1Mo16yo5F/MtifXFgaofIFsdFMox2SxIbQ==}
-
-  '@types/node@25.6.0':
-    resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
 
   '@types/node@25.6.2':
     resolution: {integrity: sha512-sokuT28dxf9JT5Kady1fsXOvI4HVpjZa95NKT5y9PNTIrs2AsobR4GFAA90ZG8M+nxVRLysCXsVj6eGC7Vbrlw==}
@@ -2882,10 +2879,6 @@ packages:
 
   end-of-stream@1.4.5:
     resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
-
-  enhanced-resolve@5.19.0:
-    resolution: {integrity: sha512-phv3E1Xl4tQOShqSte26C7Fl84EwUdZsyOuSSk9qtAGyyQs2s3jJzComh+Abf4g187lUUAvH+H26omrqia2aGg==}
-    engines: {node: '>=10.13.0'}
 
   enhanced-resolve@5.21.1:
     resolution: {integrity: sha512-8p7DUVq6XJnZEz9W4oSwiwycxBIjHjRzYb3Je3zVN+geKTRQKzAkR/K4PBExlS0090d9nshak6phMUxr3PDjmQ==}
@@ -5201,10 +5194,6 @@ packages:
 
   tailwindcss@4.3.0:
     resolution: {integrity: sha512-y6nxMGB1nMW9R6k96e5gdIFzcfL/gTJRNaqGes1YvkLnPVXzWgbqFF2yLC0T8G774n24cx3Pe8XrKoniCOAH+Q==}
-
-  tapable@2.3.0:
-    resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
-    engines: {node: '>=6'}
 
   tapable@2.3.3:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
@@ -7581,7 +7570,7 @@ snapshots:
 
   '@tuwaio/orbit-core@0.2.8': {}
 
-  '@tuwaio/pulsar-core@0.6.1(@tuwaio/orbit-core@0.2.8)(dayjs@1.11.19)(immer@11.1.4)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6)))':
+  '@tuwaio/pulsar-core@0.6.2(@tuwaio/orbit-core@0.2.8)(dayjs@1.11.19)(immer@11.1.4)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6)))':
     dependencies:
       '@tuwaio/orbit-core': 0.2.8
       dayjs: 1.11.19
@@ -7758,10 +7747,6 @@ snapshots:
   '@types/node@25.2.3':
     dependencies:
       undici-types: 7.16.0
-
-  '@types/node@25.6.0':
-    dependencies:
-      undici-types: 7.19.2
 
   '@types/node@25.6.2':
     dependencies:
@@ -8731,11 +8716,6 @@ snapshots:
     dependencies:
       once: 1.4.0
 
-  enhanced-resolve@5.19.0:
-    dependencies:
-      graceful-fs: 4.2.11
-      tapable: 2.3.0
-
   enhanced-resolve@5.21.1:
     dependencies:
       graceful-fs: 4.2.11
@@ -9559,7 +9539,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 25.6.0
+      '@types/node': 25.6.2
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -11557,8 +11537,6 @@ snapshots:
 
   tailwindcss@4.3.0: {}
 
-  tapable@2.3.0: {}
-
   tapable@2.3.3: {}
 
   temp-dir@3.0.0: {}
@@ -12019,7 +11997,7 @@ snapshots:
       acorn-import-phases: 1.0.4(acorn@8.16.0)
       browserslist: 4.28.1
       chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.19.0
+      enhanced-resolve: 5.21.1
       es-module-lexer: 2.0.0
       eslint-scope: 5.1.1
       events: 3.3.0
@@ -12030,7 +12008,7 @@ snapshots:
       mime-types: 2.1.35
       neo-async: 2.6.2
       schema-utils: 4.3.3
-      tapable: 2.3.0
+      tapable: 2.3.3
       terser-webpack-plugin: 5.3.16(webpack@5.105.2)
       watchpack: 2.5.1
       webpack-sources: 3.3.4
