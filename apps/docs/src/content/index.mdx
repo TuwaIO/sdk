@@ -1,45 +1,51 @@
 # Introduction
 
-Welcome to the **TUWA SDK** documentation — the official server-side SDK for the **Quasar Cloud**.
+Welcome to the **TUWA SDK** documentation — the official server-side SDK for the **Quasar Cloud**, featuring built-in React authentication bridges.
 
 ## What is Quasar SDK?
 
-`@tuwaio/quasar-sdk` is a type-safe Node.js & Edge SDK for interacting with the TUWA Quasar Cloud API. It provides a clean, modular interface for blockchain transaction lifecycle management — syncing, updating, and querying transactions across multiple chains.
+`@tuwaio/quasar-sdk` is a type-safe Node.js & Edge SDK for interacting with the TUWA Quasar Cloud API. It provides two main ways to interact with the platform:
+
+1.  **Quasar Client**: A stateful, server-side client for high-level operations like Pulsar transaction syncing.
+2.  **Utils**: A set of stateless, functional utilities for signature verification and security (ideal for both server and browser).
 
 ## Key Features
 
 - 🔐 **Iron Dome Protocol** — every request is authenticated via secret key headers
-- 🛡️ **Mini-Session Verification** — protect your API quota with cryptographic signatures (EVM & Solana)
+- 🛡️ **QuasarAuthBridge** — built-in React component for unified EVM & Solana authentication
 - 📦 **Dual module format** — ships as ESM and CJS
-- 🧩 **Modular architecture** — domain modules (Pulsar) and utilities (Auth)
+- 🧩 **Modular architecture** — isolated modules for Pulsar (Transactions) and Utils (Security)
 - 🔒 **Server-side only** — your secret keys never leak to the browser
 - 📖 **Auto-generated API reference** — TypeDoc annotations powering this docs site
 
-## Quick Start
+## Quick Start (Core & Utils)
 
 ```typescript
-import { Quasar } from '@tuwaio/quasar-sdk';
+import { Quasar, utils } from '@tuwaio/quasar-sdk';
 
-const quasar = new Quasar({
-  secretKey: 'sk_live_your_secret_key',
-});
+// Initialize the client
+const quasar = new Quasar({ secretKey: 'sk_live_...' });
 
-// Sync a pending transaction to the cloud
-const { txKey } = await quasar.pulsar.syncCreate({
-  hash: '0xabc...',
-  chainId: 1,
-  status: 'pending',
-  from: '0x123...',
-  to: '0x456...',
-});
+// Use domain modules
+await quasar.pulsar.syncCreate(transaction);
 
-// Query transaction history with filters
-const history = await quasar.pulsar.getHistory({
-  page: 1,
-  limit: 20,
-  status: 'Success',
-  chainId: 1,
-});
+// Or use stateless utilities directly
+const isValid = await utils.verifyMiniSession(params);
+```
+
+## Quick Start (React)
+
+```tsx
+import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
+
+// Mount within your SatelliteConnectProvider tree to handle signatures
+<QuasarAuthBridge
+  activeConnection={activeConnection}
+  store={store}
+  wagmiConfig={config}
+  session={miniSession}
+  setSession={setMiniSession}
+/>
 ```
 
 ## Installation
@@ -47,8 +53,6 @@ const history = await quasar.pulsar.getHistory({
 ```bash
 pnpm add @tuwaio/quasar-sdk
 ```
-
-Peer dependencies: `@tuwaio/pulsar-core` (≥0.5.1) and `ofetch` (≥1.5.1).
 
 ## Next Steps
 

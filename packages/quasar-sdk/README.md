@@ -4,24 +4,28 @@
 [![License](https://img.shields.io/npm/l/@tuwaio/quasar-sdk.svg)](./LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/TuwaIO/sdk/release.yml?branch=main)](https://github.com/TuwaIO/sdk/actions)
 
-> The official server-side Node.js & Edge SDK for the **TUWA Quasar Cloud**.
+> The official server-side Node.js & Edge SDK for the **TUWA Quasar Cloud**, featuring built-in React authentication bridges.
 
 ## Installation
 
 ```bash
-# Using pnpm (recommended), but you can use npm, yarn or bun as well
+# Using pnpm (recommended)
 pnpm add @tuwaio/quasar-sdk ofetch
 ```
 
 ### Peer Dependencies
 
-| Package               | Version   | Requirement                               |
-| --------------------- | --------- | ----------------------------------------- |
-| `@tuwaio/pulsar-core` | `>=0.6.0` | **Required** (Core types)                 |
-| `ofetch`              | `>=1.5.1` | **Required** (Transport)                  |
-| `viem`                | `^2.0.0`  | Optional (EVM Auth & Signing)             |
-| `gill`                | `^0.14.0` | Optional (Solana Auth & Signing)          |
-| `zustand`             | `^5.0.0`  | Optional (Persistent Session Management)  |
+| Package                    | Version    | Requirement                                |
+| -------------------------- | ---------- | ------------------------------------------ |
+| `@tuwaio/pulsar-core`      | `>=0.6.0`  | **Required** (Core types)                  |
+| `ofetch`                   | `>=1.5.1`  | **Required** (Transport)                   |
+| `react`                    | `>=18.0.0` | Optional (React Bridge support)            |
+| `@solana/react`            | `>=6.9.0`  | Optional (Solana signing)                  |
+| `@wallet-standard/react`   | `>=1.0.2`  | Optional (Wallet Standard)                 |
+| `@wagmi/core`              | `>=3.0.0`  | Optional (EVM signing)                     |
+| `viem`                     | `^2.0.0`   | Optional (EVM Auth primitives)             |
+| `gill`                     | `^0.14.0`  | Optional (Solana Auth primitives)          |
+| `zustand`                  | `^5.0.0`   | Optional (Session state management)        |
 
 ## Quick Start
 
@@ -37,6 +41,26 @@ const { txKey } = await quasar.pulsar.syncCreate(transaction, 'My Application');
 const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ```
 
+## React Authentication Bridge
+
+The SDK provides a unified component to handle multi-chain authentication (EVM & Solana) with zero boilerplate.
+
+```tsx
+import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
+
+function MyApp() {
+  return (
+    <QuasarAuthBridge
+      activeConnection={activeConnection} // Structural interface for wallet state
+      store={store}                      // Zustand store API
+      wagmiConfig={config}               // Wagmi config
+      session={miniSession}              // Current session state
+      setSession={setMiniSession}        // Session setter
+    />
+  );
+}
+```
+
 ## Modules
 
 ### Pulsar — `quasar.pulsar`
@@ -48,7 +72,19 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 ### Utils — `utils`
 
-Security and authentication utilities. These can be used as standalone functions (ideal for frontends).
+Security and authentication utilities for signature verification and session management.
+
+```typescript
+import { utils, ChainType } from '@tuwaio/quasar-sdk';
+
+// Verify a Mini-Session signature on the server
+const isValid = await utils.verifyMiniSession({
+  walletAddress: '0x...',
+  signature,
+  timestamp,
+  chainType: ChainType.EVM
+});
+```
 
 | Method                         | Description                                            |
 | ------------------------------ | ------------------------------------------------------ |
@@ -56,7 +92,7 @@ Security and authentication utilities. These can be used as standalone functions
 | `signMiniSession(params)`      | Trigger signature request in the connected wallet      |
 | `verifyMiniSession(params)`    | Verify an EVM or Solana signature with expiration check |
 | `createMiniSessionStore(name)` | Create a persistent Zustand store for session caching  |
-| `getMiniSessionAuth(conn, st)` | Reusable helper for signing and caching logic          |
+| `getMiniSessionAuth(conn, st)` | Core logic for signing and caching a mini-session      |
 
 ## Error Handling
 
@@ -69,7 +105,6 @@ try {
   if (err instanceof QuasarSDKError) {
     console.error(err.status); // HTTP status code
     console.error(err.message); // Formatted error message
-    console.error(err.originalError); // Raw fetch error
   }
 }
 ```
