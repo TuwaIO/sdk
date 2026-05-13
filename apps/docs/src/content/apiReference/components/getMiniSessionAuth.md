@@ -6,12 +6,13 @@
 
 > **getMiniSessionAuth**(`connection`, `store`): `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\>
 
-Defined in: [packages/quasar-sdk/src/utils/session.ts:40](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/utils/session.ts#L40)
+Defined in: [packages/quasar-sdk/src/utils/session.ts:50](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/utils/session.ts#L50)
 
-Generic helper to manage Mini-Session signing and caching.
+High-level orchestrator to retrieve an existing Mini-Session or trigger a new signature.
 
-Checks the provided store for an existing session matching the current connection.
-If no session is found, it triggers a signature request using the provided signer.
+This function checks the provided store for a valid, non-expired session matching
+the current wallet connection. If no session is found or it has expired, it
+triggers a signature request through the wallet.
 
 ## Parameters
 
@@ -19,11 +20,11 @@ If no session is found, it triggers a signature request using the provided signe
 
 [`ConnectionData`](../interfaces/ConnectionData.md)
 
-Current active connection state.
+The current active wallet connection data (address, signer, etc).
 
 ### store
 
-An object compatible with MiniSessionStore to read/write the session.
+A store implementation (Zustand or compatible) for session persistence.
 
 #### miniSession
 
@@ -31,14 +32,14 @@ An object compatible with MiniSessionStore to read/write the session.
 
 #### setMiniSession
 
-(`s`) => `void`
+(`session`) => `void`
 
 ## Returns
 
 `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\>
 
-A promise resolving to the authenticated session.
+A promise resolving to a valid MiniSessionAuth object.
 
 ## Throws
 
-If no wallet is connected or signing fails.
+If the wallet is disconnected or signing fails.

@@ -4,7 +4,7 @@
 
 # SignSessionParams
 
-Defined in: [packages/quasar-sdk/src/types.ts:215](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/types.ts#L215)
+Defined in: [packages/quasar-sdk/src/types.ts:160](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L160)
 
 Parameters for signing a mini-session message.
 
@@ -14,7 +14,7 @@ Parameters for signing a mini-session message.
 
 > **chainType**: [`ChainType`](../enumerations/ChainType.md)
 
-Defined in: [packages/quasar-sdk/src/types.ts:221](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/types.ts#L221)
+Defined in: [packages/quasar-sdk/src/types.ts:166](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L166)
 
 The blockchain ecosystem type.
 
@@ -22,18 +22,18 @@ The blockchain ecosystem type.
 
 ### signer
 
-> **signer**: `any`
+> **signer**: [`EvmSigner`](EvmSigner.md) \| [`SolanaSigner`](SolanaSigner.md)
 
-Defined in: [packages/quasar-sdk/src/types.ts:217](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/types.ts#L217)
+Defined in: [packages/quasar-sdk/src/types.ts:162](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L162)
 
-The signer object. For EVM, a `WalletClient`. For Solana, a `KeyPairSigner` or `TransactionSendingSigner`.
+The signer object for the respective ecosystem.
 
 ***
 
-### walletAddress?
+### walletAddress
 
-> `optional` **walletAddress?**: `string`
+> **walletAddress**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:219](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/types.ts#L219)
+Defined in: [packages/quasar-sdk/src/types.ts:164](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L164)
 
-The wallet address to sign with (required for EVM).
+The wallet address to sign with.

@@ -26,6 +26,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ## Interfaces
 
 - [ConnectionData](interfaces/ConnectionData.md)
+- [EvmSigner](interfaces/EvmSigner.md)
 - [HistoryQuery](interfaces/HistoryQuery.md)
 - [MiniSessionAuth](interfaces/MiniSessionAuth.md)
 - [MiniSessionStore](interfaces/MiniSessionStore.md)
@@ -33,6 +34,8 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 - [QuasarConfig](interfaces/QuasarConfig.md)
 - [SignSessionParams](interfaces/SignSessionParams.md)
 - [SignSessionResult](interfaces/SignSessionResult.md)
+- [SolanaSignedMessage](interfaces/SolanaSignedMessage.md)
+- [SolanaSigner](interfaces/SolanaSigner.md)
 - [VerifySessionParams](interfaces/VerifySessionParams.md)
 
 ## Type Aliases
@@ -43,6 +46,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ## Variables
 
 - [BASE\_API\_URL](variables/BASE_API_URL.md)
+- [DEFAULT\_MAX\_AGE](variables/DEFAULT_MAX_AGE.md)
 - [PULSAR\_HISTORY\_ENDPOINT](variables/PULSAR_HISTORY_ENDPOINT.md)
 - [PULSAR\_SYNC\_ENDPOINT](variables/PULSAR_SYNC_ENDPOINT.md)
 - [utils](variables/utils.md)

@@ -1,8 +1,7 @@
 /**
  * @module types
  * @description Shared type definitions for the Quasar SDK.
- * Contains configuration interfaces, query parameters, paginated result structure,
- * and re-exports from `@tuwaio/pulsar-core`.
+ * Contains configuration interfaces, query parameters, and authentication structures.
  */
 
 import type { Transaction, UpdatableTransactionFields } from '@tuwaio/pulsar-core';
@@ -11,109 +10,37 @@ import type { Transaction, UpdatableTransactionFields } from '@tuwaio/pulsar-cor
  * Configuration options for initializing the {@link Quasar} SDK client.
  *
  * @public
- * @example
- * ```typescript
- * const config: QuasarConfig = {
- *   secretKey: 'sk_live_abc123...',
- *   baseUrl: 'https://api.tuwa.io',
- *   timeout: 15000,
- * };
- * ```
  */
 export interface QuasarConfig {
-  /**
-   * Your secret API key starting with `sk_live_`.
-   *
-   * @remarks
-   * This key authenticates every request through the Iron Dome security perimeter.
-   * It **MUST** be kept secure on the server side — never expose it in client-side bundles
-   * as it grants full access to your organization's Quasar data.
-   */
+  /** Your secret API key starting with `sk_live_`. */
   secretKey: string;
-
-  /**
-   * Optional internal secret sent as `x-internal-secret` header on every request.
-   *
-   * @remarks
-   * This is used for system-to-system communication between TUWA internal services.
-   * Most third-party developers do not need to provide this.
-   */
+  /** Optional internal secret for system-to-system communication. */
   internalSecret?: string;
-
-  /**
-   * The base URL of the Quasar Cloud API.
-   *
-   * @defaultValue `'https://api.tuwa.io'`
-   */
+  /** The base URL of the Quasar Cloud API. Defaults to 'https://api.tuwa.io'. */
   baseUrl?: string;
-
-  /**
-   * Request timeout in milliseconds for all API calls.
-   *
-   * @defaultValue `10000` (10 seconds)
-   */
+  /** Request timeout in milliseconds. Defaults to 10000. */
   timeout?: number;
 }
 
 /**
  * Query parameters for filtering and paginating transaction history.
  *
- * All fields are optional. When omitted, no filtering is applied to that field.
- *
  * @public
- * @example
- * ```typescript
- * const query: HistoryQuery = {
- *   page: 1,
- *   limit: 10,
- *   chainId: 1,           // Ethereum Mainnet
- *   status: 'Success',    // Only successful transactions
- *   appName: 'Tuwa App',  // Filter by application
- * };
- * ```
  */
 export interface HistoryQuery {
-  /**
-   * Page number for pagination (1-indexed).
-   *
-   * @defaultValue `1`
-   */
+  /** Page number for pagination (1-indexed). */
   page?: number;
-
-  /**
-   * Maximum number of results to return per page.
-   *
-   * @defaultValue `10`
-   */
+  /** Maximum number of results to return per page. */
   limit?: number;
-
-  /**
-   * Filter by blockchain chain ID.
-   *
-   * @example `1` (Ethereum), `'solana'`, `'SN_MAIN'` (Starknet)
-   */
+  /** Filter by blockchain chain ID (e.g., 1, 'solana'). */
   chainId?: string | number;
-
-  /**
-   * Filter by transaction status.
-   *
-   * @example `'pending'`, `'Success'`, `'Failed'`, `'Replaced'`
-   */
+  /** Filter by transaction status (e.g., 'Success', 'Failed'). */
   status?: string;
-
-  /**
-   * Filter by a specific unique transaction key assigned by Quasar.
-   */
+  /** Filter by a specific Quasar transaction key. */
   txKey?: string;
-
-  /**
-   * Filter by the application name that synced the transaction.
-   */
+  /** Filter by the application name. */
   appName?: string;
-
-  /**
-   * Filter by the sender's wallet address.
-   */
+  /** Filter by the sender's wallet address. */
   walletAddress?: string;
 }
 
@@ -121,61 +48,45 @@ export interface HistoryQuery {
  * Generic wrapper for paginated API responses.
  *
  * @typeParam T - The type of the documents contained in the result set.
- *
  * @public
- * @example
- * ```typescript
- * const result: PaginatedResult<Transaction> = await quasar.pulsar.getHistory();
- *
- * console.log(`Showing page ${result.page} of ${result.totalPages}`);
- * console.log(`Total transactions found: ${result.totalDocs}`);
- * ```
  */
 export interface PaginatedResult<T> {
   /** Array of documents for the current page. */
   docs: T[];
-
-  /** Total number of documents matching the query across all pages. */
+  /** Total number of documents matching the query. */
   totalDocs: number;
-
-  /** Total number of available pages based on the limit. */
+  /** Total number of available pages. */
   totalPages: number;
-
   /** The current page number (1-indexed). */
   page: number;
-
-  /** Indicates if a subsequent page of results is available. */
+  /** Indicates if a subsequent page is available. */
   hasNextPage: boolean;
-
-  /** Indicates if a preceding page of results is available. */
+  /** Indicates if a preceding page is available. */
   hasPrevPage: boolean;
 }
 
-/**
- * Re-exported `Transaction` type from `@tuwaio/pulsar-core`.
- *
- * Represents a unified blockchain transaction object used across the TUWA ecosystem.
- * It is a discriminated union of EVM, Solana, and Starknet transactions.
- *
- * @see {@link OrbitAdapter} for the discriminator field.
- */
-export type { Transaction };
-
-/**
- * Re-exported `UpdatableTransactionFields` type from `@tuwaio/pulsar-core`.
- *
- * A subset of {@link Transaction} fields that were intended for manual patches.
- * @internal
- */
-export type { UpdatableTransactionFields };
+export type { Transaction, UpdatableTransactionFields };
 
 /**
  * Supported blockchain ecosystems for authentication.
  * @public
  */
 export enum ChainType {
+  /** Ethereum and compatible L2s. */
   EVM = 'EVM',
+  /** Solana blockchain. */
   SOLANA = 'SOLANA',
+}
+
+/**
+ * Result structure for a signed message.
+ * @public
+ */
+export interface SignSessionResult {
+  /** The cryptographic signature string. */
+  signature: string;
+  /** The ISO timestamp used to generate the message. */
+  timestamp: string;
 }
 
 /**
@@ -183,11 +94,7 @@ export enum ChainType {
  * Used for both frontend-side caching and backend-side verification.
  * @public
  */
-export interface MiniSessionAuth {
-  /** The cryptographic signature (hex for EVM, base58 for Solana). */
-  signature: string;
-  /** ISO string timestamp used in the signed message. */
-  timestamp: string;
+export interface MiniSessionAuth extends SignSessionResult {
   /** The blockchain ecosystem type. */
   chainType: ChainType;
   /** The wallet address that signed the message. */
@@ -201,11 +108,49 @@ export interface MiniSessionAuth {
 export interface VerifySessionParams extends Omit<MiniSessionAuth, 'walletAddress'> {
   /** The wallet address that allegedly signed the message. */
   walletAddress: string;
-  /**
-   * Maximum allowed age for the signature in milliseconds.
-   * Default: 5 minutes (300,000ms).
-   */
+  /** Maximum allowed age for the signature in milliseconds. Defaults to 5 minutes. */
   maxAge?: number;
+}
+
+/**
+ * Interface for an EVM signer (compatible with Viem WalletClient).
+ * @public
+ */
+export interface EvmSigner {
+  /** Signs a message using the specified account. */
+  signMessage: (params: { account: `0x${string}`; message: string }) => Promise<`0x${string}`>;
+}
+
+/**
+ * Result structure for a signed Solana message in Web3 v2.
+ * @public
+ */
+export interface SolanaSignedMessage {
+  /** A map of public addresses to their corresponding signature bytes. */
+  readonly signatures: Readonly<Record<string, Uint8Array>>;
+}
+
+/**
+ * Interface for a Solana signer.
+ * Optimized to handle modern Web3 v2 (MessageModifyingSigner), Standard, and Legacy interfaces.
+ * @public
+ */
+export interface SolanaSigner {
+  /** The public address of the signer. */
+  readonly address: string;
+  /**
+   * Modern Web3 v2 method to modify and sign messages.
+   * Used by latest @solana/react hooks.
+   */
+  modifyAndSignMessages?: (messages: readonly unknown[]) => Promise<readonly SolanaSignedMessage[]>;
+  /**
+   * Plural signing method (Wallet Standard).
+   */
+  signMessages?: (messages: readonly Uint8Array[]) => Promise<readonly { signature: Uint8Array }[]>;
+  /**
+   * Singular signing method (Legacy).
+   */
+  signMessage?: (message: Uint8Array) => Promise<Uint8Array>;
 }
 
 /**
@@ -213,16 +158,17 @@ export interface VerifySessionParams extends Omit<MiniSessionAuth, 'walletAddres
  * @public
  */
 export interface SignSessionParams {
-  /** The signer object. For EVM, a `WalletClient`. For Solana, a `KeyPairSigner` or `TransactionSendingSigner`. */
-  signer: any;
-  /** The wallet address to sign with (required for EVM). */
-  walletAddress?: string;
+  /** The signer object for the respective ecosystem. */
+  signer: EvmSigner | SolanaSigner;
+  /** The wallet address to sign with. */
+  walletAddress: string;
   /** The blockchain ecosystem type. */
   chainType: ChainType;
 }
 
 /**
- * Zustand store interface for managing Mini-Sessions.
+ * Interface for a store that manages Mini-Session persistence.
+ * Designed to be compatible with Zustand.
  * @public
  */
 export interface MiniSessionStore {
@@ -245,6 +191,6 @@ export interface ConnectionData {
   address: string;
   /** The blockchain ecosystem type. */
   chainType: ChainType;
-  /** The wallet signer object (WalletClient for EVM, TransactionSendingSigner for Solana). */
-  signer: any;
+  /** The wallet signer object. */
+  signer: EvmSigner | SolanaSigner;
 }

@@ -4,7 +4,7 @@
 
 # ChainType
 
-Defined in: [packages/quasar-sdk/src/types.ts:176](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/types.ts#L176)
+Defined in: [packages/quasar-sdk/src/types.ts:74](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L74)
 
 Supported blockchain ecosystems for authentication.
 
@@ -14,7 +14,9 @@ Supported blockchain ecosystems for authentication.
 
 > **EVM**: `"EVM"`
 
-Defined in: [packages/quasar-sdk/src/types.ts:177](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/types.ts#L177)
+Defined in: [packages/quasar-sdk/src/types.ts:76](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L76)
+
+Ethereum and compatible L2s.
 
 ***
 
@@ -22,4 +24,6 @@ Defined in: [packages/quasar-sdk/src/types.ts:177](https://github.com/TuwaIO/sdk
 
 > **SOLANA**: `"SOLANA"`
 
-Defined in: [packages/quasar-sdk/src/types.ts:178](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/types.ts#L178)
+Defined in: [packages/quasar-sdk/src/types.ts:78](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L78)
+
+Solana blockchain.

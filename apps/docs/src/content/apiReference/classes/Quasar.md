@@ -4,7 +4,7 @@
 
 # Quasar
 
-Defined in: [packages/quasar-sdk/src/index.ts:89](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/index.ts#L89)
+Defined in: [packages/quasar-sdk/src/index.ts:89](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/index.ts#L89)
 
 Main entry point for the Quasar SDK.
 
@@ -34,7 +34,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 > **new Quasar**(`config`): `Quasar`
 
-Defined in: [packages/quasar-sdk/src/index.ts:123](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/index.ts#L123)
+Defined in: [packages/quasar-sdk/src/index.ts:123](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/index.ts#L123)
 
 Creates a new instance of the Quasar SDK.
 
@@ -66,7 +66,7 @@ const quasar = new Quasar({ secretKey: process.env.QUASAR_SECRET_KEY! });
 
 > `readonly` **pulsar**: [`PulsarModule`](PulsarModule.md)
 
-Defined in: [packages/quasar-sdk/src/index.ts:110](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/index.ts#L110)
+Defined in: [packages/quasar-sdk/src/index.ts:110](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/index.ts#L110)
 
 The Pulsar Transaction Engine module.
 
@@ -83,7 +83,7 @@ and retrieve indexed transaction history across multiple blockchain networks.
 
 > `readonly` `static` **utils**: `object`
 
-Defined in: [packages/quasar-sdk/src/index.ts:94](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/index.ts#L94)
+Defined in: [packages/quasar-sdk/src/index.ts:94](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/index.ts#L94)
 
 Security and authentication utilities.
 Shared across all instances and available statically.
@@ -94,8 +94,8 @@ Shared across all instances and available statically.
 
 Standardizes the message format for Quasar Mini-Session login.
 
-Standardizes the message format for Mini-Session login.
-Both frontend and backend must use this exact template.
+Standardizes the message format for Mini-Session authentication.
+Both frontend and backend MUST use this exact template for verification to pass.
 
 ##### Parameters
 
@@ -129,7 +129,7 @@ const msg = createMiniSessionMessage(new Date().toISOString());
 Creates a persistent Zustand store for session management.
 
 Creates a persistent Zustand store to cache Mini-Session signatures.
-Requires `zustand` to be installed as a peer dependency.
+This is the recommended way to manage sessions in React applications.
 
 ##### Parameters
 
@@ -137,13 +137,13 @@ Requires `zustand` to be installed as a peer dependency.
 
 `string` = `'mini-session-storage'`
 
-Key name for localStorage persistence.
+The localStorage key for persistence. Defaults to 'mini-session-storage'.
 
 ##### Returns
 
 `UseBoundStore`\<`WithPersist`\<`StoreApi`\<[`MiniSessionStore`](../interfaces/MiniSessionStore.md)\>, [`MiniSessionStore`](../interfaces/MiniSessionStore.md)\>\>
 
-A Zustand store instance.
+A Zustand store instance initialized with MiniSessionStore interface.
 
 ##### See
 
@@ -155,10 +155,11 @@ A Zustand store instance.
 
 Reusable helper to manage signing and session caching.
 
-Generic helper to manage Mini-Session signing and caching.
+High-level orchestrator to retrieve an existing Mini-Session or trigger a new signature.
 
-Checks the provided store for an existing session matching the current connection.
-If no session is found, it triggers a signature request using the provided signer.
+This function checks the provided store for a valid, non-expired session matching
+the current wallet connection. If no session is found or it has expired, it
+triggers a signature request through the wallet.
 
 ##### Parameters
 
@@ -166,11 +167,11 @@ If no session is found, it triggers a signature request using the provided signe
 
 [`ConnectionData`](../interfaces/ConnectionData.md)
 
-Current active connection state.
+The current active wallet connection data (address, signer, etc).
 
 ###### store
 
-An object compatible with MiniSessionStore to read/write the session.
+A store implementation (Zustand or compatible) for session persistence.
 
 ###### miniSession
 
@@ -178,17 +179,17 @@ An object compatible with MiniSessionStore to read/write the session.
 
 ###### setMiniSession
 
-(`s`) => `void`
+(`session`) => `void`
 
 ##### Returns
 
 `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\>
 
-A promise resolving to the authenticated session.
+A promise resolving to a valid MiniSessionAuth object.
 
 ##### Throws
 
-If no wallet is connected or signing fails.
+If the wallet is disconnected or signing fails.
 
 ##### See
 
@@ -202,11 +203,8 @@ Triggers a signature request in the connected wallet.
 
 Triggers a signature request in the connected wallet to create a Mini-Session.
 
-This is a frontend-friendly helper that:
-1. Generates a fresh ISO timestamp.
-2. Formats the standard login message.
-3. Triggers the wallet's signMessage method.
-4. Returns the signature and timestamp for verification on the backend.
+This function detects the signer's capabilities and uses the most appropriate
+signing method available (e.g., Web3 v2, Standard, or Legacy).
 
 ##### Parameters
 
@@ -214,17 +212,17 @@ This is a frontend-friendly helper that:
 
 [`SignSessionParams`](../interfaces/SignSessionParams.md)
 
-The signing parameters including the signer and ecosystem type.
+Parameters containing the signer and target ecosystem.
 
 ##### Returns
 
 `Promise`\<[`SignSessionResult`](../interfaces/SignSessionResult.md)\>
 
-A promise that resolves to the signature and timestamp.
+A promise resolving to the signature and timestamp.
 
 ##### Throws
 
-If the required peer dependencies are missing or signing fails.
+If signing fails or the signer lacks required methods.
 
 ##### See
 
@@ -236,12 +234,10 @@ If the required peer dependencies are missing or signing fails.
 
 Verifies a Mini-Session signature (EVM or Solana).
 
-Verifies a Mini-Session signature to protect API quota from unauthorized access.
+Verifies a Mini-Session signature for authenticity and freshness.
 
-This utility performs three checks:
-1. Timestamp freshness (rejects if older than 5 minutes or in the future).
-2. Cryptographic validity (checks if the signature matches the wallet address and message).
-3. Ecosystem-specific logic (EVM via `viem`, Solana via `gill`).
+Performs cryptographic verification against the provided wallet address and
+ensures the signature hasn't expired according to the `maxAge` parameter.
 
 ##### Parameters
 
@@ -249,21 +245,13 @@ This utility performs three checks:
 
 [`VerifySessionParams`](../interfaces/VerifySessionParams.md)
 
-The verification parameters including address, signature, and timestamp.
+Verification data including signature and timestamp.
 
 ##### Returns
 
 `Promise`\<`boolean`\>
 
-A promise that resolves to `true` if the signature is valid and fresh.
-
-##### Throws
-
-If the required peer dependencies (`viem` or `gill`) are missing.
-
-##### Throws
-
-If the timestamp is invalid or expired.
+A promise resolving to true if the session is valid.
 
 ##### See
 

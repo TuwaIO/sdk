@@ -4,9 +4,13 @@
 
 # SignSessionResult
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:40](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/utils/auth.ts#L40)
+Defined in: [packages/quasar-sdk/src/types.ts:85](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L85)
 
-Result of a mini-session signing operation.
+Result structure for a signed message.
+
+## Extended by
+
+- [`MiniSessionAuth`](MiniSessionAuth.md)
 
 ## Properties
 
@@ -14,9 +18,9 @@ Result of a mini-session signing operation.
 
 > **signature**: `string`
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:42](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/utils/auth.ts#L42)
+Defined in: [packages/quasar-sdk/src/types.ts:87](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L87)
 
-The cryptographic signature.
+The cryptographic signature string.
 
 ***
 
@@ -24,6 +28,6 @@ The cryptographic signature.
 
 > **timestamp**: `string`
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:44](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/utils/auth.ts#L44)
+Defined in: [packages/quasar-sdk/src/types.ts:89](https://github.com/TuwaIO/sdk/blob/481db453690902aaac0d162605083e3cd1fe6605/packages/quasar-sdk/src/types.ts#L89)
 
 The ISO timestamp used to generate the message.
