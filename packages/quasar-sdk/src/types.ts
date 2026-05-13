@@ -248,4 +248,3 @@ export interface ConnectionData {
   /** The wallet signer object (WalletClient for EVM, TransactionSendingSigner for Solana). */
   signer: any;
 }
-

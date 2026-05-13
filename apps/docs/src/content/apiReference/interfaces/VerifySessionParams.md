@@ -4,7 +4,7 @@
 
 # VerifySessionParams
 
-Defined in: [packages/quasar-sdk/src/types.ts:201](https://github.com/TuwaIO/sdk/blob/56f32d05204d8e3face85bd0cfcf4d125f27ce73/packages/quasar-sdk/src/types.ts#L201)
+Defined in: [packages/quasar-sdk/src/types.ts:201](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L201)
 
 Parameters for verifying a mini-session signature.
 
@@ -18,7 +18,7 @@ Parameters for verifying a mini-session signature.
 
 > **chainType**: [`ChainType`](../enumerations/ChainType.md)
 
-Defined in: [packages/quasar-sdk/src/types.ts:192](https://github.com/TuwaIO/sdk/blob/56f32d05204d8e3face85bd0cfcf4d125f27ce73/packages/quasar-sdk/src/types.ts#L192)
+Defined in: [packages/quasar-sdk/src/types.ts:192](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L192)
 
 The blockchain ecosystem type.
 
@@ -32,7 +32,7 @@ The blockchain ecosystem type.
 
 > `optional` **maxAge?**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:208](https://github.com/TuwaIO/sdk/blob/56f32d05204d8e3face85bd0cfcf4d125f27ce73/packages/quasar-sdk/src/types.ts#L208)
+Defined in: [packages/quasar-sdk/src/types.ts:208](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L208)
 
 Maximum allowed age for the signature in milliseconds.
 Default: 5 minutes (300,000ms).
@@ -43,7 +43,7 @@ Default: 5 minutes (300,000ms).
 
 > **signature**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:188](https://github.com/TuwaIO/sdk/blob/56f32d05204d8e3face85bd0cfcf4d125f27ce73/packages/quasar-sdk/src/types.ts#L188)
+Defined in: [packages/quasar-sdk/src/types.ts:188](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L188)
 
 The cryptographic signature (hex for EVM, base58 for Solana).
 
@@ -57,7 +57,7 @@ The cryptographic signature (hex for EVM, base58 for Solana).
 
 > **timestamp**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:190](https://github.com/TuwaIO/sdk/blob/56f32d05204d8e3face85bd0cfcf4d125f27ce73/packages/quasar-sdk/src/types.ts#L190)
+Defined in: [packages/quasar-sdk/src/types.ts:190](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L190)
 
 ISO string timestamp used in the signed message.
 
@@ -71,6 +71,6 @@ ISO string timestamp used in the signed message.
 
 > **walletAddress**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:203](https://github.com/TuwaIO/sdk/blob/56f32d05204d8e3face85bd0cfcf4d125f27ce73/packages/quasar-sdk/src/types.ts#L203)
+Defined in: [packages/quasar-sdk/src/types.ts:203](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L203)
 
 The wallet address that allegedly signed the message.

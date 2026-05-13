@@ -15,10 +15,13 @@ pnpm add @tuwaio/quasar-sdk ofetch
 
 ### Peer Dependencies
 
-| Package               | Version   |
-| --------------------- | --------- |
-| `@tuwaio/pulsar-core` | `>=0.6.0` |
-| `ofetch`              | `>=1.5.1` |
+| Package               | Version   | Requirement                               |
+| --------------------- | --------- | ----------------------------------------- |
+| `@tuwaio/pulsar-core` | `>=0.6.0` | **Required** (Core types)                 |
+| `ofetch`              | `>=1.5.1` | **Required** (Transport)                  |
+| `viem`                | `^2.0.0`  | Optional (EVM Auth & Signing)             |
+| `gill`                | `^0.14.0` | Optional (Solana Auth & Signing)          |
+| `zustand`             | `^5.0.0`  | Optional (Persistent Session Management)  |
 
 ## Quick Start
 
@@ -42,6 +45,18 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 | -------------------------- | --------------------------------------------------- |
 | `syncCreate(tx, appName?)` | Sync a new pending transaction to the cloud         |
 | `getHistory(query?)`       | Retrieve paginated transaction history with filters |
+
+### Utils — `utils`
+
+Security and authentication utilities. These can be used as standalone functions (ideal for frontends).
+
+| Method                         | Description                                            |
+| ------------------------------ | ------------------------------------------------------ |
+| `createMiniSessionMessage(ts)` | Format a standard login message for signing            |
+| `signMiniSession(params)`      | Trigger signature request in the connected wallet      |
+| `verifyMiniSession(params)`    | Verify an EVM or Solana signature with expiration check |
+| `createMiniSessionStore(name)` | Create a persistent Zustand store for session caching  |
+| `getMiniSessionAuth(conn, st)` | Reusable helper for signing and caching logic          |
 
 ## Error Handling
 

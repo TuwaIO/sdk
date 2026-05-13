@@ -61,10 +61,14 @@ yarn add @tuwaio/quasar-sdk
 
 The SDK requires the following peer dependencies:
 
-| Package               | Version   |
-| --------------------- | --------- |
-| `@tuwaio/pulsar-core` | `>=0.6.0` |
-| `ofetch`              | `>=1.5.1` |
+| Package               | Version   | Requirement                               |
+| --------------------- | --------- | ----------------------------------------- |
+| `@tuwaio/pulsar-core` | `>=0.6.0` | **Required** (Core types)                 |
+| `ofetch`              | `>=1.5.1` | **Required** (Transport)                  |
+| `viem`                | `^2.0.0`  | Optional (EVM Auth & Signing)             |
+| `gill`                | `^0.14.0` | Optional (Solana Auth & Signing)          |
+| `zustand`             | `^5.0.0`  | Optional (Persistent Session Management)  |
+
 
 ---
 

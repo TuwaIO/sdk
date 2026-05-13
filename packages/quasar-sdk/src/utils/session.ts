@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { ChainType, ConnectionData, MiniSessionAuth, MiniSessionStore } from '../types';
+import { ConnectionData, MiniSessionAuth, MiniSessionStore } from '../types';
 import { signMiniSession } from './auth';
 
 /**
@@ -48,11 +48,7 @@ export async function getMiniSessionAuth(
   const { address, chainType, signer } = connection;
 
   // 1. Check if we have a valid cached session
-  if (
-    store.miniSession &&
-    store.miniSession.walletAddress === address &&
-    store.miniSession.chainType === chainType
-  ) {
+  if (store.miniSession && store.miniSession.walletAddress === address && store.miniSession.chainType === chainType) {
     return store.miniSession;
   }
 

@@ -55,14 +55,12 @@ export const utils = {
    */
   createMiniSessionStore: authUtils.createMiniSessionStore,
 
-
   /**
    * Reusable helper to manage signing and session caching.
    * @see {@link getMiniSessionAuth}
    */
   getMiniSessionAuth: authUtils.getMiniSessionAuth,
 };
-
 
 /**
  * Main entry point for the Quasar SDK.
