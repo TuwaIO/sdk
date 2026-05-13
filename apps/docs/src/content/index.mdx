@@ -23,7 +23,7 @@ const quasar = new Quasar({
   secretKey: 'sk_live_your_secret_key',
 });
 
-// Sync a pending transaction
+// Sync a pending transaction to the cloud
 const { txKey } = await quasar.pulsar.syncCreate({
   hash: '0xabc...',
   chainId: 1,
@@ -32,14 +32,12 @@ const { txKey } = await quasar.pulsar.syncCreate({
   to: '0x456...',
 });
 
-// Update its status
-await quasar.pulsar.syncUpdate(txKey, { status: 'confirmed' });
-
-// Query history
+// Query transaction history with filters
 const history = await quasar.pulsar.getHistory({
   page: 1,
   limit: 20,
-  status: 'confirmed',
+  status: 'Success',
+  chainId: 1,
 });
 ```
 

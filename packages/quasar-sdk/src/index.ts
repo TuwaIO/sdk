@@ -24,42 +24,54 @@ import { QuasarConfig } from './types';
 /**
  * Main entry point for the Quasar SDK.
  *
- * Initializes the internal HTTP client with your secret key
- * and exposes domain-specific modules for interacting with the Quasar Cloud API.
+ * The `Quasar` class provides a unified interface for interacting with the Quasar Cloud API.
+ * It handles authentication, base URL configuration, and exposes domain-specific modules
+ * like {@link PulsarModule} for transaction management.
  *
  * @example
  * ```typescript
  * import { Quasar } from '@tuwaio/quasar-sdk';
  *
+ * // Initialize with your secret API key
  * const quasar = new Quasar({
  *   secretKey: 'sk_live_your_secret_key',
- *   baseUrl: 'https://api.tuwa.io',
- *   timeout: 15000,
+ *   baseUrl: 'https://api.tuwa.io', // Optional
+ *   timeout: 10000,                // Optional, default is 10s
  * });
  *
- * // Access the Pulsar transaction engine
- * const { txKey } = await quasar.pulsar.syncCreate(tx);
+ * // Access domain-specific modules
+ * const history = await quasar.pulsar.getHistory({ chainId: 1 });
  * ```
+ *
+ * @public
  */
 export class Quasar {
-  /** @internal */
+  /**
+   * The internal HTTP client used for authenticated requests.
+   * @internal
+   */
   private readonly client: QuasarClient;
 
   /**
    * The Pulsar Transaction Engine module.
    *
-   * Use this to sync transaction states to the Quasar Cloud
-   * and retrieve paginated transaction history.
+   * This module provides methods to sync transaction states to the Quasar Cloud
+   * and retrieve indexed transaction history across multiple blockchain networks.
    *
    * @see {@link PulsarModule}
    */
   public readonly pulsar: PulsarModule;
 
   /**
-   * Creates a new Quasar SDK instance.
+   * Creates a new instance of the Quasar SDK.
    *
-   * @param config - SDK configuration. See {@link QuasarConfig} for available options.
-   * @throws {Error} If `config.secretKey` is missing.
+   * @param config - Configuration options for the SDK.
+   * @throws {Error} If the `secretKey` is missing or invalid.
+   *
+   * @example
+   * ```typescript
+   * const quasar = new Quasar({ secretKey: process.env.QUASAR_SECRET_KEY! });
+   * ```
    */
   constructor(config: QuasarConfig) {
     this.client = new QuasarClient(config);

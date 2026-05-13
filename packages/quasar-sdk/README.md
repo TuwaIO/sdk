@@ -27,13 +27,10 @@ import { Quasar } from '@tuwaio/quasar-sdk';
 
 const quasar = new Quasar({ secretKey: 'sk_live_your_secret_key' });
 
-// Sync a pending transaction
-const { txKey } = await quasar.pulsar.syncCreate(tx, 'My Application');
+// Sync a pending transaction to the cloud
+const { txKey } = await quasar.pulsar.syncCreate(transaction, 'My Application');
 
-// Update status
-await quasar.pulsar.syncUpdate(txKey, { status: 'confirmed' });
-
-// Query history
+// Query transaction history
 const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ```
 
@@ -41,11 +38,10 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 ### Pulsar — `quasar.pulsar`
 
-| Method                       | Description                                       |
-| ---------------------------- | ------------------------------------------------- |
-| `syncCreate(tx, appName?)`   | Sync a new pending transaction to the cloud       |
-| `syncUpdate(txKey, patches)` | Update an existing transaction's status or fields |
-| `getHistory(query?)`         | Retrieve paginated transaction history            |
+| Method                     | Description                                         |
+| -------------------------- | --------------------------------------------------- |
+| `syncCreate(tx, appName?)` | Sync a new pending transaction to the cloud         |
+| `getHistory(query?)`       | Retrieve paginated transaction history with filters |
 
 ## Error Handling
 

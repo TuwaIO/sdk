@@ -4,20 +4,21 @@
 
 # HistoryQuery
 
-Defined in: [packages/quasar-sdk/src/types.ts:72](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L72)
+Defined in: [packages/quasar-sdk/src/types.ts:75](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L75)
 
-Query parameters for filtering transaction history.
+Query parameters for filtering and paginating transaction history.
 
-All fields are optional — omitted fields apply no filter.
+All fields are optional. When omitted, no filtering is applied to that field.
 
 ## Example
 
 ```typescript
 const query: HistoryQuery = {
-  page: 2,
-  limit: 25,
-  chainId: 1,
-  status: 'confirmed',
+  page: 1,
+  limit: 10,
+  chainId: 1,           // Ethereum Mainnet
+  status: 'Success',    // Only successful transactions
+  appName: 'Tuwa App',  // Filter by application
 };
 ```
 
@@ -27,9 +28,9 @@ const query: HistoryQuery = {
 
 > `optional` **appName?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:105](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L105)
+Defined in: [packages/quasar-sdk/src/types.ts:112](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L112)
 
-Filter by a specific app name.
+Filter by the application name that synced the transaction.
 
 ***
 
@@ -37,9 +38,15 @@ Filter by a specific app name.
 
 > `optional` **chainId?**: `string` \| `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:90](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L90)
+Defined in: [packages/quasar-sdk/src/types.ts:95](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L95)
 
-Filter by blockchain chain ID (e.g. `1` for Ethereum Mainnet, `'solana'` for Solana).
+Filter by blockchain chain ID.
+
+#### Example
+
+```ts
+`1` (Ethereum), `'solana'`, `'SN_MAIN'` (Starknet)
+```
 
 ***
 
@@ -47,9 +54,9 @@ Filter by blockchain chain ID (e.g. `1` for Ethereum Mainnet, `'solana'` for Sol
 
 > `optional` **limit?**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:85](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L85)
+Defined in: [packages/quasar-sdk/src/types.ts:88](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L88)
 
-Maximum number of results per page.
+Maximum number of results to return per page.
 
 #### Default Value
 
@@ -61,7 +68,7 @@ Maximum number of results per page.
 
 > `optional` **page?**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:78](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L78)
+Defined in: [packages/quasar-sdk/src/types.ts:81](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L81)
 
 Page number for pagination (1-indexed).
 
@@ -75,9 +82,15 @@ Page number for pagination (1-indexed).
 
 > `optional` **status?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:95](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L95)
+Defined in: [packages/quasar-sdk/src/types.ts:102](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L102)
 
-Filter by transaction status (e.g. `'pending'`, `'confirmed'`, `'failed'`).
+Filter by transaction status.
+
+#### Example
+
+```ts
+`'pending'`, `'Success'`, `'Failed'`, `'Replaced'`
+```
 
 ***
 
@@ -85,9 +98,9 @@ Filter by transaction status (e.g. `'pending'`, `'confirmed'`, `'failed'`).
 
 > `optional` **txKey?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:100](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L100)
+Defined in: [packages/quasar-sdk/src/types.ts:107](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L107)
 
-Filter by a specific transaction key (unique identifier assigned by Quasar).
+Filter by a specific unique transaction key assigned by Quasar.
 
 ***
 
@@ -95,6 +108,6 @@ Filter by a specific transaction key (unique identifier assigned by Quasar).
 
 > `optional` **walletAddress?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:110](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L110)
+Defined in: [packages/quasar-sdk/src/types.ts:117](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L117)
 
-Filter by a specific wallet address.
+Filter by the sender's wallet address.

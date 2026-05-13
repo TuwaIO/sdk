@@ -10,11 +10,11 @@ import type { Transaction, UpdatableTransactionFields } from '@tuwaio/pulsar-cor
 /**
  * Configuration options for initializing the {@link Quasar} SDK client.
  *
+ * @public
  * @example
  * ```typescript
  * const config: QuasarConfig = {
  *   secretKey: 'sk_live_abc123...',
- *   internalSecret: 'int_secret_abc123...',
  *   baseUrl: 'https://api.tuwa.io',
  *   timeout: 15000,
  * };
@@ -26,7 +26,8 @@ export interface QuasarConfig {
    *
    * @remarks
    * This key authenticates every request through the Iron Dome security perimeter.
-   * It **MUST** be kept secure on the server side — never expose it in client bundles.
+   * It **MUST** be kept secure on the server side — never expose it in client-side bundles
+   * as it grants full access to your organization's Quasar data.
    */
   secretKey: string;
 
@@ -34,8 +35,8 @@ export interface QuasarConfig {
    * Optional internal secret sent as `x-internal-secret` header on every request.
    *
    * @remarks
-   * If provided, the SDK automatically includes it in outgoing requests.
-   * If omitted, the header is not added.
+   * This is used for system-to-system communication between TUWA internal services.
+   * Most third-party developers do not need to provide this.
    */
   internalSecret?: string;
 
@@ -47,25 +48,27 @@ export interface QuasarConfig {
   baseUrl?: string;
 
   /**
-   * Request timeout in milliseconds.
+   * Request timeout in milliseconds for all API calls.
    *
-   * @defaultValue `10000`
+   * @defaultValue `10000` (10 seconds)
    */
   timeout?: number;
 }
 
 /**
- * Query parameters for filtering transaction history.
+ * Query parameters for filtering and paginating transaction history.
  *
- * All fields are optional — omitted fields apply no filter.
+ * All fields are optional. When omitted, no filtering is applied to that field.
  *
+ * @public
  * @example
  * ```typescript
  * const query: HistoryQuery = {
- *   page: 2,
- *   limit: 25,
- *   chainId: 1,
- *   status: 'confirmed',
+ *   page: 1,
+ *   limit: 10,
+ *   chainId: 1,           // Ethereum Mainnet
+ *   status: 'Success',    // Only successful transactions
+ *   appName: 'Tuwa App',  // Filter by application
  * };
  * ```
  */
@@ -78,34 +81,38 @@ export interface HistoryQuery {
   page?: number;
 
   /**
-   * Maximum number of results per page.
+   * Maximum number of results to return per page.
    *
    * @defaultValue `10`
    */
   limit?: number;
 
   /**
-   * Filter by blockchain chain ID (e.g. `1` for Ethereum Mainnet, `'solana'` for Solana).
+   * Filter by blockchain chain ID.
+   *
+   * @example `1` (Ethereum), `'solana'`, `'SN_MAIN'` (Starknet)
    */
   chainId?: string | number;
 
   /**
-   * Filter by transaction status (e.g. `'pending'`, `'confirmed'`, `'failed'`).
+   * Filter by transaction status.
+   *
+   * @example `'pending'`, `'Success'`, `'Failed'`, `'Replaced'`
    */
   status?: string;
 
   /**
-   * Filter by a specific transaction key (unique identifier assigned by Quasar).
+   * Filter by a specific unique transaction key assigned by Quasar.
    */
   txKey?: string;
 
   /**
-   * Filter by a specific app name.
+   * Filter by the application name that synced the transaction.
    */
   appName?: string;
 
   /**
-   * Filter by a specific wallet address.
+   * Filter by the sender's wallet address.
    */
   walletAddress?: string;
 }
@@ -113,14 +120,15 @@ export interface HistoryQuery {
 /**
  * Generic wrapper for paginated API responses.
  *
- * @typeParam T - The type of each document in the result set.
+ * @typeParam T - The type of the documents contained in the result set.
  *
+ * @public
  * @example
  * ```typescript
  * const result: PaginatedResult<Transaction> = await quasar.pulsar.getHistory();
- * console.log(result.docs);       // Transaction[]
- * console.log(result.totalPages);  // number
- * console.log(result.hasNextPage); // boolean
+ *
+ * console.log(`Showing page ${result.page} of ${result.totalPages}`);
+ * console.log(`Total transactions found: ${result.totalDocs}`);
  * ```
  */
 export interface PaginatedResult<T> {
@@ -130,30 +138,33 @@ export interface PaginatedResult<T> {
   /** Total number of documents matching the query across all pages. */
   totalDocs: number;
 
-  /** Total number of available pages. */
+  /** Total number of available pages based on the limit. */
   totalPages: number;
 
-  /** Current page number (1-indexed). */
+  /** The current page number (1-indexed). */
   page: number;
 
-  /** Whether a subsequent page exists. */
+  /** Indicates if a subsequent page of results is available. */
   hasNextPage: boolean;
 
-  /** Whether a previous page exists. */
+  /** Indicates if a preceding page of results is available. */
   hasPrevPage: boolean;
 }
 
 /**
  * Re-exported `Transaction` type from `@tuwaio/pulsar-core`.
  *
- * Represents the full transaction object used across the TUWA ecosystem.
- * Supports EVM, Solana, and StarkNet transaction variants.
+ * Represents a unified blockchain transaction object used across the TUWA ecosystem.
+ * It is a discriminated union of EVM, Solana, and Starknet transactions.
+ *
+ * @see {@link OrbitAdapter} for the discriminator field.
  */
 export type { Transaction };
 
 /**
  * Re-exported `UpdatableTransactionFields` type from `@tuwaio/pulsar-core`.
  *
- * A subset of `Transaction` fields that can be patched via `syncUpdate`.
+ * A subset of {@link Transaction} fields that were intended for manual patches.
+ * @internal
  */
 export type { UpdatableTransactionFields };

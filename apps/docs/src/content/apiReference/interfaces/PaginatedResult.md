@@ -4,7 +4,7 @@
 
 # PaginatedResult\<T\>
 
-Defined in: [packages/quasar-sdk/src/types.ts:126](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L126)
+Defined in: [packages/quasar-sdk/src/types.ts:134](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L134)
 
 Generic wrapper for paginated API responses.
 
@@ -12,9 +12,9 @@ Generic wrapper for paginated API responses.
 
 ```typescript
 const result: PaginatedResult<Transaction> = await quasar.pulsar.getHistory();
-console.log(result.docs);       // Transaction[]
-console.log(result.totalPages);  // number
-console.log(result.hasNextPage); // boolean
+
+console.log(`Showing page ${result.page} of ${result.totalPages}`);
+console.log(`Total transactions found: ${result.totalDocs}`);
 ```
 
 ## Type Parameters
@@ -23,7 +23,7 @@ console.log(result.hasNextPage); // boolean
 
 `T`
 
-The type of each document in the result set.
+The type of the documents contained in the result set.
 
 ## Properties
 
@@ -31,7 +31,7 @@ The type of each document in the result set.
 
 > **docs**: `T`[]
 
-Defined in: [packages/quasar-sdk/src/types.ts:128](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L128)
+Defined in: [packages/quasar-sdk/src/types.ts:136](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L136)
 
 Array of documents for the current page.
 
@@ -41,9 +41,9 @@ Array of documents for the current page.
 
 > **hasNextPage**: `boolean`
 
-Defined in: [packages/quasar-sdk/src/types.ts:140](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L140)
+Defined in: [packages/quasar-sdk/src/types.ts:148](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L148)
 
-Whether a subsequent page exists.
+Indicates if a subsequent page of results is available.
 
 ***
 
@@ -51,9 +51,9 @@ Whether a subsequent page exists.
 
 > **hasPrevPage**: `boolean`
 
-Defined in: [packages/quasar-sdk/src/types.ts:143](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L143)
+Defined in: [packages/quasar-sdk/src/types.ts:151](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L151)
 
-Whether a previous page exists.
+Indicates if a preceding page of results is available.
 
 ***
 
@@ -61,9 +61,9 @@ Whether a previous page exists.
 
 > **page**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:137](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L137)
+Defined in: [packages/quasar-sdk/src/types.ts:145](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L145)
 
-Current page number (1-indexed).
+The current page number (1-indexed).
 
 ***
 
@@ -71,7 +71,7 @@ Current page number (1-indexed).
 
 > **totalDocs**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:131](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L131)
+Defined in: [packages/quasar-sdk/src/types.ts:139](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L139)
 
 Total number of documents matching the query across all pages.
 
@@ -81,6 +81,6 @@ Total number of documents matching the query across all pages.
 
 > **totalPages**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:134](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/types.ts#L134)
+Defined in: [packages/quasar-sdk/src/types.ts:142](https://github.com/TuwaIO/sdk/blob/278964210e6a2f193f4cd1ad209653fda6239b42/packages/quasar-sdk/src/types.ts#L142)
 
-Total number of available pages.
+Total number of available pages based on the limit.

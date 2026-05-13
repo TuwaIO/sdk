@@ -63,7 +63,7 @@ The SDK requires the following peer dependencies:
 
 | Package               | Version   |
 | --------------------- | --------- |
-| `@tuwaio/pulsar-core` | `>=0.5.1` |
+| `@tuwaio/pulsar-core` | `>=0.6.0` |
 | `ofetch`              | `>=1.5.1` |
 
 ---
@@ -79,7 +79,7 @@ const quasar = new Quasar({
   // timeout: 10000,                   // optional, ms
 });
 
-// Sync a new pending transaction
+// Sync a new pending transaction to the cloud
 const { txKey } = await quasar.pulsar.syncCreate({
   hash: '0xabc...',
   chainId: 1,
@@ -87,15 +87,12 @@ const { txKey } = await quasar.pulsar.syncCreate({
   // ...full Transaction object
 });
 
-// Update transaction status
-await quasar.pulsar.syncUpdate(txKey, { status: 'confirmed' });
-
 // Query transaction history
 const history = await quasar.pulsar.getHistory({
   page: 1,
   limit: 20,
   chainId: 1,
-  status: 'confirmed',
+  status: 'Success',
 });
 ```
 
@@ -115,11 +112,10 @@ const quasar = new Quasar(config: QuasarConfig);
 
 The transaction engine interface for the Quasar Cloud.
 
-| Method                       | Description                                         |
-| ---------------------------- | --------------------------------------------------- |
-| `syncCreate(tx)`             | Sync a new pending transaction to the cloud         |
-| `syncUpdate(txKey, patches)` | Update an existing transaction's status or fields   |
-| `getHistory(query?)`         | Retrieve paginated transaction history with filters |
+| Method               | Description                                         |
+| -------------------- | --------------------------------------------------- |
+| `syncCreate(tx)`     | Sync a new pending transaction to the cloud         |
+| `getHistory(query?)` | Retrieve paginated transaction history with filters |
 
 ### Error Handling
 
