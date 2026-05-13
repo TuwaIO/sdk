@@ -20,6 +20,35 @@
 import { QuasarClient } from './core/client';
 import { PulsarModule } from './modules/pulsar';
 import { QuasarConfig } from './types';
+import * as authUtils from './utils';
+
+/**
+ * Security and authentication utilities.
+ *
+ * Includes methods for creating, signing, and verifying Mini-Session signatures
+ * to protect your API quota. These can be used without initializing the Quasar class.
+ *
+ * @public
+ */
+export const utils = {
+  /**
+   * Standardizes the message format for Quasar Mini-Session login.
+   * @see {@link createMiniSessionMessage}
+   */
+  createMiniSessionMessage: authUtils.createMiniSessionMessage,
+
+  /**
+   * Verifies a Mini-Session signature (EVM or Solana).
+   * @see {@link verifyMiniSession}
+   */
+  verifyMiniSession: authUtils.verifyMiniSession,
+
+  /**
+   * Triggers a signature request in the connected wallet.
+   * @see {@link signMiniSession}
+   */
+  signMiniSession: authUtils.signMiniSession,
+};
 
 /**
  * Main entry point for the Quasar SDK.
@@ -46,6 +75,12 @@ import { QuasarConfig } from './types';
  * @public
  */
 export class Quasar {
+  /**
+   * Security and authentication utilities.
+   * Shared across all instances and available statically.
+   */
+  public static readonly utils = utils;
+
   /**
    * The internal HTTP client used for authenticated requests.
    * @internal
@@ -83,3 +118,4 @@ export * from './constants';
 export { QuasarSDKError } from './core/client';
 export { PulsarModule } from './modules/pulsar';
 export * from './types';
+export * from './utils';

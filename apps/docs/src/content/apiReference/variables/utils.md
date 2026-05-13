@@ -2,93 +2,20 @@
 
 ***
 
-# Quasar
+# utils
 
-Defined in: [packages/quasar-sdk/src/index.ts:77](https://github.com/TuwaIO/sdk/blob/cac842692dc42a6eb953a623b23aa9e6ce5c3f3b/packages/quasar-sdk/src/index.ts#L77)
+> `const` **utils**: `object`
 
-Main entry point for the Quasar SDK.
-
-The `Quasar` class provides a unified interface for interacting with the Quasar Cloud API.
-It handles authentication, base URL configuration, and exposes domain-specific modules
-like [PulsarModule](PulsarModule.md) for transaction management.
-
-## Example
-
-```typescript
-import { Quasar } from '@tuwaio/quasar-sdk';
-
-// Initialize with your secret API key
-const quasar = new Quasar({
-  secretKey: 'sk_live_your_secret_key',
-  baseUrl: 'https://api.tuwa.io', // Optional
-  timeout: 10000,                // Optional, default is 10s
-});
-
-// Access domain-specific modules
-const history = await quasar.pulsar.getHistory({ chainId: 1 });
-```
-
-## Constructors
-
-### Constructor
-
-> **new Quasar**(`config`): `Quasar`
-
-Defined in: [packages/quasar-sdk/src/index.ts:111](https://github.com/TuwaIO/sdk/blob/cac842692dc42a6eb953a623b23aa9e6ce5c3f3b/packages/quasar-sdk/src/index.ts#L111)
-
-Creates a new instance of the Quasar SDK.
-
-#### Parameters
-
-##### config
-
-[`QuasarConfig`](../interfaces/QuasarConfig.md)
-
-Configuration options for the SDK.
-
-#### Returns
-
-`Quasar`
-
-#### Throws
-
-If the `secretKey` is missing or invalid.
-
-#### Example
-
-```typescript
-const quasar = new Quasar({ secretKey: process.env.QUASAR_SECRET_KEY! });
-```
-
-## Properties
-
-### pulsar
-
-> `readonly` **pulsar**: [`PulsarModule`](PulsarModule.md)
-
-Defined in: [packages/quasar-sdk/src/index.ts:98](https://github.com/TuwaIO/sdk/blob/cac842692dc42a6eb953a623b23aa9e6ce5c3f3b/packages/quasar-sdk/src/index.ts#L98)
-
-The Pulsar Transaction Engine module.
-
-This module provides methods to sync transaction states to the Quasar Cloud
-and retrieve indexed transaction history across multiple blockchain networks.
-
-#### See
-
-[PulsarModule](PulsarModule.md)
-
-***
-
-### utils
-
-> `readonly` `static` **utils**: `object`
-
-Defined in: [packages/quasar-sdk/src/index.ts:82](https://github.com/TuwaIO/sdk/blob/cac842692dc42a6eb953a623b23aa9e6ce5c3f3b/packages/quasar-sdk/src/index.ts#L82)
+Defined in: [packages/quasar-sdk/src/index.ts:33](https://github.com/TuwaIO/sdk/blob/cac842692dc42a6eb953a623b23aa9e6ce5c3f3b/packages/quasar-sdk/src/index.ts#L33)
 
 Security and authentication utilities.
-Shared across all instances and available statically.
 
-#### createMiniSessionMessage
+Includes methods for creating, signing, and verifying Mini-Session signatures
+to protect your API quota. These can be used without initializing the Quasar class.
+
+## Type Declaration
+
+### createMiniSessionMessage
 
 > **createMiniSessionMessage**: (`timestamp`) => `string` = `authUtils.createMiniSessionMessage`
 
@@ -97,32 +24,32 @@ Standardizes the message format for Quasar Mini-Session login.
 Standardizes the message format for Quasar Mini-Session login.
 Both frontend and backend must use this exact template.
 
-##### Parameters
+#### Parameters
 
-###### timestamp
+##### timestamp
 
 `string`
 
 ISO string timestamp (e.g., `new Date().toISOString()`).
 
-##### Returns
+#### Returns
 
 `string`
 
 The formatted message string to be signed.
 
-##### Example
+#### Example
 
 ```typescript
 const msg = createMiniSessionMessage(new Date().toISOString());
 // msg -> "Quasar Login: 2026-05-13T10:00:00.000Z"
 ```
 
-##### See
+#### See
 
 [createMiniSessionMessage](../functions/createMiniSessionMessage.md)
 
-#### signMiniSession
+### signMiniSession
 
 > **signMiniSession**: (`params`) => `Promise`\<[`SignSessionResult`](../interfaces/SignSessionResult.md)\> = `authUtils.signMiniSession`
 
@@ -136,25 +63,25 @@ This is a frontend-friendly helper that:
 3. Triggers the wallet's signMessage method.
 4. Returns the signature and timestamp for verification on the backend.
 
-##### Parameters
+#### Parameters
 
-###### params
+##### params
 
 [`SignSessionParams`](../interfaces/SignSessionParams.md)
 
 The signing parameters including the signer and ecosystem type.
 
-##### Returns
+#### Returns
 
 `Promise`\<[`SignSessionResult`](../interfaces/SignSessionResult.md)\>
 
 A promise that resolves to the signature and timestamp.
 
-##### Throws
+#### Throws
 
 If the required peer dependencies are missing or signing fails.
 
-##### Example
+#### Example
 
 ```typescript
 // EVM (viem)
@@ -171,11 +98,11 @@ const { signature, timestamp } = await signMiniSession({
 });
 ```
 
-##### See
+#### See
 
 [signMiniSession](../functions/signMiniSession.md)
 
-#### verifyMiniSession
+### verifyMiniSession
 
 > **verifyMiniSession**: (`params`) => `Promise`\<`boolean`\> = `authUtils.verifyMiniSession`
 
@@ -188,29 +115,29 @@ This utility performs three checks:
 2. Cryptographic validity (checks if the signature matches the wallet address and message).
 3. ecosystem-specific logic (EVM via `viem`, Solana via `gill`).
 
-##### Parameters
+#### Parameters
 
-###### params
+##### params
 
 [`VerifySessionParams`](../interfaces/VerifySessionParams.md)
 
 The verification parameters including address, signature, and timestamp.
 
-##### Returns
+#### Returns
 
 `Promise`\<`boolean`\>
 
 A promise that resolves to `true` if the signature is valid and fresh.
 
-##### Throws
+#### Throws
 
 If the required peer dependencies (`viem` or `gill`) are missing.
 
-##### Throws
+#### Throws
 
 If the timestamp is invalid or expired.
 
-##### Example
+#### Example
 
 ```typescript
 const isValid = await verifyMiniSession({
@@ -221,6 +148,6 @@ const isValid = await verifyMiniSession({
 });
 ```
 
-##### See
+#### See
 
 [verifyMiniSession](../functions/verifyMiniSession.md)

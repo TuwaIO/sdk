@@ -117,6 +117,38 @@ The transaction engine interface for the Quasar Cloud.
 | `syncCreate(tx)`     | Sync a new pending transaction to the cloud         |
 | `getHistory(query?)` | Retrieve paginated transaction history with filters |
 
+### Utils — `utils`
+
+Security and authentication utilities. These can be used as standalone functions without providing a secret key (ideal for frontends).
+
+| Method                         | Description                                            |
+| ------------------------------ | ------------------------------------------------------ |
+| `createMiniSessionMessage(ts)` | Format a standard login message for signing            |
+| `signMiniSession(params)`      | Trigger signature request in the connected wallet      |
+| `verifyMiniSession(params)`    | Verify an EVM or Solana signature with expiration check |
+
+**Example Standalone Usage:**
+
+```typescript
+import { utils } from '@tuwaio/quasar-sdk';
+
+// 1. Sign in the browser
+const { signature, timestamp } = await utils.signMiniSession({
+  signer: walletClient,
+  walletAddress: '0x...',
+  chainType: 'evm',
+});
+
+// 2. Verify on the server (no secret key needed)
+const isValid = await utils.verifyMiniSession({
+  walletAddress: '0x...',
+  signature,
+  timestamp,
+  chainType: 'evm',
+});
+```
+
+
 ### Error Handling
 
 All API errors are wrapped in `QuasarSDKError`:

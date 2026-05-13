@@ -41,7 +41,17 @@
   ],
   "peerDependencies": {
     "@tuwaio/pulsar-core": ">=0.6.0",
-    "ofetch": ">=1.5.1"
+    "ofetch": ">=1.5.1",
+    "viem": "^2.0.0",
+    "gill": "^0.14.0"
+  },
+  "peerDependenciesMeta": {
+    "viem": {
+      "optional": true
+    },
+    "gill": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@tuwaio/pulsar-core": "^0.6.2",
