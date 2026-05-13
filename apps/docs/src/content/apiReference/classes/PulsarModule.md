@@ -4,31 +4,32 @@
 
 # PulsarModule
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:36](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/modules/pulsar/index.ts#L36)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:37](https://github.com/TuwaIO/sdk/blob/40e865856a0617a904fae0c2bda5ce0c68ac8117/packages/quasar-sdk/src/modules/pulsar/index.ts#L37)
 
 Pulsar module — the transaction engine interface for Quasar Cloud.
 
-Handles all operations related to blockchain transaction lifecycle:
-creating, updating, and querying transactions through the API.
+The `PulsarModule` handles the lifecycle of blockchain transactions within the Quasar ecosystem.
+It allows developers to sync transaction states (EVM, Solana, Starknet) to the cloud for
+persistent tracking and to retrieve comprehensive transaction histories.
 
 ## Remarks
 
-Access this module via `quasar.pulsar` after initializing the SDK.
-All methods authenticate automatically using the configured secret key.
+Access this module via `quasar.pulsar` after initializing the [Quasar](Quasar.md) SDK.
+All methods are authenticated automatically using the configured secret key.
 
 ## Example
 
 ```typescript
 const quasar = new Quasar({ secretKey: 'sk_live_...' });
 
-// Create
+// Sync a new transaction to start tracking
 const { txKey } = await quasar.pulsar.syncCreate(transaction);
 
-// Update
-await quasar.pulsar.syncUpdate(txKey, { status: 'confirmed' });
-
-// Read
-const history = await quasar.pulsar.getHistory({ chainId: 1 });
+// Retrieve transaction history with filters
+const history = await quasar.pulsar.getHistory({
+  chainId: 1,
+  status: 'Success',
+});
 ```
 
 ## Constructors
@@ -37,7 +38,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 > **new PulsarModule**(`client`): `PulsarModule`
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:43](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/modules/pulsar/index.ts#L43)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:44](https://github.com/TuwaIO/sdk/blob/40e865856a0617a904fae0c2bda5ce0c68ac8117/packages/quasar-sdk/src/modules/pulsar/index.ts#L44)
 
 **`Internal`**
 
@@ -61,12 +62,12 @@ The internal [QuasarClient](#) instance for making authenticated API calls.
 
 > **getHistory**(`query?`): `Promise`\<[`PaginatedResult`](../interfaces/PaginatedResult.md)\<[`Transaction`](../type-aliases/Transaction.md)\>\>
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:101](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/modules/pulsar/index.ts#L101)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:102](https://github.com/TuwaIO/sdk/blob/40e865856a0617a904fae0c2bda5ce0c68ac8117/packages/quasar-sdk/src/modules/pulsar/index.ts#L102)
 
-Retrieves paginated transaction history from the Quasar Cloud.
+Retrieves a paginated list of transactions from the Quasar Cloud.
 
-Supports filtering by chain ID, status, and specific transaction key.
-Returns a typed [PaginatedResult](../interfaces/PaginatedResult.md) with navigation metadata.
+Supports advanced filtering by chain, status, wallet address, and more.
+Results are returned in a typed [PaginatedResult](../interfaces/PaginatedResult.md) wrapper.
 
 #### Parameters
 
@@ -74,17 +75,17 @@ Returns a typed [PaginatedResult](../interfaces/PaginatedResult.md) with navigat
 
 [`HistoryQuery`](../interfaces/HistoryQuery.md) = `{}`
 
-Optional query parameters for filtering and pagination.
+Optional query parameters for filtering and pagination. See [HistoryQuery](../interfaces/HistoryQuery.md).
 
 #### Returns
 
 `Promise`\<[`PaginatedResult`](../interfaces/PaginatedResult.md)\<[`Transaction`](../type-aliases/Transaction.md)\>\>
 
-A paginated result containing an array of [Transaction](../type-aliases/Transaction.md) documents.
+A promise that resolves to a [PaginatedResult](../interfaces/PaginatedResult.md) containing an array of [Transaction](../type-aliases/Transaction.md) documents.
 
 #### Throws
 
-On authentication failure or network issue.
+If the request fails (e.g., 401 Unauthorized, 404 Not Found).
 
 #### Example
 
@@ -92,13 +93,10 @@ On authentication failure or network issue.
 const result = await quasar.pulsar.getHistory({
   page: 1,
   limit: 20,
-  chainId: 1,
-  status: 'confirmed',
+  walletAddress: '6x...',
 });
 
-for (const tx of result.docs) {
-  console.log(tx.hash, tx.status);
-}
+result.docs.forEach(tx => console.log(tx.txKey, tx.status));
 ```
 
 ***
@@ -107,12 +105,12 @@ for (const tx of result.docs) {
 
 > **syncCreate**(`tx`, `appName?`): `Promise`\<\{ `success`: `true`; `txKey`: `string`; \}\>
 
-Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:67](https://github.com/TuwaIO/sdk/blob/72093f1e841361703da223b1fa107e555630b04e/packages/quasar-sdk/src/modules/pulsar/index.ts#L67)
+Defined in: [packages/quasar-sdk/src/modules/pulsar/index.ts:71](https://github.com/TuwaIO/sdk/blob/40e865856a0617a904fae0c2bda5ce0c68ac8117/packages/quasar-sdk/src/modules/pulsar/index.ts#L71)
 
-Syncs a newly created pending transaction to the Quasar Cloud.
+Syncs a newly created or pending transaction to the Quasar Cloud.
 
-Sends the full transaction object to the `tx-sync` endpoint via POST.
-The server assigns a unique `txKey` that can be used for subsequent updates.
+This method sends the full transaction object to the Pulsar sync engine.
+Once synced, the transaction is indexed and tracked through the Iron Dome infrastructure.
 
 #### Parameters
 
@@ -120,32 +118,35 @@ The server assigns a unique `txKey` that can be used for subsequent updates.
 
 [`Transaction`](../type-aliases/Transaction.md)
 
-The complete transaction object to sync.
+The complete transaction object to sync. Must conform to the [Transaction](../type-aliases/Transaction.md) type.
 
 ##### appName?
 
 `string`
 
-The application name for filtering by.
+Optional application name to associate with this transaction for filtering purposes.
 
 #### Returns
 
 `Promise`\<\{ `success`: `true`; `txKey`: `string`; \}\>
 
-An object containing `success: true` and the assigned `txKey`.
+A promise that resolves to an object containing the assigned `txKey`.
 
 #### Throws
 
-On authentication failure, validation error, or network issue.
+If the request fails due to authentication, validation, or network issues.
 
 #### Example
 
 ```typescript
-const { txKey } = await quasar.pulsar.syncCreate({
+const result = await quasar.pulsar.syncCreate({
   hash: '0xabc...',
   chainId: 1,
   status: 'pending',
   from: '0x123...',
   to: '0x456...',
-});
+  // ... other transaction fields
+}, 'My Dashboard');
+
+console.log(result.txKey); // The unique key for this transaction
 ```
