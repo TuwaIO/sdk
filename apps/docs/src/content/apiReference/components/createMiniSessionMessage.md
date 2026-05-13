@@ -6,7 +6,7 @@
 
 > **createMiniSessionMessage**(`timestamp`): `string`
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:45](https://github.com/TuwaIO/sdk/blob/cac842692dc42a6eb953a623b23aa9e6ce5c3f3b/packages/quasar-sdk/src/utils/auth.ts#L45)
+Defined in: [packages/quasar-sdk/src/utils/auth.ts:51](https://github.com/TuwaIO/sdk/blob/908b7c04af95e7c3cc2d623fe77e4ed458145298/packages/quasar-sdk/src/utils/auth.ts#L51)
 
 Standardizes the message format for Quasar Mini-Session login.
 Both frontend and backend must use this exact template.

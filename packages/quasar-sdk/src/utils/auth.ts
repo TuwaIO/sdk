@@ -15,13 +15,19 @@ export interface VerifySessionParams {
   signature: string;
   /** The blockchain ecosystem type. */
   chainType: 'evm' | 'solana';
+  /** 
+   * Maximum allowed age for the signature in milliseconds.
+   * Default: 5 minutes (300,000ms).
+   */
+  maxAge?: number;
 }
 
 /**
- * Maximum allowed age for a signature (5 minutes).
+ * Default maximum allowed age for a signature (5 minutes).
  * @internal
  */
-const MAX_AGE = 5 * 60 * 1000;
+const DEFAULT_MAX_AGE = 5 * 60 * 1000;
+
 
 /**
  * Allowed clock drift for future timestamps (1 minute).
@@ -180,7 +186,8 @@ export async function verifyMiniSession(params: VerifySessionParams): Promise<bo
     throw new Error('[Quasar SDK] Invalid timestamp format. Use ISO string.');
   }
 
-  if (now - requestTime > MAX_AGE) {
+  const allowedAge = params.maxAge ?? DEFAULT_MAX_AGE;
+  if (now - requestTime > allowedAge) {
     throw new Error('[Quasar SDK] Signature expired. Please sign a fresh message.');
   }
 
