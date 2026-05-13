@@ -168,3 +168,84 @@ export type { Transaction };
  * @internal
  */
 export type { UpdatableTransactionFields };
+
+/**
+ * Supported blockchain ecosystems for authentication.
+ * @public
+ */
+export enum ChainType {
+  EVM = 'EVM',
+  SOLANA = 'SOLANA',
+}
+
+/**
+ * Result of the Mini-Session signing process.
+ * Used for both frontend-side caching and backend-side verification.
+ * @public
+ */
+export interface MiniSessionAuth {
+  /** The cryptographic signature (hex for EVM, base58 for Solana). */
+  signature: string;
+  /** ISO string timestamp used in the signed message. */
+  timestamp: string;
+  /** The blockchain ecosystem type. */
+  chainType: ChainType;
+  /** The wallet address that signed the message. */
+  walletAddress: string;
+}
+
+/**
+ * Parameters for verifying a mini-session signature.
+ * @public
+ */
+export interface VerifySessionParams extends Omit<MiniSessionAuth, 'walletAddress'> {
+  /** The wallet address that allegedly signed the message. */
+  walletAddress: string;
+  /**
+   * Maximum allowed age for the signature in milliseconds.
+   * Default: 5 minutes (300,000ms).
+   */
+  maxAge?: number;
+}
+
+/**
+ * Parameters for signing a mini-session message.
+ * @public
+ */
+export interface SignSessionParams {
+  /** The signer object. For EVM, a `WalletClient`. For Solana, a `KeyPairSigner` or `TransactionSendingSigner`. */
+  signer: any;
+  /** The wallet address to sign with (required for EVM). */
+  walletAddress?: string;
+  /** The blockchain ecosystem type. */
+  chainType: ChainType;
+}
+
+/**
+ * Zustand store interface for managing Mini-Sessions.
+ * @public
+ */
+export interface MiniSessionStore {
+  /** Current active session or null. */
+  miniSession: MiniSessionAuth | null;
+  /** Sets the active session. */
+  setMiniSession: (session: MiniSessionAuth | null) => void;
+  /** Clears the current session. */
+  clearSession: () => void;
+}
+
+/**
+ * Minimum connection data required for Mini-Session signing.
+ * @public
+ */
+export interface ConnectionData {
+  /** Whether a wallet is currently connected. */
+  isConnected: boolean;
+  /** The active wallet address. */
+  address: string;
+  /** The blockchain ecosystem type. */
+  chainType: ChainType;
+  /** The wallet signer object (WalletClient for EVM, TransactionSendingSigner for Solana). */
+  signer: any;
+}
+

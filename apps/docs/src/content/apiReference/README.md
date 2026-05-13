@@ -13,6 +13,10 @@ const quasar = new Quasar({ secretKey: 'sk_live_...' });
 const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ```
 
+## Enumerations
+
+- [ChainType](enumerations/ChainType.md)
+
 ## Classes
 
 - [PulsarModule](classes/PulsarModule.md)
@@ -21,7 +25,10 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 ## Interfaces
 
+- [ConnectionData](interfaces/ConnectionData.md)
 - [HistoryQuery](interfaces/HistoryQuery.md)
+- [MiniSessionAuth](interfaces/MiniSessionAuth.md)
+- [MiniSessionStore](interfaces/MiniSessionStore.md)
 - [PaginatedResult](interfaces/PaginatedResult.md)
 - [QuasarConfig](interfaces/QuasarConfig.md)
 - [SignSessionParams](interfaces/SignSessionParams.md)
@@ -43,5 +50,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ## Functions
 
 - [createMiniSessionMessage](functions/createMiniSessionMessage.md)
+- [createMiniSessionStore](functions/createMiniSessionStore.md)
+- [getMiniSessionAuth](functions/getMiniSessionAuth.md)
 - [signMiniSession](functions/signMiniSession.md)
 - [verifyMiniSession](functions/verifyMiniSession.md)

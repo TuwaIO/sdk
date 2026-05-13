@@ -6,9 +6,9 @@
 
 > **createMiniSessionMessage**(`timestamp`): `string`
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:51](https://github.com/TuwaIO/sdk/blob/908b7c04af95e7c3cc2d623fe77e4ed458145298/packages/quasar-sdk/src/utils/auth.ts#L51)
+Defined in: [packages/quasar-sdk/src/utils/auth.ts:33](https://github.com/TuwaIO/sdk/blob/56f32d05204d8e3face85bd0cfcf4d125f27ce73/packages/quasar-sdk/src/utils/auth.ts#L33)
 
-Standardizes the message format for Quasar Mini-Session login.
+Standardizes the message format for Mini-Session login.
 Both frontend and backend must use this exact template.
 
 ## Parameters
@@ -29,5 +29,5 @@ The formatted message string to be signed.
 
 ```typescript
 const msg = createMiniSessionMessage(new Date().toISOString());
-// msg -> "Quasar Login: 2026-05-13T10:00:00.000Z"
+// msg -> "Mini-Session Login: 2026-05-13T10:00:00.000Z"
 ```

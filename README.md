@@ -126,17 +126,19 @@ Security and authentication utilities. These can be used as standalone functions
 | `createMiniSessionMessage(ts)` | Format a standard login message for signing            |
 | `signMiniSession(params)`      | Trigger signature request in the connected wallet      |
 | `verifyMiniSession(params)`    | Verify an EVM or Solana signature with expiration check |
+| `createMiniSessionStore(name)` | Create a persistent Zustand store for session caching  |
+| `getMiniSessionAuth(conn, st)` | Reusable helper for signing and caching logic          |
 
 **Example Standalone Usage:**
 
 ```typescript
-import { utils } from '@tuwaio/quasar-sdk';
+import { utils, ChainType } from '@tuwaio/quasar-sdk';
 
 // 1. Sign in the browser
 const { signature, timestamp } = await utils.signMiniSession({
   signer: walletClient,
   walletAddress: '0x...',
-  chainType: 'evm',
+  chainType: ChainType.EVM,
 });
 
 // 2. Verify on the server (no secret key needed)
@@ -144,9 +146,11 @@ const isValid = await utils.verifyMiniSession({
   walletAddress: '0x...',
   signature,
   timestamp,
-  chainType: 'evm',
+  chainType: ChainType.EVM,
+  maxAge: 24 * 60 * 60 * 1000, // Optional: 24h session
 });
 ```
+
 
 
 ### Error Handling

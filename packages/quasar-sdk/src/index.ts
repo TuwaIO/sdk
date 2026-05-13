@@ -48,7 +48,21 @@ export const utils = {
    * @see {@link signMiniSession}
    */
   signMiniSession: authUtils.signMiniSession,
+
+  /**
+   * Creates a persistent Zustand store for session management.
+   * @see {@link createMiniSessionStore}
+   */
+  createMiniSessionStore: authUtils.createMiniSessionStore,
+
+
+  /**
+   * Reusable helper to manage signing and session caching.
+   * @see {@link getMiniSessionAuth}
+   */
+  getMiniSessionAuth: authUtils.getMiniSessionAuth,
 };
+
 
 /**
  * Main entry point for the Quasar SDK.
