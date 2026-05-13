@@ -8,6 +8,18 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.mjs",
+      "require": "./dist/react.js"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -15,7 +27,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "tsup src/index.ts --watch",
+    "start": "tsup --watch",
     "build": "tsup"
   },
   "keywords": [
@@ -40,11 +52,15 @@
     }
   ],
   "peerDependencies": {
+    "@solana/react": ">=6.9.0",
     "@tuwaio/pulsar-core": ">=0.6.0",
+    "@wagmi/core": "3.x.x",
+    "@wallet-standard/react": "1.x.x",
     "ofetch": ">=1.5.1",
-    "viem": "^2.0.0",
-    "gill": "^0.14.0",
-    "zustand": "^5.0.0"
+    "react": ">=19.2.0",
+    "gill": ">=0.14",
+    "viem": "2.x.x",
+    "zustand": "5.x.x"
   },
   "peerDependenciesMeta": {
     "viem": {
@@ -55,12 +71,30 @@
     },
     "zustand": {
       "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "@solana/react": {
+      "optional": true
+    },
+    "@wagmi/core": {
+      "optional": true
+    },
+    "@wallet-standard/react": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@solana/react": "^6.9.0",
     "@tuwaio/pulsar-core": "^0.6.2",
+    "@types/react": "^19.2.14",
+    "@wagmi/core": "^3.4.11",
+    "@wallet-standard/react": "^1.0.2",
     "ofetch": "^1.5.1",
+    "react": "^19.2.6",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "zustand": "^5.0.13"
   }
 }

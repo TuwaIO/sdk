@@ -6,6 +6,6 @@
 
 > **Transaction** = `EvmTransaction` \| `SolanaTransaction` \| `StarknetTransaction`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.6.2\_@tuwaio+orbit-core@0.2.8\_dayjs@1.11.19\_immer@11.1.4\_zustand@5\_f3a80d3ad5457c2659f5cc5f14dc2dc4/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:160
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.6.2\_@tuwaio+orbit-core@0.2.8\_dayjs@1.11.19\_immer@11.1.4\_zustand@5\_620c8438c294bbaa35197f191ca3ba49/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:160
 
 A union type representing any possible transaction structure that Pulsar can handle.

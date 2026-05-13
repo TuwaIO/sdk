@@ -5,7 +5,10 @@ import pkg from './package.json';
 export default defineConfig([
   {
     format: ['cjs', 'esm'],
-    entry: ['./src/index.ts'],
+    entry: {
+      index: './src/index.ts',
+      react: './src/react/index.tsx',
+    },
     sourcemap: false,
     splitting: true,
     treeshake: true,
