@@ -93,17 +93,16 @@ export async function signMiniSession(params: SignSessionParams): Promise<SignSe
       const encoder = gill.getUtf8Encoder();
       const messageBytes = encoder.encode(message);
 
-      // Sign the message (returns SignatureBytes[])
-      const [signatureBytes] = await params.signer.signMessages([messageBytes]);
+      // Sign the message (returns SignMessagesOutput[])
+      const [output] = await params.signer.signMessages([messageBytes]);
 
-      // Defensive check: Ensure we have a Uint8Array for base58 encoding
-      // Some environments or older polyfills might return Buffer or Array-like
-      const safeBytes = signatureBytes instanceof Uint8Array 
-        ? signatureBytes 
-        : new Uint8Array(signatureBytes as any);
+      if (!output || !output.signature) {
+        throw new Error('[SDK] Wallet returned invalid signature output.', { cause: output });
+      }
 
       // Convert bytes to base58 string for the API
-      const signature = gill.getSignatureFromBytes(safeBytes as any);
+      // We cast to any to satisfy the branded type requirement of gill (Solana Web3 v2)
+      const signature = gill.getSignatureFromBytes(output.signature as any);
 
       return { signature, timestamp };
     } catch (err) {

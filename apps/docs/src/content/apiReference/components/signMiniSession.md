@@ -6,7 +6,7 @@
 
 > **signMiniSession**(`params`): `Promise`\<[`SignSessionResult`](../interfaces/SignSessionResult.md)\>
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:60](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/utils/auth.ts#L60)
+Defined in: [packages/quasar-sdk/src/utils/auth.ts:60](https://github.com/TuwaIO/sdk/blob/248399a6984792d96235541a58c591dc8188e928/packages/quasar-sdk/src/utils/auth.ts#L60)
 
 Triggers a signature request in the connected wallet to create a Mini-Session.
 
