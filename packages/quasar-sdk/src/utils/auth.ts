@@ -96,8 +96,14 @@ export async function signMiniSession(params: SignSessionParams): Promise<SignSe
       // Sign the message (returns SignatureBytes[])
       const [signatureBytes] = await params.signer.signMessages([messageBytes]);
 
+      // Defensive check: Ensure we have a Uint8Array for base58 encoding
+      // Some environments or older polyfills might return Buffer or Array-like
+      const safeBytes = signatureBytes instanceof Uint8Array 
+        ? signatureBytes 
+        : new Uint8Array(signatureBytes as any);
+
       // Convert bytes to base58 string for the API
-      const signature = gill.getSignatureFromBytes(signatureBytes);
+      const signature = gill.getSignatureFromBytes(safeBytes as any);
 
       return { signature, timestamp };
     } catch (err) {

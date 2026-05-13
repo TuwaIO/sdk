@@ -4,7 +4,7 @@
 
 # SignSessionParams
 
-Defined in: [packages/quasar-sdk/src/types.ts:215](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L215)
+Defined in: [packages/quasar-sdk/src/types.ts:215](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L215)
 
 Parameters for signing a mini-session message.
 
@@ -14,7 +14,7 @@ Parameters for signing a mini-session message.
 
 > **chainType**: [`ChainType`](../enumerations/ChainType.md)
 
-Defined in: [packages/quasar-sdk/src/types.ts:221](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L221)
+Defined in: [packages/quasar-sdk/src/types.ts:221](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L221)
 
 The blockchain ecosystem type.
 
@@ -24,7 +24,7 @@ The blockchain ecosystem type.
 
 > **signer**: `any`
 
-Defined in: [packages/quasar-sdk/src/types.ts:217](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L217)
+Defined in: [packages/quasar-sdk/src/types.ts:217](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L217)
 
 The signer object. For EVM, a `WalletClient`. For Solana, a `KeyPairSigner` or `TransactionSendingSigner`.
 
@@ -34,6 +34,6 @@ The signer object. For EVM, a `WalletClient`. For Solana, a `KeyPairSigner` or `
 
 > `optional` **walletAddress?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:219](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L219)
+Defined in: [packages/quasar-sdk/src/types.ts:219](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L219)
 
 The wallet address to sign with (required for EVM).

@@ -6,7 +6,7 @@
 
 > **getMiniSessionAuth**(`connection`, `store`): `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\>
 
-Defined in: [packages/quasar-sdk/src/utils/session.ts:40](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/utils/session.ts#L40)
+Defined in: [packages/quasar-sdk/src/utils/session.ts:40](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/utils/session.ts#L40)
 
 Generic helper to manage Mini-Session signing and caching.
 

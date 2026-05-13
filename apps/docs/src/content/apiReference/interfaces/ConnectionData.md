@@ -4,7 +4,7 @@
 
 # ConnectionData
 
-Defined in: [packages/quasar-sdk/src/types.ts:241](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L241)
+Defined in: [packages/quasar-sdk/src/types.ts:241](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L241)
 
 Minimum connection data required for Mini-Session signing.
 
@@ -14,7 +14,7 @@ Minimum connection data required for Mini-Session signing.
 
 > **address**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:245](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L245)
+Defined in: [packages/quasar-sdk/src/types.ts:245](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L245)
 
 The active wallet address.
 
@@ -24,7 +24,7 @@ The active wallet address.
 
 > **chainType**: [`ChainType`](../enumerations/ChainType.md)
 
-Defined in: [packages/quasar-sdk/src/types.ts:247](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L247)
+Defined in: [packages/quasar-sdk/src/types.ts:247](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L247)
 
 The blockchain ecosystem type.
 
@@ -34,7 +34,7 @@ The blockchain ecosystem type.
 
 > **isConnected**: `boolean`
 
-Defined in: [packages/quasar-sdk/src/types.ts:243](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L243)
+Defined in: [packages/quasar-sdk/src/types.ts:243](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L243)
 
 Whether a wallet is currently connected.
 
@@ -44,6 +44,6 @@ Whether a wallet is currently connected.
 
 > **signer**: `any`
 
-Defined in: [packages/quasar-sdk/src/types.ts:249](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/types.ts#L249)
+Defined in: [packages/quasar-sdk/src/types.ts:249](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/types.ts#L249)
 
 The wallet signer object (WalletClient for EVM, TransactionSendingSigner for Solana).

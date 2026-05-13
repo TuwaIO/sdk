@@ -6,7 +6,7 @@
 
 > **createMiniSessionStore**(`storageName?`): `UseBoundStore`\<`WithPersist`\<`StoreApi`\<[`MiniSessionStore`](../interfaces/MiniSessionStore.md)\>, [`MiniSessionStore`](../interfaces/MiniSessionStore.md)\>\>
 
-Defined in: [packages/quasar-sdk/src/utils/session.ts:14](https://github.com/TuwaIO/sdk/blob/494fbc95844351c2656d7f175f4f1af1877ba7dc/packages/quasar-sdk/src/utils/session.ts#L14)
+Defined in: [packages/quasar-sdk/src/utils/session.ts:14](https://github.com/TuwaIO/sdk/blob/7b4fa2d828783f8e5a64b9061a463e1a36db4ee9/packages/quasar-sdk/src/utils/session.ts#L14)
 
 Creates a persistent Zustand store to cache Mini-Session signatures.
 Requires `zustand` to be installed as a peer dependency.
