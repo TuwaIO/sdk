@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.4...quasar-sdk-v0.0.5) (2026-05-13)
+
+
+### Bug Fixes
+
+* added auth provider and a little fix docs ([#6](https://github.com/TuwaIO/sdk/issues/6)) ([6fb6b88](https://github.com/TuwaIO/sdk/commit/6fb6b887ab9c11b83f9bd1a51a50f78d38460b5b))
+
 ## [0.0.4](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.3...quasar-sdk-v0.0.4) (2026-05-09)
 
 
