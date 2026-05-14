@@ -6,7 +6,7 @@
 
 > **UpdatableTransactionFields** = `Partial`\<`Pick`\<`EvmTransaction`, `"to"` \| `"nonce"` \| `"txKey"` \| `"pending"` \| `"hash"` \| `"status"` \| `"replacedTxHash"` \| `"error"` \| `"finishedTimestamp"` \| `"isTrackedModalOpen"` \| `"isError"` \| `"maxPriorityFeePerGas"` \| `"maxFeePerGas"` \| `"input"` \| `"value"` \| `"confirmations"` \| `"requiredConfirmations"`\>\> & `Partial`\<`Pick`\<`SolanaTransaction`, `"slot"` \| `"confirmations"` \| `"fee"` \| `"instructions"` \| `"recentBlockhash"` \| `"rpcUrl"`\>\>
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.6.2\_@tuwaio+orbit-core@0.2.8\_dayjs@1.11.19\_immer@11.1.4\_zustand@5\_620c8438c294bbaa35197f191ca3ba49/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:313
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.6.3\_@tuwaio+orbit-core@0.2.8\_dayjs@1.11.19\_immer@11.1.4\_zustand@5\_5701f318bda2665bd6c8e26d8a750247/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:329
 
 A utility type that creates a union of all fields that can be safely updated
 on a transaction object via the `updateTxParams` action. This ensures type safety

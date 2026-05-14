@@ -87,7 +87,7 @@
   },
   "devDependencies": {
     "@solana/react": "^6.9.0",
-    "@tuwaio/pulsar-core": "^0.6.2",
+    "@tuwaio/pulsar-core": "^0.6.3",
     "@types/react": "^19.2.14",
     "@wagmi/core": "^3.4.11",
     "@wallet-standard/react": "^1.0.2",
