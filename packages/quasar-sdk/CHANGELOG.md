@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.7...quasar-sdk-v0.0.8) (2026-05-15)
+
+
+### Bug Fixes
+
+* auth max age ([e0ea6d4](https://github.com/TuwaIO/sdk/commit/e0ea6d481944a34ec9055065e956b50d06b8c4dd))
+
 ## [0.0.7](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.6...quasar-sdk-v0.0.7) (2026-05-15)
 
 
