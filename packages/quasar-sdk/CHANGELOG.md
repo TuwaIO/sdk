@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.6...quasar-sdk-v0.0.7) (2026-05-15)
+
+
+### Bug Fixes
+
+* updated auth logic ([074a887](https://github.com/TuwaIO/sdk/commit/074a887cb6f4ce0fff3acdd5a1d1af68622b32ae))
+
 ## [0.0.6](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.5...quasar-sdk-v0.0.6) (2026-05-14)
 
 
