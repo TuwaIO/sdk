@@ -49,6 +49,9 @@ export function createMiniSessionStore(storageName = 'mini-session-storage') {
  *
  * @param connection - The current active wallet connection data (address, signer, etc).
  * @param store - A store implementation (Zustand or compatible) for session persistence.
+ * @param maxAge - Maximum allowed session age in milliseconds. Must match the value
+ *   passed to `verifyMiniSession` to keep cache and verification in sync.
+ *   Defaults to `DEFAULT_MAX_AGE` (5 minutes).
  * @returns A promise resolving to a valid MiniSessionAuth object.
  * @throws {Error} If the wallet is disconnected or signing fails.
  *
@@ -60,6 +63,7 @@ export async function getMiniSessionAuth(
     miniSession: MiniSessionAuth | null;
     setMiniSession: (session: MiniSessionAuth | null) => void;
   },
+  maxAge: number = DEFAULT_MAX_AGE,
 ): Promise<MiniSessionAuth> {
   const { isConnected, address, chainType, signer } = connection;
 
@@ -75,7 +79,7 @@ export async function getMiniSessionAuth(
 
     // Subtract safety buffer to account for network latency between
     // cache check and server-side verifyMiniSession call.
-    if (now - timestampDate < DEFAULT_MAX_AGE - NETWORK_SAFETY_BUFFER) {
+    if (now - timestampDate < maxAge - NETWORK_SAFETY_BUFFER) {
       return cached;
     }
   }

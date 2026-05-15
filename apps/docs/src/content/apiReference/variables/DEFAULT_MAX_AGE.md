@@ -6,7 +6,7 @@
 
 > `const` **DEFAULT\_MAX\_AGE**: `number`
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:21](https://github.com/TuwaIO/sdk/blob/ce81cef2e11371edca68c5ede6f63a43b1f217a3/packages/quasar-sdk/src/utils/auth.ts#L21)
+Defined in: [packages/quasar-sdk/src/utils/auth.ts:21](https://github.com/TuwaIO/sdk/blob/ad96ef0019f28a19fc06ee40597f0d1a3e2b1f66/packages/quasar-sdk/src/utils/auth.ts#L21)
 
 **`Internal`**
 

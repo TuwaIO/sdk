@@ -4,7 +4,7 @@
 
 # Quasar
 
-Defined in: [packages/quasar-sdk/src/index.ts:89](https://github.com/TuwaIO/sdk/blob/ce81cef2e11371edca68c5ede6f63a43b1f217a3/packages/quasar-sdk/src/index.ts#L89)
+Defined in: [packages/quasar-sdk/src/index.ts:89](https://github.com/TuwaIO/sdk/blob/ad96ef0019f28a19fc06ee40597f0d1a3e2b1f66/packages/quasar-sdk/src/index.ts#L89)
 
 Main entry point for the Quasar SDK.
 
@@ -34,7 +34,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 > **new Quasar**(`config`): `Quasar`
 
-Defined in: [packages/quasar-sdk/src/index.ts:123](https://github.com/TuwaIO/sdk/blob/ce81cef2e11371edca68c5ede6f63a43b1f217a3/packages/quasar-sdk/src/index.ts#L123)
+Defined in: [packages/quasar-sdk/src/index.ts:123](https://github.com/TuwaIO/sdk/blob/ad96ef0019f28a19fc06ee40597f0d1a3e2b1f66/packages/quasar-sdk/src/index.ts#L123)
 
 Creates a new instance of the Quasar SDK.
 
@@ -66,7 +66,7 @@ const quasar = new Quasar({ secretKey: process.env.QUASAR_SECRET_KEY! });
 
 > `readonly` **pulsar**: [`PulsarModule`](PulsarModule.md)
 
-Defined in: [packages/quasar-sdk/src/index.ts:110](https://github.com/TuwaIO/sdk/blob/ce81cef2e11371edca68c5ede6f63a43b1f217a3/packages/quasar-sdk/src/index.ts#L110)
+Defined in: [packages/quasar-sdk/src/index.ts:110](https://github.com/TuwaIO/sdk/blob/ad96ef0019f28a19fc06ee40597f0d1a3e2b1f66/packages/quasar-sdk/src/index.ts#L110)
 
 The Pulsar Transaction Engine module.
 
@@ -83,7 +83,7 @@ and retrieve indexed transaction history across multiple blockchain networks.
 
 > `readonly` `static` **utils**: `object`
 
-Defined in: [packages/quasar-sdk/src/index.ts:94](https://github.com/TuwaIO/sdk/blob/ce81cef2e11371edca68c5ede6f63a43b1f217a3/packages/quasar-sdk/src/index.ts#L94)
+Defined in: [packages/quasar-sdk/src/index.ts:94](https://github.com/TuwaIO/sdk/blob/ad96ef0019f28a19fc06ee40597f0d1a3e2b1f66/packages/quasar-sdk/src/index.ts#L94)
 
 Security and authentication utilities.
 Shared across all instances and available statically.
@@ -151,7 +151,7 @@ A Zustand store instance initialized with MiniSessionStore interface.
 
 #### getMiniSessionAuth
 
-> **getMiniSessionAuth**: (`connection`, `store`) => `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\> = `authUtils.getMiniSessionAuth`
+> **getMiniSessionAuth**: (`connection`, `store`, `maxAge`) => `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\> = `authUtils.getMiniSessionAuth`
 
 Reusable helper to manage signing and session caching.
 
@@ -180,6 +180,14 @@ A store implementation (Zustand or compatible) for session persistence.
 ###### setMiniSession
 
 (`session`) => `void`
+
+###### maxAge?
+
+`number` = `DEFAULT_MAX_AGE`
+
+Maximum allowed session age in milliseconds. Must match the value
+  passed to `verifyMiniSession` to keep cache and verification in sync.
+  Defaults to `DEFAULT_MAX_AGE` (5 minutes).
 
 ##### Returns
 

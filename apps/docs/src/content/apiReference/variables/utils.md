@@ -6,7 +6,7 @@
 
 > `const` **utils**: `object`
 
-Defined in: [packages/quasar-sdk/src/index.ts:33](https://github.com/TuwaIO/sdk/blob/ce81cef2e11371edca68c5ede6f63a43b1f217a3/packages/quasar-sdk/src/index.ts#L33)
+Defined in: [packages/quasar-sdk/src/index.ts:33](https://github.com/TuwaIO/sdk/blob/ad96ef0019f28a19fc06ee40597f0d1a3e2b1f66/packages/quasar-sdk/src/index.ts#L33)
 
 Security and authentication utilities.
 
@@ -78,7 +78,7 @@ A Zustand store instance initialized with MiniSessionStore interface.
 
 ### getMiniSessionAuth
 
-> **getMiniSessionAuth**: (`connection`, `store`) => `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\> = `authUtils.getMiniSessionAuth`
+> **getMiniSessionAuth**: (`connection`, `store`, `maxAge`) => `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\> = `authUtils.getMiniSessionAuth`
 
 Reusable helper to manage signing and session caching.
 
@@ -107,6 +107,14 @@ A store implementation (Zustand or compatible) for session persistence.
 ###### setMiniSession
 
 (`session`) => `void`
+
+##### maxAge?
+
+`number` = `DEFAULT_MAX_AGE`
+
+Maximum allowed session age in milliseconds. Must match the value
+  passed to `verifyMiniSession` to keep cache and verification in sync.
+  Defaults to `DEFAULT_MAX_AGE` (5 minutes).
 
 #### Returns
 

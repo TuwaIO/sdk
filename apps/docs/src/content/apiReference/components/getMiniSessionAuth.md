@@ -4,9 +4,9 @@
 
 # getMiniSessionAuth()
 
-> **getMiniSessionAuth**(`connection`, `store`): `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\>
+> **getMiniSessionAuth**(`connection`, `store`, `maxAge?`): `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\>
 
-Defined in: [packages/quasar-sdk/src/utils/session.ts:57](https://github.com/TuwaIO/sdk/blob/ce81cef2e11371edca68c5ede6f63a43b1f217a3/packages/quasar-sdk/src/utils/session.ts#L57)
+Defined in: [packages/quasar-sdk/src/utils/session.ts:60](https://github.com/TuwaIO/sdk/blob/ad96ef0019f28a19fc06ee40597f0d1a3e2b1f66/packages/quasar-sdk/src/utils/session.ts#L60)
 
 High-level orchestrator to retrieve an existing Mini-Session or trigger a new signature.
 
@@ -33,6 +33,14 @@ A store implementation (Zustand or compatible) for session persistence.
 #### setMiniSession
 
 (`session`) => `void`
+
+### maxAge?
+
+`number` = `DEFAULT_MAX_AGE`
+
+Maximum allowed session age in milliseconds. Must match the value
+  passed to `verifyMiniSession` to keep cache and verification in sync.
+  Defaults to `DEFAULT_MAX_AGE` (5 minutes).
 
 ## Returns
 

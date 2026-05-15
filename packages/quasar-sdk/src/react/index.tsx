@@ -77,6 +77,22 @@ export interface QuasarAuthBridgeProps {
   session: MiniSessionAuth | null;
   /** Callback to update the session in your state store. */
   setSession: (session: MiniSessionAuth | null) => void;
+  /**
+   * Maximum session age in milliseconds. Must be the same value passed to
+   * `verifyMiniSession` — this is the single source of truth for session lifetime.
+   * Defaults to 5 minutes.
+   *
+   * @example
+   * ```tsx
+   * const TOKEN_EXPIRATION = 86400 * 1000; // 24 hours in ms
+   *
+   * <QuasarAuthBridge maxAge={TOKEN_EXPIRATION} ... />
+   *
+   * // Later, for verification:
+   * verifyMiniSession({ ...auth, maxAge: TOKEN_EXPIRATION });
+   * ```
+   */
+  maxAge?: number;
   /** Optional callback triggered when an address mismatch is detected. */
   onAddressMismatch?: () => void;
 }
@@ -114,6 +130,7 @@ export function QuasarAuthBridge({
   wagmiConfig,
   session,
   setSession,
+  maxAge,
   onAddressMismatch,
 }: QuasarAuthBridgeProps) {
   const isSolana = typeof activeConnection?.chainId === 'string';
@@ -137,11 +154,12 @@ export function QuasarAuthBridge({
         store={store}
         session={session}
         setSession={setSession}
+        maxAge={maxAge}
       />
     );
   }
 
-  return <QuasarEvmAuthBridge wagmiConfig={wagmiConfig} store={store} session={session} setSession={setSession} />;
+  return <QuasarEvmAuthBridge wagmiConfig={wagmiConfig} store={store} session={session} setSession={setSession} maxAge={maxAge} />;
 }
 
 /** @internal */
@@ -150,11 +168,13 @@ function QuasarSolanaAuthBridge({
   store,
   session,
   setSession,
+  maxAge,
 }: {
   connectedAccount: UiWalletAccount;
   store: StoreApi<unknown>;
   session: MiniSessionAuth | null;
   setSession: (s: MiniSessionAuth | null) => void;
+  maxAge?: number;
 }) {
   const solanaSigner = useWalletAccountMessageSigner(connectedAccount);
 
@@ -191,8 +211,9 @@ function QuasarSolanaAuthBridge({
         miniSession: sessionRef.current,
         setMiniSession: setSessionRef.current,
       },
+      maxAge,
     );
-  }, [store]);
+  }, [store, maxAge]);
 
   useEffect(() => {
     authHelperReference = getAuth;
@@ -210,11 +231,13 @@ function QuasarEvmAuthBridge({
   store,
   session,
   setSession,
+  maxAge,
 }: {
   wagmiConfig: Config;
   store: StoreApi<unknown>;
   session: MiniSessionAuth | null;
   setSession: (s: MiniSessionAuth | null) => void;
+  maxAge?: number;
 }) {
   const sessionRef = useRef(session);
   const setSessionRef = useRef(setSession);
@@ -242,8 +265,9 @@ function QuasarEvmAuthBridge({
         miniSession: sessionRef.current,
         setMiniSession: setSessionRef.current,
       },
+      maxAge,
     );
-  }, [store, wagmiConfig]);
+  }, [store, wagmiConfig, maxAge]);
 
   useEffect(() => {
     authHelperReference = getAuth;
