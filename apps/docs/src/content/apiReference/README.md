@@ -47,6 +47,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 - [BASE\_API\_URL](variables/BASE_API_URL.md)
 - [DEFAULT\_MAX\_AGE](variables/DEFAULT_MAX_AGE.md)
+- [NETWORK\_SAFETY\_BUFFER](variables/NETWORK_SAFETY_BUFFER.md)
 - [PULSAR\_HISTORY\_ENDPOINT](variables/PULSAR_HISTORY_ENDPOINT.md)
 - [PULSAR\_SYNC\_ENDPOINT](variables/PULSAR_SYNC_ENDPOINT.md)
 - [utils](variables/utils.md)

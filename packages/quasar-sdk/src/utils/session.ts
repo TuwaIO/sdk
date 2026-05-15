@@ -7,7 +7,14 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { ConnectionData, MiniSessionAuth, MiniSessionStore } from '../types';
-import { DEFAULT_MAX_AGE, signMiniSession } from './auth';
+import { DEFAULT_MAX_AGE, NETWORK_SAFETY_BUFFER, signMiniSession } from './auth';
+
+/**
+ * Deduplicates concurrent signing requests. If multiple callers ask for auth
+ * simultaneously when the cache is expired, only one wallet popup is shown.
+ * @internal
+ */
+let signingInFlight: Promise<MiniSessionAuth> | null = null;
 
 /**
  * Creates a persistent Zustand store to cache Mini-Session signatures.
@@ -66,26 +73,25 @@ export async function getMiniSessionAuth(
     const now = Date.now();
     const timestampDate = new Date(cached.timestamp).getTime();
 
-    // Use the default max age (5 mins) as the validity buffer
-    if (now - timestampDate < DEFAULT_MAX_AGE) {
+    // Subtract safety buffer to account for network latency between
+    // cache check and server-side verifyMiniSession call.
+    if (now - timestampDate < DEFAULT_MAX_AGE - NETWORK_SAFETY_BUFFER) {
       return cached;
     }
   }
 
-  // 2. Cache Miss -> Trigger Signature Request
-  const authResult = await signMiniSession({
-    signer,
-    walletAddress: address,
-    chainType: chainType,
-  });
+  // 2. Cache Miss -> Trigger Signature Request (deduplicated)
+  if (!signingInFlight) {
+    signingInFlight = signMiniSession({ signer, walletAddress: address, chainType })
+      .then((authResult) => {
+        const newSession: MiniSessionAuth = { ...authResult, chainType, walletAddress: address };
+        store.setMiniSession(newSession);
+        return newSession;
+      })
+      .finally(() => {
+        signingInFlight = null;
+      });
+  }
 
-  const newSession: MiniSessionAuth = {
-    ...authResult,
-    chainType: chainType,
-    walletAddress: address,
-  };
-
-  // 3. Update the store and return
-  store.setMiniSession(newSession);
-  return newSession;
+  return signingInFlight;
 }

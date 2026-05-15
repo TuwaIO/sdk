@@ -6,4 +6,4 @@
 
 > `const` **PULSAR\_HISTORY\_ENDPOINT**: `"/v1/engine/pulsar/history"` = `'/v1/engine/pulsar/history'`
 
-Defined in: [packages/quasar-sdk/src/constants.ts:3](https://github.com/TuwaIO/sdk/blob/6a8c521029a1526ee3cbe7403db634fcca238cea/packages/quasar-sdk/src/constants.ts#L3)
+Defined in: [packages/quasar-sdk/src/constants.ts:3](https://github.com/TuwaIO/sdk/blob/ce81cef2e11371edca68c5ede6f63a43b1f217a3/packages/quasar-sdk/src/constants.ts#L3)

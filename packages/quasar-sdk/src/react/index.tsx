@@ -1,7 +1,7 @@
 import { useWalletAccountMessageSigner } from '@solana/react';
 import { Config, getWalletClient } from '@wagmi/core';
 import { UiWalletAccount } from '@wallet-standard/react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { StoreApi } from 'zustand';
 
 import { ChainType, EvmSigner, MiniSessionAuth, SolanaSigner } from '../types';
@@ -158,13 +158,25 @@ function QuasarSolanaAuthBridge({
 }) {
   const solanaSigner = useWalletAccountMessageSigner(connectedAccount);
 
+  // Refs keep the callback stable across re-renders caused by session/signer updates.
+  // Without this, every successful sign recreates getAuth → authHelperReference briefly
+  // becomes null → incoming calls fall into the retry loop.
+  const signerRef = useRef(solanaSigner);
+  const sessionRef = useRef(session);
+  const setSessionRef = useRef(setSession);
+
+  useEffect(() => { signerRef.current = solanaSigner; }, [solanaSigner]);
+  useEffect(() => { sessionRef.current = session; }, [session]);
+  useEffect(() => { setSessionRef.current = setSession; }, [setSession]);
+
   const getAuth = useCallback(async (): Promise<MiniSessionAuth> => {
     const state = store.getState() as { activeConnection: SatelliteConnectionState };
     const currentConn = state.activeConnection;
 
     if (!currentConn?.isConnected) throw new Error('[QuasarSDK] Wallet disconnected');
 
-    if (!solanaSigner) {
+    const signer = signerRef.current;
+    if (!signer) {
       throw new Error('[QuasarSDK] Solana Message Signer not initialized.');
     }
 
@@ -173,14 +185,14 @@ function QuasarSolanaAuthBridge({
         isConnected: currentConn.isConnected,
         address: currentConn.address,
         chainType: ChainType.SOLANA,
-        signer: solanaSigner as unknown as SolanaSigner,
+        signer: signer as unknown as SolanaSigner,
       },
       {
-        miniSession: session,
-        setMiniSession: setSession,
+        miniSession: sessionRef.current,
+        setMiniSession: setSessionRef.current,
       },
     );
-  }, [store, solanaSigner, session, setSession]);
+  }, [store]);
 
   useEffect(() => {
     authHelperReference = getAuth;
@@ -204,6 +216,12 @@ function QuasarEvmAuthBridge({
   session: MiniSessionAuth | null;
   setSession: (s: MiniSessionAuth | null) => void;
 }) {
+  const sessionRef = useRef(session);
+  const setSessionRef = useRef(setSession);
+
+  useEffect(() => { sessionRef.current = session; }, [session]);
+  useEffect(() => { setSessionRef.current = setSession; }, [setSession]);
+
   const getAuth = useCallback(async (): Promise<MiniSessionAuth> => {
     const state = store.getState() as { activeConnection: SatelliteConnectionState };
     const currentConn = state.activeConnection;
@@ -221,11 +239,11 @@ function QuasarEvmAuthBridge({
         signer: signer as unknown as EvmSigner,
       },
       {
-        miniSession: session,
-        setMiniSession: setSession,
+        miniSession: sessionRef.current,
+        setMiniSession: setSessionRef.current,
       },
     );
-  }, [store, wagmiConfig, session, setSession]);
+  }, [store, wagmiConfig]);
 
   useEffect(() => {
     authHelperReference = getAuth;

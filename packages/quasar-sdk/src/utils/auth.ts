@@ -28,6 +28,15 @@ export const DEFAULT_MAX_AGE = 5 * 60 * 1000;
 const CLOCK_DRIFT = 60 * 1000;
 
 /**
+ * Safety buffer subtracted from DEFAULT_MAX_AGE during cache validation.
+ * Ensures the session is refreshed before it expires on the server,
+ * accounting for network round-trip latency between client cache check
+ * and server-side verifyMiniSession call.
+ * @public
+ */
+export const NETWORK_SAFETY_BUFFER = 30 * 1000;
+
+/**
  * Standardizes the message format for Mini-Session authentication.
  * Both frontend and backend MUST use this exact template for verification to pass.
  *
