@@ -4,7 +4,7 @@
 
 # SolanaSignedMessage
 
-Defined in: [packages/quasar-sdk/src/types.ts:128](https://github.com/TuwaIO/sdk/blob/d555dd32fdaa68a95ed22de0031c8ed1452eeeb0/packages/quasar-sdk/src/types.ts#L128)
+Defined in: [packages/quasar-sdk/src/types.ts:128](https://github.com/TuwaIO/sdk/blob/8314ee70ee8eebe759bc30c8fa9f7539722822cb/packages/quasar-sdk/src/types.ts#L128)
 
 Result structure for a signed Solana message in Web3 v2.
 
@@ -14,6 +14,6 @@ Result structure for a signed Solana message in Web3 v2.
 
 > `readonly` **signatures**: `Readonly`\<`Record`\<`string`, `Uint8Array`\>\>
 
-Defined in: [packages/quasar-sdk/src/types.ts:130](https://github.com/TuwaIO/sdk/blob/d555dd32fdaa68a95ed22de0031c8ed1452eeeb0/packages/quasar-sdk/src/types.ts#L130)
+Defined in: [packages/quasar-sdk/src/types.ts:130](https://github.com/TuwaIO/sdk/blob/8314ee70ee8eebe759bc30c8fa9f7539722822cb/packages/quasar-sdk/src/types.ts#L130)
 
 A map of public addresses to their corresponding signature bytes.

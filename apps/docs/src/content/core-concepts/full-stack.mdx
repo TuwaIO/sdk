@@ -1,68 +1,349 @@
 # Complete TUWA Stack Integration
 
-If you are building a full-stack dApp or platform, you'll want to replicate the exact environment used by the **Quasar Dashboard**. The TUWA ecosystem seamlessly unites EVM and Solana, session caching, and SIWE auth into a single provider tree.
+This guide walks you through replicating the exact, production-ready environment used by the **Quasar Dashboard**. The integration combines EVM/Solana wallet management, session caching, secure SIWE authentication, and Quasar Cloud Sync into a unified React context tree.
 
-By wrapping your application in this complete stack, you unlock automatic signature handshakes, stateful transaction pools, and cross-chain capabilities out of the box.
+* **Live Demo:** Test the integration in real-time at [demo.tuwa.io](https://demo.tuwa.io/).
+* **GitHub Repository:** View the reference implementation at [nextjs-tuwa-quasar](https://github.com/TuwaIO/cosmos-playground/tree/main/examples/nextjs-tuwa-quasar).
 
-## The App Configuration
+---
 
-First, define your unified configuration (`appConfig.ts`), providing configurations for Wagmi (EVM) and Satellite.
+## Installation & Module Overview
+
+To integrate the full TUWA ecosystem, you must install the following modules, grouped by their specific purpose:
+
+### 1. Quasar Cloud Sync
+Provides the core API client and React authentication bridge to communicate with Quasar's backend.
+* **`@tuwaio/quasar-sdk`**: Handles server-side API proxy verification (`utils.verifyMiniSession`), Quasar client initialization, and the frontend `<QuasarAuthBridge />` component.
+
+### 2. Pulsar Transaction Tracking
+The underlying state-machine that tracks local wallet transaction states and handles cross-chain transaction events.
+* **`@tuwaio/pulsar-core`**: Core state store and manager for the local transaction pool.
+* **`@tuwaio/pulsar-evm`**: EVM tracking adapter.
+* **`@tuwaio/pulsar-solana`**: Solana tracking adapter.
+* **`@tuwaio/pulsar-react`**: React bindings and execution hooks (`useInitializeTransactionsPool`).
+* **`@tuwaio/orbit-core`** / **`@tuwaio/orbit-evm`** / **`@tuwaio/orbit-solana`**: Low-level blockchain connection and transaction mapping primitives.
+
+### 3. Satellite Wallet Connector & Auth
+Standardizes multi-chain wallet adapters (EVM + Solana) and encapsulates Next-Auth/SIWE logic.
+* **`@tuwaio/satellite-core`**: Core connection managers.
+* **`@tuwaio/satellite-evm`**: EVM adaptor connecting Wagmi to Satellite.
+* **`@tuwaio/satellite-solana`**: Solana adaptor bridging Solana standard wallet adapters.
+* **`@tuwaio/satellite-siwe-next-auth`**: Integrates Sign-In With Ethereum for cookie-based authentication.
+* **`wagmi`** / **`@wagmi/core`** / **`@wagmi/connectors`** / **`viem`**: Peer dependencies managing EVM client state.
+* **`@solana/react`** / **`gill`**: Peer dependencies managing Solana client state and connection interfaces.
+
+### 4. Nova UI Kit
+Provides pre-built modular UI overlays, transaction trackers, and action status notifications.
+* **`@tuwaio/nova-connect`**: Exposes connector watchers (`EVMConnectorsWatcher`, `SolanaConnectorsWatcher`) and the main provider `<NovaConnectProvider />`.
+* **`@tuwaio/nova-transactions`**: Houses UI components (modals and toast notifications) for tracing pending, succeeded, or failed transactions.
+
+> [!NOTE]
+> The list above outlines the core ecosystem packages. It does not list all indirect peer dependencies (e.g., UI primitives like Framer Motion, Radix UI dialogs, or specific wallet standards). For a complete, production-ready dependency list, refer to the [nextjs-tuwa-quasar example template](https://github.com/TuwaIO/cosmos-playground/tree/main/examples/nextjs-tuwa-quasar) or check the documentation of each package individually.
+
+---
+
+## 1. App Configuration (`appConfig.ts`)
+
+Define your network endpoints, supported EVM chains, and Wagmi client instance.
 
 ```typescript
-// appConfig.ts
-import { cookieStorage, createConfig, createStorage, http } from 'wagmi';
-import { mainnet, polygon } from 'wagmi/chains';
+// src/configs/appConfig.ts
+import { createDefaultTransports, impersonated, safeSdkOptions } from '@tuwaio/satellite-evm';
+import { baseAccount, safe, walletConnect } from '@wagmi/connectors';
+import { createConfig, injected } from '@wagmi/core';
+import { mainnet, sepolia, polygon, base, Chain } from 'viem/chains';
+
+export const appConfig = {
+  appName: 'Pulsar & Quasar Cloud Sync Demo',
+  appDescription: 'Next.js Demo App with Pulsar and Quasar SDK Integration',
+  projectId: process.env.NEXT_PUBLIC_WALLET_PROJECT_ID ?? '',
+  appLogoUrl: 'logo_url',
+  appUrl: process.env.NODE_ENV === 'development' ? 'http://localhost:3000/' : 'https://example.com/',
+};
+
+export const solanaRPCUrls = {
+  mainnet: `https://solana-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_KEY}`,
+  devnet: 'https://api.devnet.solana.com',
+};
+
+export const appEVMChains = [mainnet, sepolia, polygon, base] as readonly [Chain, ...Chain[]];
 
 export const wagmiConfig = createConfig({
-  chains: [mainnet, polygon],
+  connectors: [
+    injected(),
+    baseAccount({ appName: appConfig.appName, appLogoUrl: appConfig.appLogoUrl }),
+    safe({ ...safeSdkOptions }),
+    walletConnect({
+      projectId: appConfig.projectId,
+      metadata: {
+        name: appConfig.appName,
+        description: appConfig.appDescription,
+        url: appConfig.appUrl,
+        icons: [appConfig.appLogoUrl],
+      },
+    }),
+    impersonated({}),
+  ],
+  transports: createDefaultTransports(appEVMChains),
+  chains: appEVMChains,
   ssr: true,
-  storage: createStorage({
-    storage: cookieStorage,
-  }),
-  transports: {
-    [mainnet.id]: http(),
-    [polygon.id]: http(),
-  },
+  syncConnectedChain: true,
 });
 ```
 
-## The Global Providers Tree
+---
 
-To unlock the full potential of TUWA, you must assemble the unified ecosystem tree. This tree composes all necessary contexts: React Query (for data fetching), Wagmi (EVM state), SIWE (Authentication), Satellite (unified connector + Solana), Nova Connect (transaction tracking), and your Pulsar Stores (session and transaction pool states).
+## 2. Server-Side Synchronization Actions (`actions.ts`)
 
-> [!TIP]
-> **Why this order?** 
-> Wagmi provides the base EVM state. SIWE Auth relies on Wagmi. Satellite connects both EVM and Solana, bridging auth state. Finally, Nova Connect handles transaction execution and passes states directly into your Pulsar store for Quasar synchronization.
+To protect your API quotas, the frontend must not call the Quasar API directly using your secret keys. Instead, use Next.js Server Actions to securely proxy calls from your server backend, verifying the wallet signature (Mini-Session).
 
-Here is a full integration example combining everything into a `SatelliteConnectProviders` wrapper.
+```typescript
+// src/app/actions.ts
+'use server';
 
-> [!IMPORTANT]
-> **Modular Entry Points**: The example below uses the unified `<QuasarAuthBridge />` for a multi-chain setup. If your application is EVM-only or Solana-only, you can import ecosystem-specific bridges from `@tuwaio/quasar-sdk/react/evm` or `@tuwaio/quasar-sdk/react/solana` to avoid installing unneeded peer dependencies (like `@solana/react` or `@wagmi/core`).
+import { MiniSessionAuth, Quasar, Transaction, utils } from '@tuwaio/quasar-sdk';
+import { appConfig } from '@/configs/appConfig';
 
-```tsx
-// providers.tsx
+const quasar = new Quasar({
+  secretKey: process.env.QUASAR_SDK_SK ?? '',
+  baseUrl: process.env.QUASAR_BASE_URL ?? 'https://api.tuwa.io',
+});
+
+// Sync local transaction tracking to the Quasar ledger
+export async function syncTransaction(tx: Transaction, authData: MiniSessionAuth) {
+  const isValid = await utils.verifyMiniSession({
+    walletAddress: authData.walletAddress,
+    signature: authData.signature,
+    timestamp: authData.timestamp,
+    chainType: authData.chainType,
+  });
+
+  if (!isValid) throw new Error('Invalid or expired security signature.');
+
+  try {
+    await quasar.pulsar.syncCreate(tx, appConfig.appName);
+    return { success: true };
+  } catch (error) {
+    console.error('Remote transaction sync failed:', error);
+    throw error;
+  }
+}
+
+// Fetch historical indexed transactions for a wallet
+export async function getHistory(
+  params: { walletAddress: string; page?: number; limit?: number; appName?: string },
+  authData: MiniSessionAuth,
+) {
+  const isValid = await utils.verifyMiniSession({
+    walletAddress: authData.walletAddress,
+    signature: authData.signature,
+    timestamp: authData.timestamp,
+    chainType: authData.chainType,
+  });
+
+  if (!isValid) throw new Error('Invalid or expired security signature.');
+
+  try {
+    return await quasar.pulsar.getHistory(params);
+  } catch (error) {
+    console.error('Failed to fetch transaction history:', error);
+    throw error;
+  }
+}
+```
+
+---
+
+## 3. Client-Side State Management & Stores
+
+Replicate the tracking state using local storage, Pulsar SDK adapters, and Zustand-bound hooks.
+
+### A. Client Session Store (`useAuthStore.ts`)
+Uses the SDK's built-in helper to cache the Quasar Mini-Session token on the client, avoiding repeated wallet prompts.
+
+```typescript
+// src/hooks/useAuthStore.ts
+import { utils } from '@tuwaio/quasar-sdk';
+
+export const useAuthStore = utils.createMiniSessionStore('quasar-mini-session-storage');
+```
+
+### B. Pulsar Sync Store (`pulsarStoreHook.ts`)
+Manages the local transaction tracking pool and hooks into the Server Actions defined above.
+
+```typescript
+// src/hooks/pulsarStoreHook.ts
 'use client';
 
-import { useMemo } from 'react';
-import { EVMConnectorsWatcher } from '@tuwaio/nova-connect/evm';
-import { SatelliteConnectProvider } from '@tuwaio/nova-connect/satellite';
-import { SolanaConnectorsWatcher } from '@tuwaio/nova-connect/solana';
-import { NovaConnectProvider } from '@tuwaio/nova-connect';
-import { NovaTransactionsProvider } from '@tuwaio/nova-transactions/providers';
-import { QuasarAuthBridge, getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
-import { satelliteEVMAdapter } from '@tuwaio/satellite-evm';
-import { satelliteSolanaAdapter } from '@tuwaio/satellite-solana';
-import { useSiweAuth } from '@tuwaio/satellite-siwe-next-auth';
+import { createBoundedUseStore, createPulsarStore, createTxInMemoryStore } from '@tuwaio/pulsar-core';
+import { pulsarEvmAdapter } from '@tuwaio/pulsar-evm';
+import { pulsarSolanaAdapter } from '@tuwaio/pulsar-solana';
+import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
+
+import { getHistory, syncTransaction } from '@/app/actions';
+import { appConfig, appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
+
+const storageName = 'quasar-tx-tracking-storage';
+
+// State-machine for real-time local transaction tracking
+const initialStore = createPulsarStore({
+  name: storageName,
+  adapter: [
+    pulsarEvmAdapter(wagmiConfig, appEVMChains),
+    pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls }),
+  ],
+  beforeTxProcess: async () => {
+    await getMiniSessionAuth();
+  },
+  onRemoteCreate: async (tx) => {
+    try {
+      const auth = await getMiniSessionAuth();
+      await syncTransaction(tx as any, auth);
+    } catch (err) {
+      console.error('[Pulsar] Remote sync failed:', err);
+    }
+  },
+});
+
+export const usePulsarStore = createBoundedUseStore(initialStore);
+
+// In-memory pagination and historical syncing
+const pulsarInMemoryStore = createTxInMemoryStore({
+  localTransactionsPool: initialStore.getState().transactionsPool,
+  getHistory: async ({ page, walletAddress }) => {
+    try {
+      const auth = await getMiniSessionAuth();
+      const history = await getHistory({
+        walletAddress,
+        page,
+        limit: 10,
+        appName: appConfig.appName,
+      }, auth);
+      return history;
+    } catch (error) {
+      console.error('[Pulsar] Failed to fetch history:', error);
+      throw error;
+    }
+  },
+  onHistoryFetched: async (remoteTxs) => {
+    await initialStore.getState().injectExternalPendingTxs(remoteTxs);
+  },
+});
+
+initialStore.subscribe((state) => 
+  pulsarInMemoryStore.getState().syncWithLocalPool(state.transactionsPool)
+);
+
+export const usePulsarInMemoryStore = createBoundedUseStore(pulsarInMemoryStore);
+```
+
+---
+
+## 4. Assembling the Provider Tree
+
+Compose all multi-chain connector layers, watchers, transaction listeners, and UI notifications.
+
+### A. Quasar Authentication Bridge (`QuasarSDKAuthProvider.tsx`)
+Bridges the connection status of the wallets with the Quasar mini-sessions.
+
+```tsx
+// src/providers/QuasarSDKAuthProvider.tsx
+import { SatelliteStoreContext, useSatelliteConnectStore } from '@tuwaio/nova-connect/satellite';
+import { QuasarActiveConnection, QuasarAuthBridge as QuasarSDKAuthBridge } from '@tuwaio/quasar-sdk/react';
+import { useContext, useEffect } from 'react';
+
+import { wagmiConfig } from '@/configs/appConfig';
+import { useAuthStore } from '@/hooks/useAuthStore';
+
+export function QuasarAuthBridge() {
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
+  const store = useContext(SatelliteStoreContext);
+  const session = useAuthStore((s) => s.miniSession);
+  const setSession = useAuthStore((s) => s.setMiniSession);
+  const clearSession = useAuthStore((state) => state.clearSession);
+
+  useEffect(() => {
+    if (!activeConnection?.isConnected) {
+      clearSession();
+    }
+  }, [activeConnection?.isConnected, clearSession]);
+
+  if (!activeConnection || !store) return null;
+
+  return (
+    <QuasarSDKAuthBridge
+      activeConnection={activeConnection as QuasarActiveConnection}
+      store={store}
+      wagmiConfig={wagmiConfig}
+      session={session}
+      setSession={setSession}
+    />
+  );
+}
+```
+
+### B. Nova Transactions Observer (`NovaTransactionsProvider.tsx`)
+Binds stateful transactional events to pre-built UI toast notifications.
+
+```tsx
+// src/providers/NovaTransactionsProvider.tsx
+import { useSatelliteConnectStore } from '@tuwaio/nova-connect/satellite';
+import { NovaTransactionsProvider as NTP } from '@tuwaio/nova-transactions/providers';
+import { getAdapterFromConnectorType } from '@tuwaio/orbit-core';
+import { TxInMemoryPagination } from '@tuwaio/pulsar-core';
 import { useInitializeTransactionsPool } from '@tuwaio/pulsar-react';
 
 import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/pulsarStoreHook';
-import { wagmiConfig, appEVMChains, solanaRPCUrls } from './appConfig';
+
+export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemoryPagination }) {
+  const initialTx = usePulsarStore((state) => state.initialTx);
+  const closeTxTrackedModal = usePulsarStore((state) => state.closeTxTrackedModal);
+  const executeTxAction = usePulsarStore((state) => state.executeTxAction);
+  const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
+  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
+  const getAdapter = usePulsarStore((state) => state.getAdapter);
+  const transactionsPool = usePulsarInMemoryStore((state) => state.transactionsPool);
+
+  useInitializeTransactionsPool({ initializeTransactionsPool });
+
+  return (
+    <NTP
+      transactionsPool={transactionsPool}
+      initialTx={initialTx}
+      closeTxTrackedModal={closeTxTrackedModal}
+      executeTxAction={executeTxAction}
+      connectedWalletAddress={activeConnection?.isConnected ? activeConnection.address : undefined}
+      connectedAdapterType={getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:')}
+      adapter={getAdapter()}
+      pagination={pagination}
+    />
+  );
+}
+```
+
+### C. Connect Provider Setup (`SatelliteConnectProviders.tsx`)
+Wires up EVM and Solana wallet listeners, triggers the initial loading sequence, and wraps the cross-chain executing adapter.
+
+```tsx
+// src/providers/SatelliteConnectProviders.tsx
+'use client';
+
+import { NovaConnectProvider } from '@tuwaio/nova-connect';
+import { EVMConnectorsWatcher } from '@tuwaio/nova-connect/evm';
+import { SatelliteConnectProvider } from '@tuwaio/nova-connect/satellite';
+import { SolanaConnectorsWatcher } from '@tuwaio/nova-connect/solana';
+import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
+import { satelliteEVMAdapter } from '@tuwaio/satellite-evm';
+import { satelliteSolanaAdapter } from '@tuwaio/satellite-solana';
+import { useSiweAuth } from '@tuwaio/satellite-siwe-next-auth';
+
+import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
+import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/pulsarStoreHook';
+import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
+import { QuasarAuthBridge } from '@/providers/QuasarSDKAuthProvider';
 
 export function SatelliteConnectProviders({ children }: { children: React.ReactNode }) {
-  const { signInWithSiwe, isRejected, isSignedIn } = useSiweAuth();
-  const isSiweEnabled = true;
-
-  // Pulsar Data & Transaction Stores
+  const { signInWithSiwe, enabled, isRejected, isSignedIn } = useSiweAuth();
   const getAdapter = usePulsarStore((state) => state.getAdapter);
   const transactionsPool = usePulsarInMemoryStore((state) => state.transactionsPool);
   const isLoading = usePulsarInMemoryStore((state) => state.isLoading);
@@ -72,52 +353,38 @@ export function SatelliteConnectProviders({ children }: { children: React.ReactN
   const fetchNextPage = usePulsarInMemoryStore((state) => state.fetchNextPage);
   const fetchInitial = usePulsarInMemoryStore((state) => state.fetchInitial);
 
-  // Initializing the transaction pool sync with Pulsar
-  const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
-  useInitializeTransactionsPool({ initializeTransactionsPool });
-
   const pagination = { isLoading, isError, currentPage, hasMore, fetchNextPage };
-
-  // Adapters initialization
-  const adapters = useMemo(() => {
-    return [
-      satelliteEVMAdapter(wagmiConfig, appEVMChains, isSiweEnabled ? signInWithSiwe : undefined),
-      satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })
-    ];
-  }, [signInWithSiwe, isSiweEnabled]);
 
   return (
     <SatelliteConnectProvider
-      adapter={adapters}
-      autoConnect={false}
+      adapter={[
+        satelliteEVMAdapter(wagmiConfig, appEVMChains, enabled ? signInWithSiwe : undefined),
+        satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls }),
+      ]}
+      autoConnect={true}
       callbackAfterConnected={async (connection) => {
         try {
-          // Trigger Local Session (Mini Wallet Auth) signature
           await getMiniSessionAuth();
-          // Initial fetch for the wallet transactions from Quasar API
           setTimeout(() => fetchInitial(connection.address), 2000);
         } catch (err) {
-          console.error('Auth failed:', err);
+          console.error('[QuasarAuth] Session auth failed:', err);
+          setTimeout(() => fetchInitial(connection.address), 2000);
         }
       }}
     >
-      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} siwe={{ isSignedIn, isRejected, enabled: isSiweEnabled }} />
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} siwe={{ isSignedIn, isRejected, enabled }} />
       <SolanaConnectorsWatcher />
-      
-      {/* Handles Wallet Signature Prompts for Quasar Auth */}
       <QuasarAuthBridge />
-      
-      {/* Handles UI components (Toasts/Modals) for Transactions */}
       <NovaTransactionsProvider pagination={pagination} />
-      
-      {/* Manages the cross-chain execution pipeline */}
       <NovaConnectProvider
         appChains={appEVMChains}
+        solanaRPCUrls={solanaRPCUrls}
         transactionPool={transactionsPool}
-        pulsarAdapter={getAdapter()}
+        pulsarAdapter={getAdapter() as any}
         withImpersonated
+        withBalance
+        withChain
         pagination={pagination}
-        legal={{ termsUrl: '/terms', privacyUrl: '/privacy' }}
       >
         {children}
       </NovaConnectProvider>
@@ -126,4 +393,41 @@ export function SatelliteConnectProviders({ children }: { children: React.ReactN
 }
 ```
 
-Once this component is mounted inside your `WagmiProvider` and `SiweNextAuthProvider`, your dApp immediately possesses the same resilient transaction indexing, cross-chain execution, and session management as the official Quasar Dashboard.
+### D. Root Assembly (`providers.tsx`)
+Finally, export the root provider that wraps standard dependencies.
+
+```tsx
+// src/providers/index.tsx
+'use client';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SiweNextAuthProvider } from '@tuwaio/satellite-siwe-next-auth';
+import { ReactNode } from 'react';
+import { WagmiProvider } from 'wagmi';
+
+import { wagmiConfig } from '@/configs/appConfig';
+import { SatelliteConnectProviders } from '@/providers/SatelliteConnectProviders';
+
+const queryClient = new QueryClient();
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <SiweNextAuthProvider
+          wagmiConfig={wagmiConfig}
+          enabled={false}
+          onSignOut={() => console.log('sign out')}
+          onSignIn={(session) => console.log('sign in', session)}
+        >
+          <SatelliteConnectProviders>
+            {children}
+          </SatelliteConnectProviders>
+        </SiweNextAuthProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}
+```
+
+Wrap your root layout with this `<Providers>` component. Your dApp is now fully configured for automatic multi-chain transaction tracking, local-session persistence, and cloud synchronization.

@@ -26,11 +26,26 @@ import { Quasar, utils } from '@tuwaio/quasar-sdk';
 // Initialize the client
 const quasar = new Quasar({ secretKey: 'sk_live_...' });
 
-// Use domain modules
-await quasar.pulsar.syncCreate(transaction);
+// Use domain modules to sync a transaction to the cloud
+const { txKey } = await quasar.pulsar.syncCreate({
+  txKey: 'tx_local_18f2...',
+  chainId: 1,
+  from: '0xabc...',
+  type: 'TRANSFER',
+  connectorType: 'evm:metamask',
+  adapter: 'evm',
+  tracker: 'ethereum',
+  pending: true,
+  localTimestamp: Date.now(),
+});
 
-// Or use stateless utilities directly
-const isValid = await utils.verifyMiniSession(params);
+// Or use stateless utilities directly to verify client signatures
+const isValid = await utils.verifyMiniSession({
+  walletAddress,
+  signature,
+  timestamp,
+  chainType,
+});
 ```
 
 ## Quick Start (React)
@@ -55,12 +70,12 @@ For Solana-only or multi-chain applications, see the [Security Section](/securit
 ## Installation
 
 ```bash
-pnpm add @tuwaio/quasar-sdk
+pnpm add @tuwaio/quasar-sdk ofetch
 ```
 
 ## Next Steps
 
-- Browse the **[API Reference](/apiReference)** for full type documentation
+- Browse the **[API Reference](/apiReference/README)** for full type documentation
 - View the **[Scalar API Viewer](/scalar)** for endpoint exploration
 - Check the **[GitHub Repository](https://github.com/TuwaIO/sdk)** for source code
 

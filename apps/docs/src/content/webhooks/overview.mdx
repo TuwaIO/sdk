@@ -22,23 +22,34 @@ Once created, Quasar will immediately begin dispatching events to your URL.
 
 Webhooks in Quasar are tightly scoped to specific events within the TUWA ecosystem. The most common triggers include:
 
-- `transaction.success`: Triggered if the transaction mined successfully and is confirmed on the blockchain if confirmations set up in the transaction.
+- `transaction.success`: Triggered if the transaction mined successfully and is confirmed on the blockchain.
 - `transaction.failed`: Triggered if the transaction reverts or fails during execution.
 - `transaction.replaced`: Triggered if the transaction replaces another transaction.
 
+### Delivery Headers
+
+Every webhook `POST` request is dispatched with the following standard L7 headers:
+
+| Header Name | Description |
+| :--- | :--- |
+| `Content-Type` | Always `application/json` |
+| `User-Agent` | Always `Quasar-Webhook-Worker/1.0 (TuwaIO)` |
+| `x-quasar-signature` | The cryptographic HMAC SHA-256 signature of the raw request body.
 ### Payload Structure
 
-When an event triggers, Quasar dispatches a structured JSON payload. For a transaction event, the payload will include the `txKey`, the current `status`, and relevant chain metadata.
+When an event triggers, Quasar dispatches a structured JSON payload containing transaction properties and custom payload data:
 
 ```json
 {
-  "event": "transaction.success",
-  "timestamp": "2026-05-16T12:00:00Z",
-  "data": {
-    "txKey": "tx_abc123...",
-    "hash": "0xdef456...",
-    "chainId": 1,
-    "status": "Success"
+  "txKey": "tx_local_18f2...",
+  "hash": "0xabc123...",
+  "status": "Success",
+  "action": "Success",
+  "txType": "TRANSFER",
+  "chainId": "1",
+  "timestamp": 1779374022,
+  "payload": {
+    "customField": "arbitraryValue"
   }
 }
 ```
@@ -99,5 +110,32 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ success: true }, { status: 200 });
 }
 ```
+
+## Rolling / Rotated Webhook Secrets
+
+If you suspect your Webhook Secret has been compromised, or as part of standard security compliance, you can rotate/roll the signing secret through the Quasar Dashboard:
+
+1. Navigate to **Webhooks** in the Dashboard.
+2. Select your webhook endpoint configuration.
+3. Under **Security**, click **Roll Secret**.
+4. To prevent unauthorized rotation, you will be prompted for **Step-Up Authentication** (password and 2FA code if enabled).
+5. Once verified, a new `whsec_...` signing secret is generated and displayed.
+
+> [!WARNING]
+> **Immediate Effect**: Rolling a webhook secret instantly invalidates the old one. Quasar will immediately begin signing outgoing payloads with the new secret. Ensure your backend webhook receiver is updated with the new environment variable promptly to prevent delivery verification failures.
+>
+> Note that global multi-region edge caches might take up to **60 seconds** to propagate the eviction. Allow a 1-minute window for the new secret to propagate fully.
+
+---
+
+## Webhook Delivery & Retries
+
+To ensure reliable delivery even during brief outages of your backend receiver, Quasar employs a resilient message queue system powered by BullMQ:
+
+* **Maximum Retries:** Quasar attempts to deliver each webhook up to **10 times** before marking the delivery as failed.
+* **Exponential Backoff:** If a delivery fails, Quasar schedules retries using an exponential backoff formula, beginning with a **5-second** initial delay.
+* **SSRF and Redirect Blocking:** For infrastructure security, redirects are strictly forbidden (`redirect: 'error'`). Any endpoint attempting to return a redirect response (3xx) will trigger an immediate delivery failure.
+* **Quota Auditing:** Quasar accounts for usage on the first delivery attempt only. Retries do not consume additional organization quota units.
+* **Data Masking in Logs:** The dashboard exposes the last 1,000 delivery failures for troubleshooting. To safeguard secrets, Quasar scans and masks all sensitive keys (e.g. `secret`, `token`, `password`, `key`, `privatekey`, `credential`) inside the stored request payloads and response bodies.
 
 Next, see the [Security & Signatures](./security.mdx) page for deep details on how Quasar protects webhook deliveries.

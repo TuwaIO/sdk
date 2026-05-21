@@ -1,4 +1,4 @@
-# Apps & Secret Keys
+# Apps & API Keys
 
 In Quasar, every integration begins by creating an **App**. An App acts as an isolated logical container for your data (e.g., indexed transactions, webhooks, analytics), separated by your specific API keys.
 
@@ -11,24 +11,55 @@ You manage Apps through the Quasar Management Dashboard:
 3. Navigate to **Apps** and click **Create App**.
 4. Give your App a descriptive name (e.g., `Pulsar Indexer - Production`).
 
-Once created, you will be given a set of API keys.
+Once created, you will be given a set of API keys consisting of a **Secret Key** and a **Public Key**.
+
+---
+
+## Secret Key vs. Public Key
+
+Quasar provisions two types of keys for different trust environments:
+
+| Key Type | Prefix | Header | Target Environment | Purpose / Access |
+| :--- | :--- | :--- | :--- | :--- |
+| **Secret Key** | `sk_live_...` | `x-tuwa-secret-key` | Backend / Server-side | Root access, transaction syncing, webhook administration. |
+| **Public Key** | `pk_live_...` | `x-tuwa-public-key` | Frontend / Client-side | Read-only access, public transaction tracking, client-side SDKs. |
+
+---
 
 ## What is a Secret Key?
 
-When you create an App, Quasar provisions a highly secure **Secret Key**, which looks like this:
+The Secret Key is a highly sensitive credential:
 
 `sk_live_abc123def456...`
 
 > [!CAUTION]
 > **Never expose this key.**
-> Secret Keys act as bearer tokens granting complete root access to the App's isolated partition in Quasar. If leaked, an attacker could write fraudulent transactions or exhaust your quotas.
+> Secret Keys act as bearer tokens granting complete root access to the App's isolated partition in Quasar. If leaked, an attacker could write fraudulent transactions, query sensitive history, or exhaust your quotas. Keep this key strictly in backend environment variables (`.env`).
 
-### Why is it called a "Secret" Key?
-Because it operates purely on a **server-to-server** level.
-- **Frontend / Browser**: ❌ Never inject the Secret Key here.
-- **Node.js / Edge Server**: ✅ Always keep the Secret Key strictly in backend environment variables (`.env`).
-
-### Resolving and Hashing
+### Key Resolution & Hashing
 For security, Quasar does not store your raw Secret Key in plaintext. When you generate a key, the backend performs a SHA-256 hash before storing it. When you make an API request using the SDK, the `IronDomeGuard` intercepts the request, hashes the provided `sk_live_...` key in real-time, and compares it to the database hash. 
 
-You can reveal your Secret Key in the dashboard at any time through the App settings (requires Admin or Owner authorization), or roll a new key if you suspect it has been compromised.
+### Revealing & Rolling Secret Keys
+* **Dashboard Retrieval**: You can reveal your active Secret Key at any time through the App Settings panel. This operation requires **Step-Up Authentication** (your account password and 2FA code if enabled) to prevent Session Hijacking / BOLA vulnerabilities.
+* **Rolling Keys**: If you suspect a key has been compromised, you can roll a new key. This instantly generates a new `sk_live_...` token and invalidates the previous one. 
+
+> [!WARNING]
+> **Immediate Invalidation**: The previous Secret Key is deleted from the primary database immediately. Due to multi-region Redis cache eviction, the old key may continue to authorize requests at the API edge for up to **60 seconds**. Always deploy your new Secret Key to your production backend before performing the roll, or expect a brief downtime window during key propagation.
+
+---
+
+## What is a Public Key?
+
+The Public Key is a non-sensitive identifier:
+
+`pk_live_xyz789ghi012...`
+
+Public keys are designed to be safe for inclusion in client-side code (browsers, mobile applications, or decentralized frontend clients).
+
+### How it Works
+The Public Key is stored in plaintext in the database and is processed directly:
+1. The client sends the Public Key in the request header (`x-tuwa-public-key` or `x-api-key`).
+2. The `IronDomeGuard` matches the key directly against the `publicKey` column in the database (without hashing).
+3. The guard caches the app metadata in Redis under `{publicKey}:meta` (e.g. `{pk_live_...}:meta`) for high performance and enforces rate limiting (RPS) and organization quotas.
+4. Requests authenticated via Public Keys are restricted to public read-only queries, preventing unauthorized writes/sync operations on your ledger.
+

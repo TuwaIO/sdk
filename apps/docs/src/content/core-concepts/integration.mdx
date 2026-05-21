@@ -36,10 +36,16 @@ import { ChainType } from '@tuwaio/pulsar-core';
 
 // 1. Sync a new pending transaction to Quasar
 const { txKey } = await quasar.pulsar.syncCreate({
-  chainId: 1, // Ethereum Mainnet
-  hash: '0x...',
-  fromAddress: '0xabc...',
-  transactionType: 'TRANSFER',
+  txKey: 'tx_local_18f2...',          // Unique transaction key
+  chainId: 1,                          // Ethereum Mainnet
+  from: '0xabc...',                    // Sender address
+  type: 'TRANSFER',                    // Transaction type
+  connectorType: 'evm:metamask',       // Connector type
+  adapter: 'evm',                      // Adapter ('evm', 'solana', 'starknet')
+  tracker: 'ethereum',                 // Tracker ('ethereum', 'solana', 'safe', 'gelato')
+  pending: true,
+  localTimestamp: Date.now(),
+  hash: '0xabc...',                    // Optional transaction hash
 }, 'My Custom Application');
 
 // 2. Query transaction history

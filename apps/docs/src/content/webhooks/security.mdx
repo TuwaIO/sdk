@@ -21,6 +21,12 @@ To prevent "tarpitting"—where a malicious server intentionally keeps a connect
 
 If your server takes longer than 10 seconds to respond with a `200 OK`, Quasar immediately drops the connection and marks the delivery as failed. Ensure your webhook endpoints process payloads asynchronously (e.g., push them to a local queue and return a `200` immediately).
 
+### Redirect Chasing Protection
+
+To prevent request redirection attacks and secure internal network boundaries:
+* **No Redirects:** All outbound webhook dispatches explicitly disable redirect chasing (`redirect: 'error'`). 
+* **Aborted Connections:** If your webhook target returns a redirect status code (e.g., `301`, `302`, `307`, or `308`), the worker rejects the attempt immediately as a delivery failure. Your endpoint must be the direct, final destination of the payload.
+
 ## Verifying Signatures
 
 To ensure the payload is authentically from Quasar, you must verify the HMAC signature included in the headers.
