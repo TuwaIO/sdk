@@ -11,9 +11,10 @@ Instead of constantly polling the Quasar API to check if a transaction has mined
 You must create and configure your Webhooks through the dashboard:
 
 1. Log in to the [Quasar Dashboard](https://quasar.tuwa.io).
-2. Navigate to **Organization Settings** > **Webhooks**.
-3. Click **Add Webhook** and provide your target URL endpoint.
-4. Select the specific **Events** (triggers) you want this webhook to listen for.
+2. Ensure you are in your target **Organization**.
+3. Navigate to **Webhooks**.
+4. Click **Add Webhook** and provide your target URL endpoint.
+5. Select the specific **Events** (triggers) you want this webhook to listen for.
 
 Once created, Quasar will immediately begin dispatching events to your URL.
 
@@ -21,10 +22,9 @@ Once created, Quasar will immediately begin dispatching events to your URL.
 
 Webhooks in Quasar are tightly scoped to specific events within the TUWA ecosystem. The most common triggers include:
 
-- `transaction.pending`: Triggered immediately when a transaction enters the Quasar mempool.
-- `transaction.mined`: Triggered when the blockchain confirms the transaction.
+- `transaction.success`: Triggered if the transaction mined successfully and is confirmed on the blockchain if confirmations set up in the transaction.
 - `transaction.failed`: Triggered if the transaction reverts or fails during execution.
-- `billing.quota_exceeded`: Triggered if your App hits a rate limit or usage quota threshold.
+- `transaction.replaced`: Triggered if the transaction replaces another transaction.
 
 ### Payload Structure
 
@@ -32,13 +32,13 @@ When an event triggers, Quasar dispatches a structured JSON payload. For a trans
 
 ```json
 {
-  "event": "transaction.mined",
+  "event": "transaction.success",
   "timestamp": "2026-05-16T12:00:00Z",
   "data": {
     "txKey": "tx_abc123...",
     "hash": "0xdef456...",
     "chainId": 1,
-    "status": "mined"
+    "status": "Success"
   }
 }
 ```
@@ -50,8 +50,54 @@ When you create a webhook in the dashboard, Quasar generates a unique **Webhook 
 > [!IMPORTANT]
 > The Webhook Secret is used to securely verify that incoming `POST` requests actually came from Quasar and not a malicious third party pretending to be Quasar.
 
-Whenever Quasar dispatches a payload, it uses your Webhook Secret to generate a cryptographic hash (HMAC SHA-256) of the payload. It attaches this hash in the headers of the `POST` request (typically `Tuwa-Signature`). 
+Whenever Quasar dispatches a payload, it uses your Webhook Secret to generate a cryptographic hash (HMAC SHA-256) of the payload. It attaches this hash in the headers of the `POST` request (typically `x-quasar-signature`).
 
 Your backend must intercept the incoming request, generate its own hash using the raw payload body and your stored Webhook Secret, and compare the two hashes. If they match, the payload is authentic.
+
+### Webhook Receiver Example
+
+Here is a complete Next.js Route Handler (App Router) example showing how to verify and accept incoming webhook deliveries from Quasar:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+
+export async function POST(req: NextRequest) {
+  const signature = req.headers.get('x-quasar-signature');
+  const secret = process.env.QUASAR_WEBHOOK_SECRET;
+
+  if (!signature || !secret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Get raw body as text to ensure signature validation works correctly
+  const rawBody = await req.text();
+
+  // Generate signature using HMAC SHA-256
+  const computedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(rawBody)
+    .digest('hex');
+
+  // Compare signatures securely using timingSafeEqual
+  const signatureBuffer = Buffer.from(signature, 'utf8');
+  const computedBuffer = Buffer.from(computedSignature, 'utf8');
+
+  if (
+    signatureBuffer.length !== computedBuffer.length ||
+    !crypto.timingSafeEqual(signatureBuffer, computedBuffer)
+  ) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+
+  // Parse and process the authenticated payload
+  const payload = JSON.parse(rawBody);
+  
+  // Note: Standard Quasar webhooks contain details like event and data
+  // e.g. payload.event === 'transaction.success'
+  
+  return NextResponse.json({ success: true }, { status: 200 });
+}
+```
 
 Next, see the [Security & Signatures](./security.mdx) page for deep details on how Quasar protects webhook deliveries.

@@ -21,7 +21,7 @@ When you create an App, Quasar provisions a highly secure **Secret Key**, which 
 
 > [!CAUTION]
 > **Never expose this key.**
-> Secret Keys act as bearer tokens granting complete root access to the App's isolated partition in Quasar. If leaked, an attacker could write fraudulent transactions, delete webhooks, or exhaust your quotas. 
+> Secret Keys act as bearer tokens granting complete root access to the App's isolated partition in Quasar. If leaked, an attacker could write fraudulent transactions or exhaust your quotas.
 
 ### Why is it called a "Secret" Key?
 Because it operates purely on a **server-to-server** level.
@@ -31,4 +31,4 @@ Because it operates purely on a **server-to-server** level.
 ### Resolving and Hashing
 For security, Quasar does not store your raw Secret Key in plaintext. When you generate a key, the backend performs a SHA-256 hash before storing it. When you make an API request using the SDK, the `IronDomeGuard` intercepts the request, hashes the provided `sk_live_...` key in real-time, and compares it to the database hash. 
 
-If you lose your Secret Key, you cannot recover it; you must roll a new key via the dashboard.
+You can reveal your Secret Key in the dashboard at any time through the App settings (requires Admin or Owner authorization), or roll a new key if you suspect it has been compromised.
