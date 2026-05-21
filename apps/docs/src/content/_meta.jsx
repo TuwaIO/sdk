@@ -3,9 +3,15 @@ export default {
   '---': {
     type: 'separator',
   },
-  scalar: 'Scalar API Viewer',
+  'core-concepts': 'Core Concepts',
+  webhooks: 'Webhooks',
+  security: 'Security',
   '--': {
     type: 'separator',
   },
-  apiReference: 'API reference',
+  scalar: 'API Explorer',
+  '---api': {
+    type: 'separator',
+  },
+  apiReference: 'SDK Reference',
 };

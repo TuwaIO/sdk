@@ -1,69 +1,23 @@
-import { useWalletAccountMessageSigner } from '@solana/react';
-import { Config, getWalletClient } from '@wagmi/core';
-import { UiWalletAccount } from '@wallet-standard/react';
-import { useCallback, useEffect, useRef } from 'react';
+/**
+ * @module react
+ * @description Main React entrypoint of the Quasar SDK, featuring the unified QuasarAuthBridge.
+ */
+
+import { Config } from '@wagmi/core';
+import { useEffect } from 'react';
 import { StoreApi } from 'zustand';
 
-import { ChainType, EvmSigner, MiniSessionAuth, SolanaSigner } from '../types';
-import { getMiniSessionAuth as getAuthCore } from '../utils/session';
+import { ChainType, MiniSessionAuth } from '../types';
+import { QuasarEvmAuthBridge } from './evm';
+import { QuasarActiveConnection } from './shared';
+import { QuasarSolanaAuthBridge } from './solana';
+
+export type { QuasarActiveConnection };
+export { getMiniSessionAuth } from './shared';
 
 /**
- * Structural interface for the internal connection state of a wallet store.
- * Used to avoid strict dependency on nova-connect internal types.
- * @internal
- */
-interface SatelliteConnectionState {
-  isConnected: boolean;
-  address: string;
-}
-
-/**
- * Structural interface for an active wallet connection.
- * @public
- */
-export interface QuasarActiveConnection {
-  /** Whether the wallet is currently connected. */
-  isConnected: boolean;
-  /** The active wallet address. */
-  address: string;
-  /** The chain ID (number for EVM, string for Solana). */
-  chainId: string | number;
-  /** The UiWalletAccount object (required for Solana signing). */
-  connectedAccount?: UiWalletAccount;
-}
-
-/**
- * A static reference to the current auth helper.
- * This allows non-React code (like Pulsar sync) to trigger authentication.
- * @internal
- */
-let authHelperReference: (() => Promise<MiniSessionAuth>) | null = null;
-
-/**
- * Static utility to retrieve or trigger a Mini-Session authentication.
- * This is the primary way for services outside the React tree to get an auth token.
- *
- * @returns A promise resolving to the valid Mini-Session Auth.
- * @throws {Error} If the bridge is not mounted or the wallet is disconnected.
- *
- * @public
- */
-export async function getMiniSessionAuth(): Promise<MiniSessionAuth> {
-  // Retry mechanism to account for bridge initialization timing
-  for (let i = 0; i < 15; i++) {
-    if (authHelperReference) {
-      return authHelperReference();
-    }
-    await new Promise((resolve) => setTimeout(resolve, 200));
-  }
-
-  throw new Error(
-    '[QuasarSDK] Auth helper not initialized. Ensure QuasarAuthBridge is mounted and wallet is connected.',
-  );
-}
-
-/**
- * Props for the QuasarAuthBridge component.
+ * Props for the unified QuasarAuthBridge component.
+ * 
  * @public
  */
 export interface QuasarAuthBridgeProps {
@@ -81,16 +35,6 @@ export interface QuasarAuthBridgeProps {
    * Maximum session age in milliseconds. Must be the same value passed to
    * `verifyMiniSession` — this is the single source of truth for session lifetime.
    * Defaults to 5 minutes.
-   *
-   * @example
-   * ```tsx
-   * const TOKEN_EXPIRATION = 86400 * 1000; // 24 hours in ms
-   *
-   * <QuasarAuthBridge maxAge={TOKEN_EXPIRATION} ... />
-   *
-   * // Later, for verification:
-   * verifyMiniSession({ ...auth, maxAge: TOKEN_EXPIRATION });
-   * ```
    */
   maxAge?: number;
   /** Optional callback triggered when an address mismatch is detected. */
@@ -98,20 +42,18 @@ export interface QuasarAuthBridgeProps {
 }
 
 /**
- * The Quasar Authentication Bridge.
+ * The Unified Quasar Authentication Bridge.
  *
- * This component orchestrates signature requests across Solana and EVM ecosystems.
- * It decouples the SDK from specific library hooks by accepting connection data as props.
- *
- * It automatically handles:
- * 1. Signature generation for both Solana and EVM wallets.
- * 2. Session caching and synchronization with your state store.
- * 3. Address mismatch protection (clearing sessions when the wallet changes).
+ * This component acts as a unified cross-chain coordinator. It dynamically
+ * renders either the EVM or Solana specific bridges based on the connection type.
+ * Note: importing this component requires having both `@wagmi/core` and `@solana/react` installed.
+ * If you only need EVM or Solana bindings, import directly from the corresponding subpath:
+ * - `@tuwaio/quasar-sdk/react/evm`
+ * - `@tuwaio/quasar-sdk/react/solana`
  *
  * @example
  * ```tsx
- * const activeConnection = useSatelliteConnectStore(s => s.activeConnection);
- * const store = useContext(SatelliteStoreContext);
+ * import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
  *
  * <QuasarAuthBridge
  *   activeConnection={activeConnection}
@@ -121,7 +63,7 @@ export interface QuasarAuthBridgeProps {
  *   setSession={auth.setMiniSession}
  * />
  * ```
- *
+ * 
  * @public
  */
 export function QuasarAuthBridge({
@@ -150,7 +92,7 @@ export function QuasarAuthBridge({
   if (chainType === ChainType.SOLANA) {
     return (
       <QuasarSolanaAuthBridge
-        connectedAccount={activeConnection.connectedAccount as UiWalletAccount}
+        activeConnection={activeConnection}
         store={store}
         session={session}
         setSession={setSession}
@@ -159,122 +101,14 @@ export function QuasarAuthBridge({
     );
   }
 
-  return <QuasarEvmAuthBridge wagmiConfig={wagmiConfig} store={store} session={session} setSession={setSession} maxAge={maxAge} />;
-}
-
-/** @internal */
-function QuasarSolanaAuthBridge({
-  connectedAccount,
-  store,
-  session,
-  setSession,
-  maxAge,
-}: {
-  connectedAccount: UiWalletAccount;
-  store: StoreApi<unknown>;
-  session: MiniSessionAuth | null;
-  setSession: (s: MiniSessionAuth | null) => void;
-  maxAge?: number;
-}) {
-  const solanaSigner = useWalletAccountMessageSigner(connectedAccount);
-
-  // Refs keep the callback stable across re-renders caused by session/signer updates.
-  // Without this, every successful sign recreates getAuth → authHelperReference briefly
-  // becomes null → incoming calls fall into the retry loop.
-  const signerRef = useRef(solanaSigner);
-  const sessionRef = useRef(session);
-  const setSessionRef = useRef(setSession);
-
-  useEffect(() => { signerRef.current = solanaSigner; }, [solanaSigner]);
-  useEffect(() => { sessionRef.current = session; }, [session]);
-  useEffect(() => { setSessionRef.current = setSession; }, [setSession]);
-
-  const getAuth = useCallback(async (): Promise<MiniSessionAuth> => {
-    const state = store.getState() as { activeConnection: SatelliteConnectionState };
-    const currentConn = state.activeConnection;
-
-    if (!currentConn?.isConnected) throw new Error('[QuasarSDK] Wallet disconnected');
-
-    const signer = signerRef.current;
-    if (!signer) {
-      throw new Error('[QuasarSDK] Solana Message Signer not initialized.');
-    }
-
-    return getAuthCore(
-      {
-        isConnected: currentConn.isConnected,
-        address: currentConn.address,
-        chainType: ChainType.SOLANA,
-        signer: signer as unknown as SolanaSigner,
-      },
-      {
-        miniSession: sessionRef.current,
-        setMiniSession: setSessionRef.current,
-      },
-      maxAge,
-    );
-  }, [store, maxAge]);
-
-  useEffect(() => {
-    authHelperReference = getAuth;
-    return () => {
-      if (authHelperReference === getAuth) authHelperReference = null;
-    };
-  }, [getAuth]);
-
-  return null;
-}
-
-/** @internal */
-function QuasarEvmAuthBridge({
-  wagmiConfig,
-  store,
-  session,
-  setSession,
-  maxAge,
-}: {
-  wagmiConfig: Config;
-  store: StoreApi<unknown>;
-  session: MiniSessionAuth | null;
-  setSession: (s: MiniSessionAuth | null) => void;
-  maxAge?: number;
-}) {
-  const sessionRef = useRef(session);
-  const setSessionRef = useRef(setSession);
-
-  useEffect(() => { sessionRef.current = session; }, [session]);
-  useEffect(() => { setSessionRef.current = setSession; }, [setSession]);
-
-  const getAuth = useCallback(async (): Promise<MiniSessionAuth> => {
-    const state = store.getState() as { activeConnection: SatelliteConnectionState };
-    const currentConn = state.activeConnection;
-
-    if (!currentConn?.isConnected) throw new Error('[QuasarSDK] Wallet disconnected');
-
-    const signer = await getWalletClient(wagmiConfig);
-    if (!signer) throw new Error('[QuasarSDK] EVM Signer not found');
-
-    return getAuthCore(
-      {
-        isConnected: currentConn.isConnected,
-        address: currentConn.address,
-        chainType: ChainType.EVM,
-        signer: signer as unknown as EvmSigner,
-      },
-      {
-        miniSession: sessionRef.current,
-        setMiniSession: setSessionRef.current,
-      },
-      maxAge,
-    );
-  }, [store, wagmiConfig, maxAge]);
-
-  useEffect(() => {
-    authHelperReference = getAuth;
-    return () => {
-      if (authHelperReference === getAuth) authHelperReference = null;
-    };
-  }, [getAuth]);
-
-  return null;
+  return (
+    <QuasarEvmAuthBridge
+      activeConnection={activeConnection}
+      store={store}
+      wagmiConfig={wagmiConfig}
+      session={session}
+      setSession={setSession}
+      maxAge={maxAge}
+    />
+  );
 }

@@ -18,6 +18,16 @@
       "types": "./dist/react.d.ts",
       "import": "./dist/react.mjs",
       "require": "./dist/react.js"
+    },
+    "./react/evm": {
+      "types": "./dist/react/evm.d.ts",
+      "import": "./dist/react/evm.mjs",
+      "require": "./dist/react/evm.js"
+    },
+    "./react/solana": {
+      "types": "./dist/react/solana.d.ts",
+      "import": "./dist/react/solana.mjs",
+      "require": "./dist/react/solana.js"
     }
   },
   "publishConfig": {

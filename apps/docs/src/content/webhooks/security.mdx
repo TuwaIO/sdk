@@ -1,0 +1,50 @@
+# Webhook Security & Signatures
+
+Quasar enforces strict outbound security policies when dispatching webhooks. Because Quasar operates a massive infrastructure, malicious actors could attempt to use Quasar's webhook engine to perform attacks on external or internal systems. 
+
+To prevent this, the `WebhookDispatcherService` implements several layers of protection.
+
+## Outbound Protection (SSRF Prevention)
+
+Server-Side Request Forgery (SSRF) occurs when a system is tricked into making requests to internal or restricted IP addresses. 
+
+Before Quasar dispatches any webhook to your provided URL, it executes the following steps:
+1. **DNS Resolution**: Quasar resolves your host domain (e.g., `api.myapp.com`) into its underlying IPv4 and IPv6 addresses.
+2. **IP Blacklisting**: Quasar validates the resolved IPs against a strict internal blacklist. It outright blocks requests to `localhost`, loopback addresses (`127.0.0.0/8`), private networks (`10.0.0.0/8`, `192.168.0.0/16`), and AWS/GCP metadata endpoints (`169.254.169.254`).
+3. **Execution**: If the IP is safe, the request is dispatched.
+
+If your webhook resolves to a restricted IP, Quasar will permanently fail the delivery and flag the endpoint.
+
+## Tarpit Protection & Timeouts
+
+To prevent "tarpitting"—where a malicious server intentionally keeps a connection open forever to exhaust Quasar's worker threads—Quasar enforces a **10-second hard timeout** on all webhook deliveries.
+
+If your server takes longer than 10 seconds to respond with a `200 OK`, Quasar immediately drops the connection and marks the delivery as failed. Ensure your webhook endpoints process payloads asynchronously (e.g., push them to a local queue and return a `200` immediately).
+
+## Verifying Signatures
+
+To ensure the payload is authentically from Quasar, you must verify the HMAC signature included in the headers.
+
+```typescript
+import crypto from 'crypto';
+
+function verifyQuasarWebhook(rawBody: string, signatureHeader: string, secret: string): boolean {
+  const generatedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(rawBody, 'utf8')
+    .digest('hex');
+
+  // Use timingSafeEqual to prevent timing attacks
+  const signatureBuffer = Buffer.from(signatureHeader);
+  const generatedBuffer = Buffer.from(generatedSignature);
+
+  if (signatureBuffer.length !== generatedBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(signatureBuffer, generatedBuffer);
+}
+```
+
+> [!TIP]
+> Always use the **raw, unparsed body** as a string or buffer when verifying the signature. If your framework automatically parses the body into JSON, stringifying it might alter the formatting (e.g., removing spaces), causing the signature verification to fail.

@@ -8,6 +8,8 @@ export default defineConfig([
     entry: {
       index: './src/index.ts',
       react: './src/react/index.tsx',
+      'react/evm': './src/react/evm.tsx',
+      'react/solana': './src/react/solana.tsx',
     },
     sourcemap: false,
     splitting: true,

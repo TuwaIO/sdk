@@ -35,11 +35,13 @@ const isValid = await utils.verifyMiniSession(params);
 
 ## Quick Start (React)
 
-```tsx
-import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
+For EVM-only applications, use the EVM subpath to prevent missing `@solana/react` errors:
 
-// Mount within your SatelliteConnectProvider tree to handle signatures
-<QuasarAuthBridge
+```tsx
+import { QuasarEvmAuthBridge } from '@tuwaio/quasar-sdk/react/evm';
+
+// Mount within your SatelliteConnectProvider tree to handle EVM signatures
+<QuasarEvmAuthBridge
   activeConnection={activeConnection}
   store={store}
   wagmiConfig={config}
@@ -47,6 +49,8 @@ import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
   setSession={setMiniSession}
 />
 ```
+
+For Solana-only or multi-chain applications, see the [Security Section](/security/mini-wallet-auth) for appropriate components and subpaths.
 
 ## Installation
 

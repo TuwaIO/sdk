@@ -6,7 +6,7 @@
 
 > **getMiniSessionAuth**(`connection`, `store`, `maxAge?`): `Promise`\<[`MiniSessionAuth`](../interfaces/MiniSessionAuth.md)\>
 
-Defined in: [packages/quasar-sdk/src/utils/session.ts:60](https://github.com/TuwaIO/sdk/blob/ad96ef0019f28a19fc06ee40597f0d1a3e2b1f66/packages/quasar-sdk/src/utils/session.ts#L60)
+Defined in: [packages/quasar-sdk/src/utils/session.ts:60](https://github.com/TuwaIO/sdk/blob/d96af45cd4a786670c62b88065c8a4c12b36d113/packages/quasar-sdk/src/utils/session.ts#L60)
 
 High-level orchestrator to retrieve an existing Mini-Session or trigger a new signature.
 

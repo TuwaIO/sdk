@@ -67,17 +67,19 @@ const isValid = await utils.verifyMiniSession(params);
 
 ## Quick Start (React Bridge)
 
+To avoid missing optional peer dependencies at build time, import the bridge for your target ecosystem:
+
+- **EVM-Only**:
+```tsx
+import { QuasarEvmAuthBridge } from '@tuwaio/quasar-sdk/react/evm';
+```
+- **Solana-Only**:
+```tsx
+import { QuasarSolanaAuthBridge } from '@tuwaio/quasar-sdk/react/solana';
+```
+- **Multi-Chain**:
 ```tsx
 import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
-
-// Mount within your SatelliteConnectProvider tree to handle signatures
-<QuasarAuthBridge
-  activeConnection={activeConnection}
-  store={store}
-  wagmiConfig={config}
-  session={miniSession}
-  setSession={setMiniSession}
-/>
 ```
 
 ---

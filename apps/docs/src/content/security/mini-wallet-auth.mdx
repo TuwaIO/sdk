@@ -1,0 +1,111 @@
+# Mini Wallet Auth (Local Session)
+
+In the TUWA ecosystem, identity is strictly decentralized and sovereign. To bridge the gap between blockchain wallets and traditional Web2 infrastructure, developers typically rely on SIWE (Sign-In With Ethereum). 
+
+However, classic SIWE is session-bound, relies heavily on stateful cookies or JWTs, and often carries too much overhead for high-throughput, headless API requests. 
+
+This is why Quasar introduces **Mini Wallet Auth (Local Session)**.
+
+## What is Mini Wallet Auth?
+
+**Mini Wallet Auth** is a stateless, ephemeral, lightweight implementation of wallet authentication. Instead of establishing a long-lived browser session via cookies, it generates a quick, time-bound signature proof that a user owns a specific wallet address. 
+
+This signature acts as a temporary local session token for rapid client-server interactions.
+
+### Why Mini Wallet Auth over Standard SIWE?
+
+1. **Stateless APIs**: High-performance backend routes (like the Engine API at `api.tuwa.io`) are stateless. They cannot read browser cookies. Mini Wallet Auth allows clients to pass authentication proofs directly in request headers or JSON payloads.
+2. **Multi-Chain Support**: Unlike classic SIWE which is strictly EVM, Quasar's auth naturally extends the signature format to **Solana**. You get unified authentication proofs regardless of the underlying chain.
+3. **Decentralization Focus**: Keeping identity sovereign means avoiding heavy, centralized session stores. By using time-bound expiring signatures, your backend can independently cryptographically verify a user's intent without querying a centralized database.
+
+## Generating Local Session Signatures (React)
+
+The SDK provides React components that automatically handle the handshake, signature prompt, and caching for wallets. To prevent dependency resolution issues during application build (e.g. if you only support EVM and do not have `@solana/react` installed), you should import the bridge from the specific subpath matching your target ecosystem:
+
+### For EVM-Only Applications
+
+Import from `@tuwaio/quasar-sdk/react/evm` to avoid any Solana-related dependency errors:
+
+```tsx
+import { QuasarEvmAuthBridge } from '@tuwaio/quasar-sdk/react/evm';
+import { useSatelliteConnectStore } from '@tuwaio/nova-connect/satellite';
+import { useMiniSessionStore } from '@/stores/miniSessionStore';
+
+function App() {
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
+  const { session, setSession } = useMiniSessionStore();
+
+  return (
+    <QuasarEvmAuthBridge
+      activeConnection={activeConnection}
+      store={useMiniSessionStore}
+      session={session}
+      setSession={setSession}
+    />
+  );
+}
+```
+
+### For Solana-Only Applications
+
+Import from `@tuwaio/quasar-sdk/react/solana` to avoid any EVM-related dependency errors:
+
+```tsx
+import { QuasarSolanaAuthBridge } from '@tuwaio/quasar-sdk/react/solana';
+import { useSatelliteConnectStore } from '@tuwaio/nova-connect/satellite';
+import { useMiniSessionStore } from '@/stores/miniSessionStore';
+
+function App() {
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
+  const { session, setSession } = useMiniSessionStore();
+
+  return (
+    <QuasarSolanaAuthBridge
+      activeConnection={activeConnection}
+      store={useMiniSessionStore}
+      session={session}
+      setSession={setSession}
+    />
+  );
+}
+```
+
+### For Multi-Chain Applications (Unified Bridge)
+
+If you support both EVM and Solana (and have all peer dependencies installed), you can import the unified component from `@tuwaio/quasar-sdk/react`:
+
+```tsx
+import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
+```
+
+Once signed, the `session` state will contain the wallet address, the timestamp, the chain type (EVM/Solana), and the actual `signature`. You can pass this object to your backend on every API request.
+
+## Verifying on the Server
+
+When your Node.js or Edge backend receives a request containing the local session, you can verify it statelessly using the `utils` exported from the SDK.
+
+```typescript
+import { utils, ChainType } from '@tuwaio/quasar-sdk';
+
+async function myApiRoute(req, res) {
+  const { walletAddress, signature, timestamp, chainType } = req.body.auth;
+
+  // Verify the signature is valid, matches the address, and hasn't expired.
+  // The default expiration window is 24 hours.
+  const isValid = await utils.verifyMiniSession({
+    walletAddress,
+    signature,
+    timestamp,
+    chainType // ChainType.EVM or ChainType.SOLANA
+  });
+
+  if (!isValid) {
+    return res.status(401).json({ error: 'Invalid or expired Local Session signature' });
+  }
+
+  // Identity verified!
+  return res.json({ success: true, user: walletAddress });
+}
+```
+
+By standardizing on Mini Wallet Auth, you guarantee high performance, massive scalability, and true sovereign identity across your integration.

@@ -1,0 +1,57 @@
+# Webhooks Overview
+
+Quasar acts as a headless engine, meaning you often need to know when asynchronous events complete in the background. **Webhooks** are the primary mechanism Quasar uses to push real-time event data back to your integrator backend.
+
+## What is a Webhook?
+
+Instead of constantly polling the Quasar API to check if a transaction has mined, you provide Quasar with an HTTP endpoint (e.g., `https://api.myapp.com/webhooks/quasar`). When a specific event occurs, Quasar automatically sends an HTTP `POST` request to your endpoint containing a JSON payload describing the event.
+
+## Creating a Webhook
+
+You must create and configure your Webhooks through the dashboard:
+
+1. Log in to the [Quasar Dashboard](https://quasar.tuwa.io).
+2. Navigate to **Organization Settings** > **Webhooks**.
+3. Click **Add Webhook** and provide your target URL endpoint.
+4. Select the specific **Events** (triggers) you want this webhook to listen for.
+
+Once created, Quasar will immediately begin dispatching events to your URL.
+
+## Event Triggers
+
+Webhooks in Quasar are tightly scoped to specific events within the TUWA ecosystem. The most common triggers include:
+
+- `transaction.pending`: Triggered immediately when a transaction enters the Quasar mempool.
+- `transaction.mined`: Triggered when the blockchain confirms the transaction.
+- `transaction.failed`: Triggered if the transaction reverts or fails during execution.
+- `billing.quota_exceeded`: Triggered if your App hits a rate limit or usage quota threshold.
+
+### Payload Structure
+
+When an event triggers, Quasar dispatches a structured JSON payload. For a transaction event, the payload will include the `txKey`, the current `status`, and relevant chain metadata.
+
+```json
+{
+  "event": "transaction.mined",
+  "timestamp": "2026-05-16T12:00:00Z",
+  "data": {
+    "txKey": "tx_abc123...",
+    "hash": "0xdef456...",
+    "chainId": 1,
+    "status": "mined"
+  }
+}
+```
+
+## Why do I need a Webhook Secret?
+
+When you create a webhook in the dashboard, Quasar generates a unique **Webhook Secret** (e.g., `whsec_...`). 
+
+> [!IMPORTANT]
+> The Webhook Secret is used to securely verify that incoming `POST` requests actually came from Quasar and not a malicious third party pretending to be Quasar.
+
+Whenever Quasar dispatches a payload, it uses your Webhook Secret to generate a cryptographic hash (HMAC SHA-256) of the payload. It attaches this hash in the headers of the `POST` request (typically `Tuwa-Signature`). 
+
+Your backend must intercept the incoming request, generate its own hash using the raw payload body and your stored Webhook Secret, and compare the two hashes. If they match, the payload is authentic.
+
+Next, see the [Security & Signatures](./security.mdx) page for deep details on how Quasar protects webhook deliveries.

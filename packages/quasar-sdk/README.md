@@ -43,7 +43,50 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 ## React Authentication Bridge
 
-The SDK provides a unified component to handle multi-chain authentication (EVM & Solana) with zero boilerplate.
+The SDK provides React components to handle authentication with zero boilerplate. To prevent issues with missing optional peer dependencies at build time, the SDK exposes separate ecosystem entry points:
+
+### 1. EVM-Only Bridge (No Solana dependencies required)
+
+If your project only supports EVM chains, import from the `/react/evm` subpath. This avoids compile-time errors if `@solana/react` is not installed.
+
+```tsx
+import { QuasarEvmAuthBridge } from '@tuwaio/quasar-sdk/react/evm';
+
+function MyApp() {
+  return (
+    <QuasarEvmAuthBridge
+      activeConnection={activeConnection} // Structural interface for wallet state
+      store={store}                      // Zustand store API
+      wagmiConfig={config}               // Wagmi config
+      session={miniSession}              // Current session state
+      setSession={setMiniSession}        // Session setter
+    />
+  );
+}
+```
+
+### 2. Solana-Only Bridge (No EVM dependencies required)
+
+If your project only supports Solana, import from the `/react/solana` subpath. This avoids compile-time errors if `@wagmi/core` is not installed.
+
+```tsx
+import { QuasarSolanaAuthBridge } from '@tuwaio/quasar-sdk/react/solana';
+
+function MyApp() {
+  return (
+    <QuasarSolanaAuthBridge
+      activeConnection={activeConnection} // Structural interface for wallet state
+      store={store}                      // Zustand store API
+      session={miniSession}              // Current session state
+      setSession={setMiniSession}        // Session setter
+    />
+  );
+}
+```
+
+### 3. Unified Cross-Chain Bridge
+
+If your project supports both ecosystems and has all peer dependencies installed, you can use the unified bridge:
 
 ```tsx
 import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
@@ -51,11 +94,11 @@ import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
 function MyApp() {
   return (
     <QuasarAuthBridge
-      activeConnection={activeConnection} // Structural interface for wallet state
-      store={store}                      // Zustand store API
-      wagmiConfig={config}               // Wagmi config
-      session={miniSession}              // Current session state
-      setSession={setMiniSession}        // Session setter
+      activeConnection={activeConnection}
+      store={store}
+      wagmiConfig={config}
+      session={miniSession}
+      setSession={setMiniSession}
     />
   );
 }
