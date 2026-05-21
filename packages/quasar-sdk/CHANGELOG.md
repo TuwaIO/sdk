@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.9](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.8...quasar-sdk-v0.0.9) (2026-05-21)
+
+
+### Bug Fixes
+
+* quasar-sdk react & WIP: docs ([b05fae9](https://github.com/TuwaIO/sdk/commit/b05fae9136e7293e95d99f17db87708078a6e480))
+
 ## [0.0.8](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.7...quasar-sdk-v0.0.8) (2026-05-15)
 
 
