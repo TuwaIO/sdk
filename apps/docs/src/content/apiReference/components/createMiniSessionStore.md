@@ -6,7 +6,7 @@
 
 > **createMiniSessionStore**(`storageName?`): `UseBoundStore`\<`WithPersist`\<`StoreApi`\<[`MiniSessionStore`](../interfaces/MiniSessionStore.md)\>, [`MiniSessionStore`](../interfaces/MiniSessionStore.md)\>\>
 
-Defined in: [packages/quasar-sdk/src/utils/session.ts:28](https://github.com/TuwaIO/sdk/blob/8314ee70ee8eebe759bc30c8fa9f7539722822cb/packages/quasar-sdk/src/utils/session.ts#L28)
+Defined in: [packages/quasar-sdk/src/utils/session.ts:28](https://github.com/TuwaIO/sdk/blob/0cd523205b2f5b4c431bcfa884fa86ed8804dd3b/packages/quasar-sdk/src/utils/session.ts#L28)
 
 Creates a persistent Zustand store to cache Mini-Session signatures.
 This is the recommended way to manage sessions in React applications.

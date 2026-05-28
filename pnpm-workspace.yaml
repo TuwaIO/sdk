@@ -5,3 +5,6 @@ allowBuilds:
   esbuild: false
   sharp: false
   vue-demi: false
+minimumReleaseAgeExclude:
+  - "@tuwaio/*"
+  - viem
