@@ -252,10 +252,13 @@ This package provides direct subpath entry points for clean, tree-shakeable impo
 - **`@tuwaio/sdk/satellite`** — Wallet state & react hooks (`useSatelliteConnectStore`, `SatelliteConnectProvider`, `useAccount`).
 - **`@tuwaio/sdk/satellite/siwe`** — Client-side SIWE authentication utilities.
 - **`@tuwaio/sdk/satellite/siwe/server`** — Server-side SIWE API handler (`createSiweApiHandler`).
-- **`@tuwaio/sdk/nova-connect`** — Connect UI components & providers (`ConnectButton`, `NovaConnectProvider`).
+- **`@tuwaio/sdk/nova-connect`** — Connect UI main entry (`ConnectButton`, `NovaConnectProvider`).
+- **`@tuwaio/sdk/nova-connect/components`** — Standalone UI components (`ConnectButton`, Modals, Customization interfaces).
+- **`@tuwaio/sdk/nova-connect/hooks`** — Helper hooks (`useGetWalletNameAndAvatar`, `useWalletChainsList`).
+- **`@tuwaio/sdk/nova-connect/i18n`** — Internationalization and label providers (`NovaConnectLabelsProvider`).
 - **`@tuwaio/sdk/nova-transactions`** — Transaction UI components (`TxActionButton`, `TransactionList`).
 - **`@tuwaio/sdk/nova-transactions/providers`** — Transaction UI provider (`NovaTransactionsProvider`).
-- **`@tuwaio/sdk/nova-core`** — UI Core variables and utilities.
+- **`@tuwaio/sdk/nova-core`** — UI Core variables, base components, and utilities.
 - **`@tuwaio/sdk/orbit`** — Core multi-chain types and adapters (`OrbitAdapter`, `getAdapterFromConnectorType`).
 - **`@tuwaio/sdk/styles/all.css`** — Complete bundled stylesheet for Nova UI components.
 

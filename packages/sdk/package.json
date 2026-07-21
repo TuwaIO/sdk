@@ -45,6 +45,21 @@
       "import": "./dist/nova-connect-satellite.js",
       "require": "./dist/nova-connect-satellite.cjs"
     },
+    "./nova-connect/components": {
+      "types": "./dist/nova-connect-components.d.ts",
+      "import": "./dist/nova-connect-components.js",
+      "require": "./dist/nova-connect-components.cjs"
+    },
+    "./nova-connect/hooks": {
+      "types": "./dist/nova-connect-hooks.d.ts",
+      "import": "./dist/nova-connect-hooks.js",
+      "require": "./dist/nova-connect-hooks.cjs"
+    },
+    "./nova-connect/i18n": {
+      "types": "./dist/nova-connect-i18n.d.ts",
+      "import": "./dist/nova-connect-i18n.js",
+      "require": "./dist/nova-connect-i18n.cjs"
+    },
     "./nova-transactions": {
       "types": "./dist/nova-transactions.d.ts",
       "import": "./dist/nova-transactions.js",

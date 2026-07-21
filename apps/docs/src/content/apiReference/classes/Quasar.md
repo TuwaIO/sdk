@@ -4,7 +4,7 @@
 
 # Quasar
 
-Defined in: [packages/quasar-sdk/src/index.ts:89](https://github.com/TuwaIO/sdk/blob/67fe450e1e0bada1e32895fab8b99f264e5213cf/packages/quasar-sdk/src/index.ts#L89)
+Defined in: [packages/quasar-sdk/src/index.ts:89](https://github.com/TuwaIO/sdk/blob/89fd3c44f22f8e38e48f19240dbe515f6e35eb6d/packages/quasar-sdk/src/index.ts#L89)
 
 Main entry point for the Quasar SDK.
 
@@ -34,7 +34,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 > **new Quasar**(`config`): `Quasar`
 
-Defined in: [packages/quasar-sdk/src/index.ts:123](https://github.com/TuwaIO/sdk/blob/67fe450e1e0bada1e32895fab8b99f264e5213cf/packages/quasar-sdk/src/index.ts#L123)
+Defined in: [packages/quasar-sdk/src/index.ts:123](https://github.com/TuwaIO/sdk/blob/89fd3c44f22f8e38e48f19240dbe515f6e35eb6d/packages/quasar-sdk/src/index.ts#L123)
 
 Creates a new instance of the Quasar SDK.
 
@@ -66,7 +66,7 @@ const quasar = new Quasar({ secretKey: process.env.QUASAR_SECRET_KEY! });
 
 > `readonly` **pulsar**: [`PulsarModule`](PulsarModule.md)
 
-Defined in: [packages/quasar-sdk/src/index.ts:110](https://github.com/TuwaIO/sdk/blob/67fe450e1e0bada1e32895fab8b99f264e5213cf/packages/quasar-sdk/src/index.ts#L110)
+Defined in: [packages/quasar-sdk/src/index.ts:110](https://github.com/TuwaIO/sdk/blob/89fd3c44f22f8e38e48f19240dbe515f6e35eb6d/packages/quasar-sdk/src/index.ts#L110)
 
 The Pulsar Transaction Engine module.
 
@@ -83,7 +83,7 @@ and retrieve indexed transaction history across multiple blockchain networks.
 
 > `readonly` `static` **utils**: `object`
 
-Defined in: [packages/quasar-sdk/src/index.ts:94](https://github.com/TuwaIO/sdk/blob/67fe450e1e0bada1e32895fab8b99f264e5213cf/packages/quasar-sdk/src/index.ts#L94)
+Defined in: [packages/quasar-sdk/src/index.ts:94](https://github.com/TuwaIO/sdk/blob/89fd3c44f22f8e38e48f19240dbe515f6e35eb6d/packages/quasar-sdk/src/index.ts#L94)
 
 Security and authentication utilities.
 Shared across all instances and available statically.
