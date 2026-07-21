@@ -5,9 +5,37 @@
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
   "description": "The EVM Umbrella SDK for the TUWA Ecosystem. Contains logic and providers for Ethereum-compatible chains.",
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./orbit": {
+      "types": "./dist/orbit.d.ts",
+      "import": "./dist/orbit.js",
+      "require": "./dist/orbit.cjs"
+    },
+    "./pulsar": {
+      "types": "./dist/pulsar.d.ts",
+      "import": "./dist/pulsar.js",
+      "require": "./dist/pulsar.cjs"
+    },
+    "./satellite": {
+      "types": "./dist/satellite.d.ts",
+      "import": "./dist/satellite.js",
+      "require": "./dist/satellite.cjs"
+    },
+    "./nova-connect": {
+      "types": "./dist/nova-connect.d.ts",
+      "import": "./dist/nova-connect.js",
+      "require": "./dist/nova-connect.cjs"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -15,7 +43,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "tsup src/index.ts --watch",
+    "start": "tsup --watch",
     "build": "tsup"
   },
   "keywords": [
@@ -82,10 +110,12 @@
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
+    "@tuwaio/nova-connect": ">=0.4.6",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
+    "@tuwaio/nova-connect": "^0.4.6",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.3",
     "tsup": "^8.5.1",

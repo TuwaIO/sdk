@@ -24,7 +24,7 @@ It operates strictly on the server (Node.js, Next.js Server Actions, or Edge fun
 - **☁️ Cloud Sync**: Automatically persist pending and terminal transaction states to the Quasar Database for cross-device history.
 - **🔐 Mini-Session Auth**: Built-in cryptographic verification and React bridges (`QuasarAuthBridge`) to handle mini-session authentication across EVM and Solana with zero boilerplate.
 - **⚡ Edge Ready**: Uses `ofetch` and lightweight cryptography to run seamlessly in Cloudflare Workers and Vercel Edge.
-- **📦 InMemory Sync**: Perfectly pairs with `PulsarCore.createTxInMemoryStore` to fetch history and hydrate local React states.
+- **📦 InMemory Sync**: Perfectly pairs with `@tuwaio/sdk/pulsar` (`createTxInMemoryStore`) to fetch history and hydrate local React states.
 - **⛓️ Multi-Chain Support**: Provides separate lightweight bridges for EVM (`react/evm`) and Solana (`react/solana`), ensuring minimal bundle sizes.
 
 ---
@@ -35,7 +35,7 @@ It operates strictly on the server (Node.js, Next.js Server Actions, or Edge fun
 pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core
 ```
 
-*Note: `ofetch` and `@tuwaio/pulsar-core` are required as peer dependencies to ensure ultra-fast HTTP requests and strict TypeScript compatibility.*
+_Note: `ofetch` and `@tuwaio/pulsar-core` are required as peer dependencies to ensure ultra-fast HTTP requests and strict TypeScript compatibility._
 
 ---
 
@@ -45,7 +45,7 @@ This is a basic example of how to interact with the Quasar Cloud directly from y
 
 ```typescript
 import { Quasar, MiniSessionAuth, utils } from '@tuwaio/quasar-sdk';
-import type { PulsarCore } from '@tuwaio/pulsar-core';
+import type { Transaction } from '@tuwaio/sdk/pulsar';
 
 // Initialize Quasar with your Secret Key from the Dashboard
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
@@ -53,11 +53,11 @@ const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 /**
  * Example Next.js Server Action to Sync a Transaction
  */
-export async function syncTransaction(tx: PulsarCore.Transaction, authData: MiniSessionAuth) {
+export async function syncTransaction(tx: Transaction, authData: MiniSessionAuth) {
   // 1. Verify the client's signature (prevent unauthorized spoofing)
   const isValid = await utils.verifyMiniSession(authData);
   if (!isValid) throw new Error('Invalid signature.');
-  
+
   // 2. Sync the transaction securely to the Quasar Cloud
   await quasar.pulsar.syncCreate(tx, 'My Application');
   return { success: true };
@@ -66,10 +66,13 @@ export async function syncTransaction(tx: PulsarCore.Transaction, authData: Mini
 /**
  * Example Next.js Server Action to Fetch History
  */
-export async function getHistory(params: { walletAddress: string; page: number; limit: number; appName: string }, authData: MiniSessionAuth) {
+export async function getHistory(
+  params: { walletAddress: string; page: number; limit: number; appName: string },
+  authData: MiniSessionAuth,
+) {
   const isValid = await utils.verifyMiniSession(authData);
   if (!isValid) throw new Error('Invalid signature.');
-  
+
   // Return the paginated transaction history
   return quasar.pulsar.getHistory(params);
 }
@@ -82,6 +85,7 @@ export async function getHistory(params: { walletAddress: string; page: number; 
 The SDK provides React components to handle mini-session authentication with zero boilerplate. This bridges the gap between your frontend (where the wallet is) and your backend (where the Quasar Secret Key lives).
 
 ### 1. Create the Auth Store
+
 Before using the bridge, create a persistent Zustand store using the provided utility to manage the signature lifecycle.
 
 ```ts
@@ -108,10 +112,10 @@ export function MyApp({ activeConnection, store, wagmiConfig }) {
   return (
     <QuasarEvmAuthBridge
       activeConnection={activeConnection} // Structural interface for wallet state
-      store={store}                      // Zustand store API
-      wagmiConfig={wagmiConfig}          // Wagmi config
-      session={session}                  // Current session state
-      setSession={setSession}            // Session setter
+      store={store} // Zustand store API
+      wagmiConfig={wagmiConfig} // Wagmi config
+      session={session} // Current session state
+      setSession={setSession} // Session setter
     />
   );
 }
@@ -160,11 +164,13 @@ First, define the strict union of all possible transactions your app supports.
 
 ```ts
 // src/types.ts
-import { PulsarCore } from '@tuwaio/sdk';
+import type { Transaction } from '@tuwaio/sdk/pulsar';
 
-export enum AppTxType { SWAP = 'SWAP' }
+export enum AppTxType {
+  SWAP = 'SWAP',
+}
 
-export type SwapTx = PulsarCore.Transaction & {
+export type SwapTx = Transaction & {
   type: AppTxType.SWAP;
   payload: { tokenIn: string; tokenOut: string; amount: number };
 };
@@ -188,7 +194,7 @@ const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 export async function syncTransaction(tx: TransactionUnion, authData: MiniSessionAuth) {
   const isValid = await utils.verifyMiniSession(authData);
   if (!isValid) throw new Error('Invalid signature.');
-  
+
   await quasar.pulsar.syncCreate(tx, 'My App');
   return { success: true };
 }
@@ -196,7 +202,7 @@ export async function syncTransaction(tx: TransactionUnion, authData: MiniSessio
 export async function getHistory(params: any, authData: MiniSessionAuth) {
   const isValid = await utils.verifyMiniSession(authData);
   if (!isValid) throw new Error('Invalid signature.');
-  
+
   return quasar.pulsar.getHistory(params);
 }
 ```
@@ -217,9 +223,9 @@ export const useAuthStore = utils.createMiniSessionStore('quasar-mini-session-st
 // src/hooks/usePulsarStore.ts
 'use client';
 
-import { PulsarCore } from '@tuwaio/sdk';
-import { PulsarEVM } from '@tuwaio/evm-sdk';
-import { PulsarSolana } from '@tuwaio/solana-sdk';
+import { createPulsarStore, createTxInMemoryStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
+import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
+import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
 import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
 
 import { getHistory, syncTransaction } from '@/app/actions';
@@ -228,12 +234,9 @@ import { TransactionUnion } from '@/types';
 
 const storageName = 'transactions-tracking-storage';
 
-const initialStore = PulsarCore.createPulsarStore<TransactionUnion>({
+const initialStore = createPulsarStore<TransactionUnion>({
   name: storageName,
-  adapter: [
-    PulsarEVM.pulsarEvmAdapter(wagmiConfig, appEVMChains),
-    PulsarSolana.pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls }),
-  ],
+  adapter: [pulsarEvmAdapter(wagmiConfig, appEVMChains), pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls })],
   beforeTxProcess: async () => {
     // Ensures we have a valid signature before executing any blockchain logic
     await getMiniSessionAuth();
@@ -249,18 +252,18 @@ const initialStore = PulsarCore.createPulsarStore<TransactionUnion>({
   },
 });
 
-export const usePulsarStore = PulsarCore.createBoundedUseStore(initialStore);
+export const usePulsarStore = createBoundedUseStore(initialStore);
 
 // Wrap with inMemoryStore to enable remote history fetching & pagination
-const pulsarInMemoryStore = PulsarCore.createTxInMemoryStore<TransactionUnion>({
+const pulsarInMemoryStore = createTxInMemoryStore<TransactionUnion>({
   localTransactionsPool: initialStore.getState().transactionsPool,
   getHistory: async ({ page, walletAddress }) => {
     try {
       const auth = await getMiniSessionAuth();
       const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' }, auth);
-      
+
       if (!history) return null;
-      
+
       return { ...history, docs: history.docs as TransactionUnion[] };
     } catch (error) {
       console.error('[PulsarHook] Failed to fetch history:', error);
@@ -274,7 +277,7 @@ const pulsarInMemoryStore = PulsarCore.createTxInMemoryStore<TransactionUnion>({
 
 initialStore.subscribe((state) => pulsarInMemoryStore.getState().syncWithLocalPool(state.transactionsPool));
 
-export const usePulsarInMemoryStore = PulsarCore.createBoundedUseStore(pulsarInMemoryStore);
+export const usePulsarInMemoryStore = createBoundedUseStore(pulsarInMemoryStore);
 ```
 
 ### 5. The Quasar Auth Bridge (`QuasarSDKAuthProvider.tsx`)
@@ -284,16 +287,16 @@ export const usePulsarInMemoryStore = PulsarCore.createBoundedUseStore(pulsarInM
 'use client';
 
 import { useContext, useEffect } from 'react';
-import { SatelliteReact } from '@tuwaio/sdk';
+import { useSatelliteConnectStore, SatelliteStoreContext } from '@tuwaio/sdk/satellite';
 import { QuasarActiveConnection, QuasarAuthBridge as QuasarSDKAuthBridge } from '@tuwaio/quasar-sdk/react';
 
 import { wagmiConfig } from '@/configs/appConfig';
 import { useAuthStore } from '@/hooks/useAuthStore';
 
 export function QuasarAuthBridge() {
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((s) => s.activeConnection);
-  const store = useContext(SatelliteReact.SatelliteStoreContext);
-  
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
+  const store = useContext(SatelliteStoreContext);
+
   const session = useAuthStore((s) => s.miniSession);
   const setSession = useAuthStore((s) => s.setMiniSession);
   const clearSession = useAuthStore((s) => s.clearSession);
@@ -325,29 +328,32 @@ export function QuasarAuthBridge() {
 // src/providers/NovaTransactionsProvider.tsx
 'use client';
 
-import { SatelliteReact, NovaTransactions, OrbitCore, PulsarCore, PulsarReact } from '@tuwaio/sdk';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+import { useInitializeTransactionsPool, type TxInMemoryPagination } from '@tuwaio/sdk/pulsar';
+import { getAdapterFromConnectorType } from '@tuwaio/sdk/orbit';
+import { NovaTransactionsProvider as NTP } from '@tuwaio/sdk/nova-transactions/providers';
 import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
 
-export function NovaTransactionsProvider({ pagination }: { pagination: PulsarCore.TxInMemoryPagination }) {
+export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemoryPagination }) {
   const initialTx = usePulsarStore((state) => state.initialTx);
   const closeTxTrackedModal = usePulsarStore((state) => state.closeTxTrackedModal);
   const executeTxAction = usePulsarStore((state) => state.executeTxAction);
   const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
-  
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((state) => state.activeConnection);
+
+  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
   const getAdapter = usePulsarStore((state) => state.getAdapter);
   const transactionsPool = usePulsarInMemoryStore((state) => state.transactionsPool);
 
-  PulsarReact.useInitializeTransactionsPool({ initializeTransactionsPool });
+  useInitializeTransactionsPool({ initializeTransactionsPool });
 
   return (
-    <NovaTransactions.NovaTransactionsProvider
+    <NTP
       transactionsPool={transactionsPool}
       initialTx={initialTx}
       closeTxTrackedModal={closeTxTrackedModal}
       executeTxAction={executeTxAction}
       connectedWalletAddress={activeConnection?.isConnected ? activeConnection.address : undefined}
-      connectedAdapterType={OrbitCore.getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:')}
+      connectedAdapterType={getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:')}
       adapter={getAdapter()}
       pagination={pagination}
     />
@@ -361,9 +367,12 @@ export function NovaTransactionsProvider({ pagination }: { pagination: PulsarCor
 // src/providers/AppProviders.tsx
 'use client';
 
-import { NovaConnect, SatelliteReact } from '@tuwaio/sdk';
-import { SatelliteEVM } from '@tuwaio/evm-sdk';
-import { SatelliteSolana } from '@tuwaio/solana-sdk';
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
+import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
+import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
+import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
 import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
 
 import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
@@ -374,7 +383,7 @@ import { QuasarAuthBridge } from '@/providers/QuasarSDKAuthProvider';
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const getAdapter = usePulsarStore((state) => state.getAdapter);
   const transactionsPool = usePulsarInMemoryStore((state) => state.transactionsPool);
-  
+
   const isLoading = usePulsarInMemoryStore((state) => state.isLoading);
   const isError = usePulsarInMemoryStore((state) => state.isError);
   const currentPage = usePulsarInMemoryStore((state) => state.currentPage);
@@ -385,11 +394,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const pagination = { isLoading, isError, currentPage, hasMore, fetchNextPage };
 
   return (
-    <SatelliteReact.SatelliteConnectProvider
-      adapter={[
-        SatelliteEVM.satelliteEVMAdapter(wagmiConfig, appEVMChains),
-        SatelliteSolana.satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })
-      ]}
+    <SatelliteConnectProvider
+      adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
       autoConnect={true}
       callbackAfterConnected={async (connection) => {
         try {
@@ -401,13 +407,13 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         }
       }}
     >
-      <SatelliteEVM.EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
-      <SatelliteSolana.SolanaConnectorsWatcher />
-      
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
+      <SolanaConnectorsWatcher />
+
       <QuasarAuthBridge />
       <NovaTransactionsProvider pagination={pagination} />
-      
-      <NovaConnect.NovaConnectProvider
+
+      <NovaConnectProvider
         appChains={appEVMChains}
         solanaRPCUrls={solanaRPCUrls}
         transactionPool={transactionsPool}
@@ -418,8 +424,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         pagination={pagination}
       >
         {children}
-      </NovaConnect.NovaConnectProvider>
-    </SatelliteReact.SatelliteConnectProvider>
+      </NovaConnectProvider>
+    </SatelliteConnectProvider>
   );
 }
 ```
@@ -432,7 +438,9 @@ Now you can safely execute strictly-typed, cross-chain transactions anywhere in 
 // src/components/SwapButton.tsx
 'use client';
 
-import { OrbitCore, NovaTransactions, SatelliteReact } from '@tuwaio/sdk';
+import { getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
 import { usePulsarStore, usePulsarInMemoryStore } from '@/hooks/usePulsarStore';
 import { AppTxType } from '@/types';
 
@@ -440,33 +448,35 @@ export function SwapButton() {
   const executeTxAction = usePulsarStore((s) => s.executeTxAction);
   const getLastTxKey = usePulsarStore((s) => s.getLastTxKey);
   const transactionsPool = usePulsarInMemoryStore((s) => s.transactionsPool);
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((s) => s.activeConnection);
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
 
   const handleSwapAction = async () => {
     // Dynamically determine the adapter based on the currently connected wallet
-    const adapterType = OrbitCore.getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:');
+    const adapterType = getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:');
 
     await executeTxAction({
-      actionFunction: async () => { /* your wagmi/solana contract call */ },
+      actionFunction: async () => {
+        /* your wagmi/solana contract call */
+      },
       params: {
         adapter: adapterType,
         type: AppTxType.SWAP,
         title: 'Token Swap',
-        desiredChainID: adapterType === OrbitCore.OrbitAdapter.EVM ? 1 : undefined,
-        payload: { tokenIn: 'USDC', tokenOut: adapterType === OrbitCore.OrbitAdapter.EVM ? 'ETH' : 'SOL', amount: 100 },
+        desiredChainID: adapterType === OrbitAdapter.EVM ? 1 : undefined,
+        payload: { tokenIn: 'USDC', tokenOut: adapterType === OrbitAdapter.EVM ? 'ETH' : 'SOL', amount: 100 },
       },
     });
   };
 
   return (
-    <NovaTransactions.TxActionButton
+    <TxActionButton
       action={handleSwapAction}
       getLastTxKey={getLastTxKey}
       transactionsPool={transactionsPool}
       walletAddress={activeConnection?.address}
     >
       Cross-Chain Swap
-    </NovaTransactions.TxActionButton>
+    </TxActionButton>
   );
 }
 ```

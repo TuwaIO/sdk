@@ -30,11 +30,12 @@ Webhooks in Quasar are tightly scoped to specific events within the TUWA ecosyst
 
 Every webhook `POST` request is dispatched with the following standard L7 headers:
 
-| Header Name | Description |
-| :--- | :--- |
-| `Content-Type` | Always `application/json` |
-| `User-Agent` | Always `Quasar-Webhook-Worker/1.0 (TuwaIO)` |
-| `x-quasar-signature` | The cryptographic HMAC SHA-256 signature of the raw request body.
+| Header Name          | Description                                                       |
+| :------------------- | :---------------------------------------------------------------- |
+| `Content-Type`       | Always `application/json`                                         |
+| `User-Agent`         | Always `Quasar-Webhook-Worker/1.0 (TuwaIO)`                       |
+| `x-quasar-signature` | The cryptographic HMAC SHA-256 signature of the raw request body. |
+
 ### Payload Structure
 
 When an event triggers, Quasar dispatches a structured JSON payload containing transaction properties and custom payload data:
@@ -56,7 +57,7 @@ When an event triggers, Quasar dispatches a structured JSON payload containing t
 
 ## Why do I need a Webhook Secret?
 
-When you create a webhook in the dashboard, Quasar generates a unique **Webhook Secret** (e.g., `whsec_...`). 
+When you create a webhook in the dashboard, Quasar generates a unique **Webhook Secret** (e.g., `whsec_...`).
 
 > [!IMPORTANT]
 > The Webhook Secret is used to securely verify that incoming `POST` requests actually came from Quasar and not a malicious third party pretending to be Quasar.
@@ -85,28 +86,22 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
   // Generate signature using HMAC SHA-256
-  const computedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(rawBody)
-    .digest('hex');
+  const computedSignature = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
 
   // Compare signatures securely using timingSafeEqual
   const signatureBuffer = Buffer.from(signature, 'utf8');
   const computedBuffer = Buffer.from(computedSignature, 'utf8');
 
-  if (
-    signatureBuffer.length !== computedBuffer.length ||
-    !crypto.timingSafeEqual(signatureBuffer, computedBuffer)
-  ) {
+  if (signatureBuffer.length !== computedBuffer.length || !crypto.timingSafeEqual(signatureBuffer, computedBuffer)) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
   // Parse and process the authenticated payload
   const payload = JSON.parse(rawBody);
-  
+
   // Note: Standard Quasar webhooks contain details like event and data
   // e.g. payload.event === 'transaction.success'
-  
+
   return NextResponse.json({ success: true }, { status: 200 });
 }
 ```
@@ -132,10 +127,10 @@ If you suspect your Webhook Secret has been compromised, or as part of standard 
 
 To ensure reliable delivery even during brief outages of your backend receiver, Quasar employs a resilient message queue system powered by BullMQ:
 
-* **Maximum Retries:** Quasar attempts to deliver each webhook up to **10 times** before marking the delivery as failed.
-* **Exponential Backoff:** If a delivery fails, Quasar schedules retries using an exponential backoff formula, beginning with a **5-second** initial delay.
-* **SSRF and Redirect Blocking:** For infrastructure security, redirects are strictly forbidden (`redirect: 'error'`). Any endpoint attempting to return a redirect response (3xx) will trigger an immediate delivery failure.
-* **Quota Auditing:** Quasar accounts for usage on the first delivery attempt only. Retries do not consume additional organization quota units.
-* **Data Masking in Logs:** The dashboard exposes the last 1,000 delivery failures for troubleshooting. To safeguard secrets, Quasar scans and masks all sensitive keys (e.g. `secret`, `token`, `password`, `key`, `privatekey`, `credential`) inside the stored request payloads and response bodies.
+- **Maximum Retries:** Quasar attempts to deliver each webhook up to **10 times** before marking the delivery as failed.
+- **Exponential Backoff:** If a delivery fails, Quasar schedules retries using an exponential backoff formula, beginning with a **5-second** initial delay.
+- **SSRF and Redirect Blocking:** For infrastructure security, redirects are strictly forbidden (`redirect: 'error'`). Any endpoint attempting to return a redirect response (3xx) will trigger an immediate delivery failure.
+- **Quota Auditing:** Quasar accounts for usage on the first delivery attempt only. Retries do not consume additional organization quota units.
+- **Data Masking in Logs:** The dashboard exposes the last 1,000 delivery failures for troubleshooting. To safeguard secrets, Quasar scans and masks all sensitive keys (e.g. `secret`, `token`, `password`, `key`, `privatekey`, `credential`) inside the stored request payloads and response bodies.
 
 Next, see the [Security & Signatures](./security.mdx) page for deep details on how Quasar protects webhook deliveries.

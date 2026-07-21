@@ -5,9 +5,71 @@
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
   "description": "The Umbrella Core SDK for the TUWA Ecosystem. Bundles framework-agnostic logic and Nova UI components.",
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./pulsar": {
+      "types": "./dist/pulsar.d.ts",
+      "import": "./dist/pulsar.js",
+      "require": "./dist/pulsar.cjs"
+    },
+    "./satellite": {
+      "types": "./dist/satellite.d.ts",
+      "import": "./dist/satellite.js",
+      "require": "./dist/satellite.cjs"
+    },
+    "./satellite/siwe": {
+      "types": "./dist/satellite-siwe.d.ts",
+      "import": "./dist/satellite-siwe.js",
+      "require": "./dist/satellite-siwe.cjs"
+    },
+    "./satellite/siwe/server": {
+      "types": "./dist/satellite-siwe-server.d.ts",
+      "import": "./dist/satellite-siwe-server.js",
+      "require": "./dist/satellite-siwe-server.cjs"
+    },
+    "./nova-connect": {
+      "types": "./dist/nova-connect.d.ts",
+      "import": "./dist/nova-connect.js",
+      "require": "./dist/nova-connect.cjs"
+    },
+    "./nova-connect/satellite": {
+      "types": "./dist/nova-connect-satellite.d.ts",
+      "import": "./dist/nova-connect-satellite.js",
+      "require": "./dist/nova-connect-satellite.cjs"
+    },
+    "./nova-transactions": {
+      "types": "./dist/nova-transactions.d.ts",
+      "import": "./dist/nova-transactions.js",
+      "require": "./dist/nova-transactions.cjs"
+    },
+    "./nova-transactions/providers": {
+      "types": "./dist/nova-transactions-providers.d.ts",
+      "import": "./dist/nova-transactions-providers.js",
+      "require": "./dist/nova-transactions-providers.cjs"
+    },
+    "./nova-core": {
+      "types": "./dist/nova-core.d.ts",
+      "import": "./dist/nova-core.js",
+      "require": "./dist/nova-core.cjs"
+    },
+    "./orbit": {
+      "types": "./dist/orbit.d.ts",
+      "import": "./dist/orbit.js",
+      "require": "./dist/orbit.cjs"
+    },
+    "./styles/nova-core.css": "./dist/styles/nova-core.css",
+    "./styles/nova-transactions.css": "./dist/styles/nova-transactions.css",
+    "./styles/nova-connect.css": "./dist/styles/nova-connect.css",
+    "./styles/all.css": "./dist/styles/all.css"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -15,8 +77,8 @@
     "dist"
   ],
   "scripts": {
-    "start": "tsup src/index.ts --watch",
-    "build": "tsup"
+    "start": "tsup --watch",
+    "build": "tsup && node scripts/bundle-styles.js"
   },
   "keywords": [
     "tuwa",
@@ -96,7 +158,9 @@
     "ethereum-blockies-base64": "^1.0.2",
     "framer-motion": "^12.42.2",
     "immer": "^11.1.15",
+    "iron-session": "^8.0.4",
     "react-toastify": "^11.1.0",
+    "siwe": "^3.0.0",
     "tailwind-merge": "^3.6.0",
     "zustand": "^5.0.14"
   },

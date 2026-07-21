@@ -3,24 +3,25 @@
 [![NPM Version](https://img.shields.io/npm/v/@tuwaio/evm-sdk.svg)](https://www.npmjs.com/package/@tuwaio/evm-sdk)
 [![License](https://img.shields.io/npm/l/@tuwaio/evm-sdk.svg)](./LICENSE)
 
-The EVM Adapter SDK for the TUWA Ecosystem. Packages all Ethereum-compatible logic (`OrbitEVM`, `PulsarEVM`, `SatelliteEVM`) into a single import point.
+The EVM Adapter SDK for the TUWA Ecosystem. Packages all Ethereum-compatible logic (`OrbitEVM`, `PulsarEVM`, `SatelliteEVM`, `EVMConnectorsWatcher`) into clean subpath entry points.
 
 ---
 
 ## 🏛️ What is `@tuwaio/evm-sdk`?
 
-`@tuwaio/evm-sdk` is a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` how to interact with EVM-compatible blockchains. 
+`@tuwaio/evm-sdk` is a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` how to interact with EVM-compatible blockchains.
 
-It does **not** contain React or UI components. Instead, it securely wraps `viem` and `@wagmi/core`, providing standardized adapters for Wallet Connection (Satellite) and Transaction Tracking (Pulsar). This modular approach ensures your app only ships EVM dependencies when you actually need them.
+It securely wraps `viem` and `@wagmi/core`, providing standardized adapters for Wallet Connection (Satellite) and Transaction Tracking (Pulsar). This modular subpath approach ensures your app only ships EVM dependencies when you actually need them.
 
 ---
 
 ## ✨ Key Features
 
 - **⛓️ EVM Native**: Full support for Wagmi config creation, Viem transports, and injected connectors.
-- **⚡ Namespaced Architecture**: Clean exports without naming collisions (e.g., `SatelliteEVM`, `PulsarEVM`).
-- **🧩 Zero UI Bloat**: Focuses strictly on connection logic and transaction processing.
-- **🔄 Sync & Watchers**: Includes background watchers that automatically sync Wagmi state with Satellite's unified store.
+- **🌐 Ecosystem Adapters**: Packages OrbitEVM, PulsarEVM, SatelliteEVM, and EVMConnectorsWatcher under unified subpaths.
+- **⚡ Subpath Architecture**: Clean subpath imports (`@tuwaio/evm-sdk/satellite`, `@tuwaio/evm-sdk/pulsar`, `@tuwaio/evm-sdk/orbit`, `@tuwaio/evm-sdk/nova-connect`).
+- **🧩 Zero UI Bloat**: Focuses strictly on connection logic and transaction processing adapters.
+- **🔄 State Sync & Watchers**: Includes background watchers (`EVMConnectorsWatcher`) that automatically sync Wagmi state with Satellite's unified store.
 
 ---
 
@@ -36,7 +37,7 @@ pnpm add @tuwaio/sdk @tuwaio/evm-sdk viem @wagmi/core
 
 ## 🚀 Quick Start (EVM Integration)
 
-To cleanly integrate EVM wallets and transaction tracking with TUWA, you should adopt a modular architecture. Below is the recommended implementation pattern.
+To cleanly integrate EVM wallets and transaction tracking with TUWA, you should adopt a modular architecture. Below is the recommended implementation pattern using subpath imports.
 
 > **Note:** This example uses standard client-side state. For Quasar Cloud syncing and server-side tracking, see the full-stack guide in the core `@tuwaio/sdk` documentation.
 
@@ -44,11 +45,13 @@ To cleanly integrate EVM wallets and transaction tracking with TUWA, you should 
 
 ```ts
 // src/types.ts
-import { PulsarCore } from '@tuwaio/sdk';
+import type { Transaction } from '@tuwaio/sdk/pulsar';
 
-export enum AppTxType { SWAP = 'SWAP' }
+export enum AppTxType {
+  SWAP = 'SWAP',
+}
 
-export type SwapTx = PulsarCore.Transaction & {
+export type SwapTx = Transaction & {
   type: AppTxType.SWAP;
   payload: { tokenIn: string; tokenOut: string; amount: number };
 };
@@ -64,17 +67,17 @@ Create a headless tracking store specifically for EVM transactions.
 // src/hooks/usePulsarStore.ts
 'use client';
 
-import { PulsarCore } from '@tuwaio/sdk';
-import { PulsarEVM } from '@tuwaio/evm-sdk';
+import { createPulsarStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
+import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
 import { wagmiConfig, appEVMChains } from '@/configs/appConfig';
 import { TransactionUnion } from '@/types';
 
-const initialStore = PulsarCore.createPulsarStore<TransactionUnion>({
+const initialStore = createPulsarStore<TransactionUnion>({
   name: 'tuwa-transactions-evm',
-  adapter: [PulsarEVM.pulsarEvmAdapter(wagmiConfig, appEVMChains)],
+  adapter: [pulsarEvmAdapter(wagmiConfig, appEVMChains)],
 });
 
-export const usePulsarStore = PulsarCore.createBoundedUseStore(initialStore);
+export const usePulsarStore = createBoundedUseStore(initialStore);
 ```
 
 ### 3. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
@@ -85,7 +88,10 @@ Binds the React UI elements to the headless transaction state.
 // src/providers/NovaTransactionsProvider.tsx
 'use client';
 
-import { SatelliteReact, NovaTransactions, OrbitCore, PulsarReact } from '@tuwaio/sdk';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+import { useInitializeTransactionsPool } from '@tuwaio/sdk/pulsar';
+import { getAdapterFromConnectorType } from '@tuwaio/sdk/orbit';
+import { NovaTransactionsProvider as NTP } from '@tuwaio/sdk/nova-transactions/providers';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
 
 export function NovaTransactionsProvider() {
@@ -95,19 +101,19 @@ export function NovaTransactionsProvider() {
   const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
   const getAdapter = usePulsarStore((state) => state.getAdapter);
   const transactionsPool = usePulsarStore((state) => state.transactionsPool);
-  
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((state) => state.activeConnection);
 
-  PulsarReact.useInitializeTransactionsPool({ initializeTransactionsPool });
+  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
+
+  useInitializeTransactionsPool({ initializeTransactionsPool });
 
   return (
-    <NovaTransactions.NovaTransactionsProvider
+    <NTP
       transactionsPool={transactionsPool}
       initialTx={initialTx}
       closeTxTrackedModal={closeTxTrackedModal}
       executeTxAction={executeTxAction}
       connectedWalletAddress={activeConnection?.isConnected ? activeConnection.address : undefined}
-      connectedAdapterType={OrbitCore.getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:')}
+      connectedAdapterType={getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:')}
       adapter={getAdapter()}
     />
   );
@@ -116,14 +122,16 @@ export function NovaTransactionsProvider() {
 
 ### 4. App Providers Layout (`AppProviders.tsx`)
 
-Assembling the complete EVM layout. The `EVMConnectorsWatcher` runs invisibly in the background to sync Wagmi's state with the unified `SatelliteReact` store.
+Assembling the complete EVM layout. The `EVMConnectorsWatcher` runs invisibly in the background to sync Wagmi's state with the unified `SatelliteConnectProvider` store.
 
 ```tsx
 // src/providers/AppProviders.tsx
 'use client';
 
-import { NovaConnect, SatelliteReact } from '@tuwaio/sdk';
-import { SatelliteEVM } from '@tuwaio/evm-sdk';
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
+import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
 
 import { appEVMChains, wagmiConfig } from '@/configs/appConfig';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
@@ -134,15 +142,12 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const transactionsPool = usePulsarStore((state) => state.transactionsPool);
 
   return (
-    <SatelliteReact.SatelliteConnectProvider
-      adapter={[SatelliteEVM.satelliteEVMAdapter(wagmiConfig, appEVMChains)]}
-      autoConnect={true}
-    >
-      <SatelliteEVM.EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
-      
+    <SatelliteConnectProvider adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains)]} autoConnect={true}>
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
+
       <NovaTransactionsProvider />
-      
-      <NovaConnect.NovaConnectProvider
+
+      <NovaConnectProvider
         appChains={appEVMChains}
         transactionPool={transactionsPool}
         pulsarAdapter={getAdapter() as any}
@@ -151,8 +156,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         withChain
       >
         {children}
-      </NovaConnect.NovaConnectProvider>
-    </SatelliteReact.SatelliteConnectProvider>
+      </NovaConnectProvider>
+    </SatelliteConnectProvider>
   );
 }
 ```
@@ -165,7 +170,9 @@ Now you can safely execute strictly-typed transactions anywhere in your app.
 // src/components/SwapButton.tsx
 'use client';
 
-import { OrbitCore, NovaTransactions, SatelliteReact } from '@tuwaio/sdk';
+import { OrbitAdapter } from '@tuwaio/sdk/orbit';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
 import { AppTxType } from '@/types';
 
@@ -173,13 +180,15 @@ export function SwapButton() {
   const executeTxAction = usePulsarStore((s) => s.executeTxAction);
   const getLastTxKey = usePulsarStore((s) => s.getLastTxKey);
   const transactionsPool = usePulsarStore((s) => s.transactionsPool);
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((s) => s.activeConnection);
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
 
   const handleSwapAction = async () => {
     await executeTxAction({
-      actionFunction: async () => { /* your wagmi contract call */ },
+      actionFunction: async () => {
+        /* your wagmi contract call */
+      },
       params: {
-        adapter: OrbitCore.OrbitAdapter.EVM,
+        adapter: OrbitAdapter.EVM,
         type: AppTxType.SWAP,
         title: 'Token Swap',
         desiredChainID: 1,
@@ -189,25 +198,26 @@ export function SwapButton() {
   };
 
   return (
-    <NovaTransactions.TxActionButton
+    <TxActionButton
       action={handleSwapAction}
       getLastTxKey={getLastTxKey}
       transactionsPool={transactionsPool}
       walletAddress={activeConnection?.address}
     >
       Execute EVM Swap
-    </NovaTransactions.TxActionButton>
+    </TxActionButton>
   );
 }
 ```
 
 ---
 
-## 📦 Available Namespaces
+## 📦 Available Subpath Exports
 
-- `OrbitEVM` ([@tuwaio/orbit-evm](https://github.com/TuwaIO/orbit))
-- `PulsarEVM` ([@tuwaio/pulsar-evm](https://github.com/TuwaIO/pulsar-core))
-- `SatelliteEVM` ([@tuwaio/satellite-evm](https://github.com/TuwaIO/satellite-connect))
+- **`@tuwaio/evm-sdk/satellite`** — EVM Satellite adapter (`satelliteEVMAdapter`, `createEVMConnectionsWatcher`, `checkIsWalletAddressContract`, `impersonated`).
+- **`@tuwaio/evm-sdk/pulsar`** — EVM Pulsar adapter (`pulsarEvmAdapter`).
+- **`@tuwaio/evm-sdk/orbit`** — EVM Orbit helpers & types.
+- **`@tuwaio/evm-sdk/nova-connect`** — EVM React watcher component (`EVMConnectorsWatcher`).
 
 ---
 

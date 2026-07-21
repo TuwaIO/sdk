@@ -9,17 +9,17 @@ The Core Umbrella SDK for the TUWA Ecosystem. It provides a unified entry point 
 
 ## 🏛️ What is `@tuwaio/sdk`?
 
-`@tuwaio/sdk` is the massive, all-in-one UI and Logic foundation for the TUWA ecosystem. Instead of manually resolving versions and importing from a dozen decoupled packages (`@tuwaio/pulsar-core`, `@tuwaio/nova-connect`, etc.), you install this single SDK and access beautifully namespaced exports. 
+`@tuwaio/sdk` is the massive, all-in-one UI and Logic foundation for the TUWA ecosystem. Instead of manually resolving versions and importing from a dozen decoupled packages (`@tuwaio/pulsar-core`, `@tuwaio/nova-connect`, etc.), you install this single SDK and access clean, modular subpath exports.
 
-It abstracts away complex dependency management (automatically handling `zustand`, `framer-motion`, `radix-ui`, etc.) and lets you focus on building your application.
+It abstracts away complex dependency management (automatically handling `zustand`, `framer-motion`, `radix-ui`, `siwe`, `iron-session`, etc.) and lets you focus on building your application.
 
 ---
 
 ## ✨ Key Features
 
-- **📦 Zero-Config Integration**: Combines blockchain connection layers with beautiful React UI components out of the box.
-- **⚡ Namespaced Architecture**: Clean exports without naming collisions (e.g., `PulsarCore`, `SatelliteReact`).
-- **🎨 Includes Nova UI**: Access beautifully styled wallet connection modals and transaction toasts without additional configuration.
+- **📦 Zero-Config Integration**: Combines Orbit (adapters), Pulsar (tracking), Satellite (connections), and Nova (UI) out of the box.
+- **⚡ Modular Subpath Imports**: Clean exports for each domain (e.g. `@tuwaio/sdk/pulsar`, `@tuwaio/sdk/satellite`, `@tuwaio/sdk/orbit`, `@tuwaio/sdk/nova-connect`).
+- **🎨 Includes Nova UI & Styles**: Access beautifully styled wallet connection modals and transaction toasts with simple CSS imports (`@import '@tuwaio/sdk/styles/all.css'`).
 - **🛡️ Strict Singleton Contexts**: Uses intelligent peer dependencies to ensure you never run into multiple instances of React or Web3 singletons.
 
 ---
@@ -32,7 +32,23 @@ To install the core SDK, simply run:
 pnpm add @tuwaio/sdk react react-dom
 ```
 
-*Note: For network-specific capabilities, you must also install either `@tuwaio/evm-sdk` or `@tuwaio/solana-sdk`.*
+_Note: For network-specific capabilities, you must also install either `@tuwaio/evm-sdk` or `@tuwaio/solana-sdk`._
+
+---
+
+## 🎨 Styles Configuration
+
+Import the bundled CSS styles into your global CSS file (e.g., `globals.css`):
+
+```css
+/* Import all Nova UI styles at once */
+@import '@tuwaio/sdk/styles/all.css';
+
+/* Or import individually if needed */
+/* @import '@tuwaio/sdk/styles/nova-core.css'; */
+/* @import '@tuwaio/sdk/styles/nova-transactions.css'; */
+/* @import '@tuwaio/sdk/styles/nova-connect.css'; */
+```
 
 ---
 
@@ -48,11 +64,13 @@ First, define the strict union of all possible transactions your app supports.
 
 ```ts
 // src/types.ts
-import { PulsarCore } from '@tuwaio/sdk';
+import type { Transaction } from '@tuwaio/sdk/pulsar';
 
-export enum AppTxType { SWAP = 'SWAP' }
+export enum AppTxType {
+  SWAP = 'SWAP',
+}
 
-export type SwapTx = PulsarCore.Transaction & {
+export type SwapTx = Transaction & {
   type: AppTxType.SWAP;
   payload: { tokenIn: string; tokenOut: string; amount: number };
 };
@@ -68,23 +86,20 @@ Configure the headless tracking store with both EVM and Solana adapters.
 // src/hooks/usePulsarStore.ts
 'use client';
 
-import { PulsarCore } from '@tuwaio/sdk';
-import { PulsarEVM } from '@tuwaio/evm-sdk';
-import { PulsarSolana } from '@tuwaio/solana-sdk';
+import { createPulsarStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
+import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
+import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
 
 import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
 import { TransactionUnion } from '@/types';
 
 // Create the headless tracking store with BOTH EVM and Solana adapters
-const initialStore = PulsarCore.createPulsarStore<TransactionUnion>({
+const initialStore = createPulsarStore<TransactionUnion>({
   name: 'tuwa-transactions-multi',
-  adapter: [
-    PulsarEVM.pulsarEvmAdapter(wagmiConfig, appEVMChains),
-    PulsarSolana.pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls }),
-  ],
+  adapter: [pulsarEvmAdapter(wagmiConfig, appEVMChains), pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls })],
 });
 
-export const usePulsarStore = PulsarCore.createBoundedUseStore(initialStore);
+export const usePulsarStore = createBoundedUseStore(initialStore);
 ```
 
 ### 3. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
@@ -95,7 +110,10 @@ Binds the React UI elements to the headless transaction state.
 // src/providers/NovaTransactionsProvider.tsx
 'use client';
 
-import { SatelliteReact, NovaTransactions, OrbitCore, PulsarReact } from '@tuwaio/sdk';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+import { useInitializeTransactionsPool } from '@tuwaio/sdk/pulsar';
+import { getAdapterFromConnectorType } from '@tuwaio/sdk/orbit';
+import { NovaTransactionsProvider as NTP } from '@tuwaio/sdk/nova-transactions/providers';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
 
 export function NovaTransactionsProvider() {
@@ -105,19 +123,19 @@ export function NovaTransactionsProvider() {
   const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
   const getAdapter = usePulsarStore((state) => state.getAdapter);
   const transactionsPool = usePulsarStore((state) => state.transactionsPool);
-  
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((state) => state.activeConnection);
 
-  PulsarReact.useInitializeTransactionsPool({ initializeTransactionsPool });
+  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
+
+  useInitializeTransactionsPool({ initializeTransactionsPool });
 
   return (
-    <NovaTransactions.NovaTransactionsProvider
+    <NTP
       transactionsPool={transactionsPool}
       initialTx={initialTx}
       closeTxTrackedModal={closeTxTrackedModal}
       executeTxAction={executeTxAction}
       connectedWalletAddress={activeConnection?.isConnected ? activeConnection.address : undefined}
-      connectedAdapterType={OrbitCore.getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:')}
+      connectedAdapterType={getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:')}
       adapter={getAdapter()}
     />
   );
@@ -132,9 +150,12 @@ Assembling the complete multi-chain ecosystem layout. Notice how both `EVMConnec
 // src/providers/AppProviders.tsx
 'use client';
 
-import { NovaConnect, SatelliteReact } from '@tuwaio/sdk';
-import { SatelliteEVM } from '@tuwaio/evm-sdk';
-import { SatelliteSolana } from '@tuwaio/solana-sdk';
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
+import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
+import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
+import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
 
 import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
@@ -145,19 +166,16 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const transactionsPool = usePulsarStore((state) => state.transactionsPool);
 
   return (
-    <SatelliteReact.SatelliteConnectProvider
-      adapter={[
-        SatelliteEVM.satelliteEVMAdapter(wagmiConfig, appEVMChains),
-        SatelliteSolana.satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })
-      ]}
+    <SatelliteConnectProvider
+      adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
       autoConnect={true}
     >
-      <SatelliteEVM.EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
-      <SatelliteSolana.SolanaConnectorsWatcher />
-      
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
+      <SolanaConnectorsWatcher />
+
       <NovaTransactionsProvider />
-      
-      <NovaConnect.NovaConnectProvider
+
+      <NovaConnectProvider
         appChains={appEVMChains}
         solanaRPCUrls={solanaRPCUrls}
         transactionPool={transactionsPool}
@@ -167,8 +185,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         withChain
       >
         {children}
-      </NovaConnect.NovaConnectProvider>
-    </SatelliteReact.SatelliteConnectProvider>
+      </NovaConnectProvider>
+    </SatelliteConnectProvider>
   );
 }
 ```
@@ -181,7 +199,9 @@ Now you can safely execute strictly-typed, cross-chain transactions anywhere in 
 // src/components/SwapButton.tsx
 'use client';
 
-import { OrbitCore, NovaTransactions, SatelliteReact } from '@tuwaio/sdk';
+import { getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
 import { AppTxType } from '@/types';
 
@@ -189,52 +209,55 @@ export function SwapButton() {
   const executeTxAction = usePulsarStore((s) => s.executeTxAction);
   const getLastTxKey = usePulsarStore((s) => s.getLastTxKey);
   const transactionsPool = usePulsarStore((s) => s.transactionsPool);
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((s) => s.activeConnection);
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
 
   const handleSwapAction = async () => {
     // Dynamically determine the adapter based on the currently connected wallet
-    const adapterType = OrbitCore.getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:');
+    const adapterType = getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:');
 
     await executeTxAction({
-      actionFunction: async () => { /* your wagmi/solana contract call */ },
+      actionFunction: async () => {
+        /* your wagmi/solana contract call */
+      },
       params: {
         adapter: adapterType,
         type: AppTxType.SWAP,
         title: 'Token Swap',
-        desiredChainID: adapterType === OrbitCore.OrbitAdapter.EVM ? 1 : undefined,
-        payload: { tokenIn: 'USDC', tokenOut: adapterType === OrbitCore.OrbitAdapter.EVM ? 'ETH' : 'SOL', amount: 100 },
+        desiredChainID: adapterType === OrbitAdapter.EVM ? 1 : undefined,
+        payload: { tokenIn: 'USDC', tokenOut: adapterType === OrbitAdapter.EVM ? 'ETH' : 'SOL', amount: 100 },
       },
     });
   };
 
   return (
-    <NovaTransactions.TxActionButton
+    <TxActionButton
       action={handleSwapAction}
       getLastTxKey={getLastTxKey}
       transactionsPool={transactionsPool}
       walletAddress={activeConnection?.address}
     >
       Cross-Chain Swap
-    </NovaTransactions.TxActionButton>
+    </TxActionButton>
   );
 }
 ```
 
 ---
 
-## 📦 Available Namespaces
+## 📦 Available Subpath Exports
 
-This package re-exports the framework-agnostic and UI layers of TUWA:
+This package provides direct subpath entry points for clean, tree-shakeable imports:
 
-- `OrbitCore` ([@tuwaio/orbit-core](https://github.com/TuwaIO/orbit))
-- `PulsarCore` ([@tuwaio/pulsar-core](https://github.com/TuwaIO/pulsar-core))
-- `PulsarReact` ([@tuwaio/pulsar-react](https://github.com/TuwaIO/pulsar-core))
-- `SatelliteCore` ([@tuwaio/satellite-core](https://github.com/TuwaIO/satellite-connect))
-- `SatelliteReact` ([@tuwaio/satellite-react](https://github.com/TuwaIO/satellite-connect))
-- `SatelliteSiwe` ([@tuwaio/satellite-siwe-next-auth](https://github.com/TuwaIO/satellite-connect))
-- `NovaCore` ([@tuwaio/nova-core](https://github.com/TuwaIO/nova-uikit))
-- `NovaConnect` ([@tuwaio/nova-connect](https://github.com/TuwaIO/nova-uikit))
-- `NovaTransactions` ([@tuwaio/nova-transactions](https://github.com/TuwaIO/nova-uikit))
+- **`@tuwaio/sdk/pulsar`** — State machine & tracking stores (`createPulsarStore`, `createTxInMemoryStore`, `useInitializeTransactionsPool`).
+- **`@tuwaio/sdk/satellite`** — Wallet state & react hooks (`useSatelliteConnectStore`, `SatelliteConnectProvider`, `useAccount`).
+- **`@tuwaio/sdk/satellite/siwe`** — Client-side SIWE authentication utilities.
+- **`@tuwaio/sdk/satellite/siwe/server`** — Server-side SIWE API handler (`createSiweApiHandler`).
+- **`@tuwaio/sdk/nova-connect`** — Connect UI components & providers (`ConnectButton`, `NovaConnectProvider`).
+- **`@tuwaio/sdk/nova-transactions`** — Transaction UI components (`TxActionButton`, `TransactionList`).
+- **`@tuwaio/sdk/nova-transactions/providers`** — Transaction UI provider (`NovaTransactionsProvider`).
+- **`@tuwaio/sdk/nova-core`** — UI Core variables and utilities.
+- **`@tuwaio/sdk/orbit`** — Core multi-chain types and adapters (`OrbitAdapter`, `getAdapterFromConnectorType`).
+- **`@tuwaio/sdk/styles/all.css`** — Complete bundled stylesheet for Nova UI components.
 
 ---
 

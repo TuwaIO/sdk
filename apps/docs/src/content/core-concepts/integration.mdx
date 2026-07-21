@@ -12,7 +12,7 @@ pnpm add @tuwaio/quasar-sdk ofetch
 
 ## Initialization
 
-The `Quasar` class requires a `secretKey`. This key authenticates your requests to the **High-Performance Engine API** (`api.tuwa.io`). 
+The `Quasar` class requires a `secretKey`. This key authenticates your requests to the **High-Performance Engine API** (`api.tuwa.io`).
 
 > [!WARNING]
 > **Server-Side Only**: Never expose the `Quasar` client or your `secretKey` to the frontend. The `secretKey` has full administrative power over your Quasar App's resources.
@@ -21,9 +21,9 @@ The `Quasar` class requires a `secretKey`. This key authenticates your requests 
 import { Quasar } from '@tuwaio/quasar-sdk';
 
 // Initialize the client in your backend
-export const quasar = new Quasar({ 
-  secretKey: process.env.QUASAR_SECRET_KEY, 
-  baseUrl: 'https://api.tuwa.io' // Optional, defaults to production
+export const quasar = new Quasar({
+  secretKey: process.env.QUASAR_SECRET_KEY,
+  baseUrl: 'https://api.tuwa.io', // Optional, defaults to production
 });
 ```
 
@@ -35,23 +35,26 @@ Once initialized, the client provides access to various domain services. The mos
 import { ChainType } from '@tuwaio/pulsar-core';
 
 // 1. Sync a new pending transaction to Quasar
-const { txKey } = await quasar.pulsar.syncCreate({
-  txKey: 'tx_local_18f2...',          // Unique transaction key
-  chainId: 1,                          // Ethereum Mainnet
-  from: '0xabc...',                    // Sender address
-  type: 'TRANSFER',                    // Transaction type
-  connectorType: 'evm:metamask',       // Connector type
-  adapter: 'evm',                      // Adapter ('evm', 'solana', 'starknet')
-  tracker: 'ethereum',                 // Tracker ('ethereum', 'solana', 'safe', 'gelato')
-  pending: true,
-  localTimestamp: Date.now(),
-  hash: '0xabc...',                    // Optional transaction hash
-}, 'My Custom Application');
+const { txKey } = await quasar.pulsar.syncCreate(
+  {
+    txKey: 'tx_local_18f2...', // Unique transaction key
+    chainId: 1, // Ethereum Mainnet
+    from: '0xabc...', // Sender address
+    type: 'TRANSFER', // Transaction type
+    connectorType: 'evm:metamask', // Connector type
+    adapter: 'evm', // Adapter ('evm', 'solana', 'starknet')
+    tracker: 'ethereum', // Tracker ('ethereum', 'solana', 'safe', 'gelato')
+    pending: true,
+    localTimestamp: Date.now(),
+    hash: '0xabc...', // Optional transaction hash
+  },
+  'My Custom Application',
+);
 
 // 2. Query transaction history
 const history = await quasar.pulsar.getHistory({
   chainId: 1,
-  limit: 10
+  limit: 10,
 });
 ```
 

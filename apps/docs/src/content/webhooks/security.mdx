@@ -1,14 +1,15 @@
 # Webhook Security & Signatures
 
-Quasar enforces strict outbound security policies when dispatching webhooks. Because Quasar operates a massive infrastructure, malicious actors could attempt to use Quasar's webhook engine to perform attacks on external or internal systems. 
+Quasar enforces strict outbound security policies when dispatching webhooks. Because Quasar operates a massive infrastructure, malicious actors could attempt to use Quasar's webhook engine to perform attacks on external or internal systems.
 
 To prevent this, the `WebhookDispatcherService` implements several layers of protection.
 
 ## Outbound Protection (SSRF Prevention)
 
-Server-Side Request Forgery (SSRF) occurs when a system is tricked into making requests to internal or restricted IP addresses. 
+Server-Side Request Forgery (SSRF) occurs when a system is tricked into making requests to internal or restricted IP addresses.
 
 Before Quasar dispatches any webhook to your provided URL, it executes the following steps:
+
 1. **DNS Resolution**: Quasar resolves your host domain (e.g., `api.myapp.com`) into its underlying IPv4 and IPv6 addresses.
 2. **IP Blacklisting**: Quasar validates the resolved IPs against a strict internal blacklist. It outright blocks requests to `localhost`, loopback addresses (`127.0.0.0/8`), private networks (`10.0.0.0/8`, `192.168.0.0/16`), and AWS/GCP metadata endpoints (`169.254.169.254`).
 3. **Execution**: If the IP is safe, the request is dispatched.
@@ -24,8 +25,9 @@ If your server takes longer than 10 seconds to respond with a `200 OK`, Quasar i
 ### Redirect Chasing Protection
 
 To prevent request redirection attacks and secure internal network boundaries:
-* **No Redirects:** All outbound webhook dispatches explicitly disable redirect chasing (`redirect: 'error'`). 
-* **Aborted Connections:** If your webhook target returns a redirect status code (e.g., `301`, `302`, `307`, or `308`), the worker rejects the attempt immediately as a delivery failure. Your endpoint must be the direct, final destination of the payload.
+
+- **No Redirects:** All outbound webhook dispatches explicitly disable redirect chasing (`redirect: 'error'`).
+- **Aborted Connections:** If your webhook target returns a redirect status code (e.g., `301`, `302`, `307`, or `308`), the worker rejects the attempt immediately as a delivery failure. Your endpoint must be the direct, final destination of the payload.
 
 ## Verifying Signatures
 
@@ -35,10 +37,7 @@ To ensure the payload is authentically from Quasar, you must verify the HMAC sig
 import crypto from 'crypto';
 
 function verifyQuasarWebhook(rawBody: string, signatureHeader: string, secret: string): boolean {
-  const generatedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(rawBody, 'utf8')
-    .digest('hex');
+  const generatedSignature = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');
 
   // Use timingSafeEqual to prevent timing attacks
   const signatureBuffer = Buffer.from(signatureHeader);

@@ -5,9 +5,37 @@
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
   "description": "The Solana Umbrella SDK for the TUWA Ecosystem. Contains logic and providers for the Solana blockchain, built strictly on Wallet Standard and Gill.",
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./orbit": {
+      "types": "./dist/orbit.d.ts",
+      "import": "./dist/orbit.js",
+      "require": "./dist/orbit.cjs"
+    },
+    "./pulsar": {
+      "types": "./dist/pulsar.d.ts",
+      "import": "./dist/pulsar.js",
+      "require": "./dist/pulsar.cjs"
+    },
+    "./satellite": {
+      "types": "./dist/satellite.d.ts",
+      "import": "./dist/satellite.js",
+      "require": "./dist/satellite.cjs"
+    },
+    "./nova-connect": {
+      "types": "./dist/nova-connect.d.ts",
+      "import": "./dist/nova-connect.js",
+      "require": "./dist/nova-connect.cjs"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -15,7 +43,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "tsup src/index.ts --watch",
+    "start": "tsup --watch",
     "build": "tsup"
   },
   "keywords": [
@@ -82,6 +110,7 @@
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
+    "@tuwaio/nova-connect": ">=0.4.6",
     "@wallet-standard/app": "1.1.x",
     "@wallet-standard/base": "1.1.x",
     "@wallet-standard/core": "1.x.x",
@@ -92,6 +121,7 @@
     "gill": ">=0.14"
   },
   "devDependencies": {
+    "@tuwaio/nova-connect": "^0.4.6",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",

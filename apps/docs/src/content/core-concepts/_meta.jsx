@@ -5,4 +5,3 @@ export default {
   isolation: 'Tenant Isolation (Iron Dome)',
   'best-practices': 'Production & Best Practices',
 };
-

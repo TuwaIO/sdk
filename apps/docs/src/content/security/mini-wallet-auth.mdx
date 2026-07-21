@@ -1,14 +1,14 @@
 # Mini Wallet Auth (Local Session)
 
-In the TUWA ecosystem, identity is strictly decentralized and sovereign. To bridge the gap between blockchain wallets and traditional Web2 infrastructure, developers typically rely on SIWE (Sign-In With Ethereum). 
+In the TUWA ecosystem, identity is strictly decentralized and sovereign. To bridge the gap between blockchain wallets and traditional Web2 infrastructure, developers typically rely on SIWE (Sign-In With Ethereum).
 
-However, classic SIWE is session-bound, relies heavily on stateful cookies or JWTs, and often carries too much overhead for high-throughput, headless API requests. 
+However, classic SIWE is session-bound, relies heavily on stateful cookies or JWTs, and often carries too much overhead for high-throughput, headless API requests.
 
 This is why Quasar introduces **Mini Wallet Auth (Local Session)**.
 
 ## What is Mini Wallet Auth?
 
-**Mini Wallet Auth** is a stateless, ephemeral, lightweight implementation of wallet authentication. Instead of establishing a long-lived browser session via cookies, it generates a quick, time-bound signature proof that a user owns a specific wallet address. 
+**Mini Wallet Auth** is a stateless, ephemeral, lightweight implementation of wallet authentication. Instead of establishing a long-lived browser session via cookies, it generates a quick, time-bound signature proof that a user owns a specific wallet address.
 
 This signature acts as a temporary local session token for rapid client-server interactions.
 
@@ -96,7 +96,7 @@ async function myApiRoute(req, res) {
     walletAddress,
     signature,
     timestamp,
-    chainType // ChainType.EVM or ChainType.SOLANA
+    chainType, // ChainType.EVM or ChainType.SOLANA
   });
 
   if (!isValid) {

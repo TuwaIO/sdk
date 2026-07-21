@@ -52,11 +52,13 @@ pnpm add @tuwaio/sdk react react-dom
 Depending on your target blockchain, install the network-specific SDK and its Web3 singletons:
 
 **For EVM:**
+
 ```bash
 pnpm add @tuwaio/evm-sdk viem @wagmi/core
 ```
 
 **For Solana:**
+
 ```bash
 pnpm add @tuwaio/solana-sdk gill @wallet-standard/react @wallet-standard/app @wallet-standard/ui-core @wallet-standard/ui-registry
 ```
@@ -68,13 +70,14 @@ The Quasar SDK requires `ofetch` and `@tuwaio/pulsar-core` (for type definitions
 ```bash
 pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core
 ```
-*Note: If you plan to use the React Auth Bridges (`QuasarAuthBridge`), you will also need `react` and the respective Web3 singletons for your target network (e.g. `viem` / `gill`).*
+
+_Note: If you plan to use the React Auth Bridges (`QuasarAuthBridge`), you will also need `react` and the respective Web3 singletons for your target network (e.g. `viem` / `gill`)._
 
 ---
 
 ## 🚀 Explore the SDKs (Examples & Guides)
 
-The true power of the TUWA Umbrella SDKs is composability. Because the ecosystem is highly modular, each package has its own detailed documentation and integration examples. 
+The true power of the TUWA Umbrella SDKs is composability. Because the ecosystem is highly modular, each package has its own detailed documentation and integration examples.
 
 Dive into the specific READMEs below to see how to use them in detail:
 
@@ -87,7 +90,7 @@ Dive into the specific READMEs below to see how to use them in detail:
 
 ## Documentation
 
-The full documentation site lives at **[sdk.docs.tuwa.io](https://sdk.docs.tuwa.io/)**. 
+The full documentation site lives at **[sdk.docs.tuwa.io](https://sdk.docs.tuwa.io/)**.
 
 ### API Reference Generation
 

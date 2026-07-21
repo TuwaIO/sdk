@@ -6,7 +6,7 @@ allowBuilds:
   sharp: false
   vue-demi: false
 minimumReleaseAgeExclude:
-  - "@tuwaio/*"
+  - '@tuwaio/*'
   - viem
   - '@scalar/api-reference-react@0.9.59'
   - '@scalar/api-reference@1.63.0'

@@ -3,24 +3,25 @@
 [![NPM Version](https://img.shields.io/npm/v/@tuwaio/solana-sdk.svg)](https://www.npmjs.com/package/@tuwaio/solana-sdk)
 [![License](https://img.shields.io/npm/l/@tuwaio/solana-sdk.svg)](./LICENSE)
 
-The Solana Adapter SDK for the TUWA Ecosystem. Packages all Solana-compatible logic (`OrbitSolana`, `PulsarSolana`, `SatelliteSolana`) into a single import point.
+The Solana Adapter SDK for the TUWA Ecosystem. Packages all Solana-compatible logic (`OrbitSolana`, `PulsarSolana`, `SatelliteSolana`, `SolanaConnectorsWatcher`) into clean subpath entry points.
 
 ---
 
 ## 🏛️ What is `@tuwaio/solana-sdk`?
 
-`@tuwaio/solana-sdk` is a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` how to interact with the Solana blockchain. 
+`@tuwaio/solana-sdk` is a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` how to interact with the Solana blockchain.
 
-It completely avoids legacy `@solana/web3.js` classes and is built from the ground up on modern primitives: **Gill** and **Wallet Standard**. It provides standardized adapters for Wallet Connection (Satellite) and Transaction Tracking (Pulsar). This modular approach ensures your app only ships Solana dependencies when you actually need them.
+It completely avoids legacy `@solana/web3.js` classes and is built from the ground up on modern primitives: **Gill** and **Wallet Standard**. It provides standardized adapters for Wallet Connection (Satellite) and Transaction Tracking (Pulsar). This modular subpath approach ensures your app only ships Solana dependencies when you actually need them.
 
 ---
 
 ## ✨ Key Features
 
 - **🪙 Solana Native**: Built entirely on Wallet Standard to ensure maximum forward compatibility.
-- **⚡ Namespaced Architecture**: Clean exports without naming collisions (e.g., `SatelliteSolana`, `PulsarSolana`).
-- **🧩 Zero UI Bloat**: Focuses strictly on connection logic, standard wallet features, and transaction tracking.
-- **🔄 Standardized Auto-Discovery**: Seamlessly detects and connects to any browser extension that supports Wallet Standard.
+- **🌐 Ecosystem Adapters**: Packages OrbitSolana, PulsarSolana, SatelliteSolana, and SolanaConnectorsWatcher under unified subpaths.
+- **⚡ Subpath Architecture**: Clean subpath imports (`@tuwaio/solana-sdk/satellite`, `@tuwaio/solana-sdk/pulsar`, `@tuwaio/solana-sdk/orbit`, `@tuwaio/solana-sdk/nova-connect`).
+- **🧩 Zero UI Bloat**: Focuses strictly on connection logic, standard wallet features, and transaction tracking adapters.
+- **🔄 Standardized Auto-Discovery**: Seamlessly detects and connects to any browser extension that supports Wallet Standard (`SolanaConnectorsWatcher`).
 
 ---
 
@@ -36,7 +37,7 @@ pnpm add @tuwaio/sdk @tuwaio/solana-sdk gill @wallet-standard/react @wallet-stan
 
 ## 🚀 Quick Start (Solana Integration)
 
-To cleanly integrate Solana wallets and transaction tracking with TUWA, you should adopt a modular architecture. Below is the recommended implementation pattern.
+To cleanly integrate Solana wallets and transaction tracking with TUWA, you should adopt a modular architecture. Below is the recommended implementation pattern using subpath imports.
 
 > **Note:** This example uses standard client-side state. For Quasar Cloud syncing and server-side tracking, see the full-stack guide in the core `@tuwaio/sdk` documentation.
 
@@ -44,11 +45,13 @@ To cleanly integrate Solana wallets and transaction tracking with TUWA, you shou
 
 ```ts
 // src/types.ts
-import { PulsarCore } from '@tuwaio/sdk';
+import type { Transaction } from '@tuwaio/sdk/pulsar';
 
-export enum AppTxType { SWAP = 'SWAP' }
+export enum AppTxType {
+  SWAP = 'SWAP',
+}
 
-export type SwapTx = PulsarCore.Transaction & {
+export type SwapTx = Transaction & {
   type: AppTxType.SWAP;
   payload: { tokenIn: string; tokenOut: string; amount: number };
 };
@@ -64,17 +67,17 @@ Create a headless tracking store specifically for Solana transactions.
 // src/hooks/usePulsarStore.ts
 'use client';
 
-import { PulsarCore } from '@tuwaio/sdk';
-import { PulsarSolana } from '@tuwaio/solana-sdk';
+import { createPulsarStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
+import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
 import { solanaRPCUrls } from '@/configs/appConfig';
 import { TransactionUnion } from '@/types';
 
-const initialStore = PulsarCore.createPulsarStore<TransactionUnion>({
+const initialStore = createPulsarStore<TransactionUnion>({
   name: 'tuwa-transactions-solana',
-  adapter: [PulsarSolana.pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls })],
+  adapter: [pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls })],
 });
 
-export const usePulsarStore = PulsarCore.createBoundedUseStore(initialStore);
+export const usePulsarStore = createBoundedUseStore(initialStore);
 ```
 
 ### 3. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
@@ -85,7 +88,10 @@ Binds the React UI elements to the headless transaction state.
 // src/providers/NovaTransactionsProvider.tsx
 'use client';
 
-import { SatelliteReact, NovaTransactions, OrbitCore, PulsarReact } from '@tuwaio/sdk';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+import { useInitializeTransactionsPool } from '@tuwaio/sdk/pulsar';
+import { getAdapterFromConnectorType } from '@tuwaio/sdk/orbit';
+import { NovaTransactionsProvider as NTP } from '@tuwaio/sdk/nova-transactions/providers';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
 
 export function NovaTransactionsProvider() {
@@ -95,19 +101,19 @@ export function NovaTransactionsProvider() {
   const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
   const getAdapter = usePulsarStore((state) => state.getAdapter);
   const transactionsPool = usePulsarStore((state) => state.transactionsPool);
-  
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((state) => state.activeConnection);
 
-  PulsarReact.useInitializeTransactionsPool({ initializeTransactionsPool });
+  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
+
+  useInitializeTransactionsPool({ initializeTransactionsPool });
 
   return (
-    <NovaTransactions.NovaTransactionsProvider
+    <NTP
       transactionsPool={transactionsPool}
       initialTx={initialTx}
       closeTxTrackedModal={closeTxTrackedModal}
       executeTxAction={executeTxAction}
       connectedWalletAddress={activeConnection?.isConnected ? activeConnection.address : undefined}
-      connectedAdapterType={OrbitCore.getAdapterFromConnectorType(activeConnection?.connectorType ?? 'solana:')}
+      connectedAdapterType={getAdapterFromConnectorType(activeConnection?.connectorType ?? 'solana:')}
       adapter={getAdapter()}
     />
   );
@@ -122,8 +128,10 @@ Assembling the complete Solana layout. The `SolanaConnectorsWatcher` handles the
 // src/providers/AppProviders.tsx
 'use client';
 
-import { NovaConnect, SatelliteReact } from '@tuwaio/sdk';
-import { SatelliteSolana } from '@tuwaio/solana-sdk';
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
+import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
 
 import { solanaRPCUrls } from '@/configs/appConfig';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
@@ -134,15 +142,12 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const transactionsPool = usePulsarStore((state) => state.transactionsPool);
 
   return (
-    <SatelliteReact.SatelliteConnectProvider
-      adapter={[SatelliteSolana.satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
-      autoConnect={true}
-    >
-      <SatelliteSolana.SolanaConnectorsWatcher />
-      
+    <SatelliteConnectProvider adapter={[satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]} autoConnect={true}>
+      <SolanaConnectorsWatcher />
+
       <NovaTransactionsProvider />
-      
-      <NovaConnect.NovaConnectProvider
+
+      <NovaConnectProvider
         solanaRPCUrls={solanaRPCUrls}
         transactionPool={transactionsPool}
         pulsarAdapter={getAdapter() as any}
@@ -151,8 +156,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         withChain
       >
         {children}
-      </NovaConnect.NovaConnectProvider>
-    </SatelliteReact.SatelliteConnectProvider>
+      </NovaConnectProvider>
+    </SatelliteConnectProvider>
   );
 }
 ```
@@ -165,7 +170,9 @@ Now you can safely execute strictly-typed transactions anywhere in your app.
 // src/components/SwapButton.tsx
 'use client';
 
-import { OrbitCore, NovaTransactions, SatelliteReact } from '@tuwaio/sdk';
+import { OrbitAdapter } from '@tuwaio/sdk/orbit';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
 import { AppTxType } from '@/types';
 
@@ -173,13 +180,15 @@ export function SwapButton() {
   const executeTxAction = usePulsarStore((s) => s.executeTxAction);
   const getLastTxKey = usePulsarStore((s) => s.getLastTxKey);
   const transactionsPool = usePulsarStore((s) => s.transactionsPool);
-  const activeConnection = SatelliteReact.useSatelliteConnectStore((s) => s.activeConnection);
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
 
   const handleSwapAction = async () => {
     await executeTxAction({
-      actionFunction: async () => { /* solana web3 contract call */ },
+      actionFunction: async () => {
+        /* solana web3 contract call */
+      },
       params: {
-        adapter: OrbitCore.OrbitAdapter.SOLANA,
+        adapter: OrbitAdapter.SOLANA,
         type: AppTxType.SWAP,
         title: 'Token Swap',
         payload: { tokenIn: 'USDC', tokenOut: 'SOL', amount: 100 },
@@ -188,25 +197,26 @@ export function SwapButton() {
   };
 
   return (
-    <NovaTransactions.TxActionButton
+    <TxActionButton
       action={handleSwapAction}
       getLastTxKey={getLastTxKey}
       transactionsPool={transactionsPool}
       walletAddress={activeConnection?.address}
     >
       Execute Solana Swap
-    </NovaTransactions.TxActionButton>
+    </TxActionButton>
   );
 }
 ```
 
 ---
 
-## 📦 Available Namespaces
+## 📦 Available Subpath Exports
 
-- `OrbitSolana` ([@tuwaio/orbit-solana](https://github.com/TuwaIO/orbit))
-- `PulsarSolana` ([@tuwaio/pulsar-solana](https://github.com/TuwaIO/pulsar-core))
-- `SatelliteSolana` ([@tuwaio/satellite-solana](https://github.com/TuwaIO/satellite-connect))
+- **`@tuwaio/solana-sdk/satellite`** — Solana Satellite adapter (`satelliteSolanaAdapter`).
+- **`@tuwaio/solana-sdk/pulsar`** — Solana Pulsar adapter (`pulsarSolanaAdapter`).
+- **`@tuwaio/solana-sdk/orbit`** — Solana Orbit helpers & types.
+- **`@tuwaio/solana-sdk/nova-connect`** — Solana React watcher component (`SolanaConnectorsWatcher`).
 
 ---
 

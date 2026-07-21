@@ -48,6 +48,7 @@ export function App() {
 Depending on your target blockchain, install the network-specific SDK and its Web3 singletons:
 
 **For EVM:**
+
 ```bash
 pnpm add @tuwaio/evm-sdk viem @wagmi/core
 ```
@@ -56,12 +57,11 @@ pnpm add @tuwaio/evm-sdk viem @wagmi/core
 import { SatelliteEVM, OrbitEVM } from '@tuwaio/evm-sdk';
 
 // Mount the EVM providers
-<SatelliteEVM.WagmiProvider config={wagmiConfig}>
-  {children}
-</SatelliteEVM.WagmiProvider>
+<SatelliteEVM.WagmiProvider config={wagmiConfig}>{children}</SatelliteEVM.WagmiProvider>;
 ```
 
 **For Solana:**
+
 ```bash
 pnpm add @tuwaio/solana-sdk gill @wallet-standard/react @wallet-standard/app @wallet-standard/ui-core @wallet-standard/ui-registry
 ```

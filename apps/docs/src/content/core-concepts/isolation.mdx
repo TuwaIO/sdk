@@ -13,11 +13,13 @@ When you send a request with your Secret Key, the Quasar Engine first resolves t
 To achieve high performance without compromising security, Quasar is split into a dual-subdomain architecture known as **"The Iron Dome"**.
 
 ### Management Layer (`quasar.tuwa.io`)
+
 - **Purpose**: Dashboard UI, Payload Admin, Client Auth, and App configuration.
 - **Tech**: Next.js App Router (Stateless).
 - **Security**: Relies on Payload Auth, WebAuthn, and standard cookie-based sessions.
 
 ### Performance Layer (`api.tuwa.io`)
+
 - **Purpose**: High-performance Engine API for the Quasar SDK (`/v1/engine/*`).
 - **Tech**: NestJS & Fastify (Stateless, horizontally scaled).
 - **Security**: Protected by the **IronDomeGuard**. This guard intercepts every SDK request, performs SHA-256 resolution on the `sk_live_...` headers, enforces strict RPS (Requests Per Second) limits, and applies Smart Degradation logic if quotas are exceeded.
