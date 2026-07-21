@@ -104,7 +104,8 @@ export async function signMiniSession(params: SignSessionParams): Promise<SignSe
         const signableMessage = gill.createSignableMessage(
           messageBytes as unknown as Parameters<typeof gill.createSignableMessage>[0],
         );
-        const [signedMessage] = await solanaSigner.modifyAndSignMessages([signableMessage]);
+        const signedMessages = await solanaSigner.modifyAndSignMessages([signableMessage]);
+        const signedMessage = signedMessages[0];
         const signature = signedMessage.signatures[solanaSigner.address];
         if (!signature) {
           throw new Error(`[SDK] Signature missing for address: ${solanaSigner.address}`);
@@ -114,7 +115,8 @@ export async function signMiniSession(params: SignSessionParams): Promise<SignSe
       }
       // Case B: Wallet Standard (signMessages)
       else if (solanaSigner.signMessages) {
-        const [output] = await solanaSigner.signMessages([messageBytes as unknown as Uint8Array]);
+        const outputs = await solanaSigner.signMessages([messageBytes as unknown as Uint8Array]);
+        const output = outputs[0];
         if (!output?.signature) {
           throw new Error('[SDK] Wallet returned invalid signMessages output.');
         }

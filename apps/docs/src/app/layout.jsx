@@ -4,7 +4,12 @@ import { Head } from 'nextra/components';
 import { getPageMap } from 'nextra/page-map';
 import { Layout } from 'nextra-theme-docs';
 import NextTopLoader from 'nextjs-toploader';
-import { Footer, Navbar, baseNavLinks } from '@tuwaio/docs-ui';
+import { Footer, Navbar, RemoteLogo, baseNavLinks } from '@tuwaio/docs-ui';
+
+const LOGO_URL = 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/preview/logo_v2.svg';
+const logo = (
+  <RemoteLogo url={LOGO_URL} width={126} height={40} className="tuwadocs:transition-opacity tuwadocs:duration-300" />
+);
 
 // --- Metadata Configuration ---
 export const metadata = {
@@ -70,12 +75,12 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head>
-        <meta name="apple-mobile-web-app-title" content="Orbit Utils Docs" />
+        <meta name="apple-mobile-web-app-title" content="TUWA SDK Docs" />
       </Head>
       <body>
         <Layout
-          navbar={<Navbar key="navbar" links={navLinks} />}
-          footer={<Footer key="footer" />}
+          navbar={<Navbar key="navbar" links={navLinks} logo={logo} />}
+          footer={<Footer key="footer" logo={logo} />}
           pageMap={await getPageMap()}
           docsRepositoryBase="https://github.com/TuwaIO/sdk/tree/main/apps/docs"
           navigation={{ prev: true, next: true }}

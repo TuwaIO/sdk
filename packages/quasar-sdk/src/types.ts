@@ -125,7 +125,9 @@ export interface EvmSigner {
  * Result structure for a signed Solana message in Web3 v2.
  * @public
  */
-export interface SolanaSignedMessage {
+export interface SolanaSignableMessage {
+  /** The content of the message as bytes. */
+  readonly content: Uint8Array;
   /** A map of public addresses to their corresponding signature bytes. */
   readonly signatures: Readonly<Record<string, Uint8Array>>;
 }
@@ -142,7 +144,7 @@ export interface SolanaSigner {
    * Modern Web3 v2 method to modify and sign messages.
    * Used by latest @solana/react hooks.
    */
-  modifyAndSignMessages?: (messages: readonly unknown[]) => Promise<readonly SolanaSignedMessage[]>;
+  modifyAndSignMessages?: (messages: readonly SolanaSignableMessage[]) => Promise<readonly SolanaSignableMessage[]>;
   /**
    * Plural signing method (Wallet Standard).
    */

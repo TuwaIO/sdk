@@ -1,6 +1,21 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
+    "packages/sdk": {
+      "package-name": "@tuwaio/sdk",
+      "release-type": "node",
+      "initial-version": "0.0.1"
+    },
+    "packages/evm-sdk": {
+      "package-name": "@tuwaio/evm-sdk",
+      "release-type": "node",
+      "initial-version": "0.0.1"
+    },
+    "packages/solana-sdk": {
+      "package-name": "@tuwaio/solana-sdk",
+      "release-type": "node",
+      "initial-version": "0.0.1"
+    },
     "packages/quasar-sdk": {
       "package-name": "@tuwaio/quasar-sdk",
       "release-type": "node"

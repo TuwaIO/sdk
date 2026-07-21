@@ -4,7 +4,7 @@
 
 # MiniSessionAuth
 
-Defined in: [packages/quasar-sdk/src/types.ts:97](https://github.com/TuwaIO/sdk/blob/0cd523205b2f5b4c431bcfa884fa86ed8804dd3b/packages/quasar-sdk/src/types.ts#L97)
+Defined in: [packages/quasar-sdk/src/types.ts:97](https://github.com/TuwaIO/sdk/blob/4921616721c44ea26dbd18d72f452e63c4750c3a/packages/quasar-sdk/src/types.ts#L97)
 
 Result of the Mini-Session signing process.
 Used for both frontend-side caching and backend-side verification.
@@ -19,7 +19,7 @@ Used for both frontend-side caching and backend-side verification.
 
 > **chainType**: [`ChainType`](../enumerations/ChainType.md)
 
-Defined in: [packages/quasar-sdk/src/types.ts:99](https://github.com/TuwaIO/sdk/blob/0cd523205b2f5b4c431bcfa884fa86ed8804dd3b/packages/quasar-sdk/src/types.ts#L99)
+Defined in: [packages/quasar-sdk/src/types.ts:99](https://github.com/TuwaIO/sdk/blob/4921616721c44ea26dbd18d72f452e63c4750c3a/packages/quasar-sdk/src/types.ts#L99)
 
 The blockchain ecosystem type.
 
@@ -29,7 +29,7 @@ The blockchain ecosystem type.
 
 > **signature**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:87](https://github.com/TuwaIO/sdk/blob/0cd523205b2f5b4c431bcfa884fa86ed8804dd3b/packages/quasar-sdk/src/types.ts#L87)
+Defined in: [packages/quasar-sdk/src/types.ts:87](https://github.com/TuwaIO/sdk/blob/4921616721c44ea26dbd18d72f452e63c4750c3a/packages/quasar-sdk/src/types.ts#L87)
 
 The cryptographic signature string.
 
@@ -43,7 +43,7 @@ The cryptographic signature string.
 
 > **timestamp**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:89](https://github.com/TuwaIO/sdk/blob/0cd523205b2f5b4c431bcfa884fa86ed8804dd3b/packages/quasar-sdk/src/types.ts#L89)
+Defined in: [packages/quasar-sdk/src/types.ts:89](https://github.com/TuwaIO/sdk/blob/4921616721c44ea26dbd18d72f452e63c4750c3a/packages/quasar-sdk/src/types.ts#L89)
 
 The ISO timestamp used to generate the message.
 
@@ -57,6 +57,6 @@ The ISO timestamp used to generate the message.
 
 > **walletAddress**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:101](https://github.com/TuwaIO/sdk/blob/0cd523205b2f5b4c431bcfa884fa86ed8804dd3b/packages/quasar-sdk/src/types.ts#L101)
+Defined in: [packages/quasar-sdk/src/types.ts:101](https://github.com/TuwaIO/sdk/blob/4921616721c44ea26dbd18d72f452e63c4750c3a/packages/quasar-sdk/src/types.ts#L101)
 
 The wallet address that signed the message.

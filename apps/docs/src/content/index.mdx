@@ -1,76 +1,83 @@
 # Introduction
 
-Welcome to the **TUWA SDK** documentation — the official server-side SDK for the **Quasar Cloud**, featuring built-in React authentication bridges.
+Welcome to the **TUWA SDK** documentation — the official documentation for the TUWA Ecosystem's umbrella SDKs and the server-side Quasar Cloud client.
 
-## What is Quasar SDK?
+## What is the TUWA SDK?
 
-`@tuwaio/quasar-sdk` is a type-safe Node.js & Edge SDK for interacting with the TUWA Quasar Cloud API. It provides two main ways to interact with the platform:
+This repository provides developers with a seamless integration experience by bundling all TUWA packages (Orbit, Pulsar, Satellite, Nova UI) into easy-to-use, unified points of entry. It is divided into several packages:
 
-1.  **Quasar Client**: A stateful, server-side client for high-level operations like Pulsar transaction syncing.
-2.  **Utils**: A set of stateless, functional utilities for signature verification and security (ideal for both server and browser).
+1. **`@tuwaio/sdk`**: The Core Umbrella SDK. Bundles framework-agnostic logic and UI components.
+2. **`@tuwaio/evm-sdk`**: The EVM Adapter SDK. Bundles Ethereum/EVM specific implementations.
+3. **`@tuwaio/solana-sdk`**: The Solana Adapter SDK. Bundles Solana specific implementations.
+4. **`@tuwaio/quasar-sdk`**: The Node.js & Edge SDK for interacting with the TUWA Quasar Cloud API.
 
-## Key Features
+## Dependency Architecture
 
-- 🔐 **Iron Dome Protocol** — every request is authenticated via secret key headers
-- 🛡️ **QuasarAuthBridge** — built-in React component for unified EVM & Solana authentication
-- 📦 **Dual module format** — ships as ESM and CJS
-- 🧩 **Modular architecture** — isolated modules for Pulsar (Transactions) and Utils (Security)
-- 🔒 **Server-side only** — your secret keys never leak to the browser
-- 📖 **Auto-generated API reference** — TypeDoc annotations powering this docs site
+To prevent dangerous singleton conflicts (like "Multiple instances of React" or Wagmi context errors), the TUWA SDK adopts a strict dependency strategy:
 
-## Quick Start (Core & Utils)
+- **Internal Logic** (`orbit`, `pulsar`, `satellite`, `nova`) is hidden inside direct `dependencies`. You never need to install them manually.
+- **Web3 Singletons** (`react`, `viem`, `@wagmi/core`, `gill`, `@wallet-standard/*`) are explicitly kept as `peerDependencies`. Your dApp is responsible for installing them alongside the SDK.
+
+## Installation & Quick Start
+
+### 1. Base SDK
+
+Install the core SDK and the required React peer dependencies:
+
+```bash
+pnpm add @tuwaio/sdk react react-dom
+```
+
+```tsx
+import { NovaConnect, NovaTransactions, SatelliteReact } from '@tuwaio/sdk';
+
+export function App() {
+  const { address } = SatelliteReact.useAccount();
+
+  return (
+    <div>
+      <NovaConnect.ConnectButton />
+      {address && <NovaTransactions.TransactionList />}
+    </div>
+  );
+}
+```
+
+### 2. Network Adapters
+
+Depending on your target blockchain, install the network-specific SDK and its Web3 singletons:
+
+**For EVM:**
+```bash
+pnpm add @tuwaio/evm-sdk viem @wagmi/core
+```
+
+```tsx
+import { SatelliteEVM, OrbitEVM } from '@tuwaio/evm-sdk';
+
+// Mount the EVM providers
+<SatelliteEVM.WagmiProvider config={wagmiConfig}>
+  {children}
+</SatelliteEVM.WagmiProvider>
+```
+
+**For Solana:**
+```bash
+pnpm add @tuwaio/solana-sdk gill @wallet-standard/react @wallet-standard/app @wallet-standard/ui-core @wallet-standard/ui-registry
+```
+
+### 3. Quasar Cloud Client (Server-side)
+
+```bash
+pnpm add @tuwaio/quasar-sdk
+```
 
 ```typescript
 import { Quasar, utils } from '@tuwaio/quasar-sdk';
 
 // Initialize the client
 const quasar = new Quasar({ secretKey: 'sk_live_...' });
-
-// Use domain modules to sync a transaction to the cloud
-const { txKey } = await quasar.pulsar.syncCreate({
-  txKey: 'tx_local_18f2...',
-  chainId: 1,
-  from: '0xabc...',
-  type: 'TRANSFER',
-  connectorType: 'evm:metamask',
-  adapter: 'evm',
-  tracker: 'ethereum',
-  pending: true,
-  localTimestamp: Date.now(),
-});
-
-// Or use stateless utilities directly to verify client signatures
-const isValid = await utils.verifyMiniSession({
-  walletAddress,
-  signature,
-  timestamp,
-  chainType,
-});
-```
-
-## Quick Start (React)
-
-For EVM-only applications, use the EVM subpath to prevent missing `@solana/react` errors:
-
-```tsx
-import { QuasarEvmAuthBridge } from '@tuwaio/quasar-sdk/react/evm';
-
-// Mount within your SatelliteConnectProvider tree to handle EVM signatures
-<QuasarEvmAuthBridge
-  activeConnection={activeConnection}
-  store={store}
-  wagmiConfig={config}
-  session={miniSession}
-  setSession={setMiniSession}
-/>
-```
-
-For Solana-only or multi-chain applications, see the [Security Section](/security/mini-wallet-auth) for appropriate components and subpaths.
-
-## Installation
-
-```bash
-pnpm add @tuwaio/quasar-sdk ofetch
+const { txKey } = await quasar.pulsar.syncCreate(transaction);
 ```
 
 ## Next Steps
