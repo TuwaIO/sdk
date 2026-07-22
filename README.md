@@ -20,15 +20,26 @@ This monorepo contains the core TUWA SDKs — a production-grade toolkit for int
 
 ---
 
+## 🏛️ Ecosystem Layer Architecture
+
+| Layer | Package | Description |
+| :--- | :--- | :--- |
+| **L5** | **[`@tuwaio/quasar-sdk`](./packages/quasar-sdk/README.md)** | **Quasar Cloud Client (Server/Edge)** — Server-side Node.js & Edge SDK for transaction indexing, cloud sync, and signature verification. |
+| **L8** | **[`@tuwaio/sdk`](./packages/sdk/README.md)** | **Core Umbrella SDK (UI & Logic)** — Bundles framework-agnostic logic (Orbit, Pulsar, Satellite) and Nova UI components into subpath-only entrypoints. |
+| **L9** | **[`@tuwaio/evm-sdk`](./packages/evm-sdk/README.md)** | **EVM Network Adapter SDK** — EVM-specific transports (Wagmi/Viem), connectors, and background state watchers (`EVMConnectorsWatcher`). |
+| **L9** | **[`@tuwaio/solana-sdk`](./packages/solana-sdk/README.md)** | **Solana Network Adapter SDK** — Solana-specific transports (Gill/Wallet-Standard), connectors, and background state watchers (`SolanaConnectorsWatcher`). |
+
+---
+
 ## Repository Structure
 
 ```
 sdk/
 ├── packages/
-│   ├── sdk/                 # @tuwaio/sdk — The core umbrella SDK (UI + Logic)
-│   ├── evm-sdk/             # @tuwaio/evm-sdk — EVM-specific implementations
-│   ├── solana-sdk/          # @tuwaio/solana-sdk — Solana-specific implementations
-│   └── quasar-sdk/          # @tuwaio/quasar-sdk — Node.js Quasar Cloud Client
+│   ├── quasar-sdk/          # @tuwaio/quasar-sdk (L5 Cloud Client)
+│   ├── sdk/                 # @tuwaio/sdk (L8 Core Umbrella SDK)
+│   ├── evm-sdk/             # @tuwaio/evm-sdk (L9 EVM Adapter SDK)
+│   └── solana-sdk/          # @tuwaio/solana-sdk (L9 Solana Adapter SDK)
 ├── apps/
 │   └── docs/                # Nextra-based documentation site
 ├── typedoc.json             # TypeDoc config

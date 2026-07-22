@@ -4,7 +4,7 @@
 
 # EvmSigner
 
-Defined in: [packages/quasar-sdk/src/types.ts:119](https://github.com/TuwaIO/sdk/blob/89fd3c44f22f8e38e48f19240dbe515f6e35eb6d/packages/quasar-sdk/src/types.ts#L119)
+Defined in: [packages/quasar-sdk/src/types.ts:119](https://github.com/TuwaIO/sdk/blob/1a17de617fb94f0662aae90cb9092921f4a6e2bd/packages/quasar-sdk/src/types.ts#L119)
 
 Interface for an EVM signer (compatible with Viem WalletClient).
 
@@ -14,7 +14,7 @@ Interface for an EVM signer (compatible with Viem WalletClient).
 
 > **signMessage**: (`params`) => `Promise`\<`` `0x${string}` ``\>
 
-Defined in: [packages/quasar-sdk/src/types.ts:121](https://github.com/TuwaIO/sdk/blob/89fd3c44f22f8e38e48f19240dbe515f6e35eb6d/packages/quasar-sdk/src/types.ts#L121)
+Defined in: [packages/quasar-sdk/src/types.ts:121](https://github.com/TuwaIO/sdk/blob/1a17de617fb94f0662aae90cb9092921f4a6e2bd/packages/quasar-sdk/src/types.ts#L121)
 
 Signs a message using the specified account.
 

@@ -4,17 +4,9 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "The Solana Umbrella SDK for the TUWA Ecosystem. Contains logic and providers for the Solana blockchain, built strictly on Wallet Standard and Gill.",
+  "description": "Layer 9 (L9) of the TUWA Ecosystem. The Solana Network Adapter SDK providing Gill/Wallet-Standard transports and state watchers.",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
     "./orbit": {
       "types": "./dist/orbit.d.ts",
       "import": "./dist/orbit.js",

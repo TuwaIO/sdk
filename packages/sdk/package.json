@@ -4,17 +4,9 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "The Umbrella Core SDK for the TUWA Ecosystem. Bundles framework-agnostic logic and Nova UI components.",
+  "description": "Layer 8 (L8) of the TUWA Ecosystem. The Core Umbrella SDK bundling logic and Nova UI components into clean subpath entrypoints.",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
     "./pulsar": {
       "types": "./dist/pulsar.d.ts",
       "import": "./dist/pulsar.js",

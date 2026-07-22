@@ -6,7 +6,6 @@ export default defineConfig([
   {
     format: ['cjs', 'esm'],
     entry: [
-      './src/index.ts',
       './src/pulsar.ts',
       './src/satellite.ts',
       './src/satellite-siwe.ts',

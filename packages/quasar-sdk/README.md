@@ -7,13 +7,13 @@
   <img src="https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/preview/repos/quasar_sdk.png" alt="Quasar SDK Architecture" width="100%" />
 </p>
 
-> The official server-side Node.js & Edge SDK for the **TUWA Quasar Cloud**, featuring built-in React authentication bridges.
+> The official **Layer 5 (L5)** server-side Node.js & Edge SDK for the **TUWA Quasar Cloud**, featuring built-in React authentication bridges.
 
 ---
 
 ## 🏛️ What is `@tuwaio/quasar-sdk`?
 
-`@tuwaio/quasar-sdk` is the official backend companion to the TUWA client libraries. It serves as the gateway to the **Quasar Cloud Engine**, allowing your server to securely push transaction logs, query paginated transaction histories, and cryptographically verify client signatures.
+`@tuwaio/quasar-sdk` is **Layer 5 (L5)** of the TUWA ecosystem architecture — the official backend companion to the TUWA client libraries. It serves as the gateway to the **Quasar Cloud Engine**, allowing your server to securely push transaction logs, query paginated transaction histories, and cryptographically verify client signatures.
 
 It operates strictly on the server (Node.js, Next.js Server Actions, or Edge functions) and uses Secret Keys to communicate with Quasar's iron-dome guarded endpoints. It also includes React Bridges for establishing secure "Mini-Session" authentication on the client side.
 

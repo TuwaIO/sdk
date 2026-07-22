@@ -3,13 +3,13 @@
 [![NPM Version](https://img.shields.io/npm/v/@tuwaio/sdk.svg)](https://www.npmjs.com/package/@tuwaio/sdk)
 [![License](https://img.shields.io/npm/l/@tuwaio/sdk.svg)](./LICENSE)
 
-The Core Umbrella SDK for the TUWA Ecosystem. It provides a unified entry point for `Orbit`, `Pulsar`, `Satellite`, and `Nova UI` core layers, minimizing boilerplate while ensuring maximum type safety.
+The **Layer 8 (L8)** Core Umbrella SDK for the TUWA Ecosystem. It provides a unified entry point bundling `Orbit`, `Pulsar`, `Satellite`, and `Nova UI` core layers into modular subpath entrypoints, minimizing boilerplate while ensuring maximum type safety.
 
 ---
 
 ## 🏛️ What is `@tuwaio/sdk`?
 
-`@tuwaio/sdk` is the massive, all-in-one UI and Logic foundation for the TUWA ecosystem. Instead of manually resolving versions and importing from a dozen decoupled packages (`@tuwaio/pulsar-core`, `@tuwaio/nova-connect`, etc.), you install this single SDK and access clean, modular subpath exports.
+`@tuwaio/sdk` is **Layer 8 (L8)** of the TUWA ecosystem architecture — the all-in-one UI and Logic foundation. Instead of manually resolving versions and importing from a dozen decoupled packages (`@tuwaio/pulsar-core`, `@tuwaio/nova-connect`, etc.), you install this single SDK and access clean, modular subpath exports.
 
 It abstracts away complex dependency management (automatically handling `zustand`, `framer-motion`, `radix-ui`, `siwe`, `iron-session`, etc.) and lets you focus on building your application.
 

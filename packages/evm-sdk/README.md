@@ -3,13 +3,13 @@
 [![NPM Version](https://img.shields.io/npm/v/@tuwaio/evm-sdk.svg)](https://www.npmjs.com/package/@tuwaio/evm-sdk)
 [![License](https://img.shields.io/npm/l/@tuwaio/evm-sdk.svg)](./LICENSE)
 
-The EVM Adapter SDK for the TUWA Ecosystem. Packages all Ethereum-compatible logic (`OrbitEVM`, `PulsarEVM`, `SatelliteEVM`, `EVMConnectorsWatcher`) into clean subpath entry points.
+The **Layer 9 (L9)** EVM Network Adapter SDK for the TUWA Ecosystem. Packages all Ethereum-compatible logic (`OrbitEVM`, `PulsarEVM`, `SatelliteEVM`, `EVMConnectorsWatcher`) into clean subpath entry points.
 
 ---
 
 ## 🏛️ What is `@tuwaio/evm-sdk`?
 
-`@tuwaio/evm-sdk` is a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` how to interact with EVM-compatible blockchains.
+`@tuwaio/evm-sdk` is **Layer 9 (L9)** of the TUWA ecosystem architecture — a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` (L8) how to interact with EVM-compatible blockchains.
 
 It securely wraps `viem` and `@wagmi/core`, providing standardized adapters for Wallet Connection (Satellite) and Transaction Tracking (Pulsar). This modular subpath approach ensures your app only ships EVM dependencies when you actually need them.
 

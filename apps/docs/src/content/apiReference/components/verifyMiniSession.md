@@ -6,7 +6,7 @@
 
 > **verifyMiniSession**(`params`): `Promise`\<`boolean`\>
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:159](https://github.com/TuwaIO/sdk/blob/89fd3c44f22f8e38e48f19240dbe515f6e35eb6d/packages/quasar-sdk/src/utils/auth.ts#L159)
+Defined in: [packages/quasar-sdk/src/utils/auth.ts:159](https://github.com/TuwaIO/sdk/blob/1a17de617fb94f0662aae90cb9092921f4a6e2bd/packages/quasar-sdk/src/utils/auth.ts#L159)
 
 Verifies a Mini-Session signature for authenticity and freshness.
 

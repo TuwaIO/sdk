@@ -3,13 +3,13 @@
 [![NPM Version](https://img.shields.io/npm/v/@tuwaio/solana-sdk.svg)](https://www.npmjs.com/package/@tuwaio/solana-sdk)
 [![License](https://img.shields.io/npm/l/@tuwaio/solana-sdk.svg)](./LICENSE)
 
-The Solana Adapter SDK for the TUWA Ecosystem. Packages all Solana-compatible logic (`OrbitSolana`, `PulsarSolana`, `SatelliteSolana`, `SolanaConnectorsWatcher`) into clean subpath entry points.
+The **Layer 9 (L9)** Solana Network Adapter SDK for the TUWA Ecosystem. Packages all Solana-compatible logic (`OrbitSolana`, `PulsarSolana`, `SatelliteSolana`, `SolanaConnectorsWatcher`) into clean subpath entry points.
 
 ---
 
 ## 🏛️ What is `@tuwaio/solana-sdk`?
 
-`@tuwaio/solana-sdk` is a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` how to interact with the Solana blockchain.
+`@tuwaio/solana-sdk` is **Layer 9 (L9)** of the TUWA ecosystem architecture — a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` (L8) how to interact with the Solana blockchain.
 
 It completely avoids legacy `@solana/web3.js` classes and is built from the ground up on modern primitives: **Gill** and **Wallet Standard**. It provides standardized adapters for Wallet Connection (Satellite) and Transaction Tracking (Pulsar). This modular subpath approach ensures your app only ships Solana dependencies when you actually need them.
 

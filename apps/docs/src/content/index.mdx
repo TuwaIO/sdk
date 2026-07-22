@@ -6,10 +6,10 @@ Welcome to the **TUWA SDK** documentation — the official documentation for the
 
 This repository provides developers with a seamless integration experience by bundling all TUWA packages (Orbit, Pulsar, Satellite, Nova UI) into easy-to-use, unified points of entry. It is divided into several packages:
 
-1. **`@tuwaio/sdk`**: The Core Umbrella SDK. Bundles framework-agnostic logic and UI components.
-2. **`@tuwaio/evm-sdk`**: The EVM Adapter SDK. Bundles Ethereum/EVM specific implementations.
-3. **`@tuwaio/solana-sdk`**: The Solana Adapter SDK. Bundles Solana specific implementations.
-4. **`@tuwaio/quasar-sdk`**: The Node.js & Edge SDK for interacting with the TUWA Quasar Cloud API.
+1. **`@tuwaio/sdk`** *(Layer 8 — L8)*: The Core Umbrella SDK. Bundles framework-agnostic logic and UI components into clean subpaths.
+2. **`@tuwaio/evm-sdk`** *(Layer 9 — L9)*: The EVM Network Adapter SDK. Bundles Ethereum/EVM specific implementations and watchers.
+3. **`@tuwaio/solana-sdk`** *(Layer 9 — L9)*: The Solana Network Adapter SDK. Bundles Solana specific implementations and watchers.
+4. **`@tuwaio/quasar-sdk`** *(Layer 5 — L5)*: The Node.js & Edge SDK for interacting with the TUWA Quasar Cloud API.
 
 ## Dependency Architecture
 
@@ -29,15 +29,17 @@ pnpm add @tuwaio/sdk react react-dom
 ```
 
 ```tsx
-import { NovaConnect, NovaTransactions, SatelliteReact } from '@tuwaio/sdk';
+import { ConnectButton } from '@tuwaio/sdk/nova-connect';
+import { TransactionList } from '@tuwaio/sdk/nova-transactions';
+import { useAccount } from '@tuwaio/sdk/satellite';
 
 export function App() {
-  const { address } = SatelliteReact.useAccount();
+  const { address } = useAccount();
 
   return (
     <div>
-      <NovaConnect.ConnectButton />
-      {address && <NovaTransactions.TransactionList />}
+      <ConnectButton />
+      {address && <TransactionList />}
     </div>
   );
 }
@@ -54,10 +56,11 @@ pnpm add @tuwaio/evm-sdk viem @wagmi/core
 ```
 
 ```tsx
-import { SatelliteEVM, OrbitEVM } from '@tuwaio/evm-sdk';
+import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
+import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
 
-// Mount the EVM providers
-<SatelliteEVM.WagmiProvider config={wagmiConfig}>{children}</SatelliteEVM.WagmiProvider>;
+// Mount the EVM providers and watchers
+<EVMConnectorsWatcher wagmiConfig={wagmiConfig} />;
 ```
 
 **For Solana:**
