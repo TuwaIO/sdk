@@ -6,7 +6,21 @@ This guide demonstrates how to build a production-ready, multi-chain Next.js App
 
 ## 🎨 1. Global CSS Styles Import (`layout.tsx`)
 
-Import the bundled Nova UI CSS stylesheet in your root layout:
+To style Nova UI components (`ConnectButton`, transaction toasts, modal dialogs), import the bundled CSS stylesheet into your global CSS file (e.g. `src/styles/globals.css`) or root layout:
+
+### Option A: Complete Bundle Import (Recommended)
+
+In your global CSS file (`src/styles/globals.css`):
+
+```css
+/* src/styles/globals.css */
+@import '@tuwaio/sdk/styles/all.css';
+
+/* Optional: if your dApp uses Tailwind CSS v4 */
+@import 'tailwindcss';
+```
+
+Or directly in your root React layout (`src/app/layout.tsx`):
 
 ```tsx
 // src/app/layout.tsx
@@ -20,6 +34,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 ```
+
+### Option B: Granular Individual Styles
+
+If you prefer to include only specific module styles:
+
+```css
+/* Import individual stylesheets as needed */
+@import '@tuwaio/sdk/styles/nova-core.css';
+@import '@tuwaio/sdk/styles/nova-connect.css';
+@import '@tuwaio/sdk/styles/nova-transactions.css';
+
+/* Optional: if your dApp uses Tailwind CSS v4 */
+@import 'tailwindcss';
+```
+
+> **Styling & Tailwind CSS Note**: All Nova UI components (`ConnectButton`, modals, toasts) ship with fully compiled, self-contained styles inside `@tuwaio/sdk/styles/all.css`. Installing Tailwind CSS is **optional** — we use Tailwind utility classes in our code examples for dApp layout structure, but you are free to use any styling solution (CSS Modules, Styled Components, or Plain CSS). If you do use Tailwind CSS v4 in your project, remember to include `@import 'tailwindcss';` in your global CSS file.
 
 ---
 
@@ -83,7 +113,35 @@ export const useAuthStore = utils.createMiniSessionStore('quasar-mini-session-st
 
 ---
 
-## ⚡ 5. Headless Tracking Store (`usePulsarStore.ts`)
+## ⚙️ 5. Application Configuration (`appConfig.ts`)
+
+Configure EVM chains, Wagmi connectors, default transports, and Solana RPC endpoints using SDK subpath imports:
+
+```typescript
+// src/configs/appConfig.ts
+import { createDefaultTransports, impersonated } from '@tuwaio/evm-sdk/satellite';
+import { createConfig, injected } from '@wagmi/core';
+import { type Chain, mainnet, sepolia } from 'viem/chains';
+
+export const solanaRPCUrls = {
+  'solana:mainnet': 'https://api.mainnet-beta.solana.com',
+  'solana:devnet': 'https://api.devnet.solana.com',
+};
+
+export const appEVMChains = [mainnet, sepolia] as readonly [Chain, ...Chain[]];
+
+export const wagmiConfig = createConfig({
+  connectors: [injected(), impersonated({})],
+  transports: createDefaultTransports(appEVMChains),
+  chains: appEVMChains,
+  ssr: true,
+  syncConnectedChain: true,
+});
+```
+
+---
+
+## ⚡ 6. Headless Tracking Store (`usePulsarStore.ts`)
 
 ```typescript
 // src/hooks/usePulsarStore.ts
@@ -137,14 +195,14 @@ const pulsarInMemoryStore = createTxInMemoryStore<TransactionUnion>({
   },
 });
 
-initialStore.subscribe((state) => pulsarInMemoryStore.getState().syncWithLocalPool(state.transactionsPool));
+initialStore.subscribe((s) => pulsarInMemoryStore.getState().syncWithLocalPool(s.transactionsPool));
 
 export const usePulsarInMemoryStore = createBoundedUseStore(pulsarInMemoryStore);
 ```
 
 ---
 
-## 🌉 6. Quasar Auth Bridge (`QuasarSDKAuthProvider.tsx`)
+## 🌉 7. Quasar Auth Bridge (`QuasarSDKAuthProvider.tsx`)
 
 ```tsx
 // src/providers/QuasarSDKAuthProvider.tsx
@@ -186,7 +244,7 @@ export function QuasarAuthBridge() {
 
 ---
 
-## 📺 7. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
+## 📺 8. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
 
 ```tsx
 // src/providers/NovaTransactionsProvider.tsx
@@ -199,14 +257,14 @@ import { NovaTransactionsProvider as NTP } from '@tuwaio/sdk/nova-transactions/p
 import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
 
 export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemoryPagination }) {
-  const initialTx = usePulsarStore((state) => state.initialTx);
-  const closeTxTrackedModal = usePulsarStore((state) => state.closeTxTrackedModal);
-  const executeTxAction = usePulsarStore((state) => state.executeTxAction);
-  const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
+  const initialTx = usePulsarStore((s) => s.initialTx);
+  const closeTxTrackedModal = usePulsarStore((s) => s.closeTxTrackedModal);
+  const executeTxAction = usePulsarStore((s) => s.executeTxAction);
+  const initializeTransactionsPool = usePulsarStore((s) => s.initializeTransactionsPool);
 
-  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
-  const getAdapter = usePulsarStore((state) => state.getAdapter);
-  const transactionsPool = usePulsarInMemoryStore((state) => state.transactionsPool);
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
+  const getAdapter = usePulsarStore((s) => s.getAdapter);
+  const transactionsPool = usePulsarInMemoryStore((s) => s.transactionsPool);
 
   useInitializeTransactionsPool({ initializeTransactionsPool });
 
@@ -227,7 +285,7 @@ export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemor
 
 ---
 
-## 🚀 8. Assembling Application Providers (`AppProviders.tsx`)
+## 🚀 9. Assembling Application Providers (`AppProviders.tsx`)
 
 ```tsx
 // src/providers/AppProviders.tsx
@@ -247,15 +305,15 @@ import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
 import { QuasarAuthBridge } from '@/providers/QuasarSDKAuthProvider';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
-  const getAdapter = usePulsarStore((state) => state.getAdapter);
-  const transactionsPool = usePulsarInMemoryStore((state) => state.transactionsPool);
+  const getAdapter = usePulsarStore((s) => s.getAdapter);
+  const transactionsPool = usePulsarInMemoryStore((s) => s.transactionsPool);
 
-  const isLoading = usePulsarInMemoryStore((state) => state.isLoading);
-  const isError = usePulsarInMemoryStore((state) => state.isError);
-  const currentPage = usePulsarInMemoryStore((state) => state.currentPage);
-  const hasMore = usePulsarInMemoryStore((state) => state.hasMore);
-  const fetchNextPage = usePulsarInMemoryStore((state) => state.fetchNextPage);
-  const fetchInitial = usePulsarInMemoryStore((state) => state.fetchInitial);
+  const isLoading = usePulsarInMemoryStore((s) => s.isLoading);
+  const isError = usePulsarInMemoryStore((s) => s.isError);
+  const currentPage = usePulsarInMemoryStore((s) => s.currentPage);
+  const hasMore = usePulsarInMemoryStore((s) => s.hasMore);
+  const fetchNextPage = usePulsarInMemoryStore((s) => s.fetchNextPage);
+  const fetchInitial = usePulsarInMemoryStore((s) => s.fetchInitial);
 
   const pagination = { isLoading, isError, currentPage, hasMore, fetchNextPage };
 
@@ -298,16 +356,16 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
 ---
 
-## 💻 9. Rendering UI Components (`page.tsx`)
+## 💻 10. Rendering UI Components (`page.tsx`)
 
-Render **`<ConnectButton />`**, **`<TxActionButton />`**, and **`<TransactionList />`** anywhere in your application:
+Render **`<ConnectButton />`** and **`<TxActionButton />`** anywhere in your application:
 
 ```tsx
 // src/app/page.tsx
 'use client';
 
 import { ConnectButton } from '@tuwaio/sdk/nova-connect';
-import { TransactionList, TxActionButton } from '@tuwaio/sdk/nova-transactions';
+import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
 import { getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
 import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
 
@@ -321,18 +379,38 @@ export default function HomePage() {
   const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
 
   const handleSwapAction = async () => {
-    const adapterType = getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:');
+    const adapterType = activeConnection?.connectorType
+      ? getAdapterFromConnectorType(activeConnection.connectorType)
+      : OrbitAdapter.EVM;
+    const isEvm = adapterType === OrbitAdapter.EVM;
 
     await executeTxAction({
       actionFunction: async () => {
-        /* contract execution call */
+        // Execute smart contract call (e.g. writeContract via Viem/Wagmi or sendTransaction via Gill)
+        /* return await swapTokensContractCall(); */
+      },
+      onSuccess: (tx) => {
+        console.log('Swap transaction completed successfully:', tx);
       },
       params: {
-        adapter: adapterType,
         type: AppTxType.SWAP,
-        title: 'Cross-Chain Swap',
-        desiredChainID: adapterType === OrbitAdapter.EVM ? 1 : undefined,
-        payload: { tokenIn: 'USDC', tokenOut: adapterType === OrbitAdapter.EVM ? 'ETH' : 'SOL', amount: 100 },
+        adapter: adapterType,
+        desiredChainID: isEvm ? 1 : 'mainnet',
+        rpcUrl: isEvm ? undefined : activeConnection?.rpcURL,
+        title: ['Swapping Tokens', 'Tokens Swapped', 'Error During Swap', 'Swap Transaction Replaced'],
+        description: [
+          `Swapping 100 USDC for ${isEvm ? 'ETH' : 'SOL'}...`,
+          `Success! Swapped 100 USDC for ${isEvm ? 'ETH' : 'SOL'}.`,
+          'Something went wrong during token swap.',
+          'Transaction was replaced in wallet.',
+        ],
+        payload: {
+          tokenIn: 'USDC',
+          tokenOut: isEvm ? 'ETH' : 'SOL',
+          amount: 100,
+        },
+        withTrackedModal: true,
+        requiredConfirmations: isEvm ? 3 : undefined,
       },
     });
   };
@@ -355,11 +433,6 @@ export default function HomePage() {
           Execute Swap Action
         </TxActionButton>
       </section>
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">Transaction History</h2>
-        <TransactionList />
-      </section>
     </main>
   );
 }
@@ -369,8 +442,8 @@ export default function HomePage() {
 
 ## 🔗 TUWA Ecosystem Quick Links
 
-- 🌐 **[Ecosystem Central Hub](https://docs.tuwa.io/)**
-- 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)**
-- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)**
-- ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)**
-- 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)**
+- 🌐 **[TUWA Documentation Hub](https://docs.tuwa.io/)** — Central directory linking to all ecosystem documentation sites.
+- 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Low-level, framework-agnostic multi-chain communication primitives.
+- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine & SIWE auth layer.
+- ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — Headless transaction lifecycle & tracking engine.
+- 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — Interactive component catalog and visual design system.

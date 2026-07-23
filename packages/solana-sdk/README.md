@@ -95,14 +95,14 @@ import { NovaTransactionsProvider as NTP } from '@tuwaio/sdk/nova-transactions/p
 import { usePulsarStore } from '@/hooks/usePulsarStore';
 
 export function NovaTransactionsProvider() {
-  const initialTx = usePulsarStore((state) => state.initialTx);
-  const closeTxTrackedModal = usePulsarStore((state) => state.closeTxTrackedModal);
-  const executeTxAction = usePulsarStore((state) => state.executeTxAction);
-  const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
-  const getAdapter = usePulsarStore((state) => state.getAdapter);
-  const transactionsPool = usePulsarStore((state) => state.transactionsPool);
+  const initialTx = usePulsarStore((s) => s.initialTx);
+  const closeTxTrackedModal = usePulsarStore((s) => s.closeTxTrackedModal);
+  const executeTxAction = usePulsarStore((s) => s.executeTxAction);
+  const initializeTransactionsPool = usePulsarStore((s) => s.initializeTransactionsPool);
+  const getAdapter = usePulsarStore((s) => s.getAdapter);
+  const transactionsPool = usePulsarStore((s) => s.transactionsPool);
 
-  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
 
   useInitializeTransactionsPool({ initializeTransactionsPool });
 
@@ -138,8 +138,8 @@ import { usePulsarStore } from '@/hooks/usePulsarStore';
 import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
-  const getAdapter = usePulsarStore((state) => state.getAdapter);
-  const transactionsPool = usePulsarStore((state) => state.transactionsPool);
+  const getAdapter = usePulsarStore((s) => s.getAdapter);
+  const transactionsPool = usePulsarStore((s) => s.transactionsPool);
 
   return (
     <SatelliteConnectProvider adapter={[satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]} autoConnect={true}>

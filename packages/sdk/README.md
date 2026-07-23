@@ -44,11 +44,16 @@ Import the bundled CSS styles into your global CSS file (e.g., `globals.css`):
 /* Import all Nova UI styles at once */
 @import '@tuwaio/sdk/styles/all.css';
 
+/* Optional: if your dApp uses Tailwind CSS v4 */
+@import 'tailwindcss';
+
 /* Or import individually if needed */
 /* @import '@tuwaio/sdk/styles/nova-core.css'; */
-/* @import '@tuwaio/sdk/styles/nova-transactions.css'; */
 /* @import '@tuwaio/sdk/styles/nova-connect.css'; */
+/* @import '@tuwaio/sdk/styles/nova-transactions.css'; */
 ```
+
+> **Note**: Nova UI components include fully compiled, self-contained styles inside `@tuwaio/sdk/styles/all.css`. Tailwind CSS is **optional** — we use Tailwind utility classes in our documentation layout examples for convenience, but you can use any styling solution (CSS Modules, Styled Components, Vanilla CSS) for your dApp layout. If you do use Tailwind CSS v4 in your project, include `@import 'tailwindcss';` in your global CSS file.
 
 ---
 
@@ -117,14 +122,14 @@ import { NovaTransactionsProvider as NTP } from '@tuwaio/sdk/nova-transactions/p
 import { usePulsarStore } from '@/hooks/usePulsarStore';
 
 export function NovaTransactionsProvider() {
-  const initialTx = usePulsarStore((state) => state.initialTx);
-  const closeTxTrackedModal = usePulsarStore((state) => state.closeTxTrackedModal);
-  const executeTxAction = usePulsarStore((state) => state.executeTxAction);
-  const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
-  const getAdapter = usePulsarStore((state) => state.getAdapter);
-  const transactionsPool = usePulsarStore((state) => state.transactionsPool);
+  const initialTx = usePulsarStore((s) => s.initialTx);
+  const closeTxTrackedModal = usePulsarStore((s) => s.closeTxTrackedModal);
+  const executeTxAction = usePulsarStore((s) => s.executeTxAction);
+  const initializeTransactionsPool = usePulsarStore((s) => s.initializeTransactionsPool);
+  const getAdapter = usePulsarStore((s) => s.getAdapter);
+  const transactionsPool = usePulsarStore((s) => s.transactionsPool);
 
-  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
+  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
 
   useInitializeTransactionsPool({ initializeTransactionsPool });
 
@@ -212,19 +217,38 @@ export function SwapButton() {
   const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
 
   const handleSwapAction = async () => {
-    // Dynamically determine the adapter based on the currently connected wallet
-    const adapterType = getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:');
+    const adapterType = activeConnection?.connectorType
+      ? getAdapterFromConnectorType(activeConnection.connectorType)
+      : OrbitAdapter.EVM;
+    const isEvm = adapterType === OrbitAdapter.EVM;
 
     await executeTxAction({
       actionFunction: async () => {
-        /* your wagmi/solana contract call */
+        // Execute smart contract call (e.g. writeContract via Viem/Wagmi or sendTransaction via Gill)
+        /* return await swapTokensContractCall(); */
+      },
+      onSuccess: (tx) => {
+        console.log('Swap transaction completed successfully:', tx);
       },
       params: {
-        adapter: adapterType,
         type: AppTxType.SWAP,
-        title: 'Token Swap',
-        desiredChainID: adapterType === OrbitAdapter.EVM ? 1 : undefined,
-        payload: { tokenIn: 'USDC', tokenOut: adapterType === OrbitAdapter.EVM ? 'ETH' : 'SOL', amount: 100 },
+        adapter: adapterType,
+        desiredChainID: isEvm ? 1 : 'mainnet',
+        rpcUrl: isEvm ? undefined : activeConnection?.rpcURL,
+        title: ['Swapping Tokens', 'Tokens Swapped', 'Error During Swap', 'Swap Transaction Replaced'],
+        description: [
+          `Swapping 100 USDC for ${isEvm ? 'ETH' : 'SOL'}...`,
+          `Success! Swapped 100 USDC for ${isEvm ? 'ETH' : 'SOL'}.`,
+          'Something went wrong during token swap.',
+          'Transaction was replaced in wallet.',
+        ],
+        payload: {
+          tokenIn: 'USDC',
+          tokenOut: isEvm ? 'ETH' : 'SOL',
+          amount: 100,
+        },
+        withTrackedModal: true,
+        requiredConfirmations: isEvm ? 3 : undefined,
       },
     });
   };
@@ -256,7 +280,7 @@ This package provides direct subpath entry points for clean, tree-shakeable impo
 - **`@tuwaio/sdk/nova-connect/components`** — Standalone UI components (`ConnectButton`, Modals, Customization interfaces).
 - **`@tuwaio/sdk/nova-connect/hooks`** — Helper hooks (`useGetWalletNameAndAvatar`, `useWalletChainsList`).
 - **`@tuwaio/sdk/nova-connect/i18n`** — Internationalization and label providers (`NovaConnectLabelsProvider`).
-- **`@tuwaio/sdk/nova-transactions`** — Transaction UI components (`TxActionButton`, `TransactionList`).
+- **`@tuwaio/sdk/nova-transactions`** — Transaction UI components (`TxActionButton`).
 - **`@tuwaio/sdk/nova-transactions/providers`** — Transaction UI provider (`NovaTransactionsProvider`).
 - **`@tuwaio/sdk/nova-core`** — UI Core variables, base components, and utilities.
 - **`@tuwaio/sdk/orbit`** — Core multi-chain types and adapters (`OrbitAdapter`, `getAdapterFromConnectorType`).

@@ -1,6 +1,6 @@
 # Layer Architecture & Overview
 
-The **TUWA Ecosystem** is designed around a strict, multi-tiered architecture that decouples low-level Web3 communication, state management, UI rendering, and cloud synchronization.
+The **TUWA Ecosystem** is built around a multi-tiered architecture that decouples low-level Web3 primitives, state management, UI rendering components, and cloud transaction indexing.
 
 ---
 
@@ -9,7 +9,7 @@ The **TUWA Ecosystem** is designed around a strict, multi-tiered architecture th
 ```
 +-----------------------------------------------------------------------------------+
 | L8: Core SDK (@tuwaio/sdk)                                                        |
-|     Modular Subpaths: /pulsar, /satellite, /orbit, /nova-connect, /nova-transactions|
+|     Modular Subpaths: /orbit, /satellite, /pulsar, /nova-connect, /nova-transactions|
 +------------------------------------+----------------------------------------------+
 | L9: EVM Adapter SDK (@tuwaio/evm-sdk)| L9: Solana Adapter SDK (@tuwaio/solana-sdk)|
 |     Wagmi/Viem + EVMConnectorsWatcher|     Gill/Wallet Standard + SolanaWatcher  |
@@ -18,38 +18,38 @@ The **TUWA Ecosystem** is designed around a strict, multi-tiered architecture th
 |     Server-Side Node.js/Edge + QuasarAuthBridge                                  |
 +-----------------------------------------------------------------------------------+
 | L1-L4 & L6-L7 Headless & UI Primitives                                            |
-|     Orbit (L1-L3), Pulsar (L4), Satellite (L4), Nova UI (L6-L7)                    |
+|     Orbit (L1-L3), Satellite (L4), Pulsar (L4), Nova UI (L6-L7)                    |
 +-----------------------------------------------------------------------------------+
 ```
 
 ### Layer Breakdown
 
-1. **L1 – L3 (Orbit Utils)** — Low-level, framework-agnostic multi-chain communication primitives.
-2. **L4 (Pulsar & Satellite Core)** — Headless state machines for transaction tracking and wallet session lifecycle.
-3. **L5 (Quasar Cloud Engine)** — Server-side Node.js & Edge client (`@tuwaio/quasar-sdk`) for indexing, cloud sync, and cryptographic signatures.
-4. **L6 – L7 (Nova UI Kit)** — Pure view layer React components, modals, toasts, and design tokens.
-5. **L8 (Core SDK)** — The main client entrypoint (`@tuwaio/sdk`) bundling logic and UI into modular subpaths.
-6. **L9 (Network Adapters)** — Ecosystem adapters (`@tuwaio/evm-sdk` and `@tuwaio/solana-sdk`) providing Web3 singletons, transports, and background state watchers.
+1. **L1 – L3 (Orbit Utils)** — Low-level, framework-agnostic multi-chain communication primitives and adapters (`OrbitAdapter.EVM`, `OrbitAdapter.SOLANA`).
+2. **L4 (Satellite & Pulsar Engine)** — Headless state machines for wallet connectivity (Satellite) and transaction tracking lifecycles (Pulsar).
+3. **L5 (Quasar Cloud Engine)** — Server-side Node.js & Edge client (`@tuwaio/quasar-sdk`) for cloud transaction indexing, history pagination, and authentication verification.
+4. **L6 – L7 (Nova UI Kit)** — View layer React components (`ConnectButton`, `TxActionButton`), modals, toasts, and visual design tokens.
+5. **L8 (Core SDK)** — The umbrella client entrypoint (`@tuwaio/sdk`) packaging all client layers into version-aligned subpaths.
+6. **L9 (Network Adapters)** — Specialized network packages (`@tuwaio/evm-sdk` and `@tuwaio/solana-sdk`) providing network singletons, transports, and background state watchers.
 
 ---
 
 ## ⚡ Zero UI Bloat & Subpath Guarantee
 
-To guarantee zero bundle bloat and prevent dangerous Web3 singleton conflicts (such as duplicate instances of React, Wagmi, or Wallet Standard context), all client SDK packages enforce a **100% Subpath-Only Policy**.
+To prevent bundle bloat and Web3 context conflicts, all TUWA client SDK packages enforce a **100% Subpath-Only Policy**.
 
-Direct imports from package roots (`from '@tuwaio/sdk'`) are disabled. Developers import only the specific subpaths required:
+Direct imports from package root (`from '@tuwaio/sdk'`) are disabled. Developers import only the specific subpaths required:
 
 ```tsx
 import { ConnectButton } from '@tuwaio/sdk/nova-connect';
-import { TransactionList } from '@tuwaio/sdk/nova-transactions';
-import { useAccount } from '@tuwaio/sdk/satellite';
+import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
+import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
 
 import '@tuwaio/sdk/styles/all.css';
 ```
 
 ---
 
-## 🔗 Related Resources
+## 🔗 TUWA Ecosystem Documentation Portals
 
 - 🌐 **[Ecosystem Central Hub](https://docs.tuwa.io/)** — Main ecosystem architecture & product portal.
 - 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Multi-chain utility primitives.

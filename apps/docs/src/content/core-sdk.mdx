@@ -37,9 +37,14 @@ To style Nova UI components (`ConnectButton`, transaction toasts, modal dialogs)
 
 ### Option A: Complete Bundle Import (Recommended)
 
+In your global CSS file (`src/styles/globals.css`):
+
 ```css
 /* src/styles/globals.css */
 @import '@tuwaio/sdk/styles/all.css';
+
+/* Optional: if your dApp uses Tailwind CSS v4 */
+@import 'tailwindcss';
 ```
 
 Or directly in your root React layout (`src/app/layout.tsx`):
@@ -66,7 +71,12 @@ If you prefer to include only specific module styles:
 @import '@tuwaio/sdk/styles/nova-core.css';
 @import '@tuwaio/sdk/styles/nova-connect.css';
 @import '@tuwaio/sdk/styles/nova-transactions.css';
+
+/* Optional: if your dApp uses Tailwind CSS v4 */
+@import 'tailwindcss';
 ```
+
+> **Styling & Tailwind CSS Note**: All Nova UI components (`ConnectButton`, modals, toasts) ship with fully compiled, self-contained styles inside `@tuwaio/sdk/styles/all.css`. Installing Tailwind CSS is **optional** — we use Tailwind utility classes in our code examples for dApp layout structure, but you are free to use any styling solution (CSS Modules, Styled Components, or Plain CSS). If you do use Tailwind CSS v4 in your project, remember to include `@import 'tailwindcss';` in your global CSS file.
 
 ---
 

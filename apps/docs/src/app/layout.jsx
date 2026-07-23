@@ -101,6 +101,7 @@ export default async function RootLayout({ children }) {
           pageMap={await getPageMap()}
           docsRepositoryBase="https://github.com/TuwaIO/sdk/tree/main/apps/docs"
           navigation={{ prev: true, next: true }}
+          sidebar={{ defaultMenuCollapseLevel: 1 }}
         >
           <NextTopLoader color="#6366f1" showSpinner={false} />
           {children}

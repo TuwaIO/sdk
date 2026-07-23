@@ -6,7 +6,7 @@
 
 > `const` **NETWORK\_SAFETY\_BUFFER**: `number`
 
-Defined in: [packages/quasar-sdk/src/utils/auth.ts:37](https://github.com/TuwaIO/sdk/blob/fe67c543a0f125fbcbaca8a0ff4173a1d6a6e749/packages/quasar-sdk/src/utils/auth.ts#L37)
+Defined in: [packages/quasar-sdk/src/utils/auth.ts:37](https://github.com/TuwaIO/sdk/blob/dcf26ccd80d9fe03c62500234a79a92eadb99de0/packages/quasar-sdk/src/utils/auth.ts#L37)
 
 Safety buffer subtracted from DEFAULT_MAX_AGE during cache validation.
 Ensures the session is refreshed before it expires on the server,
