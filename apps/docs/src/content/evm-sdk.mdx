@@ -1,0 +1,58 @@
+# EVM Network Adapter (`@tuwaio/evm-sdk`)
+
+`@tuwaio/evm-sdk` is **Layer 9 (L9)** of the TUWA ecosystem architecture — a headless network adapter SDK designed to teach `@tuwaio/sdk` how to interact with Ethereum and EVM-compatible blockchains.
+
+It wraps `viem` and `@wagmi/core`, providing standardized EVM transports, connectors, and background state watchers.
+
+---
+
+## 🏛️ Included EVM Adapters & Dedicated Documentation
+
+| Layer             | Subpath                        | Purpose & Documentation                                                                                                              |
+| :---------------- | :----------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| **Orbit EVM**     | `@tuwaio/evm-sdk/orbit`        | 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — ENS resolution, Viem client helpers, and EVM chain utilities.               |
+| **Satellite EVM** | `@tuwaio/evm-sdk/satellite`    | 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — `satelliteEVMAdapter(wagmiConfig, chains)` for Wagmi EVM wallets. |
+| **Pulsar EVM**    | `@tuwaio/evm-sdk/pulsar`       | ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — `pulsarEvmAdapter(wagmiConfig, chains)` for EVM transaction tracking.    |
+| **Nova UI EVM**   | `@tuwaio/evm-sdk/nova-connect` | 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — `<EVMConnectorsWatcher wagmiConfig={wagmiConfig} />` for Wagmi state sync.    |
+
+---
+
+## 💾 Installation
+
+Install `@tuwaio/evm-sdk` alongside the core SDK and required Web3 singletons:
+
+```bash
+pnpm add @tuwaio/sdk @tuwaio/evm-sdk viem @wagmi/core
+```
+
+---
+
+## 📦 Subpath Entrypoints
+
+`@tuwaio/evm-sdk` provides clean subpaths ordered by ecosystem layer:
+
+```tsx
+// 1. Multi-Chain Primitives (Orbit EVM)
+import { createViemClient } from '@tuwaio/evm-sdk/orbit';
+
+// 2. Wallet Connection State (Satellite EVM)
+import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
+
+// 3. Transaction Tracking Engine (Pulsar EVM)
+import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
+
+// 4. Connect UI State Sync (Nova Connect EVM)
+import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
+```
+
+---
+
+## 🚀 Full Integration & Starter Templates
+
+To scaffold a complete production dApp pre-configured with EVM wallet connectors, transaction tracking stores, and Nova UI providers, run the official starter CLI:
+
+```bash
+npx @tuwaio/create-cosmos-playground
+```
+
+For a comprehensive step-by-step walkthrough detailing manual provider setup, contract actions, SIWE authentication, and cloud indexing, explore our **[Full-Stack React Guide](/full-stack)**.

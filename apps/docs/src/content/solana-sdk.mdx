@@ -1,0 +1,58 @@
+# Solana Network Adapter (`@tuwaio/solana-sdk`)
+
+`@tuwaio/solana-sdk` is **Layer 9 (L9)** of the TUWA ecosystem architecture — a headless network adapter SDK built on **Gill** and **Wallet Standard** for Solana.
+
+It provides modern Solana RPC connections, standard wallet auto-discovery, and signature tracking adapters without relying on legacy `@solana/web3.js` classes.
+
+---
+
+## 🏛️ Included Solana Adapters & Dedicated Documentation
+
+| Layer                | Subpath                           | Purpose & Documentation                                                                                                                      |
+| :------------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Orbit Solana**     | `@tuwaio/solana-sdk/orbit`        | 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Gill RPC wrappers and Solana utilities.                                             |
+| **Satellite Solana** | `@tuwaio/solana-sdk/satellite`    | 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — `satelliteSolanaAdapter({ rpcUrls })` for Wallet Standard Solana wallets. |
+| **Pulsar Solana**    | `@tuwaio/solana-sdk/pulsar`       | ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — `pulsarSolanaAdapter({ rpcUrls })` for Solana transaction confirmation.          |
+| **Nova UI Solana**   | `@tuwaio/solana-sdk/nova-connect` | 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — `<SolanaConnectorsWatcher />` for extension wallet auto-discovery.                    |
+
+---
+
+## 💾 Installation
+
+Install `@tuwaio/solana-sdk` alongside the core SDK and required Solana singletons:
+
+```bash
+pnpm add @tuwaio/sdk @tuwaio/solana-sdk gill @wallet-standard/react @wallet-standard/app @wallet-standard/ui-core @wallet-standard/ui-registry
+```
+
+---
+
+## 📦 Subpath Entrypoints
+
+`@tuwaio/solana-sdk` provides clean subpaths ordered by ecosystem layer:
+
+```tsx
+// 1. Multi-Chain Primitives (Orbit Solana)
+import { createSolanaRPC } from '@tuwaio/solana-sdk/orbit';
+
+// 2. Wallet Connection State (Satellite Solana)
+import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
+
+// 3. Transaction Tracking Engine (Pulsar Solana)
+import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
+
+// 4. Connect UI Auto-Discovery (Nova Connect Solana)
+import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
+```
+
+---
+
+## 🚀 Full Integration & Starter Templates
+
+To scaffold a complete production dApp pre-configured with Solana wallet connectors, transaction tracking stores, and Nova UI providers, run the official starter CLI:
+
+```bash
+npx @tuwaio/create-cosmos-playground
+```
+
+For a comprehensive step-by-step walkthrough detailing manual provider setup, contract actions, and cloud indexing, explore our **[Full-Stack React Guide](/full-stack)**.

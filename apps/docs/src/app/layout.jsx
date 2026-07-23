@@ -4,7 +4,18 @@ import { Head } from 'nextra/components';
 import { getPageMap } from 'nextra/page-map';
 import { Layout } from 'nextra-theme-docs';
 import NextTopLoader from 'nextjs-toploader';
+import { Geist, Geist_Mono } from 'next/font/google';
 import { Footer, Navbar, RemoteLogo, baseNavLinks } from '@tuwaio/docs-ui';
+
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
 
 const LOGO_URL = 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/preview/logo_v2.svg';
 const logo = (
@@ -18,6 +29,12 @@ export const metadata = {
     template: '%s – TUWA SDK',
   },
   description: 'The official documentation for SDK of the TUWA Ecosystem.',
+  manifest: '/manifest.json',
+  icons: {
+    icon: 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/favicon/icon0.svg',
+    shortcut: 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/favicon/web-app-manifest-512x512.png',
+    apple: 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/favicon/web-app-manifest-512x512.png',
+  },
 
   keywords: [
     'headless',
@@ -77,7 +94,7 @@ export default async function RootLayout({ children }) {
       <Head>
         <meta name="apple-mobile-web-app-title" content="TUWA SDK Docs" />
       </Head>
-      <body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <Layout
           navbar={<Navbar key="navbar" links={navLinks} logo={logo} />}
           footer={<Footer key="footer" logo={logo} />}

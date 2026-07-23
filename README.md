@@ -22,11 +22,11 @@ This monorepo contains the core TUWA SDKs — a production-grade toolkit for int
 
 ## 🏛️ Ecosystem Layer Architecture
 
-| Layer | Package | Description |
-| :--- | :--- | :--- |
-| **L5** | **[`@tuwaio/quasar-sdk`](./packages/quasar-sdk/README.md)** | **Quasar Cloud Client (Server/Edge)** — Server-side Node.js & Edge SDK for transaction indexing, cloud sync, and signature verification. |
-| **L8** | **[`@tuwaio/sdk`](./packages/sdk/README.md)** | **Core Umbrella SDK (UI & Logic)** — Bundles framework-agnostic logic (Orbit, Pulsar, Satellite) and Nova UI components into subpath-only entrypoints. |
-| **L9** | **[`@tuwaio/evm-sdk`](./packages/evm-sdk/README.md)** | **EVM Network Adapter SDK** — EVM-specific transports (Wagmi/Viem), connectors, and background state watchers (`EVMConnectorsWatcher`). |
+| Layer  | Package                                                     | Description                                                                                                                                                |
+| :----- | :---------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **L5** | **[`@tuwaio/quasar-sdk`](./packages/quasar-sdk/README.md)** | **Quasar Cloud Client (Server/Edge)** — Server-side Node.js & Edge SDK for transaction indexing, cloud sync, and signature verification.                   |
+| **L8** | **[`@tuwaio/sdk`](./packages/sdk/README.md)**               | **Core Umbrella SDK (UI & Logic)** — Bundles framework-agnostic logic (Orbit, Pulsar, Satellite) and Nova UI components into subpath-only entrypoints.     |
+| **L9** | **[`@tuwaio/evm-sdk`](./packages/evm-sdk/README.md)**       | **EVM Network Adapter SDK** — EVM-specific transports (Wagmi/Viem), connectors, and background state watchers (`EVMConnectorsWatcher`).                    |
 | **L9** | **[`@tuwaio/solana-sdk`](./packages/solana-sdk/README.md)** | **Solana Network Adapter SDK** — Solana-specific transports (Gill/Wallet-Standard), connectors, and background state watchers (`SolanaConnectorsWatcher`). |
 
 ---

@@ -1,6 +1,5 @@
 export default {
-  integration: 'Node.js SDK Integration',
-  'full-stack': 'Full TUWA Stack (React)',
+  overview: 'Layer Architecture & Overview',
   apps: 'Apps & API Keys',
   isolation: 'Tenant Isolation (Iron Dome)',
   'best-practices': 'Production & Best Practices',

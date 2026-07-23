@@ -1,0 +1,96 @@
+# Core SDK (`@tuwaio/sdk`)
+
+`@tuwaio/sdk` is **Layer 8 (L8)** of the TUWA ecosystem — the unified client UI and Logic foundation. It packages Orbit (primitives), Pulsar (transaction tracking), Satellite (wallet connections), and Nova (React UI components) into clean, tree-shakeable subpaths.
+
+Instead of installing and managing separate decoupled packages, `@tuwaio/sdk` gives you a single, version-aligned entrypoint for building Web3 interfaces.
+
+---
+
+## 🏛️ Ecosystem Layers & Dedicated Documentation
+
+The core SDK bundles the complete suite of TUWA client packages. For full API references, state machine specifications, and component catalogs of each underlying layer, explore their dedicated documentation portals:
+
+| Layer                  | Subpath                    | Full Documentation & Catalog                                                                                      |
+| :--------------------- | :------------------------- | :---------------------------------------------------------------------------------------------------------------- |
+| **Orbit Utils**        | `@tuwaio/sdk/orbit`        | 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Framework-agnostic multi-chain communication primitives. |
+| **Satellite Connect**  | `@tuwaio/sdk/satellite`    | 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine & SIWE auth.     |
+| **Pulsar Engine**      | `@tuwaio/sdk/pulsar`       | ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — Transaction lifecycle state tracking engine.          |
+| **Nova UI Components** | `@tuwaio/sdk/nova-connect` | 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — Interactive component catalog and visual design system.    |
+
+---
+
+## 💾 Installation
+
+Install `@tuwaio/sdk` alongside React peer dependencies:
+
+```bash
+pnpm add @tuwaio/sdk react react-dom
+```
+
+> **Note**: For network-specific transports and wallet watchers, also install either [`@tuwaio/evm-sdk`](/evm-sdk) for Ethereum/EVM or [`@tuwaio/solana-sdk`](/solana-sdk) for Solana.
+
+---
+
+## 🎨 Global Styles Configuration
+
+To style Nova UI components (`ConnectButton`, transaction toasts, modal dialogs), import the bundled CSS stylesheet into your global CSS file (e.g. `src/styles/globals.css`) or root layout:
+
+### Option A: Complete Bundle Import (Recommended)
+
+```css
+/* src/styles/globals.css */
+@import '@tuwaio/sdk/styles/all.css';
+```
+
+Or directly in your root React layout (`src/app/layout.tsx`):
+
+```tsx
+// src/app/layout.tsx
+import '@tuwaio/sdk/styles/all.css';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+### Option B: Granular Individual Styles
+
+If you prefer to include only specific module styles:
+
+```css
+/* Import individual stylesheets as needed */
+@import '@tuwaio/sdk/styles/nova-core.css';
+@import '@tuwaio/sdk/styles/nova-connect.css';
+@import '@tuwaio/sdk/styles/nova-transactions.css';
+```
+
+---
+
+## 📦 Subpath Entrypoints
+
+`@tuwaio/sdk` provides clean subpath exports for all underlying ecosystem features. Below are representative examples of key exports across the available subpaths:
+
+```tsx
+// 1. Multi-Chain Primitives (Orbit)
+import { OrbitAdapter, getAdapterFromConnectorType } from '@tuwaio/sdk/orbit';
+
+// 2. Wallet Connection State (Satellite)
+import { SatelliteConnectProvider, useAccount, useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
+
+// 3. Transaction Tracking Engine (Pulsar)
+import { createPulsarStore, createTxInMemoryStore, useInitializeTransactionsPool } from '@tuwaio/sdk/pulsar';
+
+// 4. Connect UI Components (Nova Connect)
+import { ConnectButton, NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { ConnectButton as StandaloneConnectButton } from '@tuwaio/sdk/nova-connect/components';
+
+// 5. Transaction UI Components (Nova Transactions)
+import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
+import { NovaTransactionsProvider } from '@tuwaio/sdk/nova-transactions/providers';
+```
+
+_Note: `@tuwaio/sdk` exports the full API surface of Satellite, Pulsar, Orbit, and Nova. Refer to the respective documentation links above for complete API signatures._

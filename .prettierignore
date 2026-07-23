@@ -1,3 +1,7 @@
 /node_modules
 /build
 /dist
+/.next
+**/_pagefind
+apps/docs/src/content/apiReference
+apps/docs/public/openapi.yaml

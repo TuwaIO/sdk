@@ -1,94 +1,30 @@
 # Introduction
 
-Welcome to the **TUWA SDK** documentation — the official documentation for the TUWA Ecosystem's umbrella SDKs and the server-side Quasar Cloud client.
+Welcome to the **TUWA SDK Documentation** — the main entry point for building multi-chain Web3 applications with EVM, Solana, and server-side cloud transaction indexing.
 
-## What is the TUWA SDK?
-
-This repository provides developers with a seamless integration experience by bundling all TUWA packages (Orbit, Pulsar, Satellite, Nova UI) into easy-to-use, unified points of entry. It is divided into several packages:
-
-1. **`@tuwaio/sdk`** *(Layer 8 — L8)*: The Core Umbrella SDK. Bundles framework-agnostic logic and UI components into clean subpaths.
-2. **`@tuwaio/evm-sdk`** *(Layer 9 — L9)*: The EVM Network Adapter SDK. Bundles Ethereum/EVM specific implementations and watchers.
-3. **`@tuwaio/solana-sdk`** *(Layer 9 — L9)*: The Solana Network Adapter SDK. Bundles Solana specific implementations and watchers.
-4. **`@tuwaio/quasar-sdk`** *(Layer 5 — L5)*: The Node.js & Edge SDK for interacting with the TUWA Quasar Cloud API.
-
-## Dependency Architecture
-
-To prevent dangerous singleton conflicts (like "Multiple instances of React" or Wagmi context errors), the TUWA SDK adopts a strict dependency strategy:
-
-- **Internal Logic** (`orbit`, `pulsar`, `satellite`, `nova`) is hidden inside direct `dependencies`. You never need to install them manually.
-- **Web3 Singletons** (`react`, `viem`, `@wagmi/core`, `gill`, `@wallet-standard/*`) are explicitly kept as `peerDependencies`. Your dApp is responsible for installing them alongside the SDK.
-
-## Installation & Quick Start
-
-### 1. Base SDK
-
-Install the core SDK and the required React peer dependencies:
-
-```bash
-pnpm add @tuwaio/sdk react react-dom
-```
-
-```tsx
-import { ConnectButton } from '@tuwaio/sdk/nova-connect';
-import { TransactionList } from '@tuwaio/sdk/nova-transactions';
-import { useAccount } from '@tuwaio/sdk/satellite';
-
-export function App() {
-  const { address } = useAccount();
-
-  return (
-    <div>
-      <ConnectButton />
-      {address && <TransactionList />}
-    </div>
-  );
-}
-```
-
-### 2. Network Adapters
-
-Depending on your target blockchain, install the network-specific SDK and its Web3 singletons:
-
-**For EVM:**
-
-```bash
-pnpm add @tuwaio/evm-sdk viem @wagmi/core
-```
-
-```tsx
-import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
-import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
-
-// Mount the EVM providers and watchers
-<EVMConnectorsWatcher wagmiConfig={wagmiConfig} />;
-```
-
-**For Solana:**
-
-```bash
-pnpm add @tuwaio/solana-sdk gill @wallet-standard/react @wallet-standard/app @wallet-standard/ui-core @wallet-standard/ui-registry
-```
-
-### 3. Quasar Cloud Client (Server-side)
-
-```bash
-pnpm add @tuwaio/quasar-sdk
-```
-
-```typescript
-import { Quasar, utils } from '@tuwaio/quasar-sdk';
-
-// Initialize the client
-const quasar = new Quasar({ secretKey: 'sk_live_...' });
-const { txKey } = await quasar.pulsar.syncCreate(transaction);
-```
-
-## Next Steps
-
-- Browse the **[API Reference](/apiReference/README)** for full type documentation
-- View the **[Scalar API Viewer](/scalar)** for endpoint exploration
-- Check the **[GitHub Repository](https://github.com/TuwaIO/sdk)** for source code
+The TUWA SDK suite consists of 4 specialized packages that work together seamlessly across client and server environments.
 
 ---
 
-**Built with ❤️ by the [TUWA Team](https://github.com/TuwaIO)**
+## 🏛️ Ecosystem SDK Packages
+
+All TUWA SDK packages enforce modular subpath entrypoints (e.g. `@tuwaio/sdk/satellite`, `@tuwaio/evm-sdk/nova-connect`, `@tuwaio/quasar-sdk/react`). This ensures your application only loads the exact code and dependencies it requires, preventing bundle bloat and Web3 context conflicts.
+
+| Layer  | Package                                            | Description                                                                                                                                                   |
+| :----- | :------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **L5** | **[`@tuwaio/quasar-sdk`](/quasar-cloud/overview)** | **Quasar Cloud Client** — Server-side Node.js & Edge SDK for transaction indexing, cloud sync, history pagination, and mini-session auth.                     |
+| **L8** | **[`@tuwaio/sdk`](/core-sdk)**                     | **Core Client SDK** — Unified entrypoint bundling multi-chain logic (Orbit, Pulsar, Satellite) and React UI components (Nova) into clean subpaths.            |
+| **L9** | **[`@tuwaio/evm-sdk`](/evm-sdk)**                  | **EVM Network Adapter** — EVM-specific transports (`viem`, `@wagmi/core`), connectors, and background state watcher (`EVMConnectorsWatcher`).                 |
+| **L9** | **[`@tuwaio/solana-sdk`](/solana-sdk)**            | **Solana Network Adapter** — Solana-specific transports (`gill`, `@wallet-standard/*`), connectors, and background state watcher (`SolanaConnectorsWatcher`). |
+
+---
+
+## 🔗 Documentation Links
+
+Access dedicated documentation portals across the TUWA ecosystem:
+
+- 🌐 **[TUWA Documentation Hub](https://docs.tuwa.io/)** — Central directory linking to all ecosystem documentation sites.
+- 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Low-level, framework-agnostic multi-chain communication primitives.
+- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine & SIWE auth layer.
+- ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — Headless transaction lifecycle & tracking engine.
+- 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — Interactive component catalog and visual design system.
