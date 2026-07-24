@@ -32,7 +32,8 @@
     "access": "public"
   },
   "files": [
-    "dist"
+    "dist",
+    "socket.json"
   ],
   "scripts": {
     "start": "tsup --watch",
@@ -96,9 +97,9 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-evm": "^0.2.18",
-    "@tuwaio/pulsar-evm": "^0.5.6",
-    "@tuwaio/satellite-evm": "^0.3.8"
+    "@tuwaio/orbit-evm": "^0.2.20",
+    "@tuwaio/pulsar-evm": "^0.5.7",
+    "@tuwaio/satellite-evm": "^0.3.9"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
@@ -107,11 +108,11 @@
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.4.6",
+    "@tuwaio/nova-connect": "^0.4.7",
     "@tuwaio/sdk": "workspace:^",
-    "@wagmi/core": "^3.6.3",
+    "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "viem": "^2.55.4"
+    "viem": "^2.55.8"
   }
 }

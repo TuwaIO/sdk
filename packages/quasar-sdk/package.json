@@ -35,7 +35,8 @@
     "access": "public"
   },
   "files": [
-    "dist"
+    "dist",
+    "socket.json"
   ],
   "scripts": {
     "start": "tsup src/index.ts --watch",
@@ -140,12 +141,12 @@
   },
   "devDependencies": {
     "@solana/react": "^6.9.0",
-    "@tuwaio/pulsar-core": "^0.6.7",
+    "@tuwaio/pulsar-core": "^0.6.8",
     "@types/react": "^19.2.17",
-    "@wagmi/core": "^3.6.3",
+    "@wagmi/core": "^3.6.4",
     "@wallet-standard/react": "^1.0.3",
     "ofetch": "^1.5.1",
-    "react": "^19.2.7",
+    "react": "^19.2.8",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "zustand": "^5.0.14"
