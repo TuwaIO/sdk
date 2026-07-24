@@ -8,51 +8,57 @@ The **TUWA Ecosystem** is built around a multi-tiered architecture that decouple
 
 ```
 +-----------------------------------------------------------------------------------+
+| L1–L2: Orbit Primitives                                                           |
+|     L1: @tuwaio/orbit-core | L2: @tuwaio/orbit-evm, @tuwaio/orbit-solana          |
++-----------------------------------------------------------------------------------+
+| L3–L4: Headless Core Engines & Adapters                                           |
+|     Satellite (L3-L4), Pulsar (L3-L4)                                             |
++-----------------------------------------------------------------------------------+
+| L5: Quasar Cloud Engine Client (@tuwaio/quasar-sdk)                               |
+|     Server-Side Node.js / Edge Client + QuasarAuthBridge                          |
++-----------------------------------------------------------------------------------+
+| L6–L7: Nova UI Kit (React View Layer)                                             |
+|     L6: @tuwaio/nova-core | L7: @tuwaio/nova-connect, @tuwaio/nova-transactions  |
++-----------------------------------------------------------------------------------+
 | L8: Core SDK (@tuwaio/sdk)                                                        |
 |     Modular Subpaths: /orbit, /satellite, /pulsar, /nova-connect, /nova-transactions|
 +------------------------------------+----------------------------------------------+
 | L9: EVM Adapter SDK (@tuwaio/evm-sdk)| L9: Solana Adapter SDK (@tuwaio/solana-sdk)|
 |     Wagmi/Viem + EVMConnectorsWatcher|     Gill/Wallet Standard + SolanaWatcher  |
 +------------------------------------+----------------------------------------------+
-| L5: Cloud Engine Client (@tuwaio/quasar-sdk)                                      |
-|     Server-Side Node.js/Edge + QuasarAuthBridge                                  |
-+-----------------------------------------------------------------------------------+
-| L1-L4 & L6-L7 Headless & UI Primitives                                            |
-|     Orbit (L1-L3), Satellite (L4), Pulsar (L4), Nova UI (L6-L7)                    |
-+-----------------------------------------------------------------------------------+
 ```
 
 ### Layer Breakdown
 
-1. **L1 – L3 (Orbit Utils)** — Low-level, framework-agnostic multi-chain communication primitives and adapters (`OrbitAdapter.EVM`, `OrbitAdapter.SOLANA`).
-2. **L4 (Satellite & Pulsar Engine)** — Headless state machines for wallet connectivity (Satellite) and transaction tracking lifecycles (Pulsar).
-3. **L5 (Quasar Cloud Engine)** — Server-side Node.js & Edge client (`@tuwaio/quasar-sdk`) for cloud transaction indexing, history pagination, and authentication verification.
-4. **L6 – L7 (Nova UI Kit)** — View layer React components (`ConnectButton`, `TxActionButton`), modals, toasts, and visual design tokens.
-5. **L8 (Core SDK)** — The umbrella client entrypoint (`@tuwaio/sdk`) packaging all client layers into version-aligned subpaths.
-6. **L9 (Network Adapters)** — Specialized network packages (`@tuwaio/evm-sdk` and `@tuwaio/solana-sdk`) providing network singletons, transports, and background state watchers.
+1. **L1 – L2: Orbit Utils (Foundation Primitives)**
+   - **L1 Core (`@tuwaio/orbit-core`)**: Low-level, framework-agnostic multi-chain communication primitives, formatting helpers, and core adapter types (`OrbitAdapter.EVM`, `OrbitAdapter.SOLANA`).
+   - **L2 Platforms (`@tuwaio/orbit-evm`, `@tuwaio/orbit-solana`)**: Chain-specific client creators and wrappers (Viem, Wagmi, Gill).
+
+2. **L3 – L4: Headless Core Engines (Connection & Lifecycle)**
+   - **L3 Engines (`@tuwaio/satellite-core`, `@tuwaio/pulsar-core`)**: Framework-agnostic state machines for wallet connectivity (Satellite) and transaction tracking lifecycles (Pulsar).
+   - **L4 Adapters & Bindings (`@tuwaio/satellite-evm`, `@tuwaio/satellite-solana`, `@tuwaio/satellite-react`, `@tuwaio/pulsar-evm`, `@tuwaio/pulsar-solana`, `@tuwaio/pulsar-react`, `@tuwaio/satellite-siwe-next-auth`)**: Chain adapters, React hooks, and SIWE session auth modules.
+
+3. **L5: Quasar Cloud Engine (`@tuwaio/quasar-sdk`)**
+   - The official server-side Node.js & Edge client for transaction indexing, cloud sync, history pagination, and authentication verification.
+
+4. **L6 – L7: Nova UI Kit (React Visual Layer)**
+   - **L6 UI Core (`@tuwaio/nova-core`)**: Foundational styling primitives, theme CSS variables, and design tokens.
+   - **L7 UI Components (`@tuwaio/nova-connect`, `@tuwaio/nova-transactions`)**: High-level React components (`ConnectButton`, `TxActionButton`), modals, and transaction status toasts.
+
+5. **L8: Core SDK (`@tuwaio/sdk`)**
+   - The unified client entrypoint bundling Orbit, Satellite, Pulsar, and Nova UI components into version-aligned, tree-shakeable subpaths.
+
+6. **L9: Dedicated Network Adapters (`@tuwaio/evm-sdk`, `@tuwaio/solana-sdk`)**
+   - Specialized network packages bundling chain connectors, transports, and background state watchers (`EVMConnectorsWatcher`, `SolanaConnectorsWatcher`).
 
 ---
 
-## ⚡ Zero UI Bloat & Subpath Guarantee
+## 🔗 Documentation Links
 
-To prevent bundle bloat and Web3 context conflicts, all TUWA client SDK packages enforce a **100% Subpath-Only Policy**.
+Access dedicated documentation portals across the TUWA ecosystem:
 
-Direct imports from package root (`from '@tuwaio/sdk'`) are disabled. Developers import only the specific subpaths required:
-
-```tsx
-import { ConnectButton } from '@tuwaio/sdk/nova-connect';
-import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
-import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
-
-import '@tuwaio/sdk/styles/all.css';
-```
-
----
-
-## 🔗 TUWA Ecosystem Documentation Portals
-
-- 🌐 **[Ecosystem Central Hub](https://docs.tuwa.io/)** — Main ecosystem architecture & product portal.
-- 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Multi-chain utility primitives.
-- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Wallet connection state machine.
-- ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — Transaction lifecycle state machine.
-- 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — Interactive component catalog and design system.
+- 🌐 **[TUWA Documentation Hub](https://docs.tuwa.io/)** — Central directory linking to all ecosystem documentation sites.
+- 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Low-level, framework-agnostic multi-chain communication primitives.
+- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine & SIWE auth layer.
+- ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — Headless transaction lifecycle & tracking engine.
+- 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — Interactive component catalog and visual design system.
