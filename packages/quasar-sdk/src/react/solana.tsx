@@ -4,7 +4,6 @@
  */
 
 import { useWalletAccountMessageSigner } from '@solana/react';
-import { UiWalletAccount } from '@wallet-standard/react';
 import { useCallback, useEffect, useRef } from 'react';
 import { StoreApi } from 'zustand';
 
@@ -17,7 +16,7 @@ export { getMiniSessionAuth } from './shared';
 
 /**
  * Props for the QuasarSolanaAuthBridge component.
- * 
+ *
  * @public
  */
 export interface QuasarSolanaAuthBridgeProps {
@@ -56,7 +55,7 @@ export interface QuasarSolanaAuthBridgeProps {
  *   setSession={auth.setMiniSession}
  * />
  * ```
- * 
+ *
  * @public
  */
 export function QuasarSolanaAuthBridge({
@@ -80,7 +79,7 @@ export function QuasarSolanaAuthBridge({
 
   return (
     <QuasarSolanaAuthBridgeInternal
-      connectedAccount={activeConnection.connectedAccount as UiWalletAccount}
+      connectedAccount={activeConnection.connectedAccount as MinimalUiWalletAccount}
       store={store}
       session={session}
       setSession={setSession}
@@ -95,8 +94,21 @@ interface SatelliteConnectionState {
 }
 
 /**
+ * Minimal interface for a wallet account, compatible with @solana/react.
+ * @internal
+ */
+interface MinimalUiWalletAccount {
+  readonly address: string;
+  readonly publicKey: Uint8Array;
+  readonly chains: readonly string[];
+  readonly features: readonly string[];
+  readonly icon?: string;
+  readonly label?: string;
+}
+
+/**
  * Internal component to register Solana signing callback helper.
- * 
+ *
  * @internal
  */
 function QuasarSolanaAuthBridgeInternal({
@@ -106,21 +118,29 @@ function QuasarSolanaAuthBridgeInternal({
   setSession,
   maxAge,
 }: {
-  connectedAccount: UiWalletAccount;
+  connectedAccount: MinimalUiWalletAccount;
   store: StoreApi<unknown>;
   session: MiniSessionAuth | null;
   setSession: (s: MiniSessionAuth | null) => void;
   maxAge?: number;
 }) {
-  const solanaSigner = useWalletAccountMessageSigner(connectedAccount);
+  const solanaSigner = useWalletAccountMessageSigner(
+    connectedAccount as unknown as Parameters<typeof useWalletAccountMessageSigner>[0],
+  ) as unknown as SolanaSigner;
 
   const signerRef = useRef(solanaSigner);
   const sessionRef = useRef(session);
   const setSessionRef = useRef(setSession);
 
-  useEffect(() => { signerRef.current = solanaSigner; }, [solanaSigner]);
-  useEffect(() => { sessionRef.current = session; }, [session]);
-  useEffect(() => { setSessionRef.current = setSession; }, [setSession]);
+  useEffect(() => {
+    signerRef.current = solanaSigner;
+  }, [solanaSigner]);
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
+  useEffect(() => {
+    setSessionRef.current = setSession;
+  }, [setSession]);
 
   const getAuth = useCallback(async (): Promise<MiniSessionAuth> => {
     const state = store.getState() as { activeConnection: SatelliteConnectionState };
@@ -138,7 +158,7 @@ function QuasarSolanaAuthBridgeInternal({
         isConnected: currentConn.isConnected,
         address: currentConn.address,
         chainType: ChainType.SOLANA,
-        signer: signer as unknown as SolanaSigner,
+        signer: signer,
       },
       {
         miniSession: sessionRef.current,

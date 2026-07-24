@@ -8,7 +8,7 @@ import { MiniSessionAuth } from '../types';
 /**
  * Structural interface for the active wallet connection state.
  * Used to decoupling the SDK from specific library hooks.
- * 
+ *
  * @public
  */
 export interface QuasarActiveConnection {
@@ -25,14 +25,14 @@ export interface QuasarActiveConnection {
 /**
  * A static reference to the current auth helper.
  * This allows non-React code (like Pulsar sync) to trigger authentication.
- * 
+ *
  * @internal
  */
 export let authHelperReference: (() => Promise<MiniSessionAuth>) | null = null;
 
 /**
  * Sets the static reference to the authentication helper.
- * 
+ *
  * @param ref - The authentication helper callback function, or null.
  * @internal
  */

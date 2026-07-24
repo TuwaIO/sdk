@@ -1,0 +1,117 @@
+{
+  "name": "@tuwaio/evm-sdk",
+  "version": "0.0.1",
+  "private": false,
+  "author": "Oleksandr Tkach",
+  "license": "Apache-2.0",
+  "description": "Layer 9 (L9) of the TUWA Ecosystem. The EVM Network Adapter SDK providing Wagmi/Viem transports and state watchers.",
+  "type": "module",
+  "exports": {
+    "./orbit": {
+      "types": "./dist/orbit.d.ts",
+      "import": "./dist/orbit.js",
+      "require": "./dist/orbit.cjs"
+    },
+    "./pulsar": {
+      "types": "./dist/pulsar.d.ts",
+      "import": "./dist/pulsar.js",
+      "require": "./dist/pulsar.cjs"
+    },
+    "./satellite": {
+      "types": "./dist/satellite.d.ts",
+      "import": "./dist/satellite.js",
+      "require": "./dist/satellite.cjs"
+    },
+    "./nova-connect": {
+      "types": "./dist/nova-connect.d.ts",
+      "import": "./dist/nova-connect.js",
+      "require": "./dist/nova-connect.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "tsup --watch",
+    "build": "tsup"
+  },
+  "keywords": [
+    "tuwa",
+    "web3",
+    "evm",
+    "ethereum",
+    "solana",
+    "wagmi",
+    "viem",
+    "gill",
+    "wallet-standard",
+    "wallet",
+    "wallet-connect",
+    "wallets",
+    "transaction",
+    "tracking",
+    "transaction-tracking",
+    "react",
+    "ui",
+    "ui-kit",
+    "design-system",
+    "hooks",
+    "utils",
+    "components",
+    "tailwind",
+    "tailwindcss",
+    "typescript",
+    "core",
+    "headless",
+    "zustand",
+    "immer",
+    "i18n",
+    "modal",
+    "toast",
+    "quasar",
+    "cloud",
+    "sdk",
+    "siwe",
+    "next-auth",
+    "cosmos",
+    "playground",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TuwaIO/sdk.git",
+    "directory": "packages/evm-sdk"
+  },
+  "homepage": "https://github.com/TuwaIO/sdk",
+  "bugs": {
+    "url": "https://github.com/TuwaIO/sdk/issues"
+  },
+  "contributors": [
+    {
+      "name": "Oleksandr Tkach",
+      "url": "https://github.com/Argeare5"
+    }
+  ],
+  "dependencies": {
+    "@tuwaio/orbit-evm": "^0.2.18",
+    "@tuwaio/pulsar-evm": "^0.5.6",
+    "@tuwaio/satellite-evm": "^0.3.8"
+  },
+  "peerDependencies": {
+    "@tuwaio/sdk": "workspace:^",
+    "@tuwaio/nova-connect": ">=0.4.6",
+    "@wagmi/core": "3.x.x",
+    "viem": "2.x.x"
+  },
+  "devDependencies": {
+    "@tuwaio/nova-connect": "^0.4.6",
+    "@tuwaio/sdk": "workspace:^",
+    "@wagmi/core": "^3.6.3",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "viem": "^2.55.4"
+  }
+}

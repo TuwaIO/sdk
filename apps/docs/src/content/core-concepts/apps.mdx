@@ -1,65 +1,74 @@
 # Apps & API Keys
 
-In Quasar, every integration begins by creating an **App**. An App acts as an isolated logical container for your data (e.g., indexed transactions, webhooks, analytics), separated by your specific API keys.
-
-## Creating an App
-
-You manage Apps through the Quasar Management Dashboard:
-
-1. Log in to the [Quasar Dashboard](https://quasar.tuwa.io).
-2. Ensure you are in your target **Organization**.
-3. Navigate to **Apps** and click **Create App**.
-4. Give your App a descriptive name (e.g., `Pulsar Indexer - Production`).
-
-Once created, you will be given a set of API keys consisting of a **Secret Key** and a **Public Key**.
+In Quasar, every integration begins by creating an **App**. An App acts as an isolated logical container for your application data (indexed transactions, webhooks, analytics), separated by your specific API keys.
 
 ---
 
-## Secret Key vs. Public Key
+## 🛠️ Creating an App
 
-Quasar provisions two types of keys for different trust environments:
+You manage Apps through the Quasar Management Dashboard:
 
-| Key Type | Prefix | Header | Target Environment | Purpose / Access |
-| :--- | :--- | :--- | :--- | :--- |
-| **Secret Key** | `sk_live_...` | `x-tuwa-secret-key` | Backend / Server-side | Root access, transaction syncing, webhook administration. |
+1. Log in to the <QuasarDashboardLink>Quasar Dashboard</QuasarDashboardLink>.
+2. Ensure you are in your target **Organization**.
+3. Navigate to **Apps** and click **Create App**.
+4. Give your App a descriptive name (e.g. `Pulsar Indexer - Production`).
+
+Once created, Quasar provisions a pair of credentials: a **Secret Key** (`sk_live_...`) and a **Public Key** (`pk_live_...`).
+
+---
+
+## 🔑 Secret Key vs. Public Key
+
+Quasar provisions two distinct key types designed for different trust environments:
+
+| Key Type       | Prefix        | HTTP Header         | Environment            | Scope & Permissions                                              |
+| :------------- | :------------ | :------------------ | :--------------------- | :--------------------------------------------------------------- |
+| **Secret Key** | `sk_live_...` | `x-tuwa-secret-key` | Backend / Server-side  | Full root access, transaction syncing, webhook administration.   |
 | **Public Key** | `pk_live_...` | `x-tuwa-public-key` | Frontend / Client-side | Read-only access, public transaction tracking, client-side SDKs. |
 
 ---
 
-## What is a Secret Key?
+## 🔐 Secret Keys (`sk_live_...`)
 
-The Secret Key is a highly sensitive credential:
+The Secret Key is a high-privilege credential:
 
-`sk_live_abc123def456...`
+```
+sk_live_YOUR_SECRET_KEY_HERE
+```
 
 > [!CAUTION]
-> **Never expose this key.**
-> Secret Keys act as bearer tokens granting complete root access to the App's isolated partition in Quasar. If leaked, an attacker could write fraudulent transactions, query sensitive history, or exhaust your quotas. Keep this key strictly in backend environment variables (`.env`).
+> **Never expose your Secret Key in client-side code.**
+> Secret Keys act as bearer tokens granting root access to your App's isolated partition in Quasar. If leaked, unauthorized actors could sync fraudulent transactions or exhaust your organization quota. Keep Secret Keys strictly inside backend environment variables (`.env`).
 
-### Key Resolution & Hashing
-For security, Quasar does not store your raw Secret Key in plaintext. When you generate a key, the backend performs a SHA-256 hash before storing it. When you make an API request using the SDK, the `IronDomeGuard` intercepts the request, hashes the provided `sk_live_...` key in real-time, and compares it to the database hash. 
+### Hashing at Rest & `IronDomeGuard` Resolution
 
-### Revealing & Rolling Secret Keys
-* **Dashboard Retrieval**: You can reveal your active Secret Key at any time through the App Settings panel. This operation requires **Step-Up Authentication** (your account password and 2FA code if enabled) to prevent Session Hijacking / BOLA vulnerabilities.
-* **Rolling Keys**: If you suspect a key has been compromised, you can roll a new key. This instantly generates a new `sk_live_...` token and invalidates the previous one. 
+For security, Quasar does not store raw Secret Keys in plaintext inside PostgreSQL:
 
-> [!WARNING]
-> **Immediate Invalidation**: The previous Secret Key is deleted from the primary database immediately. Due to multi-region Redis cache eviction, the old key may continue to authorize requests at the API edge for up to **60 seconds**. Always deploy your new Secret Key to your production backend before performing the roll, or expect a brief downtime window during key propagation.
+1. **Hashing on Creation**: When a key is generated, Quasar computes a cryptographic SHA-256 hash before persisting it to the database.
+2. **Real-Time Verification**: When an API request arrives at the performance tier (`api.tuwa.io`), the `IronDomeGuard` intercepts the `x-tuwa-secret-key` header, hashes the incoming `sk_live_...` token in real-time using SHA-256, and matches it against the database hash.
+3. **Redis Metadata Caching**: Once resolved, the app metadata (IP whitelists, domain constraints, organization limits) is cached in Redis under `{secretKeyHash}:meta` for high-throughput evaluation.
+
+### BOLA Protection & Key Rolling
+
+- **Step-Up Authentication**: Revealing an active Secret Key in the Dashboard requires **Step-Up Authentication** (account password re-verification, plus a 2FA code if 2FA is enabled on the user's account) to prevent Session Hijacking and Broken Object Level Authorization (BOLA) exploits.
+- **Rolling Secret Keys**: If a key is compromised, you can roll a new key through the App Settings panel. Rolling immediately generates a new `sk_live_...` token and invalidates the previous key in PostgreSQL.
+
+> **Edge Propagation**: Database invalidation is instantaneous, while Redis edge caches evict old key metadata within up to **60 seconds**. After rolling a key in the Dashboard, copy the new Secret Key, update your backend environment variables (`.env`), and redeploy your backend services.
 
 ---
 
-## What is a Public Key?
+## 🌐 Public Keys (`pk_live_...`)
 
 The Public Key is a non-sensitive identifier:
 
-`pk_live_xyz789ghi012...`
+```
+pk_live_YOUR_PUBLIC_KEY_HERE
+```
 
-Public keys are designed to be safe for inclusion in client-side code (browsers, mobile applications, or decentralized frontend clients).
+Public Keys are safe for inclusion in client-side bundles (Next.js client components, mobile apps, or decentralized frontends).
 
-### How it Works
-The Public Key is stored in plaintext in the database and is processed directly:
-1. The client sends the Public Key in the request header (`x-tuwa-public-key` or `x-api-key`).
-2. The `IronDomeGuard` matches the key directly against the `publicKey` column in the database (without hashing).
-3. The guard caches the app metadata in Redis under `{publicKey}:meta` (e.g. `{pk_live_...}:meta`) for high performance and enforces rate limiting (RPS) and organization quotas.
-4. Requests authenticated via Public Keys are restricted to public read-only queries, preventing unauthorized writes/sync operations on your ledger.
+### Resolution & Scope
 
+1. **Header Identification**: The client sends the Public Key in the `x-tuwa-public-key` header.
+2. **Direct Lookup**: The `IronDomeGuard` matches the key directly against the database `publicKey` column and caches metadata in Redis under `{publicKey}:meta`.
+3. **Read-Only Enclosure**: Requests authenticated via Public Keys are restricted to read-only queries (such as public transaction tracking or history lookups), preventing unauthorized transaction writes or ledger mutations.

@@ -1,141 +1,149 @@
 # Webhooks Overview
 
-Quasar acts as a headless engine, meaning you often need to know when asynchronous events complete in the background. **Webhooks** are the primary mechanism Quasar uses to push real-time event data back to your integrator backend.
+Quasar operates as a high-performance, headless transaction tracking engine. To inform your backend when asynchronous on-chain transaction lifecycles complete, Quasar uses **Webhooks** to push real-time event notifications directly to your application endpoints.
 
-## What is a Webhook?
+---
 
-Instead of constantly polling the Quasar API to check if a transaction has mined, you provide Quasar with an HTTP endpoint (e.g., `https://api.myapp.com/webhooks/quasar`). When a specific event occurs, Quasar automatically sends an HTTP `POST` request to your endpoint containing a JSON payload describing the event.
+## ⚡ How Webhooks Work
 
-## Creating a Webhook
+Instead of polling the Quasar API to track transaction progress, you register an HTTP endpoint (e.g. `https://api.myapp.com/webhooks/quasar`) in the Quasar Dashboard.
 
-You must create and configure your Webhooks through the dashboard:
+When a subscribed event occurs (such as a transaction confirming or failing), Quasar enqueues a delivery job in its background worker queue (`BullMQ` + `Redis`), signs the payload using an HMAC SHA-256 secret, and dispatches an HTTP `POST` request to your endpoint.
 
-1. Log in to the [Quasar Dashboard](https://quasar.tuwa.io).
-2. Ensure you are in your target **Organization**.
-3. Navigate to **Webhooks**.
-4. Click **Add Webhook** and provide your target URL endpoint.
-5. Select the specific **Events** (triggers) you want this webhook to listen for.
+---
 
-Once created, Quasar will immediately begin dispatching events to your URL.
+## 🛠️ Registering a Webhook Endpoint
 
-## Event Triggers
+To register a webhook endpoint in the Quasar Dashboard:
 
-Webhooks in Quasar are tightly scoped to specific events within the TUWA ecosystem. The most common triggers include:
+1. Log in to the <QuasarDashboardLink>Quasar Dashboard</QuasarDashboardLink>.
+2. Select your target **Organization** and **App**.
+3. Navigate to **Webhooks** and click **Add Endpoint**.
+4. Enter your destination URL (e.g. `https://api.myapp.com/webhooks/quasar`).
+5. Select the **Event Triggers** you want to subscribe to (`transaction:success`, `transaction:failed`, `transaction:replaced`, or `*` for all events).
+6. Save the endpoint and copy the auto-generated **Signing Secret** (`whsec_...`).
 
-- `transaction.success`: Triggered if the transaction mined successfully and is confirmed on the blockchain.
-- `transaction.failed`: Triggered if the transaction reverts or fails during execution.
-- `transaction.replaced`: Triggered if the transaction replaces another transaction.
+> **Endpoint Limit**: Each application container can manage up to **500** active webhook endpoints. Production endpoints **must** use `https://` URLs (`http://` is allowed for local development only).
 
-### Delivery Headers
+---
 
-Every webhook `POST` request is dispatched with the following standard L7 headers:
+## 📡 Event Triggers
 
-| Header Name | Description |
-| :--- | :--- |
-| `Content-Type` | Always `application/json` |
-| `User-Agent` | Always `Quasar-Webhook-Worker/1.0 (TuwaIO)` |
-| `x-quasar-signature` | The cryptographic HMAC SHA-256 signature of the raw request body.
-### Payload Structure
+Webhooks in Quasar use standard event identifier strings:
 
-When an event triggers, Quasar dispatches a structured JSON payload containing transaction properties and custom payload data:
+| Event Identifier       | Description                                                                             |
+| :--------------------- | :-------------------------------------------------------------------------------------- |
+| `*`                    | **All Events** — Subscribes to all transaction lifecycle events.                        |
+| `transaction:success`  | Triggered when a tracked transaction mines successfully and is confirmed on-chain.      |
+| `transaction:failed`   | Triggered when a transaction execution fails or reverts.                                |
+| `transaction:replaced` | Triggered when a pending transaction is replaced/cancelled in the wallet (EVM speedup). |
+
+---
+
+## 📨 Delivery Headers
+
+Every HTTP `POST` dispatch includes standard HTTP headers:
+
+| Header Name          | Description                                                                           |
+| :------------------- | :------------------------------------------------------------------------------------ |
+| `Content-Type`       | `application/json`                                                                    |
+| `User-Agent`         | `Quasar-Webhook-Worker/1.0 (TuwaIO)`                                                  |
+| `x-quasar-signature` | The HMAC SHA-256 signature of the raw JSON body calculated using your Signing Secret. |
+| `x-quasar-event`     | The event type identifier string (e.g. `transaction:success`).                        |
+
+---
+
+## 📦 Webhook Payload Structure
+
+Dispatched webhook payloads contain transaction metadata alongside custom app payload fields:
 
 ```json
 {
-  "txKey": "tx_local_18f2...",
-  "hash": "0xabc123...",
+  "txKey": "tx_local_18f29ab4c7...",
+  "hash": "0xabc1234567890def...",
   "status": "Success",
-  "action": "Success",
-  "txType": "TRANSFER",
+  "action": "transaction:success",
+  "txType": "SWAP",
   "chainId": "1",
   "timestamp": 1779374022,
   "payload": {
-    "customField": "arbitraryValue"
+    "tokenIn": "USDC",
+    "tokenOut": "ETH",
+    "amount": 100
   }
 }
 ```
 
-## Why do I need a Webhook Secret?
+---
 
-When you create a webhook in the dashboard, Quasar generates a unique **Webhook Secret** (e.g., `whsec_...`). 
+## 🔐 Webhook Signing Secret (`whsec_...`)
 
-> [!IMPORTANT]
-> The Webhook Secret is used to securely verify that incoming `POST` requests actually came from Quasar and not a malicious third party pretending to be Quasar.
+When a webhook endpoint is created, Quasar generates a cryptographically secure 256-bit signing secret prefixed with `whsec_`:
 
-Whenever Quasar dispatches a payload, it uses your Webhook Secret to generate a cryptographic hash (HMAC SHA-256) of the payload. It attaches this hash in the headers of the `POST` request (typically `x-quasar-signature`).
+```
+whsec_a1b2c3d4e5f678901234567890abcdef...
+```
 
-Your backend must intercept the incoming request, generate its own hash using the raw payload body and your stored Webhook Secret, and compare the two hashes. If they match, the payload is authentic.
+> **Security at Rest**: Signing secrets are encrypted before storage in PostgreSQL using symmetric AES-256 (`qenc:` format).
 
-### Webhook Receiver Example
+Your backend **must** verify the `x-quasar-signature` header against your stored signing secret to ensure incoming HTTP requests originate from Quasar and have not been tampered with.
 
-Here is a complete Next.js Route Handler (App Router) example showing how to verify and accept incoming webhook deliveries from Quasar:
+---
+
+## 💻 Webhook Receiver Verification Example
+
+Below is a complete, production-grade Next.js App Router API Route Handler (`src/app/api/webhooks/quasar/route.ts`) demonstrating timing-safe signature verification:
 
 ```typescript
+// src/app/api/webhooks/quasar/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
-  const signature = req.headers.get('x-quasar-signature');
-  const secret = process.env.QUASAR_WEBHOOK_SECRET;
+  const signatureHeader = req.headers.get('x-quasar-signature');
+  const eventHeader = req.headers.get('x-quasar-event');
+  const signingSecret = process.env.QUASAR_WEBHOOK_SECRET;
 
-  if (!signature || !secret) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!signatureHeader || !signingSecret) {
+    return NextResponse.json({ error: 'Unauthorized: Missing signature or secret' }, { status: 401 });
   }
 
-  // Get raw body as text to ensure signature validation works correctly
+  // 1. Extract raw body text to preserve exact character spacing for HMAC calculation
   const rawBody = await req.text();
 
-  // Generate signature using HMAC SHA-256
-  const computedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(rawBody)
-    .digest('hex');
+  // 2. Compute expected HMAC SHA-256 hex digest
+  const expectedSignature = crypto.createHmac('sha256', signingSecret).update(rawBody).digest('hex');
 
-  // Compare signatures securely using timingSafeEqual
-  const signatureBuffer = Buffer.from(signature, 'utf8');
-  const computedBuffer = Buffer.from(computedSignature, 'utf8');
+  // 3. Perform timing-safe comparison to prevent side-channel timing attacks
+  const signatureBuffer = Buffer.from(signatureHeader, 'hex');
+  const expectedBuffer = Buffer.from(expectedSignature, 'hex');
 
-  if (
-    signatureBuffer.length !== computedBuffer.length ||
-    !crypto.timingSafeEqual(signatureBuffer, computedBuffer)
-  ) {
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  if (signatureBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(signatureBuffer, expectedBuffer)) {
+    return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 });
   }
 
-  // Parse and process the authenticated payload
+  // 4. Parse verified payload
   const payload = JSON.parse(rawBody);
-  
-  // Note: Standard Quasar webhooks contain details like event and data
-  // e.g. payload.event === 'transaction.success'
-  
+
+  console.log(`[Webhook] Received verified event "${eventHeader}" for txKey: ${payload.txKey}`);
+
+  // Process event in your business logic...
+  if (eventHeader === 'transaction:success') {
+    // Handle success...
+  }
+
+  // Always return HTTP 200 OK promptly
   return NextResponse.json({ success: true }, { status: 200 });
 }
 ```
 
-## Rolling / Rotated Webhook Secrets
-
-If you suspect your Webhook Secret has been compromised, or as part of standard security compliance, you can rotate/roll the signing secret through the Quasar Dashboard:
-
-1. Navigate to **Webhooks** in the Dashboard.
-2. Select your webhook endpoint configuration.
-3. Under **Security**, click **Roll Secret**.
-4. To prevent unauthorized rotation, you will be prompted for **Step-Up Authentication** (password and 2FA code if enabled).
-5. Once verified, a new `whsec_...` signing secret is generated and displayed.
-
-> [!WARNING]
-> **Immediate Effect**: Rolling a webhook secret instantly invalidates the old one. Quasar will immediately begin signing outgoing payloads with the new secret. Ensure your backend webhook receiver is updated with the new environment variable promptly to prevent delivery verification failures.
->
-> Note that global multi-region edge caches might take up to **60 seconds** to propagate the eviction. Allow a 1-minute window for the new secret to propagate fully.
-
 ---
 
-## Webhook Delivery & Retries
+## 🚀 Worker Performance, Retries & Data Masking
 
-To ensure reliable delivery even during brief outages of your backend receiver, Quasar employs a resilient message queue system powered by BullMQ:
+Quasar dispatches webhooks via an isolated NestJS worker tier using BullMQ and Redis:
 
-* **Maximum Retries:** Quasar attempts to deliver each webhook up to **10 times** before marking the delivery as failed.
-* **Exponential Backoff:** If a delivery fails, Quasar schedules retries using an exponential backoff formula, beginning with a **5-second** initial delay.
-* **SSRF and Redirect Blocking:** For infrastructure security, redirects are strictly forbidden (`redirect: 'error'`). Any endpoint attempting to return a redirect response (3xx) will trigger an immediate delivery failure.
-* **Quota Auditing:** Quasar accounts for usage on the first delivery attempt only. Retries do not consume additional organization quota units.
-* **Data Masking in Logs:** The dashboard exposes the last 1,000 delivery failures for troubleshooting. To safeguard secrets, Quasar scans and masks all sensitive keys (e.g. `secret`, `token`, `password`, `key`, `privatekey`, `credential`) inside the stored request payloads and response bodies.
-
-Next, see the [Security & Signatures](./security.mdx) page for deep details on how Quasar protects webhook deliveries.
+- **Concurrency & Rate Limiting**: Workers execute at up to 15 concurrent jobs per node with a global rate limit of 200 dispatches per second (`WEBHOOK_LIMITER_MAX`).
+- **Retries & Backoff**: Failed deliveries (network errors or non-2xx status codes) are retried automatically up to **5 times** using exponential backoff.
+- **Quota Billing Weight**: Webhook dispatches carry a quota weight of **1.0 unit** per event. Quota is charged **only on the initial delivery attempt**; retries do not consume additional quota units.
+- **Automated Data Masking**: Webhook delivery logs (`webhook_deliveries`) store request and response details for auditability. Sensitive keys inside request or response bodies (such as `secret`, `token`, `password`, `key`, `privatekey`, `secretkey`, `apikey`, `signingsecret`, `credential`) are automatically scrubbed and replaced with `"***MASKED***"` before database persistence.

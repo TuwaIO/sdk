@@ -1,25 +1,47 @@
-# Tenant Isolation (Iron Dome)
+# Tenant Isolation & The Iron Dome
 
-Quasar operates as a multi-tenant SaaS backend. A core tenet of the TUWA architecture is strict **Tenant Isolation**. Data leakage between different users or applications is treated as a critical, non-negotiable failure.
+Quasar operates as a multi-tenant SaaS backend powering Web3 applications across EVM and Solana blockchains. A core tenet of the TUWA architecture is strict **Tenant Isolation** — cross-tenant data access is prevented at both the application API layer and database ORM layer.
 
-## The `organizationId` Boundary
+---
 
-Every query executed within Quasar is strictly scoped by an `organizationId`. Whether the SDK is pushing a new transaction or fetching history, the underlying database schemas—powered by Drizzle ORM—enforce this boundary.
+## 🏛️ The `organizationId` Boundary
 
-When you send a request with your Secret Key, the Quasar Engine first resolves that key to its parent Organization. From that moment, every database transaction is bound to that Organization's partition. Cross-tenant data access is structurally impossible.
+Every query executed within Quasar is strictly scoped by an `organizationId`:
 
-## The Iron Dome Architecture
+- **Database-Level Isolation**: All database schemas (managed via Payload CMS and Drizzle ORM) require mandatory `organizationId` foreign keys on application tables (`apps`, `transactions`, `webhook_endpoints`, `webhook_deliveries`).
+- **Automatic Partition Scoping**: When an API request is authenticated using a Secret Key (`sk_live_...`) or Public Key (`pk_live_...`), the `IronDomeGuard` resolves the key to its owning `organizationId`. Every subsequent database transaction is automatically bound to that organization boundary.
 
-To achieve high performance without compromising security, Quasar is split into a dual-subdomain architecture known as **"The Iron Dome"**.
+---
 
-### Management Layer (`quasar.tuwa.io`)
-- **Purpose**: Dashboard UI, Payload Admin, Client Auth, and App configuration.
-- **Tech**: Next.js App Router (Stateless).
-- **Security**: Relies on Payload Auth, WebAuthn, and standard cookie-based sessions.
+## 🛡️ The Iron Dome Architecture
 
-### Performance Layer (`api.tuwa.io`)
-- **Purpose**: High-performance Engine API for the Quasar SDK (`/v1/engine/*`).
-- **Tech**: NestJS & Fastify (Stateless, horizontally scaled).
-- **Security**: Protected by the **IronDomeGuard**. This guard intercepts every SDK request, performs SHA-256 resolution on the `sk_live_...` headers, enforces strict RPS (Requests Per Second) limits, and applies Smart Degradation logic if quotas are exceeded.
+To achieve high performance without compromising security, Quasar is architected as a dual-subdomain system known as **"The Iron Dome"**:
 
-By physically separating the management APIs from the ingestion APIs, Quasar ensures that heavy traffic loads (like thousands of blockchain transactions syncing simultaneously via Pulsar) never degrade the dashboard experience or compromise the management security vectors.
+```
++-----------------------------------------------------------------------------------+
+|                           Cloudflare Tunnels & Traefik                            |
++------------------------------------------+----------------------------------------+
+                                           |
+                    +----------------------+----------------------+
+                    |                                             |
+                    v                                             v
+  Management Layer (quasar.tuwa.io)             Performance Layer (api.tuwa.io)
+  - Next.js App Router (Stateless)              - NestJS & Fastify Engine (Stateless)
+  - Payload CMS Admin                           - IronDomeGuard Security
+  - Cookie Session / WebAuthn                   - SHA-256 Secret Key Resolution
+  - App & Webhook Configuration                 - Redis RPS & Quota Metering
+```
+
+### 1. Management Layer (`quasar.tuwa.io`)
+
+- **Scope**: User Dashboard UI, Payload CMS Admin panel, and Client Authentication.
+- **Tech Stack**: Next.js App Router (Stateless).
+- **Security**: Authenticated via Payload Auth, SIWE (Sign-In with Ethereum), WebAuthn (Passkeys), and cookie sessions.
+
+### 2. Performance Layer (`api.tuwa.io`)
+
+- **Scope**: High-performance Engine API powering the Quasar SDK (`/v1/engine/*`).
+- **Tech Stack**: NestJS & Fastify (Stateless, horizontally scaled via Docker replicas).
+- **Security**: Guarded by **IronDomeGuard**. This guard intercepts every SDK request, hashes `sk_live_...` credentials using SHA-256, enforces RPS (Requests Per Second) limits, and applies Smart Degradation logic if quotas are exceeded.
+
+By logically decoupling the management dashboard from the high-throughput ingestion engine, administrative authentication vectors (Payload CMS Admin, session cookies) remain isolated from public API traffic. Furthermore, because both Next.js and NestJS Fastify layers are stateless containers, the ingestion engine can be independently scaled horizontally across dedicated nodes as transaction volume grows.

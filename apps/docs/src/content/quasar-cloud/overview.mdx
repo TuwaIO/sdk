@@ -1,0 +1,73 @@
+# Overview & Initialization
+
+`@tuwaio/quasar-sdk` is the official server-side Node.js and Edge SDK for the **TUWA Quasar Cloud** (Layer 5). It serves as the bridge between your client-side Web3 application and Quasar's high-performance cloud engine.
+
+Using `@tuwaio/quasar-sdk`, your backend can securely index on-chain transactions, maintain paginated cross-device user transaction histories, and cryptographically verify wallet signatures without managing complex database infrastructure.
+
+---
+
+## 🚀 Key Capabilities
+
+- **Server-Side Transaction Indexing**: Persist and track transaction states (`pending`, `success`, `failed`) across devices.
+- **Cross-Device History API**: Retrieve paginated, tenant-isolated transaction histories for any connected wallet address.
+- **Stateless Signature Verification**: Verify client Mini-Session authentication proofs on Node.js, Next.js Server Actions, or Edge runtimes (Cloudflare Workers, Vercel Edge).
+- **Subpath-Modular React Bridges**: Pure subpath imports (`/react/evm`, `/react/solana`) ensuring zero unnecessary dependencies are shipped to the client.
+
+---
+
+## 💾 Installation
+
+Install `@tuwaio/quasar-sdk` along with its required peer dependencies:
+
+```bash
+pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core
+```
+
+> **Peer Dependencies**: `ofetch` guarantees ultra-fast, lightweight HTTP requests across Node.js and Edge runtimes, while `@tuwaio/pulsar-core` provides shared TypeScript types for transaction state machines.
+
+---
+
+## 🔐 Server-Side Initialization
+
+Instantiate the `Quasar` client on your backend using your application's `secretKey` obtained from the <QuasarDashboardLink>Quasar Dashboard</QuasarDashboardLink>:
+
+```typescript
+// src/lib/quasar.ts
+import { Quasar } from '@tuwaio/quasar-sdk';
+
+/**
+ * Server-only Quasar Cloud Client instance.
+ * Always initialize with process.env.QUASAR_SECRET_KEY.
+ */
+export const quasar = new Quasar({
+  secretKey: process.env.QUASAR_SECRET_KEY ?? '',
+});
+```
+
+> [!CAUTION]
+> **Secret Key Safety**: Never expose your `secretKey` or instantiate `new Quasar()` on the client side. `secretKey` grants administrative database access to your Quasar application and must remain strictly in server environments (Next.js Server Actions, Node.js API routes, Cloudflare Workers).
+
+---
+
+## 📖 Architecture Flow
+
+The integration between your client dApp, backend server, and Quasar Cloud follows a clean 3-step lifecycle:
+
+```
+[ Client Wallet ] ──(1. Sign Mini-Session)──> [ React Auth Bridge ]
+                                                     │
+                                             (2. Server Action + Auth)
+                                                     ▼
+[ Quasar Cloud Engine ] <──(3. Quasar SDK)──── [ Backend Server ]
+```
+
+1. **Client Layer**: React Auth Bridges (`@tuwaio/quasar-sdk/react`) obtain a lightweight Mini-Session signature from the user's wallet.
+2. **Server Layer**: Your Next.js Server Action or API route verifies the signature (`utils.verifyMiniSession`).
+3. **Cloud Engine**: Your backend calls `quasar.pulsar.syncCreate` or `quasar.pulsar.getHistory` to interact with the Quasar Engine.
+
+---
+
+## 🔗 Related Resources
+
+- 🌐 **[TUWA Documentation Hub](https://docs.tuwa.io/)** — Central directory linking to all ecosystem documentation sites.
+- 🚀 **<QuasarDashboardLink>Quasar Cloud Dashboard</QuasarDashboardLink>** — Manage your Quasar apps and API keys.

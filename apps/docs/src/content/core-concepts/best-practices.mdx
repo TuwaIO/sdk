@@ -1,55 +1,53 @@
 # Production & Best Practices
 
-To build resilient integrations with the TUWA Quasar Cloud, developers should align their applications with the core architecture and operational rules of the platform.
+To build resilient, high-performance Web3 applications with the TUWA Ecosystem, developers should align their systems with the core operational guidelines of the platform.
 
 ---
 
-## 1. Idempotency & Re-entrancy
+## 1. Idempotency & Re-entrancy Protection
 
-Quasar enforces strict uniqueness constraints on transaction ingestion:
-* **Transaction Key (`txKey`):** Every transaction synchronized via Pulsar must have a unique `txKey` (typically generated from the blockchain transaction hash or a deterministic combination of block, chain, and sender address).
-* **Safe Retries:** Sending the same transaction multiple times with the same `txKey` is fully idempotent. Quasar will not duplicate the transaction record or charge additional quota for redundant writes.
+Quasar enforces strict uniqueness constraints on transaction ingestion to ensure safe retries:
 
----
-
-## 2. Quota Weighting & Billing
-
-Quasar measures usage via a granular weighting system rather than a flat request counter:
-
-| Endpoint / Operation | Quota Weight | Description |
-| :--- | :--- | :--- |
-| **Pulsar Transaction Sync** (`POST /v1/engine/pulsar/sync`) | **10.0** units | High write processing, database partitioning, and real-time syncing. |
-| **Webhook Delivery** | **1.0** units | Quasar forwarding events to your backend. |
-| **Standard Reads / Queries** | **0** units | Fetching history, app parameters, or list indexes. |
-| **Test Ping / Health Check** (`GET /v1/engine/test-ping`) | **0.01** units | Lightweight connection checks. |
-
-Keep these weights in mind when calculating expected costs.
+- **Transaction Key (`txKey`)**: Every transaction synchronized via Pulsar requires a unique `txKey` (e.g. `tx_local_18f2...`), typically derived from the blockchain transaction hash or a deterministic client-side identifier.
+- **Safe Re-entrancy**: Resubmitting a transaction with an identical `txKey` is idempotent. Quasar will update existing record states without duplicating entries or double-charging organization quotas.
 
 ---
 
-## 3. Quota Exhaustion & Smart Degradation
+## 2. Quota Weighting & Accounting
 
-When your organization's quota balance is exhausted, the Quasar API does not immediately fail all requests. The engine shifts into **Smart Degradation** mode:
+Quasar measures infrastructure usage via a granular weighting system:
 
-* **Fast Mode (Quota Available):** Transactions are processed, verified, and indexed in real-time.
-* **Lazy Mode (Quota Depleted):** Instead of blocking transaction syncing with immediate HTTP errors (which could break your dApp's UX), Quasar downgrades the sync priority. The transactions are pushed to a background processing queue (BullMQ + Redis) and indexed asynchronously as resources permit.
-* **Hard Block (`402 Payment Required`):** If the organization's account reaches a deep negative balance beyond safe margins, all subsequent API operations are blocked with a `402` status code.
-
----
-
-## 4. Cache Propagation & Key Rolling
-
-The high-performance API layer (`api.tuwa.io`) is governed by the `IronDomeGuard`, which caches application metadata (IP whitelists, domains, and keys) for **5 minutes** in Redis under `{apiKey}:meta` keys.
-
-* **Immediate Cache Eviction:** Changing whitelists, deleting apps, or rolling secrets automatically dispatches eviction events to invalidate the cache.
-* **Propagation Latency:** While eviction is near-instantaneous in the primary database region, it can take up to **60 seconds** to propagate fully across global multi-region edge caches. When rolling app or webhook secrets, allow a 1-minute delay before verifying the new credentials.
+| Endpoint / Operation                                              | Quota Weight   | Description                                                             |
+| :---------------------------------------------------------------- | :------------- | :---------------------------------------------------------------------- |
+| **Pulsar Transaction Sync** (`POST /v1/engine/pulsar/sync`)       | **10.0** units | High-throughput write processing, state tracking, and DB partitioning.  |
+| **Webhook Delivery**                                              | **1.0** unit   | Dispatching real-time event notifications to your backend (1st attempt) |
+| **Test Ping / Health Check** (`GET /v1/engine/test-ping`)         | **0.01** unit  | Lightweight infrastructure latency check.                               |
+| **Transaction History Queries** (`GET /v1/engine/pulsar/history`) | **0.0** units  | **Free** — Fetching transaction history does not consume quota.         |
 
 ---
 
-## 5. Webhook Safety & SSRF Protection
+## 3. Smart Degradation & Quota Thresholds
 
-Quasar's outbound webhook dispatcher enforces security policies to protect both Quasar's hosting infrastructure and your backend servers:
+When an organization's quota balance is exhausted (`currentUsage > limit`), the Quasar Engine protects application UX through **Smart Degradation**:
 
-* **Private IP Blocklist:** Webhook target URLs cannot resolve to private IP addresses (RFC 1918 spaces, loopbacks, or link-local ranges like `127.0.0.1`, `10.x.x.x`, or `192.168.x.x`). All webhook endpoints must be public-facing.
-* **10-Second Timeout:** The dispatcher enforces a strict **10-second timeout** per delivery attempt. Ensure your webhook handler responds with a `2xx` status code promptly (ideally deferring heavy database operations to a background task).
-* **HMAC Verification:** Always parse the raw request body and verify the cryptographic signature in the `x-quasar-signature` header using your Webhook Secret before processing payloads.
+- **Fast Mode (`remaining >= 0`)**: Real-time transaction ingestion and instant webhook dispatches when organization quota balance is positive (`currentUsage <= limit`).
+- **Lazy Mode (`remaining < 0`)**: Quota depleted (`currentUsage > limit`); transaction syncing requests (`POST /v1/engine/pulsar/sync`) bypass immediate HTTP errors to preserve client-side dApp UX, queueing transactions asynchronously via BullMQ and Redis.
+- **Webhook Dispatches**: Outbound webhook deliveries pause when quota is depleted (`remaining < 0`) until the organization quota balance is replenished.
+- **Free Read Access**: Transaction history queries (`GET /v1/engine/pulsar/history`) carry **0.0 quota weight** and remain fully accessible.
+
+---
+
+## 4. Cache Eviction & Key Propagation
+
+The high-performance API layer (`api.tuwa.io`) uses the `IronDomeGuard` to cache application metadata (IP whitelists, domain rules, and key hashes) in Redis under `{key}:meta`:
+
+- **Eviction Triggers**: Modifying IP whitelists, updating domain constraints, or rolling secret keys immediately dispatches eviction events to purge Redis caches.
+- **Propagation Latency**: Allow up to **60 seconds** for global multi-region edge caches to fully evict old metadata. After rolling a key in the Dashboard, immediately update your backend environment variables (`.env`) with the new Secret Key.
+
+---
+
+## 5. Webhook Security & Receiver Design
+
+- **HTTPS Required**: Production webhooks must target secure `https://` URLs (`http://` allowed only in development environments).
+- **10-Second Timeout**: Webhook receivers must return an HTTP `200 OK` response within 10 seconds. Defer long-running database tasks or external API calls to background job queues.
+- **Timing-Safe Verification**: Always verify the `x-quasar-signature` header using `crypto.timingSafeEqual` and your raw request body string before processing webhook events.

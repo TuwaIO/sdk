@@ -34,7 +34,7 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 - [QuasarConfig](interfaces/QuasarConfig.md)
 - [SignSessionParams](interfaces/SignSessionParams.md)
 - [SignSessionResult](interfaces/SignSessionResult.md)
-- [SolanaSignedMessage](interfaces/SolanaSignedMessage.md)
+- [SolanaSignableMessage](interfaces/SolanaSignableMessage.md)
 - [SolanaSigner](interfaces/SolanaSigner.md)
 - [VerifySessionParams](interfaces/VerifySessionParams.md)
 

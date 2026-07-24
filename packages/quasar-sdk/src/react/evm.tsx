@@ -16,7 +16,7 @@ export { getMiniSessionAuth } from './shared';
 
 /**
  * Props for the QuasarEvmAuthBridge component.
- * 
+ *
  * @public
  */
 export interface QuasarEvmAuthBridgeProps {
@@ -58,7 +58,7 @@ export interface QuasarEvmAuthBridgeProps {
  *   setSession={auth.setMiniSession}
  * />
  * ```
- * 
+ *
  * @public
  */
 export function QuasarEvmAuthBridge({
@@ -99,7 +99,7 @@ interface SatelliteConnectionState {
 
 /**
  * Internal component to register EVM signing callback helper.
- * 
+ *
  * @internal
  */
 function QuasarEvmAuthBridgeInternal({
@@ -118,8 +118,12 @@ function QuasarEvmAuthBridgeInternal({
   const sessionRef = useRef(session);
   const setSessionRef = useRef(setSession);
 
-  useEffect(() => { sessionRef.current = session; }, [session]);
-  useEffect(() => { setSessionRef.current = setSession; }, [setSession]);
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
+  useEffect(() => {
+    setSessionRef.current = setSession;
+  }, [setSession]);
 
   const getAuth = useCallback(async (): Promise<MiniSessionAuth> => {
     const state = store.getState() as { activeConnection: SatelliteConnectionState };

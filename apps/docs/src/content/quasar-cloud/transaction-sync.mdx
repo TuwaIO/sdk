@@ -1,0 +1,170 @@
+# Transaction Syncing & History
+
+The `@tuwaio/quasar-sdk` package enables your backend (Next.js Server Actions or Node.js API routes) to securely persist transaction states to the cloud (`syncCreate`) and query cross-device history logs (`getHistory`) for connected wallet addresses.
+
+---
+
+## 🔐 The Mini-Session Security Model
+
+When calling Quasar Cloud APIs from your server, your `QUASAR_SECRET_KEY` grants administrative access to the Quasar Engine. However, to prevent unauthorized clients from reading or spoofing another user's transaction history, every request sent to your backend should include a **Mini-Session Authentication payload** (`MiniSessionAuth`).
+
+### Why Mini-Session Auth?
+
+1. **Cryptographic Proof of Ownership**: Proves that the connected user actually owns the wallet address (`walletAddress`) without requiring heavy traditional session cookies.
+2. **Replay Attack Protection**: Every signature embeds an ISO timestamp (`Mini-Session Login: <timestamp>`). The `verifyMiniSession` method rejects any signature older than 5 minutes (`DEFAULT_MAX_AGE`).
+3. **Stateless Multi-Chain Verification**: Supports both EVM (`viem`) and Solana (`gill`) verification out of the box with zero database lookups on your server.
+
+---
+
+## ☁️ 1. Syncing Transactions (`syncCreate`)
+
+Use `quasar.pulsar.syncCreate` in your backend server action or API route to persist a transaction state in the Quasar Engine database.
+
+```typescript
+// src/app/actions/syncTransaction.ts
+'use server';
+
+import { Quasar, MiniSessionAuth, utils, QuasarSDKError } from '@tuwaio/quasar-sdk';
+import type { Transaction } from '@tuwaio/sdk/pulsar';
+
+// Initialize Quasar with your server-only Secret Key
+const quasar = new Quasar({
+  secretKey: process.env.QUASAR_SECRET_KEY ?? '',
+});
+
+export async function syncTransactionServerAction(
+  tx: Transaction,
+  authData: MiniSessionAuth,
+  appName: string = 'My dApp',
+) {
+  try {
+    // Step 1: Cryptographically verify the client's signature
+    const isValid = await utils.verifyMiniSession(authData);
+    if (!isValid) {
+      throw new Error('Unauthorized: Wallet signature verification failed.');
+    }
+
+    // Step 2: Ensure the transaction address matches the verified signer
+    if (tx.from.toLowerCase() !== authData.walletAddress.toLowerCase()) {
+      throw new Error('Forbidden: Wallet address mismatch.');
+    }
+
+    // Step 3: Persist the transaction to Quasar Cloud
+    const result = await quasar.pulsar.syncCreate(tx, appName);
+    return { success: true, txKey: result.txKey };
+  } catch (error) {
+    if (error instanceof QuasarSDKError) {
+      console.error(`[Quasar Engine Error ${error.status}]: ${error.message}`);
+      throw new Error(`Cloud Sync Failed: ${error.message}`);
+    }
+    throw error;
+  }
+}
+```
+
+---
+
+## 📜 2. Querying Transaction History (`getHistory`)
+
+Query paginated transaction histories for a verified user across all their devices.
+
+```typescript
+// src/app/actions/getHistory.ts
+'use server';
+
+import { Quasar, MiniSessionAuth, utils, QuasarSDKError } from '@tuwaio/quasar-sdk';
+
+const quasar = new Quasar({
+  secretKey: process.env.QUASAR_SECRET_KEY ?? '',
+});
+
+export async function getHistoryServerAction(
+  params: {
+    walletAddress: string;
+    page?: number;
+    limit?: number;
+    appName?: string;
+  },
+  authData: MiniSessionAuth,
+) {
+  try {
+    // Step 1: Verify the wallet signature before returning private history logs
+    const isValid = await utils.verifyMiniSession(authData);
+    if (!isValid) {
+      throw new Error('Unauthorized: Invalid or expired signature.');
+    }
+
+    // Step 2: Query paginated history from Quasar Cloud Engine
+    const history = await quasar.pulsar.getHistory({
+      walletAddress: params.walletAddress,
+      page: params.page ?? 1,
+      limit: params.limit ?? 10,
+      appName: params.appName ?? 'My dApp',
+    });
+
+    return history;
+  } catch (error) {
+    if (error instanceof QuasarSDKError) {
+      console.error(`[Quasar History Error ${error.status}]: ${error.message}`);
+      throw new Error(`Failed to fetch history: ${error.message}`);
+    }
+    throw error;
+  }
+}
+```
+
+---
+
+## 🛡️ 3. Production Error Handling (`QuasarSDKError`)
+
+All calls to `quasar.pulsar.*` throw typed `QuasarSDKError` instances when an API request fails (e.g. rate limits, invalid payload, or authentication issues).
+
+```typescript
+import { QuasarSDKError } from '@tuwaio/quasar-sdk';
+
+try {
+  await quasar.pulsar.syncCreate(txData, 'My App');
+} catch (error) {
+  if (error instanceof QuasarSDKError) {
+    // Inspected properties: error.status (HTTP status code), error.message
+    console.error(`Quasar Error Code: ${error.status}`);
+    console.error(`Error Message: ${error.message}`);
+  } else {
+    console.error('Unexpected System Error:', error);
+  }
+}
+```
+
+---
+
+## ⚡ 4. Full Client Integration with Pulsar Engine (`getMiniSessionAuth`)
+
+Now that your server actions are ready, connect them to your client-side Pulsar transaction store. Using `getMiniSessionAuth()`, Pulsar automatically requests or reuses valid Mini-Session signatures during transaction execution and history queries:
+
+```typescript
+// src/hooks/usePulsarStore.ts
+'use client';
+
+import { createPulsarStore } from '@tuwaio/pulsar-core';
+import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
+import { syncTransactionServerAction, getHistoryServerAction } from '@/app/actions';
+
+export const pulsarStore = createPulsarStore({
+  name: 'app-transaction-storage',
+
+  // 1. Ensure a valid signature exists before initiating transaction tracking
+  beforeTxProcess: async () => {
+    await getMiniSessionAuth();
+  },
+
+  // 2. Automatically sync transaction states to Quasar Cloud Engine
+  onRemoteCreate: async (tx) => {
+    try {
+      const auth = await getMiniSessionAuth();
+      await syncTransactionServerAction(tx, auth);
+    } catch (err) {
+      console.error('Remote transaction sync failed:', err);
+    }
+  },
+});
+```

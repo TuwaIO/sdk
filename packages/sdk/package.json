@@ -1,0 +1,184 @@
+{
+  "name": "@tuwaio/sdk",
+  "version": "0.0.1",
+  "private": false,
+  "author": "Oleksandr Tkach",
+  "license": "Apache-2.0",
+  "description": "Layer 8 (L8) of the TUWA Ecosystem. The Core Umbrella SDK bundling logic and Nova UI components into clean subpath entrypoints.",
+  "type": "module",
+  "exports": {
+    "./pulsar": {
+      "types": "./dist/pulsar.d.ts",
+      "import": "./dist/pulsar.js",
+      "require": "./dist/pulsar.cjs"
+    },
+    "./satellite": {
+      "types": "./dist/satellite.d.ts",
+      "import": "./dist/satellite.js",
+      "require": "./dist/satellite.cjs"
+    },
+    "./satellite/siwe": {
+      "types": "./dist/satellite-siwe.d.ts",
+      "import": "./dist/satellite-siwe.js",
+      "require": "./dist/satellite-siwe.cjs"
+    },
+    "./satellite/siwe/server": {
+      "types": "./dist/satellite-siwe-server.d.ts",
+      "import": "./dist/satellite-siwe-server.js",
+      "require": "./dist/satellite-siwe-server.cjs"
+    },
+    "./nova-connect": {
+      "types": "./dist/nova-connect.d.ts",
+      "import": "./dist/nova-connect.js",
+      "require": "./dist/nova-connect.cjs"
+    },
+    "./nova-connect/satellite": {
+      "types": "./dist/nova-connect-satellite.d.ts",
+      "import": "./dist/nova-connect-satellite.js",
+      "require": "./dist/nova-connect-satellite.cjs"
+    },
+    "./nova-connect/components": {
+      "types": "./dist/nova-connect-components.d.ts",
+      "import": "./dist/nova-connect-components.js",
+      "require": "./dist/nova-connect-components.cjs"
+    },
+    "./nova-connect/hooks": {
+      "types": "./dist/nova-connect-hooks.d.ts",
+      "import": "./dist/nova-connect-hooks.js",
+      "require": "./dist/nova-connect-hooks.cjs"
+    },
+    "./nova-connect/i18n": {
+      "types": "./dist/nova-connect-i18n.d.ts",
+      "import": "./dist/nova-connect-i18n.js",
+      "require": "./dist/nova-connect-i18n.cjs"
+    },
+    "./nova-transactions": {
+      "types": "./dist/nova-transactions.d.ts",
+      "import": "./dist/nova-transactions.js",
+      "require": "./dist/nova-transactions.cjs"
+    },
+    "./nova-transactions/providers": {
+      "types": "./dist/nova-transactions-providers.d.ts",
+      "import": "./dist/nova-transactions-providers.js",
+      "require": "./dist/nova-transactions-providers.cjs"
+    },
+    "./nova-core": {
+      "types": "./dist/nova-core.d.ts",
+      "import": "./dist/nova-core.js",
+      "require": "./dist/nova-core.cjs"
+    },
+    "./orbit": {
+      "types": "./dist/orbit.d.ts",
+      "import": "./dist/orbit.js",
+      "require": "./dist/orbit.cjs"
+    },
+    "./styles/nova-core.css": "./dist/styles/nova-core.css",
+    "./styles/nova-transactions.css": "./dist/styles/nova-transactions.css",
+    "./styles/nova-connect.css": "./dist/styles/nova-connect.css",
+    "./styles/all.css": "./dist/styles/all.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "tsup --watch",
+    "build": "tsup && node scripts/bundle-styles.js"
+  },
+  "keywords": [
+    "tuwa",
+    "web3",
+    "evm",
+    "ethereum",
+    "solana",
+    "wagmi",
+    "viem",
+    "gill",
+    "wallet-standard",
+    "wallet",
+    "wallet-connect",
+    "wallets",
+    "transaction",
+    "tracking",
+    "transaction-tracking",
+    "react",
+    "ui",
+    "ui-kit",
+    "design-system",
+    "hooks",
+    "utils",
+    "components",
+    "tailwind",
+    "tailwindcss",
+    "typescript",
+    "core",
+    "headless",
+    "zustand",
+    "immer",
+    "i18n",
+    "modal",
+    "toast",
+    "quasar",
+    "cloud",
+    "sdk",
+    "siwe",
+    "next-auth",
+    "cosmos",
+    "playground",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TuwaIO/sdk.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://github.com/TuwaIO/sdk",
+  "bugs": {
+    "url": "https://github.com/TuwaIO/sdk/issues"
+  },
+  "contributors": [
+    {
+      "name": "Oleksandr Tkach",
+      "url": "https://github.com/Argeare5"
+    }
+  ],
+  "dependencies": {
+    "@emotion/is-prop-valid": "^1.4.0",
+    "@heroicons/react": "^2.2.0",
+    "@radix-ui/react-dialog": "^1.1.20",
+    "@radix-ui/react-select": "^2.3.4",
+    "@tuwaio/nova-connect": "^0.4.6",
+    "@tuwaio/nova-core": "^0.4.5",
+    "@tuwaio/nova-transactions": "^0.4.6",
+    "@tuwaio/orbit-core": "^0.2.13",
+    "@tuwaio/pulsar-core": "^0.6.7",
+    "@tuwaio/pulsar-react": "^0.4.6",
+    "@tuwaio/satellite-core": "^0.3.7",
+    "@tuwaio/satellite-react": "^0.3.9",
+    "@tuwaio/satellite-siwe-next-auth": "^0.3.9",
+    "@web3icons/common": "^0.11.48",
+    "@web3icons/react": "^4.1.19",
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.21",
+    "ethereum-blockies-base64": "^1.0.2",
+    "framer-motion": "^12.42.2",
+    "immer": "^11.1.15",
+    "iron-session": "^8.0.4",
+    "react-toastify": "^11.1.0",
+    "siwe": "^3.0.0",
+    "tailwind-merge": "^3.6.0",
+    "zustand": "^5.0.14"
+  },
+  "peerDependencies": {
+    "react": ">=19.2.3",
+    "react-dom": ">=19.2.3"
+  },
+  "devDependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3"
+  }
+}

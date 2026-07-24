@@ -1,56 +1,42 @@
 # Webhook Security & Signatures
 
-Quasar enforces strict outbound security policies when dispatching webhooks. Because Quasar operates a massive infrastructure, malicious actors could attempt to use Quasar's webhook engine to perform attacks on external or internal systems. 
+Quasar enforces multi-layered outbound security controls to protect both the Quasar infrastructure and external integrator backends.
 
-To prevent this, the `WebhookDispatcherService` implements several layers of protection.
+Because Quasar operates a distributed execution tier dispatching HTTP POST payloads, strict policies govern target host resolution, timeout bounds, and secret rotation.
 
-## Outbound Protection (SSRF Prevention)
+---
 
-Server-Side Request Forgery (SSRF) occurs when a system is tricked into making requests to internal or restricted IP addresses. 
+## 🛡️ Outbound SSRF (Server-Side Request Forgery) Prevention
 
-Before Quasar dispatches any webhook to your provided URL, it executes the following steps:
-1. **DNS Resolution**: Quasar resolves your host domain (e.g., `api.myapp.com`) into its underlying IPv4 and IPv6 addresses.
-2. **IP Blacklisting**: Quasar validates the resolved IPs against a strict internal blacklist. It outright blocks requests to `localhost`, loopback addresses (`127.0.0.0/8`), private networks (`10.0.0.0/8`, `192.168.0.0/16`), and AWS/GCP metadata endpoints (`169.254.169.254`).
-3. **Execution**: If the IP is safe, the request is dispatched.
+To prevent malicious users from targeting internal cloud metadata services, private networks, or loopback interfaces, every webhook dispatch undergoes real-time DNS resolution checks inside the `WebhookProcessor`:
 
-If your webhook resolves to a restricted IP, Quasar will permanently fail the delivery and flag the endpoint.
+1. **Dual IPv4/IPv6 DNS Resolution**: Prior to making an HTTP request, the worker resolves the destination hostname using Node.js DNS promises (`resolve4`, `resolve6`, and `lookup`).
+2. **Strict IP Range Blacklisting**: Quasar validates every resolved IP address against internal private address blocks:
+   - Loopback & Unspecified (`127.0.0.1`, `::1`, `0.0.0.0`)
+   - Private RFC 1918 networks (`10.0.0.0/8`, `192.168.0.0/16`, `172.16.0.0 - 172.31.255.255`)
+   - Link-local & Cloud Metadata (`169.254.0.0/16`, `fe80::/10`)
+   - Unique Local IPv6 (`fc00::/7`, `fd00::/8`)
+3. **Execution Block**: If any resolved IP falls within a restricted range, delivery is aborted immediately with `SSRF Blocked: Internal IP detected` without sending an HTTP payload.
 
-## Tarpit Protection & Timeouts
+---
 
-To prevent "tarpitting"—where a malicious server intentionally keeps a connection open forever to exhaust Quasar's worker threads—Quasar enforces a **10-second hard timeout** on all webhook deliveries.
+## ⏱️ Connection Timeouts & Tarpit Protection
 
-If your server takes longer than 10 seconds to respond with a `200 OK`, Quasar immediately drops the connection and marks the delivery as failed. Ensure your webhook endpoints process payloads asynchronously (e.g., push them to a local queue and return a `200` immediately).
+To prevent "tarpitting" (where a destination endpoint intentionally holds TCP connections open to exhaust worker pool threads), Quasar enforces strict connection parameters:
 
-### Redirect Chasing Protection
+- **Hard Timeout**: Dispatches enforce a **10-second timeout** (`10,000ms`). If your server does not return an HTTP response within 10 seconds, the request is destroyed and scheduled for retry.
+- **Asynchronous Receiver Pattern**: Webhook receivers should return an immediate HTTP `200 OK` response after verifying signatures, deferring heavy database operations or external API calls to background queues.
+- **HTTPS Enforcement**: In production environments (`NODE_ENV=production`), webhook URLs **must** use `https://`. Unencrypted `http://` dispatches are restricted to local development environments.
 
-To prevent request redirection attacks and secure internal network boundaries:
-* **No Redirects:** All outbound webhook dispatches explicitly disable redirect chasing (`redirect: 'error'`). 
-* **Aborted Connections:** If your webhook target returns a redirect status code (e.g., `301`, `302`, `307`, or `308`), the worker rejects the attempt immediately as a delivery failure. Your endpoint must be the direct, final destination of the payload.
+---
 
-## Verifying Signatures
+## 🔑 Secret Key Rolling & Eviction Propagation
 
-To ensure the payload is authentically from Quasar, you must verify the HMAC signature included in the headers.
+Integrators can rotate (roll) a webhook endpoint's signing secret (`whsec_...`) at any time through the Quasar Dashboard:
 
-```typescript
-import crypto from 'crypto';
+1. Navigate to **Webhooks** in the Quasar Dashboard.
+2. Select your endpoint and click **Roll Secret**.
+3. Re-authenticate via **Step-Up Verification** (password and 2FA code).
+4. The backend generates a fresh 256-bit `whsec_...` secret and updates the encrypted secret stored in PostgreSQL.
 
-function verifyQuasarWebhook(rawBody: string, signatureHeader: string, secret: string): boolean {
-  const generatedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(rawBody, 'utf8')
-    .digest('hex');
-
-  // Use timingSafeEqual to prevent timing attacks
-  const signatureBuffer = Buffer.from(signatureHeader);
-  const generatedBuffer = Buffer.from(generatedSignature);
-
-  if (signatureBuffer.length !== generatedBuffer.length) {
-    return false;
-  }
-
-  return crypto.timingSafeEqual(signatureBuffer, generatedBuffer);
-}
-```
-
-> [!TIP]
-> Always use the **raw, unparsed body** as a string or buffer when verifying the signature. If your framework automatically parses the body into JSON, stringifying it might alter the formatting (e.g., removing spaces), causing the signature verification to fail.
+> **Edge Propagation**: Invalidation of the old signing secret takes effect immediately in the database. Due to distributed Redis cache eviction across edge proxy nodes, allow up to **60 seconds** for full cache propagation. Deploy your new secret to your backend environment prior to initiating secret rotation.

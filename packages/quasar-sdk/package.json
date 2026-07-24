@@ -4,30 +4,31 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "The official server-side Node.js & Edge SDK for the TUWA Quasar Cloud.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "description": "Layer 5 (L5) of the TUWA Ecosystem. The Quasar Cloud SDK providing server-side Node.js & Edge utilities for transaction indexing, billing, and backend API integration.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./react": {
       "types": "./dist/react.d.ts",
-      "import": "./dist/react.mjs",
-      "require": "./dist/react.js"
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
     },
     "./react/evm": {
       "types": "./dist/react/evm.d.ts",
-      "import": "./dist/react/evm.mjs",
-      "require": "./dist/react/evm.js"
+      "import": "./dist/react/evm.js",
+      "require": "./dist/react/evm.cjs"
     },
     "./react/solana": {
       "types": "./dist/react/solana.d.ts",
-      "import": "./dist/react/solana.mjs",
-      "require": "./dist/react/solana.js"
+      "import": "./dist/react/solana.js",
+      "require": "./dist/react/solana.cjs"
     }
   },
   "publishConfig": {
@@ -37,14 +38,50 @@
     "dist"
   ],
   "scripts": {
-    "start": "tsup --watch",
+    "start": "tsup src/index.ts --watch",
     "build": "tsup"
   },
   "keywords": [
+    "tuwa",
     "web3",
+    "evm",
+    "ethereum",
+    "solana",
+    "wagmi",
+    "viem",
+    "gill",
+    "wallet-standard",
+    "wallet",
+    "wallet-connect",
+    "wallets",
     "transaction",
     "tracking",
-    "sdk"
+    "transaction-tracking",
+    "react",
+    "ui",
+    "ui-kit",
+    "design-system",
+    "hooks",
+    "utils",
+    "components",
+    "tailwind",
+    "tailwindcss",
+    "typescript",
+    "core",
+    "headless",
+    "zustand",
+    "immer",
+    "i18n",
+    "modal",
+    "toast",
+    "quasar",
+    "cloud",
+    "sdk",
+    "siwe",
+    "next-auth",
+    "cosmos",
+    "playground",
+    "cli"
   ],
   "repository": {
     "type": "git",
@@ -62,17 +99,23 @@
     }
   ],
   "peerDependencies": {
-    "@solana/react": ">=6.9.0",
+    "@solana/react": "6.x.x",
     "@tuwaio/pulsar-core": ">=0.6.0",
     "@wagmi/core": "3.x.x",
     "@wallet-standard/react": "1.x.x",
+    "gill": ">=0.14.0",
     "ofetch": ">=1.5.1",
     "react": ">=19.2.0",
-    "gill": ">=0.14",
     "viem": "2.x.x",
     "zustand": "5.x.x"
   },
   "peerDependenciesMeta": {
+    "@tuwaio/pulsar-core": {
+      "optional": false
+    },
+    "ofetch": {
+      "optional": false
+    },
     "viem": {
       "optional": true
     },
@@ -97,14 +140,14 @@
   },
   "devDependencies": {
     "@solana/react": "^6.9.0",
-    "@tuwaio/pulsar-core": "^0.6.4",
-    "@types/react": "^19.2.15",
-    "@wagmi/core": "^3.5.0",
-    "@wallet-standard/react": "^1.0.2",
+    "@tuwaio/pulsar-core": "^0.6.7",
+    "@types/react": "^19.2.17",
+    "@wagmi/core": "^3.6.3",
+    "@wallet-standard/react": "^1.0.3",
     "ofetch": "^1.5.1",
-    "react": "^19.2.6",
+    "react": "^19.2.7",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "zustand": "^5.0.13"
+    "zustand": "^5.0.14"
   }
 }

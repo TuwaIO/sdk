@@ -17,7 +17,7 @@ export { getMiniSessionAuth } from './shared';
 
 /**
  * Props for the unified QuasarAuthBridge component.
- * 
+ *
  * @public
  */
 export interface QuasarAuthBridgeProps {
@@ -63,7 +63,7 @@ export interface QuasarAuthBridgeProps {
  *   setSession={auth.setMiniSession}
  * />
  * ```
- * 
+ *
  * @public
  */
 export function QuasarAuthBridge({
