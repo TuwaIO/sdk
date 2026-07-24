@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.0.2...solana-sdk-v0.0.3) (2026-07-24)
+
+
+### Bug Fixes
+
+* updated packages and added socket.json ([832f393](https://github.com/TuwaIO/sdk/commit/832f393485b36ddf74f1dd91c87a5642e009c9a0))
+
 ## [0.0.2](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.0.1...solana-sdk-v0.0.2) (2026-07-24)
 
 ### Bug Fixes
