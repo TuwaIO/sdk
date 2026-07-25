@@ -4,7 +4,7 @@
 
 # SolanaSignableMessage
 
-Defined in: [packages/quasar-sdk/src/types.ts:128](https://github.com/TuwaIO/sdk/blob/3b34c3309987a9a89cc61618b77dfc7d442ec10e/packages/quasar-sdk/src/types.ts#L128)
+Defined in: [packages/quasar-sdk/src/types.ts:128](https://github.com/TuwaIO/sdk/blob/2e1cd54fd6d1ec5ae29683660aead9c50c2a5711/packages/quasar-sdk/src/types.ts#L128)
 
 Result structure for a signed Solana message in Web3 v2.
 
@@ -14,7 +14,7 @@ Result structure for a signed Solana message in Web3 v2.
 
 > `readonly` **content**: `Uint8Array`
 
-Defined in: [packages/quasar-sdk/src/types.ts:130](https://github.com/TuwaIO/sdk/blob/3b34c3309987a9a89cc61618b77dfc7d442ec10e/packages/quasar-sdk/src/types.ts#L130)
+Defined in: [packages/quasar-sdk/src/types.ts:130](https://github.com/TuwaIO/sdk/blob/2e1cd54fd6d1ec5ae29683660aead9c50c2a5711/packages/quasar-sdk/src/types.ts#L130)
 
 The content of the message as bytes.
 
@@ -24,6 +24,6 @@ The content of the message as bytes.
 
 > `readonly` **signatures**: `Readonly`\<`Record`\<`string`, `Uint8Array`\>\>
 
-Defined in: [packages/quasar-sdk/src/types.ts:132](https://github.com/TuwaIO/sdk/blob/3b34c3309987a9a89cc61618b77dfc7d442ec10e/packages/quasar-sdk/src/types.ts#L132)
+Defined in: [packages/quasar-sdk/src/types.ts:132](https://github.com/TuwaIO/sdk/blob/2e1cd54fd6d1ec5ae29683660aead9c50c2a5711/packages/quasar-sdk/src/types.ts#L132)
 
 A map of public addresses to their corresponding signature bytes.
