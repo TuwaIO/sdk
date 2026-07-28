@@ -1,6 +1,6 @@
 {
-  "packages/sdk": "0.0.5",
-  "packages/evm-sdk": "0.0.4",
-  "packages/solana-sdk": "0.0.4",
+  "packages/sdk": "0.0.6",
+  "packages/evm-sdk": "0.0.5",
+  "packages/solana-sdk": "0.0.5",
   "packages/quasar-sdk": "0.0.12"
 }
