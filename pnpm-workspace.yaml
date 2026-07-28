@@ -47,3 +47,4 @@ minimumReleaseAgeExclude:
   - '@radix-ui/react-use-previous@1.1.4'
   - '@radix-ui/react-use-rect@1.1.4'
   - '@radix-ui/react-use-size@1.1.4'
+  - '@types/node@26.1.2'

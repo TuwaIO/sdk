@@ -4,7 +4,7 @@
 
 # SignSessionResult
 
-Defined in: [packages/quasar-sdk/src/types.ts:85](https://github.com/TuwaIO/sdk/blob/2e1cd54fd6d1ec5ae29683660aead9c50c2a5711/packages/quasar-sdk/src/types.ts#L85)
+Defined in: [packages/quasar-sdk/src/types.ts:85](https://github.com/TuwaIO/sdk/blob/c8c0c68c647cef31269582c4fb618dd3cd0fb3ab/packages/quasar-sdk/src/types.ts#L85)
 
 Result structure for a signed message.
 
@@ -18,7 +18,7 @@ Result structure for a signed message.
 
 > **signature**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:87](https://github.com/TuwaIO/sdk/blob/2e1cd54fd6d1ec5ae29683660aead9c50c2a5711/packages/quasar-sdk/src/types.ts#L87)
+Defined in: [packages/quasar-sdk/src/types.ts:87](https://github.com/TuwaIO/sdk/blob/c8c0c68c647cef31269582c4fb618dd3cd0fb3ab/packages/quasar-sdk/src/types.ts#L87)
 
 The cryptographic signature string.
 
@@ -28,6 +28,6 @@ The cryptographic signature string.
 
 > **timestamp**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:89](https://github.com/TuwaIO/sdk/blob/2e1cd54fd6d1ec5ae29683660aead9c50c2a5711/packages/quasar-sdk/src/types.ts#L89)
+Defined in: [packages/quasar-sdk/src/types.ts:89](https://github.com/TuwaIO/sdk/blob/c8c0c68c647cef31269582c4fb618dd3cd0fb3ab/packages/quasar-sdk/src/types.ts#L89)
 
 The ISO timestamp used to generate the message.

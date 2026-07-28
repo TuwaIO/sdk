@@ -103,16 +103,16 @@
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=0.4.6",
+    "@tuwaio/nova-connect": ">=0.4.9",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.4.8",
+    "@tuwaio/nova-connect": "^0.4.9",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "viem": "^2.55.8"
+    "viem": "^2.55.10"
   }
 }
