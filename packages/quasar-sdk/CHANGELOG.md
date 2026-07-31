@@ -2,10 +2,9 @@
 
 ## [0.0.12](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.11...quasar-sdk-v0.0.12) (2026-07-24)
 
-
 ### Bug Fixes
 
-* updated packages and added socket.json ([832f393](https://github.com/TuwaIO/sdk/commit/832f393485b36ddf74f1dd91c87a5642e009c9a0))
+- updated packages and added socket.json ([832f393](https://github.com/TuwaIO/sdk/commit/832f393485b36ddf74f1dd91c87a5642e009c9a0))
 
 ## [0.0.11](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.10...quasar-sdk-v0.0.11) (2026-07-24)
 

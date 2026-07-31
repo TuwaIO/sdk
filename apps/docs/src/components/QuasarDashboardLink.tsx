@@ -1,5 +1,5 @@
-import React from 'react';
 import { useMDXComponents as getThemeComponents } from 'nextra-theme-docs';
+import React from 'react';
 
 export function QuasarDashboardLink({
   children = 'Quasar Dashboard',

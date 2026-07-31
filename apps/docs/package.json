@@ -26,7 +26,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "superjson": "^2.2.6",
-    "@scalar/api-reference-react": "^0.9.59"
+    "@scalar/api-reference-react": "^0.9.60"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
