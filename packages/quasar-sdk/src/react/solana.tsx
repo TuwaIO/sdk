@@ -12,7 +12,7 @@ import { getMiniSessionAuth as getAuthCore } from '../utils/session';
 import { QuasarActiveConnection, setAuthHelperReference } from './shared';
 
 export type { QuasarActiveConnection };
-export { getMiniSessionAuth } from './shared';
+export { getMiniSessionAuth, preFlightTxCheck } from './shared';
 
 /**
  * Props for the QuasarSolanaAuthBridge component.

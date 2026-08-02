@@ -29,6 +29,11 @@
       "types": "./dist/react/solana.d.ts",
       "import": "./dist/react/solana.js",
       "require": "./dist/react/solana.cjs"
+    },
+    "./react/shared": {
+      "types": "./dist/react/shared.d.ts",
+      "import": "./dist/react/shared.js",
+      "require": "./dist/react/shared.cjs"
     }
   },
   "publishConfig": {

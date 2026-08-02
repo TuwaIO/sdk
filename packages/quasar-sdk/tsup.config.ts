@@ -10,6 +10,7 @@ export default defineConfig([
       react: './src/react/index.tsx',
       'react/evm': './src/react/evm.tsx',
       'react/solana': './src/react/solana.tsx',
+      'react/shared': './src/react/shared.ts',
     },
     sourcemap: false,
     splitting: true,
