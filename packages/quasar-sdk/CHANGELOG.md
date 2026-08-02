@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.15](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.14...quasar-sdk-v0.0.15) (2026-08-02)
+
+
+### Bug Fixes
+
+* health check url ([ce77223](https://github.com/TuwaIO/sdk/commit/ce7722372111f89b443e3f7c52ae1ea55eec61fe))
+
 ## [0.0.14](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.13...quasar-sdk-v0.0.14) (2026-08-02)
 
 
