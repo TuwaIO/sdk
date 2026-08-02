@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.16](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.15...quasar-sdk-v0.0.16) (2026-08-02)
+
+
+### Bug Fixes
+
+* updated shared react imports ([3959828](https://github.com/TuwaIO/sdk/commit/3959828a1442f72e5488e7afae933536ba1256af))
+
 ## [0.0.15](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.14...quasar-sdk-v0.0.15) (2026-08-02)
 
 
