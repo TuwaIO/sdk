@@ -2,10 +2,9 @@
 
 ## [0.0.6](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.0.5...solana-sdk-v0.0.6) (2026-07-31)
 
-
 ### Bug Fixes
 
-* updated packages ([27562fc](https://github.com/TuwaIO/sdk/commit/27562fc33690e573117c4036dd7518a0cc660bde))
+- updated packages ([27562fc](https://github.com/TuwaIO/sdk/commit/27562fc33690e573117c4036dd7518a0cc660bde))
 
 ## [0.0.5](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.0.4...solana-sdk-v0.0.5) (2026-07-28)
 

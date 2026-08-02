@@ -97,9 +97,9 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-evm": "^0.2.20",
-    "@tuwaio/pulsar-evm": "^0.5.7",
-    "@tuwaio/satellite-evm": "^0.3.9"
+    "@tuwaio/orbit-evm": "^0.2.21",
+    "@tuwaio/pulsar-evm": "^0.5.8",
+    "@tuwaio/satellite-evm": "^0.3.10"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
@@ -108,7 +108,7 @@
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.4.10",
+    "@tuwaio/nova-connect": "^0.4.11",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",

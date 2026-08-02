@@ -51,3 +51,4 @@ The high-performance API layer (`api.tuwa.io`) uses the `IronDomeGuard` to cache
 - **HTTPS Required**: Production webhooks must target secure `https://` URLs (`http://` allowed only in development environments).
 - **10-Second Timeout**: Webhook receivers must return an HTTP `200 OK` response within 10 seconds. Defer long-running database tasks or external API calls to background job queues.
 - **Timing-Safe Verification**: Always verify the `x-quasar-signature` header using `crypto.timingSafeEqual` and your raw request body string before processing webhook events.
+- **Manual Resend**: Webhooks that fail after multiple automated retries can be manually restarted from the Delivery Logs in the Quasar Dashboard.

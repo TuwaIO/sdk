@@ -150,7 +150,7 @@ export const wagmiConfig = createConfig({
 import { createPulsarStore, createTxInMemoryStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
 import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
 import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
-import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
+import { getMiniSessionAuth, preFlightTxCheck } from '@tuwaio/quasar-sdk/react';
 
 import { getHistory, syncTransaction } from '@/app/actions';
 import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
@@ -162,7 +162,7 @@ const initialStore = createPulsarStore<TransactionUnion>({
   name: storageName,
   adapter: [pulsarEvmAdapter(wagmiConfig, appEVMChains), pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls })],
   beforeTxProcess: async () => {
-    await getMiniSessionAuth();
+    await preFlightTxCheck();
   },
   onRemoteCreate: async (tx) => {
     try {

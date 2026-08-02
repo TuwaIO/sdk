@@ -75,7 +75,10 @@ components:
           description: Local timestamp (seconds) when initiated by user.
         payload:
           type: object
-          additionalProperties: {}
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: number
           description: Arbitrary custom data associated with the transaction.
         pending:
           type: boolean
@@ -115,6 +118,12 @@ components:
         rpcUrl:
           type: string
           description: RPC URL used for submission.
+        syncStatus:
+          type: string
+          enum:
+            - synced
+            - pending-sync
+          description: Status of cloud synchronization.
         adapter:
           type: string
           enum:
@@ -222,7 +231,10 @@ components:
           description: Local timestamp (seconds) when initiated by user.
         payload:
           type: object
-          additionalProperties: {}
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: number
           description: Arbitrary custom data associated with the transaction.
         pending:
           type: boolean
@@ -262,6 +274,12 @@ components:
         rpcUrl:
           type: string
           description: RPC URL used for submission.
+        syncStatus:
+          type: string
+          enum:
+            - synced
+            - pending-sync
+          description: Status of cloud synchronization.
         adapter:
           type: string
           enum:
@@ -327,7 +345,10 @@ components:
           description: Local timestamp (seconds) when initiated by user.
         payload:
           type: object
-          additionalProperties: {}
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: number
           description: Arbitrary custom data associated with the transaction.
         pending:
           type: boolean
@@ -367,6 +388,12 @@ components:
         rpcUrl:
           type: string
           description: RPC URL used for submission.
+        syncStatus:
+          type: string
+          enum:
+            - synced
+            - pending-sync
+          description: Status of cloud synchronization.
         adapter:
           type: string
           enum:
@@ -463,6 +490,11 @@ components:
           type: string
         rpcUrl:
           type: string
+        syncStatus:
+          type: string
+          enum:
+            - synced
+            - pending-sync
       required:
         - txKey
       description: Request body for updating an existing transaction. Only `txKey` is required; all other fields are optional

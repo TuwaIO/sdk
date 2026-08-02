@@ -145,5 +145,6 @@ Quasar dispatches webhooks via an isolated NestJS worker tier using BullMQ and R
 
 - **Concurrency & Rate Limiting**: Workers execute at up to 15 concurrent jobs per node with a global rate limit of 200 dispatches per second (`WEBHOOK_LIMITER_MAX`).
 - **Retries & Backoff**: Failed deliveries (network errors or non-2xx status codes) are retried automatically up to **5 times** using exponential backoff.
+- **Manual Resend**: In addition to automated retries, failed webhooks can be manually restarted directly from the Quasar Dashboard interface via the Webhook Delivery Logs.
 - **Quota Billing Weight**: Webhook dispatches carry a quota weight of **1.0 unit** per event. Quota is charged **only on the initial delivery attempt**; retries do not consume additional quota units.
 - **Automated Data Masking**: Webhook delivery logs (`webhook_deliveries`) store request and response details for auditability. Sensitive keys inside request or response bodies (such as `secret`, `token`, `password`, `key`, `privatekey`, `secretkey`, `apikey`, `signingsecret`, `credential`) are automatically scrubbed and replaced with `"***MASKED***"` before database persistence.

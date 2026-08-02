@@ -92,7 +92,9 @@ const BaseTransactionSchema = z.object({
   isError: z.boolean().optional().openapi({ description: 'Whether the transaction is in a failed state.' }),
   isTrackedModalOpen: z.boolean().optional(),
   localTimestamp: z.number().openapi({ description: 'Local timestamp (seconds) when initiated by user.' }),
-  payload: (z.record(z.string(), z.unknown()) as unknown as z.ZodType<object>)
+  payload: (
+    z.record(z.string(), z.union([z.string(), z.number()])) as unknown as z.ZodType<Record<string, string | number>>
+  )
     .optional()
     .openapi({ description: 'Arbitrary custom data associated with the transaction.' }),
   pending: z.boolean().openapi({ description: 'Whether the transaction is awaiting on-chain confirmation.' }),
@@ -113,6 +115,10 @@ const BaseTransactionSchema = z.object({
     .optional()
     .openapi({ description: 'Number of confirmations or finality status.' }),
   rpcUrl: z.string().optional().openapi({ description: 'RPC URL used for submission.' }),
+  syncStatus: z
+    .enum(['synced', 'pending-sync'])
+    .optional()
+    .openapi({ description: 'Status of cloud synchronization.' }),
 });
 
 // PHANTOM TYPE CHECK: Enforces 1:1 alignment with pulsar-core BaseTransaction
@@ -208,6 +214,7 @@ const UpdateTransactionRequestSchema: z.ZodType<UpdatableTransactionFields> = z
     instructions: z.array(z.unknown()).optional(),
     recentBlockhash: z.string().optional(),
     rpcUrl: z.string().optional(),
+    syncStatus: z.enum(['synced', 'pending-sync']).optional(),
   })
   .openapi('UpdateTransactionRequest', {
     description:

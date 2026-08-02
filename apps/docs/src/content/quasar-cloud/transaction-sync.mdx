@@ -146,15 +146,16 @@ Now that your server actions are ready, connect them to your client-side Pulsar 
 'use client';
 
 import { createPulsarStore } from '@tuwaio/pulsar-core';
-import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
+import { preFlightTxCheck, getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
 import { syncTransactionServerAction, getHistoryServerAction } from '@/app/actions';
 
 export const pulsarStore = createPulsarStore({
   name: 'app-transaction-storage',
 
   // 1. Ensure a valid signature exists before initiating transaction tracking
+  //    and ping Quasar Cloud to ensure the server is alive.
   beforeTxProcess: async () => {
-    await getMiniSessionAuth();
+    await preFlightTxCheck();
   },
 
   // 2. Automatically sync transaction states to Quasar Cloud Engine

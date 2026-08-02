@@ -13,7 +13,7 @@ import { QuasarActiveConnection } from './shared';
 import { QuasarSolanaAuthBridge } from './solana';
 
 export type { QuasarActiveConnection };
-export { getMiniSessionAuth } from './shared';
+export { getMiniSessionAuth, preFlightTxCheck } from './shared';
 
 /**
  * Props for the unified QuasarAuthBridge component.

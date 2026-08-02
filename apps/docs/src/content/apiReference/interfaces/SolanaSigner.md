@@ -4,7 +4,7 @@
 
 # SolanaSigner
 
-Defined in: [packages/quasar-sdk/src/types.ts:140](https://github.com/TuwaIO/sdk/blob/104aabcd004d479c8195ddb6696e51f6ee278efc/packages/quasar-sdk/src/types.ts#L140)
+Defined in: [packages/quasar-sdk/src/types.ts:140](https://github.com/TuwaIO/sdk/blob/3e5eee8ab131badede1ebf7e297595b678303856/packages/quasar-sdk/src/types.ts#L140)
 
 Interface for a Solana signer.
 Optimized to handle modern Web3 v2 (MessageModifyingSigner), Standard, and Legacy interfaces.
@@ -15,7 +15,7 @@ Optimized to handle modern Web3 v2 (MessageModifyingSigner), Standard, and Legac
 
 > `readonly` **address**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:142](https://github.com/TuwaIO/sdk/blob/104aabcd004d479c8195ddb6696e51f6ee278efc/packages/quasar-sdk/src/types.ts#L142)
+Defined in: [packages/quasar-sdk/src/types.ts:142](https://github.com/TuwaIO/sdk/blob/3e5eee8ab131badede1ebf7e297595b678303856/packages/quasar-sdk/src/types.ts#L142)
 
 The public address of the signer.
 
@@ -25,7 +25,7 @@ The public address of the signer.
 
 > `optional` **modifyAndSignMessages?**: (`messages`) => `Promise`\<readonly [`SolanaSignableMessage`](SolanaSignableMessage.md)[]\>
 
-Defined in: [packages/quasar-sdk/src/types.ts:147](https://github.com/TuwaIO/sdk/blob/104aabcd004d479c8195ddb6696e51f6ee278efc/packages/quasar-sdk/src/types.ts#L147)
+Defined in: [packages/quasar-sdk/src/types.ts:147](https://github.com/TuwaIO/sdk/blob/3e5eee8ab131badede1ebf7e297595b678303856/packages/quasar-sdk/src/types.ts#L147)
 
 Modern Web3 v2 method to modify and sign messages.
 Used by latest @solana/react hooks.
@@ -46,7 +46,7 @@ readonly [`SolanaSignableMessage`](SolanaSignableMessage.md)[]
 
 > `optional` **signMessage?**: (`message`) => `Promise`\<`Uint8Array`\<`ArrayBufferLike`\>\>
 
-Defined in: [packages/quasar-sdk/src/types.ts:155](https://github.com/TuwaIO/sdk/blob/104aabcd004d479c8195ddb6696e51f6ee278efc/packages/quasar-sdk/src/types.ts#L155)
+Defined in: [packages/quasar-sdk/src/types.ts:155](https://github.com/TuwaIO/sdk/blob/3e5eee8ab131badede1ebf7e297595b678303856/packages/quasar-sdk/src/types.ts#L155)
 
 Singular signing method (Legacy).
 
@@ -66,7 +66,7 @@ Singular signing method (Legacy).
 
 > `optional` **signMessages?**: (`messages`) => `Promise`\<readonly `object`[]\>
 
-Defined in: [packages/quasar-sdk/src/types.ts:151](https://github.com/TuwaIO/sdk/blob/104aabcd004d479c8195ddb6696e51f6ee278efc/packages/quasar-sdk/src/types.ts#L151)
+Defined in: [packages/quasar-sdk/src/types.ts:151](https://github.com/TuwaIO/sdk/blob/3e5eee8ab131badede1ebf7e297595b678303856/packages/quasar-sdk/src/types.ts#L151)
 
 Plural signing method (Wallet Standard).
 

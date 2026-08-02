@@ -3,6 +3,7 @@
  * @description Shared React-agnostic state and type definitions for Quasar React Bridges.
  */
 
+import { BASE_API_URL } from '../constants';
 import { MiniSessionAuth } from '../types';
 
 /**
@@ -61,4 +62,37 @@ export async function getMiniSessionAuth(): Promise<MiniSessionAuth> {
   throw new Error(
     '[QuasarSDK] Auth helper not initialized. Ensure QuasarAuthBridge is mounted and wallet is connected.',
   );
+}
+
+/**
+ * Pre-flight check before initiating a transaction.
+ * Ensures the local Mini-Session is valid (or prompts for one) and verifies Quasar Engine health.
+ *
+ * @param customApiUrl - Optional custom API URL to override the default.
+ * @throws {Error} If the session check fails or Quasar is unreachable.
+ *
+ * @public
+ */
+export async function preFlightTxCheck(customApiUrl?: string): Promise<void> {
+  // 1. Ensure a valid session exists
+  await getMiniSessionAuth();
+
+  // 2. Ping /v1/engine/health to verify Quasar Cloud is reachable
+  const apiUrl = customApiUrl || BASE_API_URL;
+
+  try {
+    const res = await fetch(`${apiUrl}/v1/engine/health?t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      throw new Error(`[QuasarSDK] API Health check failed with status: ${res.status}`);
+    }
+  } catch (error) {
+    throw new Error('[QuasarSDK] Quasar Cloud Engine is currently unreachable.', { cause: error });
+  }
 }
