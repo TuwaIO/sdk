@@ -170,6 +170,7 @@ const initialStore = createPulsarStore<TransactionUnion>({
       await syncTransaction(tx as TransactionUnion, auth);
     } catch (err) {
       console.error('[PulsarHook] Remote sync failed:', err);
+      throw err; // Rethrow to inform pulsar-core that sync failed
     }
   },
 });
@@ -178,6 +179,7 @@ export const usePulsarStore = createBoundedUseStore(initialStore);
 
 const pulsarInMemoryStore = createTxInMemoryStore<TransactionUnion>({
   localTransactionsPool: initialStore.getState().transactionsPool,
+  reconcileUnsyncedTransactions: initialStore.getState().reconcileUnsyncedTransactions,
   getHistory: async ({ page, walletAddress }) => {
     try {
       const auth = await getMiniSessionAuth();

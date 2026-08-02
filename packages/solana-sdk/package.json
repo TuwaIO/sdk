@@ -114,7 +114,7 @@
     "gill": ">=0.14"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.4.11",
+    "@tuwaio/nova-connect": "^0.4.12",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",

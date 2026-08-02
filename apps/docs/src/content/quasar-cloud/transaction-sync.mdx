@@ -165,6 +165,7 @@ export const pulsarStore = createPulsarStore({
       await syncTransactionServerAction(tx, auth);
     } catch (err) {
       console.error('Remote transaction sync failed:', err);
+      throw err; // Rethrow to inform pulsar-core that sync failed
     }
   },
 });
