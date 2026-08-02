@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/TuwaIO/sdk/compare/sdk-v0.0.7...sdk-v0.0.8) (2026-08-02)
+
+
+### Bug Fixes
+
+* updated packages and added preFlightTxCheck utility ([11560fe](https://github.com/TuwaIO/sdk/commit/11560fe42c2f6ec85c9300d3261a289cc863a57b))
+
 ## [0.0.7](https://github.com/TuwaIO/sdk/compare/sdk-v0.0.6...sdk-v0.0.7) (2026-07-31)
 
 ### Bug Fixes
