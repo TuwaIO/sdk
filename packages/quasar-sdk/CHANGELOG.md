@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.18](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.17...quasar-sdk-v0.0.18) (2026-08-03)
+
+
+### Bug Fixes
+
+* updated  preFlightTxCheck request link ([a65e810](https://github.com/TuwaIO/sdk/commit/a65e81034146ddabbc8d36b424e56adddc0c4f27))
+
 ## [0.0.17](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.16...quasar-sdk-v0.0.17) (2026-08-02)
 
 
