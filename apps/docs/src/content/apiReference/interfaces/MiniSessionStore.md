@@ -4,7 +4,7 @@
 
 # MiniSessionStore
 
-Defined in: [packages/quasar-sdk/src/types.ts:176](https://github.com/TuwaIO/sdk/blob/c3b3fedb1fd51716c9b397e4cf78d8cd632c5196/packages/quasar-sdk/src/types.ts#L176)
+Defined in: [packages/quasar-sdk/src/types.ts:176](https://github.com/TuwaIO/sdk/blob/a7cbb3fa1cca6cb994a1e0a7bbff63fac5bfdac5/packages/quasar-sdk/src/types.ts#L176)
 
 Interface for a store that manages Mini-Session persistence.
 Designed to be compatible with Zustand.
@@ -15,7 +15,7 @@ Designed to be compatible with Zustand.
 
 > **clearSession**: () => `void`
 
-Defined in: [packages/quasar-sdk/src/types.ts:182](https://github.com/TuwaIO/sdk/blob/c3b3fedb1fd51716c9b397e4cf78d8cd632c5196/packages/quasar-sdk/src/types.ts#L182)
+Defined in: [packages/quasar-sdk/src/types.ts:182](https://github.com/TuwaIO/sdk/blob/a7cbb3fa1cca6cb994a1e0a7bbff63fac5bfdac5/packages/quasar-sdk/src/types.ts#L182)
 
 Clears the current session.
 
@@ -29,7 +29,7 @@ Clears the current session.
 
 > **miniSession**: [`MiniSessionAuth`](MiniSessionAuth.md) \| `null`
 
-Defined in: [packages/quasar-sdk/src/types.ts:178](https://github.com/TuwaIO/sdk/blob/c3b3fedb1fd51716c9b397e4cf78d8cd632c5196/packages/quasar-sdk/src/types.ts#L178)
+Defined in: [packages/quasar-sdk/src/types.ts:178](https://github.com/TuwaIO/sdk/blob/a7cbb3fa1cca6cb994a1e0a7bbff63fac5bfdac5/packages/quasar-sdk/src/types.ts#L178)
 
 Current active session or null.
 
@@ -39,7 +39,7 @@ Current active session or null.
 
 > **setMiniSession**: (`session`) => `void`
 
-Defined in: [packages/quasar-sdk/src/types.ts:180](https://github.com/TuwaIO/sdk/blob/c3b3fedb1fd51716c9b397e4cf78d8cd632c5196/packages/quasar-sdk/src/types.ts#L180)
+Defined in: [packages/quasar-sdk/src/types.ts:180](https://github.com/TuwaIO/sdk/blob/a7cbb3fa1cca6cb994a1e0a7bbff63fac5bfdac5/packages/quasar-sdk/src/types.ts#L180)
 
 Sets the active session.
 

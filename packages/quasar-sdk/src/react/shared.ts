@@ -81,11 +81,8 @@ export async function preFlightTxCheck(customApiUrl?: string): Promise<void> {
   const apiUrl = customApiUrl || BASE_API_URL;
 
   try {
-    const res = await fetch(`${apiUrl}/v1/engine/monitoring/health?t=${Date.now()}`, {
+    const res = await fetch(`${apiUrl}/v1/engine/monitoring/health`, {
       method: 'GET',
-      headers: {
-        'Cache-Control': 'no-cache',
-      },
       cache: 'no-store',
     });
 
