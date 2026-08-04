@@ -6,7 +6,7 @@
 
 > `const` **utils**: `object`
 
-Defined in: [packages/quasar-sdk/src/index.ts:33](https://github.com/TuwaIO/sdk/blob/a7cbb3fa1cca6cb994a1e0a7bbff63fac5bfdac5/packages/quasar-sdk/src/index.ts#L33)
+Defined in: [packages/quasar-sdk/src/index.ts:33](https://github.com/TuwaIO/sdk/blob/db961bea777b430ae04855219e9761b199fba571/packages/quasar-sdk/src/index.ts#L33)
 
 Security and authentication utilities.
 
