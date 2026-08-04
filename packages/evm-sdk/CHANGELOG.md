@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.9](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.0.8...evm-sdk-v0.0.9) (2026-08-04)
+
+
+### Bug Fixes
+
+* updated pulsar evm package version ([9ab06ab](https://github.com/TuwaIO/sdk/commit/9ab06abef5dc352c609043981fcd1b0331461d1d))
+
 ## [0.0.8](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.0.7...evm-sdk-v0.0.8) (2026-08-02)
 
 
