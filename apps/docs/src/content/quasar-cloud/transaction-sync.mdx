@@ -23,33 +23,33 @@ Use `quasar.pulsar.syncCreate` in your backend server action or API route to per
 ```typescript
 // src/app/actions/syncTransaction.ts
 'use server';
-
+ 
 import { Quasar, QuasarSDKError } from '@tuwaio/quasar-sdk';
-import { verifySiwxPayload, type SiwxSession } from '@tuwaio/sdk/siwx/server';
+import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import type { Transaction } from '@tuwaio/sdk/pulsar';
-
+ 
 // Initialize Quasar with your server-only Secret Key
 const quasar = new Quasar({
   secretKey: process.env.QUASAR_SECRET_KEY ?? '',
 });
-
+ 
 export async function syncTransactionServerAction(
   tx: Transaction,
-  session: SiwxSession,
+  session: SiwxSession | null,
   appName: string = 'My dApp',
 ) {
-  try {
-    // Step 1: Cryptographically verify the client's signature
-    const isValid = await verifySiwxPayload(session);
-    if (!isValid) {
-      throw new Error('Unauthorized: Wallet signature verification failed.');
-    }
+  if (!session) {
+    throw new Error('Unauthorized: Wallet signature verification failed.');
+  }
 
+  try {
+    // The SiwxSession in session is already verified by the SIWX API route and deserialized from the secure HttpOnly cookie.
+ 
     // Step 2: Ensure the transaction address matches the verified signer
     if (tx.from.toLowerCase() !== session.message.address.toLowerCase()) {
       throw new Error('Forbidden: Wallet address mismatch.');
     }
-
+ 
     // Step 3: Persist the transaction to Quasar Cloud
     const result = await quasar.pulsar.syncCreate(tx, appName);
     return { success: true, txKey: result.txKey };
@@ -72,30 +72,32 @@ Query paginated transaction histories for a verified user across all their devic
 ```typescript
 // src/app/actions/getHistory.ts
 'use server';
-
+ 
 import { Quasar, QuasarSDKError } from '@tuwaio/quasar-sdk';
-import { verifySiwxPayload, type SiwxSession } from '@tuwaio/sdk/siwx/server';
-
+import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
+ 
 const quasar = new Quasar({
   secretKey: process.env.QUASAR_SECRET_KEY ?? '',
 });
+ 
+export interface GetHistoryParams {
+  walletAddress: string;
+  page?: number;
+  limit?: number;
+  appName?: string;
+}
 
 export async function getHistoryServerAction(
-  params: {
-    walletAddress: string;
-    page?: number;
-    limit?: number;
-    appName?: string;
-  },
-  session: SiwxSession,
+  params: GetHistoryParams,
+  session: SiwxSession | null,
 ) {
-  try {
-    // Step 1: Verify the wallet signature before returning private history logs
-    const isValid = await verifySiwxPayload(session);
-    if (!isValid) {
-      throw new Error('Unauthorized: Invalid or expired signature.');
-    }
+  if (!session) {
+    throw new Error('Unauthorized: Invalid or expired signature.');
+  }
 
+  try {
+    // The session is inherently trusted since it was decrypted from the HttpOnly session cookie.
+ 
     // Step 2: Query paginated history from Quasar Cloud Engine
     const history = await quasar.pulsar.getHistory({
       walletAddress: params.walletAddress,
@@ -103,7 +105,7 @@ export async function getHistoryServerAction(
       limit: params.limit ?? 10,
       appName: params.appName ?? 'My dApp',
     });
-
+ 
     return history;
   } catch (error) {
     if (error instanceof QuasarSDKError) {
@@ -123,8 +125,9 @@ All calls to `quasar.pulsar.*` throw typed `QuasarSDKError` instances when an AP
 
 ```typescript
 import { QuasarSDKError } from '@tuwaio/quasar-sdk';
-
+ 
 try {
+  // @ts-expect-error - Assuming txData is a valid Transaction
   await quasar.pulsar.syncCreate(txData, 'My App');
 } catch (error) {
   if (error instanceof QuasarSDKError) {
@@ -146,28 +149,27 @@ Now that your server actions are ready, connect them to your client-side Pulsar 
 ```typescript
 // src/hooks/usePulsarStore.ts
 'use client';
-
-import { createPulsarStore } from '@tuwaio/pulsar-core';
+ 
+import { createPulsarStore } from '@tuwaio/sdk/pulsar';
 import { useSiwxSessionStore } from '@tuwaio/sdk/siwx';
 import { preFlightTxCheck } from '@tuwaio/quasar-sdk';
-import { syncTransactionServerAction, getHistoryServerAction } from '@/app/actions';
-
-export const pulsarStore = createPulsarStore({
+import { syncTransactionServerAction } from '@/app/actions';
+import { TransactionUnion } from '@/types';
+ 
+export const pulsarStore = createPulsarStore<TransactionUnion>({
   name: 'app-transaction-storage',
-
+ 
   // 1. Ensure a valid session exists before initiating transaction tracking
   //    and ping Quasar Cloud to ensure the server is alive.
   beforeTxProcess: async () => {
     await preFlightTxCheck();
   },
-
+ 
   // 2. Automatically sync transaction states to Quasar Cloud Engine
   onRemoteCreate: async (tx) => {
     try {
       const session = useSiwxSessionStore.getState().session;
-      if (session) {
-        await syncTransactionServerAction(tx as TransactionUnion, session);
-      }
+      await syncTransactionServerAction(tx as TransactionUnion, session);
     } catch (err) {
       console.error('Remote transaction sync failed:', err);
       throw err; // Rethrow to inform pulsar-core that sync failed

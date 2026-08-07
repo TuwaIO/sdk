@@ -102,18 +102,18 @@
   ],
   "dependencies": {
     "@tuwaio/orbit-evm": "^0.2.21",
-    "@tuwaio/pulsar-evm": "^0.5.9",
-    "@tuwaio/satellite-evm": "1.0.0-fix-siwe-deprec-alpha.2.ffb5e95",
-    "@tuwaio/siwx-evm": "1.0.0-fix-initialize-alpha.3.38c3a86"
+    "@tuwaio/pulsar-evm": "1.0.0-fix-docs-alpha.2.819c1d9",
+    "@tuwaio/satellite-evm": "1.0.0-fix-siwe-deprec-alpha.3.722e74d",
+    "@tuwaio/siwx-evm": "1.0.0-fix-initialize-alpha.6.21578d6"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.1.1738709b",
+    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.2.9f77db49",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.1.1738709b",
+    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.2.9f77db49",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",

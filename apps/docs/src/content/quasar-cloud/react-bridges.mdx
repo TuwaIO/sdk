@@ -1,6 +1,6 @@
 # SIWX Authentication (Headless)
 
-The `@tuwaio/sdk/siwx` module provides a headless, CAIP-122 compliant React hook `useSiwx` to handle multi-chain session authentication automatically on the frontend. 
+The `@tuwaio/sdk/siwx` module provides a headless, CAIP-122 compliant React hook `useSiwx` to handle multi-chain session authentication automatically on the frontend.
 
 ## The Headless Approach
 
@@ -15,18 +15,17 @@ For a React application, the optimal way to auto-authenticate is by initializing
 ```tsx
 // src/components/Providers.tsx
 'use client';
-
+ 
 import { ReactNode } from 'react';
-import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
-import { useSiwx } from '@tuwaio/sdk/siwx';
-import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/orbit-core';
-import { satelliteEVMAdapter } from '@tuwaio/satellite-evm';
-import { satelliteSolanaAdapter } from '@tuwaio/satellite-solana';
+import { SatelliteConnectProvider, useSatelliteSiwx } from '@tuwaio/sdk/satellite';
+import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
+import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
+import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
-
+ 
 export function Providers({ children }: { children: ReactNode }) {
-  const { signIn } = useSiwx();
-
+  const { signIn } = useSatelliteSiwx();
+ 
   return (
     <SatelliteConnectProvider
       adapter={[
@@ -39,9 +38,17 @@ export function Providers({ children }: { children: ReactNode }) {
         
         // Skip SIWX for Smart Contract wallets like Safe
         if (isEVM && isSafeApp) return;
-
+ 
         // Trigger sign-in flow
-        await signIn();
+        await signIn({
+          verifier: async (payload) => {
+            const res = await fetch('/api/siwx/verify', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            });
+            return res.ok ? res.json() : null;
+          },
+        });
       }}
     >
       {children}
@@ -50,7 +57,7 @@ export function Providers({ children }: { children: ReactNode }) {
 }
 ```
 
-### Behavior
+## Behavior
 
 1. **Connection**: The Satellite state machine establishes a new active wallet connection and fires the `callbackAfterConnected`.
 2. **Signing Prompt**: The `signIn()` method evaluates the connected wallet and presents the user with a standard Web3 signature request following the strict CAIP-122 format.

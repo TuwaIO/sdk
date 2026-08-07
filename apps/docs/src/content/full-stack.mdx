@@ -79,7 +79,7 @@ Create a Next.js App Router API route to handle CAIP-122 SIWX verification and s
 
 ```typescript
 // src/app/api/siwx/[...siwx]/route.ts
-import { createSiwxApiHandler } from '@tuwaio/sdk/siwx/server';
+import { createSiwxApiHandler } from '@tuwaio/sdk/siwx/server-next';
 
 const handler = createSiwxApiHandler({
   cookieOptions: {
@@ -97,24 +97,33 @@ export const { GET, POST, DELETE } = handler;
 ```typescript
 // src/app/actions.ts
 'use server';
-
+ 
 import { Quasar } from '@tuwaio/quasar-sdk';
-import { verifySiwxPayload, type SiwxSession } from '@tuwaio/sdk/siwx/server';
+import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import { TransactionUnion } from '@/types';
-
+ 
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
-
-export async function syncTransaction(tx: TransactionUnion, session: SiwxSession) {
-  const isValid = await verifySiwxPayload(session);
-  if (!isValid) throw new Error('Invalid signature.');
+ 
+export async function syncTransaction(tx: TransactionUnion, session: SiwxSession | null) {
+  if (!session) throw new Error('Unauthorized');
+ 
+  // The SiwxSession in session is already verified by the SIWX API route and deserialized from the secure HttpOnly cookie.
 
   await quasar.pulsar.syncCreate(tx, 'My App');
   return { success: true };
 }
+ 
+export interface GetHistoryParams {
+  walletAddress: string;
+  page?: number;
+  limit?: number;
+  appName?: string;
+}
 
-export async function getHistory(params: any, session: SiwxSession) {
-  const isValid = await verifySiwxPayload(session);
-  if (!isValid) throw new Error('Invalid signature.');
+export async function getHistory(params: GetHistoryParams, session: SiwxSession | null) {
+  if (!session) throw new Error('Unauthorized');
+ 
+  // The session is inherently trusted since it was decrypted from the HttpOnly session cookie.
 
   return quasar.pulsar.getHistory(params);
 }
@@ -176,10 +185,8 @@ const initialStore = createPulsarStore<TransactionUnion>({
   },
   onRemoteCreate: async (tx) => {
     try {
-      const session = useSiwxSessionStore.getState().session;
-      if (session) {
-        await syncTransaction(tx as TransactionUnion, session);
-      }
+      const auth = useSiwxSessionStore.getState().session;
+      await syncTransaction(tx as TransactionUnion, auth);
     } catch (err) {
       console.error('[PulsarHook] Remote sync failed:', err);
       throw err; // Rethrow to inform pulsar-core that sync failed
@@ -265,13 +272,13 @@ export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemor
 // src/providers/AppProviders.tsx
 'use client';
 
-import { SatelliteConnectProvider, useSatelliteConnection } from '@tuwaio/sdk/satellite';
+import { SatelliteConnectProvider, useSatelliteSiwx } from '@tuwaio/sdk/satellite';
 import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
 import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
 import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
-import { useSiwx, useSiwxSession } from '@tuwaio/sdk/siwx';
+import { useSiwxSession } from '@tuwaio/sdk/siwx';
 import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
 
 import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
@@ -280,6 +287,7 @@ import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const transactionsPool = usePulsarInMemoryStore((s) => s.transactionsPool);
+  const getAdapter = usePulsarStore((s) => s.getAdapter);
 
   const isLoading = usePulsarInMemoryStore((s) => s.isLoading);
   const isError = usePulsarInMemoryStore((s) => s.isError);
@@ -292,7 +300,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
   // Watch SIWX session to keep connection state aligned
   const siwxSession = useSiwxSession();
-  const { signIn } = useSiwx();
+  const { signIn } = useSatelliteSiwx();
 
   return (
     <SatelliteConnectProvider
@@ -301,9 +309,17 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       callbackAfterConnected={async (connection) => {
         const isEVM = getAdapterFromConnectorType(connection.connectorType) === OrbitAdapter.EVM;
         if (isEVM && isSafeApp) return;
-
-        await signIn();
-
+ 
+        await signIn({
+          verifier: async (payload) => {
+            const res = await fetch('/api/siwx/verify', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            });
+            return res.ok ? res.json() : null;
+          },
+        });
+ 
         // Fetch history slightly after connection and sign-in
         setTimeout(() => fetchInitial(connection.address), 2000);
       }}

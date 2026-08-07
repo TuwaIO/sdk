@@ -11,6 +11,7 @@ export default defineConfig([
       './src/siwx.ts',
       './src/siwx-core.ts',
       './src/siwx-server.ts',
+      './src/siwx-server-next.ts',
       './src/nova-connect.ts',
       './src/nova-connect-satellite.ts',
       './src/nova-connect-components.ts',
