@@ -8,8 +8,9 @@ export default defineConfig([
     entry: [
       './src/pulsar.ts',
       './src/satellite.ts',
-      './src/satellite-siwe.ts',
-      './src/satellite-siwe-server.ts',
+      './src/siwx.ts',
+      './src/siwx-core.ts',
+      './src/siwx-server.ts',
       './src/nova-connect.ts',
       './src/nova-connect-satellite.ts',
       './src/nova-connect-components.ts',

@@ -1,6 +1,6 @@
 # Core SDK (`@tuwaio/sdk`)
 
-`@tuwaio/sdk` is **Layer 8 (L8)** of the TUWA ecosystem — the unified client UI and Logic foundation. It packages Orbit (primitives), Pulsar (transaction tracking), Satellite (wallet connections), and Nova (React UI components) into clean, tree-shakeable subpaths.
+`@tuwaio/sdk` is **Layer 8 (L8)** of the TUWA ecosystem — the unified client UI and Logic foundation. It packages Orbit (primitives), Pulsar (transaction tracking), Satellite (wallet connections), SIWX (CAIP-122 auth), and Nova (React UI components) into clean, tree-shakeable subpaths.
 
 Instead of installing and managing separate decoupled packages, `@tuwaio/sdk` gives you a single, version-aligned entrypoint for building Web3 interfaces.
 
@@ -13,9 +13,10 @@ The core SDK bundles the complete suite of TUWA client packages. For full API re
 | Layer                  | Subpath                    | Full Documentation & Catalog                                                                                      |
 | :--------------------- | :------------------------- | :---------------------------------------------------------------------------------------------------------------- |
 | **Orbit Utils**        | `@tuwaio/sdk/orbit`        | 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Framework-agnostic multi-chain communication primitives. |
-| **Satellite Connect**  | `@tuwaio/sdk/satellite`    | 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine & SIWE auth.     |
+| **Satellite Connect**  | `@tuwaio/sdk/satellite`    | 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine.     |
 | **Pulsar Engine**      | `@tuwaio/sdk/pulsar`       | ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — Transaction lifecycle state tracking engine.          |
 | **Nova UI Components** | `@tuwaio/sdk/nova-connect` | 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — Interactive component catalog and visual design system.    |
+| **SIWX Auth**          | `@tuwaio/sdk/siwx`         | 🔐 **[SIWX Docs](https://siwx.docs.tuwa.io/)** — Headless CAIP-122 multi-chain authentication.                    |
 
 ---
 
@@ -101,6 +102,9 @@ import { ConnectButton as StandaloneConnectButton } from '@tuwaio/sdk/nova-conne
 // 5. Transaction UI Components (Nova Transactions)
 import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
 import { NovaTransactionsProvider } from '@tuwaio/sdk/nova-transactions/providers';
+
+// 6. CAIP-122 Authentication (SIWX)
+import { useSiwx, useSiwxSession } from '@tuwaio/sdk/siwx';
 ```
 
-_Note: `@tuwaio/sdk` exports the full API surface of Satellite, Pulsar, Orbit, and Nova. Refer to the respective documentation links above for complete API signatures._
+_Note: `@tuwaio/sdk` exports the full API surface of Satellite, Pulsar, Orbit, Nova, and SIWX. Refer to the respective documentation links above for complete API signatures._

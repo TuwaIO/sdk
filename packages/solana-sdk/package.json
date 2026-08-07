@@ -26,6 +26,11 @@
       "types": "./dist/nova-connect.d.ts",
       "import": "./dist/nova-connect.js",
       "require": "./dist/nova-connect.cjs"
+    },
+    "./siwx": {
+      "types": "./dist/siwx.d.ts",
+      "import": "./dist/siwx.js",
+      "require": "./dist/siwx.cjs"
     }
   },
   "publishConfig": {
@@ -75,7 +80,6 @@
     "quasar",
     "cloud",
     "sdk",
-    "siwe",
     "next-auth",
     "cosmos",
     "playground",
@@ -99,11 +103,12 @@
   "dependencies": {
     "@tuwaio/orbit-solana": "^0.2.13",
     "@tuwaio/pulsar-solana": "^0.6.9",
-    "@tuwaio/satellite-solana": "^0.3.12"
+    "@tuwaio/satellite-solana": "1.0.0-fix-siwe-deprec-alpha.2.ffb5e95",
+    "@tuwaio/siwx-solana": "1.0.0-fix-initialize-alpha.3.38c3a86"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=0.4.9",
+    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.1.1738709b",
     "@wallet-standard/app": "1.1.x",
     "@wallet-standard/base": "1.1.x",
     "@wallet-standard/core": "1.x.x",
@@ -114,7 +119,7 @@
     "gill": ">=0.14"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.4.12",
+    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.1.1738709b",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",

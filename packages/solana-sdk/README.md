@@ -19,9 +19,10 @@ It completely avoids legacy `@solana/web3.js` classes and is built from the grou
 
 - **🪙 Solana Native**: Built entirely on Wallet Standard to ensure maximum forward compatibility.
 - **🌐 Ecosystem Adapters**: Packages OrbitSolana, PulsarSolana, SatelliteSolana, and SolanaConnectorsWatcher under unified subpaths.
-- **⚡ Subpath Architecture**: Clean subpath imports (`@tuwaio/solana-sdk/satellite`, `@tuwaio/solana-sdk/pulsar`, `@tuwaio/solana-sdk/orbit`, `@tuwaio/solana-sdk/nova-connect`).
+- **⚡ Subpath Architecture**: Clean subpath imports (`@tuwaio/solana-sdk/satellite`, `@tuwaio/solana-sdk/pulsar`, `@tuwaio/solana-sdk/orbit`, `@tuwaio/solana-sdk/nova-connect`, `@tuwaio/solana-sdk/siwx`).
 - **🧩 Zero UI Bloat**: Focuses strictly on connection logic, standard wallet features, and transaction tracking adapters.
 - **🔄 Standardized Auto-Discovery**: Seamlessly detects and connects to any browser extension that supports Wallet Standard (`SolanaConnectorsWatcher`).
+- **🔐 Headless SIWX Auth**: Provides the Solana-native message signer (`createSolanaSiwxSigner`) for seamless CAIP-122 authentication.
 
 ---
 
@@ -217,6 +218,7 @@ export function SwapButton() {
 - **`@tuwaio/solana-sdk/pulsar`** — Solana Pulsar adapter (`pulsarSolanaAdapter`).
 - **`@tuwaio/solana-sdk/orbit`** — Solana Orbit helpers & types.
 - **`@tuwaio/solana-sdk/nova-connect`** — Solana React watcher component (`SolanaConnectorsWatcher`).
+- **`@tuwaio/solana-sdk/siwx`** — Solana CAIP-122 signer adapter (`createSolanaSiwxSigner`).
 
 ---
 

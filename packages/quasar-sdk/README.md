@@ -7,25 +7,24 @@
   <img src="https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/preview/repos/quasar_sdk.png" alt="Quasar SDK Architecture" width="100%" />
 </p>
 
-> The official **Layer 5 (L5)** server-side Node.js & Edge SDK for the **TUWA Quasar Cloud**, featuring built-in React authentication bridges.
+> The official **Layer 5 (L5)** server-side Node.js & Edge SDK for the **TUWA Quasar Cloud**.
 
 ---
 
 ## 🏛️ What is `@tuwaio/quasar-sdk`?
 
-`@tuwaio/quasar-sdk` is **Layer 5 (L5)** of the TUWA ecosystem architecture — the official backend companion to the TUWA client libraries. It serves as the gateway to the **Quasar Cloud Engine**, allowing your server to securely push transaction logs, query paginated transaction histories, and cryptographically verify client signatures.
+`@tuwaio/quasar-sdk` is **Layer 5 (L5)** of the TUWA ecosystem architecture — the official backend companion to the TUWA client libraries. It serves as the gateway to the **Quasar Cloud Engine**, allowing your server to securely push transaction logs, query paginated transaction histories, and sync infrastructure states.
 
-It operates strictly on the server (Node.js, Next.js Server Actions, or Edge functions) and uses Secret Keys to communicate with Quasar's iron-dome guarded endpoints. It also includes React Bridges for establishing secure "Mini-Session" authentication on the client side.
+It operates strictly on the server (Node.js, Next.js Server Actions, or Edge functions) and uses Secret Keys to communicate with Quasar's iron-dome guarded endpoints.
 
 ---
 
 ## ✨ Key Features
 
 - **☁️ Cloud Sync**: Automatically persist pending and terminal transaction states to the Quasar Database for cross-device history.
-- **🔐 Mini-Session Auth**: Built-in cryptographic verification and React bridges (`QuasarAuthBridge`) to handle mini-session authentication across EVM and Solana with zero boilerplate.
+- **🔐 Headless SIWX (CAIP-122) Auth Ready**: Seamlessly pairs with `@tuwaio/sdk/siwx/server` for strict cryptographic verification of user sessions before allowing database writes.
 - **⚡ Edge Ready**: Uses `ofetch` and lightweight cryptography to run seamlessly in Cloudflare Workers and Vercel Edge.
 - **📦 InMemory Sync**: Perfectly pairs with `@tuwaio/sdk/pulsar` (`createTxInMemoryStore`) to fetch history and hydrate local React states.
-- **⛓️ Multi-Chain Support**: Provides separate lightweight bridges for EVM (`react/evm`) and Solana (`react/solana`), ensuring minimal bundle sizes.
 
 ---
 
@@ -44,7 +43,8 @@ _Note: `ofetch` and `@tuwaio/pulsar-core` are required as peer dependencies to e
 This is a basic example of how to interact with the Quasar Cloud directly from your secure backend environments (like Next.js API Routes, Server Actions, or NestJS).
 
 ```typescript
-import { Quasar, MiniSessionAuth, utils } from '@tuwaio/quasar-sdk';
+import { Quasar } from '@tuwaio/quasar-sdk';
+import { verifySiwxPayload, type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import type { Transaction } from '@tuwaio/sdk/pulsar';
 
 // Initialize Quasar with your Secret Key from the Dashboard
@@ -53,9 +53,9 @@ const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 /**
  * Example Next.js Server Action to Sync a Transaction
  */
-export async function syncTransaction(tx: Transaction, authData: MiniSessionAuth) {
+export async function syncTransaction(tx: Transaction, sessionData: SiwxSession) {
   // 1. Verify the client's signature (prevent unauthorized spoofing)
-  const isValid = await utils.verifyMiniSession(authData);
+  const isValid = await verifySiwxPayload(sessionData);
   if (!isValid) throw new Error('Invalid signature.');
 
   // 2. Sync the transaction securely to the Quasar Cloud
@@ -68,9 +68,9 @@ export async function syncTransaction(tx: Transaction, authData: MiniSessionAuth
  */
 export async function getHistory(
   params: { walletAddress: string; page: number; limit: number; appName: string },
-  authData: MiniSessionAuth,
+  sessionData: SiwxSession,
 ) {
-  const isValid = await utils.verifyMiniSession(authData);
+  const isValid = await verifySiwxPayload(sessionData);
   if (!isValid) throw new Error('Invalid signature.');
 
   // Return the paginated transaction history
@@ -80,83 +80,19 @@ export async function getHistory(
 
 ---
 
-## 🔐 React Authentication Bridge
+## 🔐 Frontend Authentication (SIWX)
 
-The SDK provides React components to handle mini-session authentication with zero boilerplate. This bridges the gap between your frontend (where the wallet is) and your backend (where the Quasar Secret Key lives).
+The Quasar SDK relies on the standard **SIWX (CAIP-122)** protocol for authenticating requests. 
 
-### 1. Create the Auth Store
+You should use the headless `useSatelliteSiwxAutoAuth` hook provided by `@tuwaio/sdk/siwx` on your frontend. This hook automatically prompts users to sign a CAIP-122 message when they connect their wallet, and establishes a secure session with your backend.
 
-Before using the bridge, create a persistent Zustand store using the provided utility to manage the signature lifecycle.
-
-```ts
-// src/hooks/useAuthStore.ts
-import { utils } from '@tuwaio/quasar-sdk';
-
-export const useAuthStore = utils.createMiniSessionStore('quasar-mini-session-storage');
-```
-
-To prevent issues with missing optional peer dependencies at build time, the SDK exposes separate ecosystem entry points for the Bridge:
-
-### EVM-Only Bridge (No Solana dependencies required)
-
-If your project only supports EVM chains, import from the `/react/evm` subpath.
-
-```tsx
-import { QuasarEvmAuthBridge } from '@tuwaio/quasar-sdk/react/evm';
-import { useAuthStore } from '@/hooks/useAuthStore';
-
-export function MyApp({ activeConnection, store, wagmiConfig }) {
-  const session = useAuthStore((s) => s.miniSession);
-  const setSession = useAuthStore((s) => s.setMiniSession);
-
-  return (
-    <QuasarEvmAuthBridge
-      activeConnection={activeConnection} // Structural interface for wallet state
-      store={store} // Zustand store API
-      wagmiConfig={wagmiConfig} // Wagmi config
-      session={session} // Current session state
-      setSession={setSession} // Session setter
-    />
-  );
-}
-```
-
-### Solana-Only Bridge (No EVM dependencies required)
-
-If your project only supports Solana, import from the `/react/solana` subpath.
-
-```tsx
-import { QuasarSolanaAuthBridge } from '@tuwaio/quasar-sdk/react/solana';
-import { useAuthStore } from '@/hooks/useAuthStore';
-
-export function MyApp({ activeConnection, store }) {
-  const session = useAuthStore((s) => s.miniSession);
-  const setSession = useAuthStore((s) => s.setMiniSession);
-
-  return (
-    <QuasarSolanaAuthBridge
-      activeConnection={activeConnection}
-      store={store}
-      session={session}
-      setSession={setSession}
-    />
-  );
-}
-```
-
-### Unified Cross-Chain Bridge
-
-If your project supports both ecosystems and has all peer dependencies installed (`@wagmi/core`, `@solana/react`, etc.), you can use the unified bridge:
-
-```tsx
-import { QuasarAuthBridge } from '@tuwaio/quasar-sdk/react';
-```
+For detailed frontend integration, see the [SIWX Documentation](https://sdk.docs.tuwa.io/quasar-cloud/react-bridges).
 
 ---
 
 ## 🌍 The Full Flow (Production Architecture)
 
-To see how incredibly powerful `@tuwaio/quasar-sdk` is when combined with `@tuwaio/sdk`, here is a complete architectural overview without any skipped steps. Notice how the **Auth Store**, **Pulsar Store**, and **QuasarAuthBridge** dance together effortlessly:
+To see how incredibly powerful `@tuwaio/quasar-sdk` is when combined with `@tuwaio/sdk`, here is a complete architectural overview without any skipped steps. Notice how the **Pulsar Store** and **Headless SIWX** dance together effortlessly:
 
 ### 1. Define Your Transaction Types (`types.ts`)
 
@@ -186,38 +122,27 @@ Proxy calls to Quasar Cloud using your backend to protect secret keys.
 // src/app/actions.ts
 'use server';
 
-import { Quasar, MiniSessionAuth, utils } from '@tuwaio/quasar-sdk';
+import { Quasar } from '@tuwaio/quasar-sdk';
+import { verifySiwxPayload, type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import { TransactionUnion } from '@/types';
 
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 
-export async function syncTransaction(tx: TransactionUnion, authData: MiniSessionAuth) {
-  const isValid = await utils.verifyMiniSession(authData);
+export async function syncTransaction(tx: TransactionUnion, sessionData: SiwxSession) {
+  const isValid = await verifySiwxPayload(sessionData);
   if (!isValid) throw new Error('Invalid signature.');
 
   await quasar.pulsar.syncCreate(tx, 'My App');
   return { success: true };
 }
 
-export async function getHistory(params: any, authData: MiniSessionAuth) {
-  const isValid = await utils.verifyMiniSession(authData);
+export async function getHistory(params: any, sessionData: SiwxSession) {
+  const isValid = await verifySiwxPayload(sessionData);
   if (!isValid) throw new Error('Invalid signature.');
 
   return quasar.pulsar.getHistory(params);
 }
 ```
-
-### 3. The Client Auth Store (`useAuthStore.ts`)
-
-```tsx
-// src/hooks/useAuthStore.ts
-import { utils } from '@tuwaio/quasar-sdk';
-
-// Automatically persists the verified signature in localStorage
-export const useAuthStore = utils.createMiniSessionStore('quasar-mini-session-storage');
-```
-
-### 4. The Headless Tracking Store (`usePulsarStore.ts`)
 
 ```ts
 // src/hooks/usePulsarStore.ts
@@ -226,7 +151,8 @@ export const useAuthStore = utils.createMiniSessionStore('quasar-mini-session-st
 import { createPulsarStore, createTxInMemoryStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
 import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
 import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
-import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
+import { useSiwxSessionStore } from '@tuwaio/sdk/siwx';
+import { preFlightTxCheck } from '@tuwaio/quasar-sdk';
 
 import { getHistory, syncTransaction } from '@/app/actions';
 import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
@@ -238,14 +164,16 @@ const initialStore = createPulsarStore<TransactionUnion>({
   name: storageName,
   adapter: [pulsarEvmAdapter(wagmiConfig, appEVMChains), pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls })],
   beforeTxProcess: async () => {
-    // Ensures we have a valid signature before executing any blockchain logic
-    await getMiniSessionAuth();
+    // Ensures we have a valid SIWX session and Quasar Cloud is reachable before executing blockchain logic
+    await preFlightTxCheck();
   },
   onRemoteCreate: async (tx) => {
     try {
       // Syncs the new transaction to Quasar via Next.js Server Actions
-      const auth = await getMiniSessionAuth();
-      await syncTransaction(tx as TransactionUnion, auth);
+      const session = useSiwxSessionStore.getState().session;
+      if (session) {
+        await syncTransaction(tx as TransactionUnion, session);
+      }
     } catch (err) {
       console.error('[PulsarHook] Remote sync failed:', err);
     }
@@ -259,8 +187,10 @@ const pulsarInMemoryStore = createTxInMemoryStore<TransactionUnion>({
   localTransactionsPool: initialStore.getState().transactionsPool,
   getHistory: async ({ page, walletAddress }) => {
     try {
-      const auth = await getMiniSessionAuth();
-      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' }, auth);
+      const session = useSiwxSessionStore.getState().session;
+      if (!session) return null;
+
+      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' }, session);
 
       if (!history) return null;
 
@@ -280,49 +210,7 @@ initialStore.subscribe((state) => pulsarInMemoryStore.getState().syncWithLocalPo
 export const usePulsarInMemoryStore = createBoundedUseStore(pulsarInMemoryStore);
 ```
 
-### 5. The Quasar Auth Bridge (`QuasarSDKAuthProvider.tsx`)
-
-```tsx
-// src/providers/QuasarSDKAuthProvider.tsx
-'use client';
-
-import { useContext, useEffect } from 'react';
-import { useSatelliteConnectStore, SatelliteStoreContext } from '@tuwaio/sdk/satellite';
-import { QuasarActiveConnection, QuasarAuthBridge as QuasarSDKAuthBridge } from '@tuwaio/quasar-sdk/react';
-
-import { wagmiConfig } from '@/configs/appConfig';
-import { useAuthStore } from '@/hooks/useAuthStore';
-
-export function QuasarAuthBridge() {
-  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
-  const store = useContext(SatelliteStoreContext);
-
-  const session = useAuthStore((s) => s.miniSession);
-  const setSession = useAuthStore((s) => s.setMiniSession);
-  const clearSession = useAuthStore((s) => s.clearSession);
-
-  // Clear Quasar Mini-Session when wallet disconnects
-  useEffect(() => {
-    if (!activeConnection?.isConnected) {
-      clearSession();
-    }
-  }, [activeConnection?.isConnected, clearSession]);
-
-  if (!activeConnection || !store) return null;
-
-  return (
-    <QuasarSDKAuthBridge
-      activeConnection={activeConnection as QuasarActiveConnection}
-      store={store as any}
-      wagmiConfig={wagmiConfig}
-      session={session}
-      setSession={setSession}
-    />
-  );
-}
-```
-
-### 6. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
+### 4. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
 
 ```tsx
 // src/providers/NovaTransactionsProvider.tsx
@@ -361,24 +249,24 @@ export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemor
 }
 ```
 
-### 7. The Seamless UI Integration (`AppProviders.tsx`)
+### 5. The Seamless UI Integration (`AppProviders.tsx`)
 
 ```tsx
 // src/providers/AppProviders.tsx
 'use client';
 
-import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { SatelliteConnectProvider, useSatelliteConnection } from '@tuwaio/sdk/satellite';
 import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
 import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
 import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
-import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
+import { useSiwx, useSiwxSession } from '@tuwaio/sdk/siwx';
+import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
 
 import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
 import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
 import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
-import { QuasarAuthBridge } from '@/providers/QuasarSDKAuthProvider';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const getAdapter = usePulsarStore((state) => state.getAdapter);
@@ -393,31 +281,35 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
   const pagination = { isLoading, isError, currentPage, hasMore, fetchNextPage };
 
+  // Watch SIWX session to keep connection state aligned
+  const siwxSession = useSiwxSession();
+  const { signIn } = useSiwx();
+
   return (
     <SatelliteConnectProvider
       adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
       autoConnect={true}
       callbackAfterConnected={async (connection) => {
-        try {
-          await getMiniSessionAuth();
-          setTimeout(() => fetchInitial(connection.address), 2000);
-        } catch (err) {
-          console.error('[QuasarAuth] Auto-authentication failed:', err);
-          setTimeout(() => fetchInitial(connection.address), 2000);
-        }
+        const isEVM = getAdapterFromConnectorType(connection.connectorType) === OrbitAdapter.EVM;
+        if (isEVM && isSafeApp) return;
+
+        // Trigger SIWX flow
+        await signIn();
+
+        // Fetch history slightly after connection and sign-in
+        setTimeout(() => fetchInitial(connection.address), 2000);
       }}
     >
-      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
-      <SolanaConnectorsWatcher />
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} siwx={siwxSession} />
+      <SolanaConnectorsWatcher siwx={siwxSession} />
 
-      <QuasarAuthBridge />
       <NovaTransactionsProvider pagination={pagination} />
 
       <NovaConnectProvider
         appChains={appEVMChains}
         solanaRPCUrls={solanaRPCUrls}
         transactionPool={transactionsPool}
-        pulsarAdapter={getAdapter() as any}
+        pulsarAdapter={getAdapter()}
         withImpersonated
         withBalance
         withChain
@@ -430,7 +322,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 }
 ```
 
-### 8. Creating a Transaction (Usage)
+### 6. Creating a Transaction (Usage)
 
 Now you can safely execute strictly-typed, cross-chain transactions anywhere in your app. The store automatically routes the transaction to the correct adapter, and Quasar syncs it to the cloud.
 
@@ -485,12 +377,10 @@ export function SwapButton() {
 
 ## 📦 Available Namespaces
 
-This package provides the following server-side utilities and React bridges:
+This package provides the following server-side utilities and React helpers:
 
 - `Quasar` — The main server-side client class instance used to access `quasar.pulsar.*` methods.
-- `utils` — Security and authentication utilities for signature verification (`verifyMiniSession`, `signMiniSession`, `createMiniSessionStore`).
-- `QuasarAuthBridge` (exported via subpaths) — The client-side React component for triggering and managing the signature flow automatically when the wallet connects.
-- `MiniSessionAuth` — The strict type definition mapping the structure of the authentication payload.
+- `preFlightTxCheck` — A client-side helper to ensure the user has a valid SIWX session and Quasar Cloud is reachable before prompting wallet signatures.
 
 ---
 

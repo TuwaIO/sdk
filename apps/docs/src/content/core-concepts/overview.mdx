@@ -8,14 +8,15 @@ The **TUWA Ecosystem** is built around a multi-tiered architecture that decouple
 
 ```
 +-----------------------------------------------------------------------------------+
-| L1–L2: Orbit Primitives                                                           |
-|     L1: @tuwaio/orbit-core | L2: @tuwaio/orbit-evm, @tuwaio/orbit-solana          |
+| L1–L2: Orbit Primitives & SIWX Auth                                               |
+|     L1: @tuwaio/orbit-core, @tuwaio/siwx-core                                     |
+|     L2: @tuwaio/orbit-evm, @tuwaio/orbit-solana, @tuwaio/siwx-*                   |
 +-----------------------------------------------------------------------------------+
 | L3–L4: Headless Core Engines & Adapters                                           |
 |     Satellite (L3-L4), Pulsar (L3-L4)                                             |
 +-----------------------------------------------------------------------------------+
 | L5: Quasar Cloud Engine Client (@tuwaio/quasar-sdk)                               |
-|     Server-Side Node.js / Edge Client + QuasarAuthBridge                          |
+|     Server-Side Node.js / Edge Client                                             |
 +-----------------------------------------------------------------------------------+
 | L6–L7: Nova UI Kit (React View Layer)                                             |
 |     L6: @tuwaio/nova-core | L7: @tuwaio/nova-connect, @tuwaio/nova-transactions  |
@@ -30,13 +31,13 @@ The **TUWA Ecosystem** is built around a multi-tiered architecture that decouple
 
 ### Layer Breakdown
 
-1. **L1 – L2: Orbit Utils (Foundation Primitives)**
-   - **L1 Core (`@tuwaio/orbit-core`)**: Low-level, framework-agnostic multi-chain communication primitives, formatting helpers, and core adapter types (`OrbitAdapter.EVM`, `OrbitAdapter.SOLANA`).
-   - **L2 Platforms (`@tuwaio/orbit-evm`, `@tuwaio/orbit-solana`)**: Chain-specific client creators and wrappers (Viem, Wagmi, Gill).
+1. **L1 – L2: Foundation Primitives (Orbit & SIWX)**
+   - **L1 Core (`@tuwaio/orbit-core`, `@tuwaio/siwx-core`)**: Low-level, framework-agnostic multi-chain communication primitives, formatting helpers, and pure CAIP-122 auth engines.
+   - **L2 Platforms & Adapters (`@tuwaio/orbit-evm`, `@tuwaio/orbit-solana`, `@tuwaio/siwx-*`)**: Chain-specific client creators and framework bindings (Viem, Wagmi, Gill, React).
 
 2. **L3 – L4: Headless Core Engines (Connection & Lifecycle)**
    - **L3 Engines (`@tuwaio/satellite-core`, `@tuwaio/pulsar-core`)**: Framework-agnostic state machines for wallet connectivity (Satellite) and transaction tracking lifecycles (Pulsar).
-   - **L4 Adapters & Bindings (`@tuwaio/satellite-evm`, `@tuwaio/satellite-solana`, `@tuwaio/satellite-react`, `@tuwaio/pulsar-evm`, `@tuwaio/pulsar-solana`, `@tuwaio/pulsar-react`, `@tuwaio/satellite-siwe-next-auth`)**: Chain adapters, React hooks, and SIWE session auth modules.
+   - **L4 Adapters & Bindings (`@tuwaio/satellite-evm`, `@tuwaio/satellite-solana`, `@tuwaio/satellite-react`, `@tuwaio/pulsar-evm`, `@tuwaio/pulsar-solana`, `@tuwaio/pulsar-react`)**: Chain adapters and React hooks.
 
 3. **L5: Quasar Cloud Engine (`@tuwaio/quasar-sdk`)**
    - The official server-side Node.js & Edge client for transaction indexing, cloud sync, history pagination, and authentication verification.
@@ -59,6 +60,7 @@ Access dedicated documentation portals across the TUWA ecosystem:
 
 - 🌐 **[TUWA Documentation Hub](https://docs.tuwa.io/)** — Central directory linking to all ecosystem documentation sites.
 - 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Low-level, framework-agnostic multi-chain communication primitives.
-- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine & SIWE auth layer.
+- 🔐 **[SIWX Core Docs](https://siwx.docs.tuwa.io/)** — Headless CAIP-122 multi-chain authentication standard.
+- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine.
 - ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — Headless transaction lifecycle & tracking engine.
 - 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — Interactive component catalog and visual design system.

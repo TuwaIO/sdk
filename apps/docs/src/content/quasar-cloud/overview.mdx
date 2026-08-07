@@ -10,8 +10,8 @@ Using `@tuwaio/quasar-sdk`, your backend can securely index on-chain transaction
 
 - **Server-Side Transaction Indexing**: Persist and track transaction states (`pending`, `success`, `failed`) across devices.
 - **Cross-Device History API**: Retrieve paginated, tenant-isolated transaction histories for any connected wallet address.
-- **Stateless Signature Verification**: Verify client Mini-Session authentication proofs on Node.js, Next.js Server Actions, or Edge runtimes (Cloudflare Workers, Vercel Edge).
-- **Subpath-Modular React Bridges**: Pure subpath imports (`/react/evm`, `/react/solana`) ensuring zero unnecessary dependencies are shipped to the client.
+- **SIWX Integration**: Seamlessly works with `@tuwaio/sdk/siwx/server` for stateless, CAIP-122 compliant signature verification across Node.js, Next.js Server Actions, and Edge runtimes.
+- **Framework Agnostic Core**: Ultra-lightweight and dependency-free backend client designed for maximum performance across any JS environment.
 
 ---
 
@@ -54,15 +54,15 @@ export const quasar = new Quasar({
 The integration between your client dApp, backend server, and Quasar Cloud follows a clean 3-step lifecycle:
 
 ```
-[ Client Wallet ] ──(1. Sign Mini-Session)──> [ React Auth Bridge ]
-                                                     │
-                                             (2. Server Action + Auth)
-                                                     ▼
-[ Quasar Cloud Engine ] <──(3. Quasar SDK)──── [ Backend Server ]
+[ Client Wallet ] ──(1. Sign CAIP-122 Message)──> [ Headless SIWX Hook ]
+                                                          │
+                                                (2. Server Verification)
+                                                          ▼
+[ Quasar Cloud Engine ] <────(3. Quasar SDK)─────── [ Backend Server ]
 ```
 
-1. **Client Layer**: React Auth Bridges (`@tuwaio/quasar-sdk/react`) obtain a lightweight Mini-Session signature from the user's wallet.
-2. **Server Layer**: Your Next.js Server Action or API route verifies the signature (`utils.verifyMiniSession`).
+1. **Client Layer**: Headless SIWX hooks (`@tuwaio/sdk/siwx`) obtain a CAIP-122 standard signature from the user's wallet automatically upon connection.
+2. **Server Layer**: Your Next.js Server Action or API route verifies the session cookie or signature (`verifySiwxPayload` from `@tuwaio/sdk/siwx/server`).
 3. **Cloud Engine**: Your backend calls `quasar.pulsar.syncCreate` or `quasar.pulsar.getHistory` to interact with the Quasar Engine.
 
 ---

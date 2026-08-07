@@ -11,7 +11,7 @@ The **Layer 8 (L8)** Core Umbrella SDK for the TUWA Ecosystem. It provides a uni
 
 `@tuwaio/sdk` is **Layer 8 (L8)** of the TUWA ecosystem architecture — the all-in-one UI and Logic foundation. Instead of manually resolving versions and importing from a dozen decoupled packages (`@tuwaio/pulsar-core`, `@tuwaio/nova-connect`, etc.), you install this single SDK and access clean, modular subpath exports.
 
-It abstracts away complex dependency management (automatically handling `zustand`, `framer-motion`, `radix-ui`, `siwe`, `iron-session`, etc.) and lets you focus on building your application.
+It abstracts away complex dependency management (automatically handling `zustand`, `framer-motion`, `radix-ui`, etc.) and lets you focus on building your application.
 
 ---
 
@@ -155,28 +155,36 @@ Assembling the complete multi-chain ecosystem layout. Notice how both `EVMConnec
 // src/providers/AppProviders.tsx
 'use client';
 
-import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
-import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
-import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
-import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
+import { useSiwx, useSiwxSession } from '@tuwaio/sdk/siwx';
+import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
 
 import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
-import { usePulsarStore } from '@/hooks/usePulsarStore';
+import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
 import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const getAdapter = usePulsarStore((state) => state.getAdapter);
   const transactionsPool = usePulsarStore((state) => state.transactionsPool);
 
+  const siwxSession = useSiwxSession();
+  const { signIn } = useSiwx();
+
   return (
     <SatelliteConnectProvider
       adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
       autoConnect={true}
+      callbackAfterConnected={async (connection) => {
+        const isEVM = getAdapterFromConnectorType(connection.connectorType) === OrbitAdapter.EVM;
+        if (isEVM && isSafeApp) return;
+
+        // Trigger SIWX flow
+        await signIn();
+      }}
     >
-      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
-      <SolanaConnectorsWatcher />
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} siwx={siwxSession} />
+      <SolanaConnectorsWatcher siwx={siwxSession} />
 
       <NovaTransactionsProvider />
 
@@ -184,7 +192,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         appChains={appEVMChains}
         solanaRPCUrls={solanaRPCUrls}
         transactionPool={transactionsPool}
-        pulsarAdapter={getAdapter() as any}
+        pulsarAdapter={getAdapter()}
         withImpersonated
         withBalance
         withChain
@@ -274,8 +282,9 @@ This package provides direct subpath entry points for clean, tree-shakeable impo
 
 - **`@tuwaio/sdk/pulsar`** — State machine & tracking stores (`createPulsarStore`, `createTxInMemoryStore`, `useInitializeTransactionsPool`).
 - **`@tuwaio/sdk/satellite`** — Wallet state & react hooks (`useSatelliteConnectStore`, `SatelliteConnectProvider`, `useAccount`).
-- **`@tuwaio/sdk/satellite/siwe`** — Client-side SIWE authentication utilities.
-- **`@tuwaio/sdk/satellite/siwe/server`** — Server-side SIWE API handler (`createSiweApiHandler`).
+- **`@tuwaio/sdk/siwx`** — Client-side SIWX (CAIP-122) auto-authentication hooks.
+- **`@tuwaio/sdk/siwx/core`** — SIWX core types, error handling, and message building logic.
+- **`@tuwaio/sdk/siwx/server`** — Server-side SIWX session handlers.
 - **`@tuwaio/sdk/nova-connect`** — Connect UI main entry (`ConnectButton`, `NovaConnectProvider`).
 - **`@tuwaio/sdk/nova-connect/components`** — Standalone UI components (`ConnectButton`, Modals, Customization interfaces).
 - **`@tuwaio/sdk/nova-connect/hooks`** — Helper hooks (`useGetWalletNameAndAvatar`, `useWalletChainsList`).

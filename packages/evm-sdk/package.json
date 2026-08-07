@@ -26,6 +26,11 @@
       "types": "./dist/nova-connect.d.ts",
       "import": "./dist/nova-connect.js",
       "require": "./dist/nova-connect.cjs"
+    },
+    "./siwx": {
+      "types": "./dist/siwx.d.ts",
+      "import": "./dist/siwx.js",
+      "require": "./dist/siwx.cjs"
     }
   },
   "publishConfig": {
@@ -75,7 +80,6 @@
     "quasar",
     "cloud",
     "sdk",
-    "siwe",
     "next-auth",
     "cosmos",
     "playground",
@@ -99,16 +103,17 @@
   "dependencies": {
     "@tuwaio/orbit-evm": "^0.2.21",
     "@tuwaio/pulsar-evm": "^0.5.9",
-    "@tuwaio/satellite-evm": "^0.3.10"
+    "@tuwaio/satellite-evm": "1.0.0-fix-siwe-deprec-alpha.2.ffb5e95",
+    "@tuwaio/siwx-evm": "1.0.0-fix-initialize-alpha.3.38c3a86"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=0.4.9",
+    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.1.1738709b",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.4.12",
+    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.1.1738709b",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",

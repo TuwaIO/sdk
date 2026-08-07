@@ -2,24 +2,21 @@
 
 ## [0.0.9](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.0.8...evm-sdk-v0.0.9) (2026-08-04)
 
-
 ### Bug Fixes
 
-* updated pulsar evm package version ([9ab06ab](https://github.com/TuwaIO/sdk/commit/9ab06abef5dc352c609043981fcd1b0331461d1d))
+- updated pulsar evm package version ([9ab06ab](https://github.com/TuwaIO/sdk/commit/9ab06abef5dc352c609043981fcd1b0331461d1d))
 
 ## [0.0.8](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.0.7...evm-sdk-v0.0.8) (2026-08-02)
 
-
 ### Bug Fixes
 
-* updated packages and fix docs ([ba2e03d](https://github.com/TuwaIO/sdk/commit/ba2e03dca558ec1b06c49b4773377e03f6a5a8c2))
+- updated packages and fix docs ([ba2e03d](https://github.com/TuwaIO/sdk/commit/ba2e03dca558ec1b06c49b4773377e03f6a5a8c2))
 
 ## [0.0.7](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.0.6...evm-sdk-v0.0.7) (2026-08-02)
 
-
 ### Bug Fixes
 
-* updated packages and added preFlightTxCheck utility ([11560fe](https://github.com/TuwaIO/sdk/commit/11560fe42c2f6ec85c9300d3261a289cc863a57b))
+- updated packages and added preFlightTxCheck utility ([11560fe](https://github.com/TuwaIO/sdk/commit/11560fe42c2f6ec85c9300d3261a289cc863a57b))
 
 ## [0.0.6](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.0.5...evm-sdk-v0.0.6) (2026-07-31)
 

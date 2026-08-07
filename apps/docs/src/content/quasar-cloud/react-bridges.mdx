@@ -1,202 +1,60 @@
-# React Authentication Bridges
+# SIWX Authentication (Headless)
 
-The `@tuwaio/quasar-sdk` package provides client-side React Auth Bridges (`QuasarAuthBridge`, `QuasarEvmAuthBridge`, `QuasarSolanaAuthBridge`) to handle mini-session wallet authentication automatically on the frontend.
+The `@tuwaio/sdk/siwx` module provides a headless, CAIP-122 compliant React hook `useSiwx` to handle multi-chain session authentication automatically on the frontend. 
 
----
+## The Headless Approach
 
-## 💡 How React Auth Bridges Work
+The modern TUWA stack separates the visual connection button (Nova UI) from the background authentication logic (SIWX). There are no "Bridge" UI components to render; you simply trigger sign-in flows after a wallet connects.
 
-A React Auth Bridge is a headless component mounted in your application's provider tree. It connects your active wallet state (managed by `@tuwaio/sdk/satellite`) with Quasar's Mini-Session authentication system.
+When a user connects their wallet (EVM or Solana), you can automatically prompt them to sign a CAIP-122 standard authentication message. Upon successful signature, a secure HTTP-Only cookie session is established with the backend API.
 
-### Key Features
+## Implementation
 
-- **Automatic Signature Lifecycle**: Prompts the user's wallet to sign a timestamped authentication message (`Mini-Session Login: <timestamp>`) only when needed.
-- **Local Storage Caching**: Caches valid signatures in `localStorage`. Subsequent API calls reuse the cached signature until it approaches expiration (default 5 minutes), preventing repetitive wallet popups.
-- **Address Mismatch Protection**: Instantly detects when a user switches accounts in MetaMask or Phantom, automatically purging stale signatures from memory and storage.
-- **Non-React Auth Trigger (`getMiniSessionAuth`)**: Registers a global helper that allows background services (such as Pulsar transaction stores or custom API callers) to retrieve a valid signature outside the React render tree.
-
----
-
-## 🔑 1. Create the Client Mini-Session Store
-
-Use `utils.createMiniSessionStore` to create a persistent Zustand store for caching session signatures in `localStorage`.
-
-```typescript
-// src/hooks/useAuthStore.ts
-import { utils } from '@tuwaio/quasar-sdk';
-
-/**
- * Creates a persistent Zustand store that caches Mini-Session signature state
- * in localStorage under the key 'quasar-mini-session-storage'.
- */
-export const useAuthStore = utils.createMiniSessionStore('quasar-mini-session-storage');
-```
-
----
-
-## 🌉 2. Subpath Auth Bridges (Zero Bundle Bloat)
-
-To ensure your application only ships the Web3 dependencies it actually uses, import the bridge component from the specific subpath matching your target chain:
-
-### EVM-Only Applications (`@tuwaio/quasar-sdk/react/evm`)
-
-For EVM-only dApps, import `QuasarEvmAuthBridge` from the `/react/evm` subpath. This avoids bundling any Solana dependencies (`gill`, `@wallet-standard/*`).
+For a React application, the optimal way to auto-authenticate is by initializing your connection provider (`SatelliteConnectProvider`) with the `callbackAfterConnected` prop. This triggers the SIWX signature prompt immediately after the wallet is securely connected.
 
 ```tsx
-// src/components/QuasarEvmAuthBridgeWrapper.tsx
+// src/components/Providers.tsx
 'use client';
 
-import { useContext, useEffect } from 'react';
-import { useSatelliteConnectStore, SatelliteStoreContext } from '@tuwaio/sdk/satellite';
-import { QuasarEvmAuthBridge, QuasarActiveConnection } from '@tuwaio/quasar-sdk/react/evm';
-import { wagmiConfig } from '@/configs/appConfig';
-import { useAuthStore } from '@/hooks/useAuthStore';
+import { ReactNode } from 'react';
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { useSiwx } from '@tuwaio/sdk/siwx';
+import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/orbit-core';
+import { satelliteEVMAdapter } from '@tuwaio/satellite-evm';
+import { satelliteSolanaAdapter } from '@tuwaio/satellite-solana';
+import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
 
-export function QuasarEvmAuthBridgeWrapper() {
-  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
-  const store = useContext(SatelliteStoreContext);
-
-  const session = useAuthStore((s) => s.miniSession);
-  const setSession = useAuthStore((s) => s.setMiniSession);
-  const clearSession = useAuthStore((s) => s.clearSession);
-
-  // Clear Mini-Session when wallet disconnects
-  useEffect(() => {
-    if (!activeConnection?.isConnected) {
-      clearSession();
-    }
-  }, [activeConnection?.isConnected, clearSession]);
-
-  if (!activeConnection || !store) return null;
+export function Providers({ children }: { children: ReactNode }) {
+  const { signIn } = useSiwx();
 
   return (
-    <QuasarEvmAuthBridge
-      activeConnection={activeConnection as QuasarActiveConnection}
-      store={store}
-      wagmiConfig={wagmiConfig}
-      session={session}
-      setSession={setSession}
-    />
+    <SatelliteConnectProvider
+      adapter={[
+        satelliteEVMAdapter(wagmiConfig, appEVMChains), 
+        satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })
+      ]}
+      // Automatically request a SIWX signature after successful connection
+      callbackAfterConnected={async (connector) => {
+        const isEVM = getAdapterFromConnectorType(connector.connectorType) === OrbitAdapter.EVM;
+        
+        // Skip SIWX for Smart Contract wallets like Safe
+        if (isEVM && isSafeApp) return;
+
+        // Trigger sign-in flow
+        await signIn();
+      }}
+    >
+      {children}
+    </SatelliteConnectProvider>
   );
 }
 ```
 
-> **Wagmi Config Note**: `wagmiConfig` is your application's Wagmi configuration instance, created via `createConfig` from `@wagmi/core` or `wagmi`.
+### Behavior
 
----
+1. **Connection**: The Satellite state machine establishes a new active wallet connection and fires the `callbackAfterConnected`.
+2. **Signing Prompt**: The `signIn()` method evaluates the connected wallet and presents the user with a standard Web3 signature request following the strict CAIP-122 format.
+3. **Verification**: The signature is automatically passed to your Quasar backend. Quasar validates the signature and issues an encrypted JWT session cookie.
+4. **Session Active**: The local state is updated globally, and the user is fully authenticated to interact with restricted Quasar endpoints.
 
-### Solana-Only Applications (`@tuwaio/quasar-sdk/react/solana`)
-
-For Solana-only dApps, import `QuasarSolanaAuthBridge` from the `/react/solana` subpath. This avoids bundling any EVM dependencies (`viem`, `@wagmi/core`).
-
-```tsx
-// src/components/QuasarSolanaAuthBridgeWrapper.tsx
-'use client';
-
-import { useContext, useEffect } from 'react';
-import { useSatelliteConnectStore, SatelliteStoreContext } from '@tuwaio/sdk/satellite';
-import { QuasarSolanaAuthBridge, QuasarActiveConnection } from '@tuwaio/quasar-sdk/react/solana';
-import { useAuthStore } from '@/hooks/useAuthStore';
-
-export function QuasarSolanaAuthBridgeWrapper() {
-  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
-  const store = useContext(SatelliteStoreContext);
-
-  const session = useAuthStore((s) => s.miniSession);
-  const setSession = useAuthStore((s) => s.setMiniSession);
-  const clearSession = useAuthStore((s) => s.clearSession);
-
-  // Clear Mini-Session when wallet disconnects
-  useEffect(() => {
-    if (!activeConnection?.isConnected) {
-      clearSession();
-    }
-  }, [activeConnection?.isConnected, clearSession]);
-
-  if (!activeConnection || !store) return null;
-
-  return (
-    <QuasarSolanaAuthBridge
-      activeConnection={activeConnection as QuasarActiveConnection}
-      store={store}
-      session={session}
-      setSession={setSession}
-    />
-  );
-}
-```
-
----
-
-### Unified Multi-Chain Applications (`@tuwaio/quasar-sdk/react`)
-
-For multi-chain dApps supporting both EVM and Solana, import `QuasarAuthBridge` from `@tuwaio/quasar-sdk/react`. It dynamically coordinates between EVM and Solana signing flows based on the connected chain type:
-
-```tsx
-// src/components/QuasarAuthBridgeWrapper.tsx
-'use client';
-
-import { useContext, useEffect } from 'react';
-import { useSatelliteConnectStore, SatelliteStoreContext } from '@tuwaio/sdk/satellite';
-import { QuasarAuthBridge, QuasarActiveConnection } from '@tuwaio/quasar-sdk/react';
-import { wagmiConfig } from '@/configs/appConfig';
-import { useAuthStore } from '@/hooks/useAuthStore';
-
-export function QuasarAuthBridgeWrapper() {
-  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
-  const store = useContext(SatelliteStoreContext);
-
-  const session = useAuthStore((s) => s.miniSession);
-  const setSession = useAuthStore((s) => s.setMiniSession);
-  const clearSession = useAuthStore((s) => s.clearSession);
-
-  // Clear Mini-Session when wallet disconnects
-  useEffect(() => {
-    if (!activeConnection?.isConnected) {
-      clearSession();
-    }
-  }, [activeConnection?.isConnected, clearSession]);
-
-  if (!activeConnection || !store) return null;
-
-  return (
-    <QuasarAuthBridge
-      activeConnection={activeConnection as QuasarActiveConnection}
-      store={store}
-      wagmiConfig={wagmiConfig}
-      session={session}
-      setSession={setSession}
-    />
-  );
-}
-```
-
----
-
-## ⚡ 3. Retrieving Signatures (`getMiniSessionAuth`)
-
-Once a bridge is mounted in your provider tree, any client-side caller can invoke `getMiniSessionAuth()` to obtain a valid authentication payload.
-
-```typescript
-import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
-
-async function fetchUserTransactionHistory(walletAddress: string) {
-  // 1. Get a valid Mini-Session signature (from localStorage cache or fresh wallet prompt)
-  const authData = await getMiniSessionAuth();
-
-  // 2. Send authData to your server action or API route
-  const response = await fetch('/api/history', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ walletAddress, auth: authData }),
-  });
-
-  return response.json();
-}
-```
-
----
-
-## ➡️ Next Steps
-
-Proceed to [Transaction Syncing & History](/quasar-cloud/transaction-sync) to learn how `getMiniSessionAuth()` connects to `@tuwaio/pulsar-core` and how your server verifies signatures to persist transaction logs.
+If the user disconnects their wallet, you can similarly invoke `signOut()` to invalidate the session.

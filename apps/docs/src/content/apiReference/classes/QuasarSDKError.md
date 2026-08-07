@@ -4,7 +4,7 @@
 
 # QuasarSDKError
 
-Defined in: [packages/quasar-sdk/src/core/client.ts:32](https://github.com/TuwaIO/sdk/blob/db961bea777b430ae04855219e9761b199fba571/packages/quasar-sdk/src/core/client.ts#L32)
+Defined in: [packages/quasar-sdk/src/core/client.ts:32](https://github.com/TuwaIO/sdk/blob/dbe9926022ce6f1d18d55cadc1a744f57babccb7/packages/quasar-sdk/src/core/client.ts#L32)
 
 Custom error class for all Quasar SDK API failures.
 
@@ -35,7 +35,7 @@ try {
 
 > **new QuasarSDKError**(`message`, `status`, `originalError`): `QuasarSDKError`
 
-Defined in: [packages/quasar-sdk/src/core/client.ts:46](https://github.com/TuwaIO/sdk/blob/db961bea777b430ae04855219e9761b199fba571/packages/quasar-sdk/src/core/client.ts#L46)
+Defined in: [packages/quasar-sdk/src/core/client.ts:46](https://github.com/TuwaIO/sdk/blob/dbe9926022ce6f1d18d55cadc1a744f57babccb7/packages/quasar-sdk/src/core/client.ts#L46)
 
 Creates a new QuasarSDKError instance.
 
@@ -109,7 +109,7 @@ Defined in: node\_modules/.pnpm/typescript@6.0.3/node\_modules/typescript/lib/li
 
 > `readonly` **originalError**: `Error`
 
-Defined in: [packages/quasar-sdk/src/core/client.ts:37](https://github.com/TuwaIO/sdk/blob/db961bea777b430ae04855219e9761b199fba571/packages/quasar-sdk/src/core/client.ts#L37)
+Defined in: [packages/quasar-sdk/src/core/client.ts:37](https://github.com/TuwaIO/sdk/blob/dbe9926022ce6f1d18d55cadc1a744f57babccb7/packages/quasar-sdk/src/core/client.ts#L37)
 
 The original error thrown by the HTTP client.
 
@@ -131,7 +131,7 @@ Defined in: node\_modules/.pnpm/typescript@6.0.3/node\_modules/typescript/lib/li
 
 > `readonly` **status**: `number` \| `undefined`
 
-Defined in: [packages/quasar-sdk/src/core/client.ts:34](https://github.com/TuwaIO/sdk/blob/db961bea777b430ae04855219e9761b199fba571/packages/quasar-sdk/src/core/client.ts#L34)
+Defined in: [packages/quasar-sdk/src/core/client.ts:34](https://github.com/TuwaIO/sdk/blob/dbe9926022ce6f1d18d55cadc1a744f57babccb7/packages/quasar-sdk/src/core/client.ts#L34)
 
 HTTP status code returned by the API, if available.
 
