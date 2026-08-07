@@ -272,14 +272,13 @@ export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemor
 // src/providers/AppProviders.tsx
 'use client';
 
-import { SatelliteConnectProvider, useSatelliteSiwx } from '@tuwaio/sdk/satellite';
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
 import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
 import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
 import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
 import { useSiwxSession } from '@tuwaio/sdk/siwx';
-import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
 
 import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
 import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
@@ -300,27 +299,13 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
   // Watch SIWX session to keep connection state aligned
   const siwxSession = useSiwxSession();
-  const { signIn } = useSatelliteSiwx();
 
   return (
     <SatelliteConnectProvider
       adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
       autoConnect={true}
       callbackAfterConnected={async (connection) => {
-        const isEVM = getAdapterFromConnectorType(connection.connectorType) === OrbitAdapter.EVM;
-        if (isEVM && isSafeApp) return;
- 
-        await signIn({
-          verifier: async (payload) => {
-            const res = await fetch('/api/siwx/verify', {
-              method: 'POST',
-              body: JSON.stringify(payload),
-            });
-            return res.ok ? res.json() : null;
-          },
-        });
- 
-        // Fetch history slightly after connection and sign-in
+        // Fetch history slightly after connection
         setTimeout(() => fetchInitial(connection.address), 2000);
       }}
     >
@@ -338,10 +323,17 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         withBalance
         withChain
         pagination={pagination}
+        siwx={{
+          verifier: async (payload) => {
+            const res = await fetch('/api/siwx/verify', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            });
+            return res.ok ? res.json() : null;
+          },
+        }}
       >
         {children}
-      </NovaConnectProvider>
-    </SatelliteConnectProvider>
   );
 }
 ```

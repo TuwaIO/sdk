@@ -10,37 +10,32 @@ When a user connects their wallet (EVM or Solana), you can automatically prompt 
 
 ## Implementation
 
-For a React application, the optimal way to auto-authenticate is by initializing your connection provider (`SatelliteConnectProvider`) with the `callbackAfterConnected` prop. This triggers the SIWX signature prompt immediately after the wallet is securely connected.
+For a React application, `NovaConnectProvider` handles auto-authentication natively via `NovaSiwxWatcher`. Simply provide your `verifier` function in the `siwx` prop of `NovaConnectProvider`.
 
 ```tsx
 // src/components/Providers.tsx
 'use client';
  
 import { ReactNode } from 'react';
-import { SatelliteConnectProvider, useSatelliteSiwx } from '@tuwaio/sdk/satellite';
-import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
 import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
  
 export function Providers({ children }: { children: ReactNode }) {
-  const { signIn } = useSatelliteSiwx();
- 
   return (
     <SatelliteConnectProvider
       adapter={[
         satelliteEVMAdapter(wagmiConfig, appEVMChains), 
         satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })
       ]}
-      // Automatically request a SIWX signature after successful connection
-      callbackAfterConnected={async (connector) => {
-        const isEVM = getAdapterFromConnectorType(connector.connectorType) === OrbitAdapter.EVM;
-        
-        // Skip SIWX for Smart Contract wallets like Safe
-        if (isEVM && isSafeApp) return;
- 
-        // Trigger sign-in flow
-        await signIn({
+      autoConnect={true}
+    >
+      <NovaConnectProvider
+        appChains={appEVMChains}
+        solanaRPCUrls={solanaRPCUrls}
+        siwx={{
           verifier: async (payload) => {
             const res = await fetch('/api/siwx/verify', {
               method: 'POST',
@@ -48,10 +43,10 @@ export function Providers({ children }: { children: ReactNode }) {
             });
             return res.ok ? res.json() : null;
           },
-        });
-      }}
-    >
-      {children}
+        }}
+      >
+        {children}
+      </NovaConnectProvider>
     </SatelliteConnectProvider>
   );
 }
@@ -59,9 +54,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
 ## Behavior
 
-1. **Connection**: The Satellite state machine establishes a new active wallet connection and fires the `callbackAfterConnected`.
-2. **Signing Prompt**: The `signIn()` method evaluates the connected wallet and presents the user with a standard Web3 signature request following the strict CAIP-122 format.
-3. **Verification**: The signature is automatically passed to your Quasar backend. Quasar validates the signature and issues an encrypted JWT session cookie.
-4. **Session Active**: The local state is updated globally, and the user is fully authenticated to interact with restricted Quasar endpoints.
+1. **Connection**: The Satellite state machine establishes a new active wallet connection.
+2. **Auto-Auth Trigger**: `NovaSiwxWatcher` inside `NovaConnectProvider` detects the active connection and automatically presents the user with a CAIP-122 signature request.
+3. **Verification**: The signature is submitted to your verifier endpoint `/api/siwx/verify`, validating the signature and issuing an encrypted session cookie.
+4. **Session Active**: The session state is updated globally across `useSiwxSessionStore`.
 
-If the user disconnects their wallet, you can similarly invoke `signOut()` to invalidate the session.
+If the user disconnects their wallet or switches accounts, SIWX session state updates accordingly.
