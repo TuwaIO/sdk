@@ -9,4 +9,5 @@ export {
   SatelliteStoreContext,
   useInitializeAutoConnect,
   useSatelliteConnectStore,
+  useSatelliteSiwx,
 } from '@tuwaio/satellite-react';
