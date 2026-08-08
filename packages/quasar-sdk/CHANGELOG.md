@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.1...quasar-sdk-v0.1.2) (2026-08-08)
+
+
+### Bug Fixes
+
+* updated packages ([d1df225](https://github.com/TuwaIO/sdk/commit/d1df225326f3f534cb4c50aed292d186e9f79737))
+
 ## [0.1.1](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.0...quasar-sdk-v0.1.1) (2026-08-08)
 
 
