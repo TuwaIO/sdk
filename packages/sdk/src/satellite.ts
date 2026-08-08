@@ -1,3 +1,6 @@
+import '@tuwaio/satellite-react/evm';
+import '@tuwaio/satellite-react/solana';
+
 export * from '@tuwaio/satellite-core';
 export {
   type AllConnections,
