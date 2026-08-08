@@ -2,24 +2,21 @@
 
 ## [0.1.2](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.1...evm-sdk-v0.1.2) (2026-08-08)
 
-
 ### Bug Fixes
 
-* updated packages ([4fb2cf9](https://github.com/TuwaIO/sdk/commit/4fb2cf9f20fd423a74cb1a87eeed51c8d7556acd))
+- updated packages ([4fb2cf9](https://github.com/TuwaIO/sdk/commit/4fb2cf9f20fd423a74cb1a87eeed51c8d7556acd))
 
 ## [0.1.1](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.0...evm-sdk-v0.1.1) (2026-08-08)
 
-
 ### Bug Fixes
 
-* updated packages ([d9b8228](https://github.com/TuwaIO/sdk/commit/d9b8228d175a5ddbd6a089ec270ebe350f75efce))
+- updated packages ([d9b8228](https://github.com/TuwaIO/sdk/commit/d9b8228d175a5ddbd6a089ec270ebe350f75efce))
 
 ## [0.1.0](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.0.9...evm-sdk-v0.1.0) (2026-08-08)
 
-
 ### Features
 
-* SIWX integration; docs and packages updated ([#26](https://github.com/TuwaIO/sdk/issues/26)) ([0f11378](https://github.com/TuwaIO/sdk/commit/0f11378465b18854b404105cc5275b1c80cc5250))
+- SIWX integration; docs and packages updated ([#26](https://github.com/TuwaIO/sdk/issues/26)) ([0f11378](https://github.com/TuwaIO/sdk/commit/0f11378465b18854b404105cc5275b1c80cc5250))
 
 ## [0.0.9](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.0.8...evm-sdk-v0.0.9) (2026-08-04)
 
