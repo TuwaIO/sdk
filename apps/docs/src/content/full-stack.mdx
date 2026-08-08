@@ -73,45 +73,94 @@ export type TransactionUnion = SwapTx;
 
 ---
 
-## ☁️ 3. Backend Server Actions (`actions.ts`)
+## 🔒 3. Backend SIWX Authentication API (`route.ts`)
+
+Create a Next.js App Router API route to handle CAIP-122 SIWX verification and session management automatically.
+
+```typescript
+// src/app/api/siwx/[...siwx]/route.ts
+import { createSiwxApiHandler } from '@tuwaio/sdk/siwx/server-next';
+
+const handler = createSiwxApiHandler({
+  cookieOptions: {
+    secure: process.env.NODE_ENV === 'production',
+  },
+});
+
+export const { GET, POST, DELETE } = handler;
+```
+
+---
+
+## ☁️ 4. Backend Server Actions (`actions.ts`)
 
 ```typescript
 // src/app/actions.ts
 'use server';
 
-import { Quasar, MiniSessionAuth, utils } from '@tuwaio/quasar-sdk';
+import { Quasar } from '@tuwaio/quasar-sdk';
+import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
+import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import { TransactionUnion } from '@/types';
 
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 
-export async function syncTransaction(tx: TransactionUnion, authData: MiniSessionAuth) {
-  const isValid = await utils.verifyMiniSession(authData);
-  if (!isValid) throw new Error('Invalid signature.');
+export async function syncTransaction(tx: TransactionUnion, session: SiwxClientSession | SiwxSession | null) {
+  if (!session) {
+    return { success: false, reason: 'unauthenticated' };
+  }
 
-  await quasar.pulsar.syncCreate(tx, 'My App');
-  return { success: true };
+  // Validate session address matches transaction sender to prevent quota draining
+  if (tx.from && !isSessionMatchingTarget(session, tx.from, tx.chainId)) {
+    return { success: false, reason: 'session_mismatch' };
+  }
+
+  try {
+    await quasar.pulsar.syncCreate(tx, 'My App');
+    return { success: true };
+  } catch (error) {
+    console.warn('[Quasar Engine Sync Error]', error instanceof Error ? error.message : error);
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
+  }
 }
 
-export async function getHistory(params: any, authData: MiniSessionAuth) {
-  const isValid = await utils.verifyMiniSession(authData);
-  if (!isValid) throw new Error('Invalid signature.');
+export interface GetHistoryParams {
+  walletAddress: string;
+  page?: number;
+  limit?: number;
+  chainId?: string;
+  appName?: string;
+}
 
-  return quasar.pulsar.getHistory(params);
+export async function getHistory(params: GetHistoryParams, session: SiwxClientSession | SiwxSession | null) {
+  if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
+    return {
+      docs: [],
+      totalDocs: 0,
+      limit: params.limit ?? 10,
+      page: params.page ?? 1,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPrevPage: false,
+    };
+  }
+
+  try {
+    return await quasar.pulsar.getHistory(params);
+  } catch (error) {
+    console.warn('[Quasar Engine GetHistory Error]', error instanceof Error ? error.message : error);
+    return {
+      docs: [],
+      totalDocs: 0,
+      limit: params.limit ?? 10,
+      page: params.page ?? 1,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPrevPage: false,
+    };
+  }
 }
 ```
-
----
-
-## 🔐 4. Client Auth Store (`useAuthStore.ts`)
-
-```typescript
-// src/hooks/useAuthStore.ts
-import { utils } from '@tuwaio/quasar-sdk';
-
-export const useAuthStore = utils.createMiniSessionStore('quasar-mini-session-storage');
-```
-
----
 
 ## ⚙️ 5. Application Configuration (`appConfig.ts`)
 
@@ -150,7 +199,8 @@ export const wagmiConfig = createConfig({
 import { createPulsarStore, createTxInMemoryStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
 import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
 import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
-import { getMiniSessionAuth, preFlightTxCheck } from '@tuwaio/quasar-sdk/react';
+import { useSiwxSessionStore } from '@tuwaio/sdk/siwx';
+import { preFlightTxCheck } from '@tuwaio/quasar-sdk';
 
 import { getHistory, syncTransaction } from '@/app/actions';
 import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
@@ -166,7 +216,7 @@ const initialStore = createPulsarStore<TransactionUnion>({
   },
   onRemoteCreate: async (tx) => {
     try {
-      const auth = await getMiniSessionAuth();
+      const auth = useSiwxSessionStore.getState().session;
       await syncTransaction(tx as TransactionUnion, auth);
     } catch (err) {
       console.error('[PulsarHook] Remote sync failed:', err);
@@ -182,8 +232,10 @@ const pulsarInMemoryStore = createTxInMemoryStore<TransactionUnion>({
   reconcileUnsyncedTransactions: initialStore.getState().reconcileUnsyncedTransactions,
   getHistory: async ({ page, walletAddress }) => {
     try {
-      const auth = await getMiniSessionAuth();
-      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' }, auth);
+      const session = useSiwxSessionStore.getState().session;
+      if (!session) return null;
+
+      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' }, session);
       if (!history) return null;
 
       return { ...history, docs: history.docs as TransactionUnion[] };
@@ -204,49 +256,7 @@ export const usePulsarInMemoryStore = createBoundedUseStore(pulsarInMemoryStore)
 
 ---
 
-## 🌉 7. Quasar Auth Bridge (`QuasarSDKAuthProvider.tsx`)
-
-```tsx
-// src/providers/QuasarSDKAuthProvider.tsx
-'use client';
-
-import { useContext, useEffect } from 'react';
-import { useSatelliteConnectStore, SatelliteStoreContext } from '@tuwaio/sdk/satellite';
-import { QuasarActiveConnection, QuasarAuthBridge as QuasarSDKAuthBridge } from '@tuwaio/quasar-sdk/react';
-import { wagmiConfig } from '@/configs/appConfig';
-import { useAuthStore } from '@/hooks/useAuthStore';
-
-export function QuasarAuthBridge() {
-  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
-  const store = useContext(SatelliteStoreContext);
-
-  const session = useAuthStore((s) => s.miniSession);
-  const setSession = useAuthStore((s) => s.setMiniSession);
-  const clearSession = useAuthStore((s) => s.clearSession);
-
-  useEffect(() => {
-    if (!activeConnection?.isConnected) {
-      clearSession();
-    }
-  }, [activeConnection?.isConnected, clearSession]);
-
-  if (!activeConnection || !store) return null;
-
-  return (
-    <QuasarSDKAuthBridge
-      activeConnection={activeConnection as QuasarActiveConnection}
-      store={store as any}
-      wagmiConfig={wagmiConfig}
-      session={session}
-      setSession={setSession}
-    />
-  );
-}
-```
-
----
-
-## 📺 8. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
+## 📺 7. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
 
 ```tsx
 // src/providers/NovaTransactionsProvider.tsx
@@ -287,7 +297,7 @@ export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemor
 
 ---
 
-## 🚀 9. Assembling Application Providers (`AppProviders.tsx`)
+## 🚀 8. Assembling Application Providers (`AppProviders.tsx`)
 
 ```tsx
 // src/providers/AppProviders.tsx
@@ -299,16 +309,15 @@ import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
 import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
-import { getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
+import { useSiwxSession } from '@tuwaio/sdk/siwx';
 
 import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
 import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
 import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
-import { QuasarAuthBridge } from '@/providers/QuasarSDKAuthProvider';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
-  const getAdapter = usePulsarStore((s) => s.getAdapter);
   const transactionsPool = usePulsarInMemoryStore((s) => s.transactionsPool);
+  const getAdapter = usePulsarStore((s) => s.getAdapter);
 
   const isLoading = usePulsarInMemoryStore((s) => s.isLoading);
   const isError = usePulsarInMemoryStore((s) => s.isError);
@@ -319,46 +328,50 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
   const pagination = { isLoading, isError, currentPage, hasMore, fetchNextPage };
 
+  // Watch SIWX session to keep connection state aligned
+  const siwxSession = useSiwxSession();
+
   return (
     <SatelliteConnectProvider
       adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
       autoConnect={true}
       callbackAfterConnected={async (connection) => {
-        try {
-          await getMiniSessionAuth();
-          setTimeout(() => fetchInitial(connection.address), 2000);
-        } catch (err) {
-          console.error('[QuasarAuth] Auto-authentication failed:', err);
-          setTimeout(() => fetchInitial(connection.address), 2000);
-        }
+        // Fetch history slightly after connection
+        setTimeout(() => fetchInitial(connection.address), 2000);
       }}
     >
-      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
-      <SolanaConnectorsWatcher />
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} siwx={siwxSession} />
+      <SolanaConnectorsWatcher siwx={siwxSession} />
 
-      <QuasarAuthBridge />
       <NovaTransactionsProvider pagination={pagination} />
 
       <NovaConnectProvider
         appChains={appEVMChains}
         solanaRPCUrls={solanaRPCUrls}
         transactionPool={transactionsPool}
-        pulsarAdapter={getAdapter() as any}
+        pulsarAdapter={getAdapter()}
         withImpersonated
         withBalance
         withChain
         pagination={pagination}
+        siwx={{
+          verifier: async (payload) => {
+            const res = await fetch('/api/siwx/verify', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            });
+            return res.ok ? res.json() : null;
+          },
+        }}
       >
         {children}
-      </NovaConnectProvider>
-    </SatelliteConnectProvider>
   );
 }
 ```
 
 ---
 
-## 💻 10. Rendering UI Components (`page.tsx`)
+## 💻 9. Rendering UI Components (`page.tsx`)
 
 Render **`<ConnectButton />`** and **`<TxActionButton />`** anywhere in your application:
 
@@ -446,6 +459,7 @@ export default function HomePage() {
 
 - 🌐 **[TUWA Documentation Hub](https://docs.tuwa.io/)** — Central directory linking to all ecosystem documentation sites.
 - 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Low-level, framework-agnostic multi-chain communication primitives.
-- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine & SIWE auth layer.
+- 🔐 **[SIWX Core Docs](https://siwx.docs.tuwa.io/)** — Headless CAIP-122 multi-chain authentication standard.
+- 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — Headless wallet state machine.
 - ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — Headless transaction lifecycle & tracking engine.
 - 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — Interactive component catalog and visual design system.

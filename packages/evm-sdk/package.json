@@ -4,7 +4,7 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Layer 9 (L9) of the TUWA Ecosystem. The EVM Network Adapter SDK providing Wagmi/Viem transports and state watchers.",
+  "description": "Layer 9 (L9) of the TUWA Ecosystem. The EVM Network Adapter SDK providing Wagmi/Viem transports, connectors, and SIWX adapters.",
   "type": "module",
   "exports": {
     "./orbit": {
@@ -26,6 +26,11 @@
       "types": "./dist/nova-connect.d.ts",
       "import": "./dist/nova-connect.js",
       "require": "./dist/nova-connect.cjs"
+    },
+    "./siwx": {
+      "types": "./dist/siwx.d.ts",
+      "import": "./dist/siwx.js",
+      "require": "./dist/siwx.cjs"
     }
   },
   "publishConfig": {
@@ -75,7 +80,6 @@
     "quasar",
     "cloud",
     "sdk",
-    "siwe",
     "next-auth",
     "cosmos",
     "playground",
@@ -97,22 +101,23 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-evm": "^0.2.21",
-    "@tuwaio/pulsar-evm": "^0.5.9",
-    "@tuwaio/satellite-evm": "^0.3.10"
+    "@tuwaio/orbit-evm": "^0.2.22",
+    "@tuwaio/pulsar-evm": "^0.5.10",
+    "@tuwaio/satellite-evm": "^0.4.0",
+    "@tuwaio/siwx-evm": "^0.1.0"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=0.4.9",
+    "@tuwaio/nova-connect": ">=0.5.0",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.4.12",
+    "@tuwaio/nova-connect": "^0.5.0",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "viem": "^2.55.10"
+    "viem": "^2.55.11"
   }
 }

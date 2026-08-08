@@ -13,10 +13,6 @@ const quasar = new Quasar({ secretKey: 'sk_live_...' });
 const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ```
 
-## Enumerations
-
-- [ChainType](enumerations/ChainType.md)
-
 ## Classes
 
 - [PulsarModule](classes/PulsarModule.md)
@@ -25,18 +21,9 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 
 ## Interfaces
 
-- [ConnectionData](interfaces/ConnectionData.md)
-- [EvmSigner](interfaces/EvmSigner.md)
 - [HistoryQuery](interfaces/HistoryQuery.md)
-- [MiniSessionAuth](interfaces/MiniSessionAuth.md)
-- [MiniSessionStore](interfaces/MiniSessionStore.md)
 - [PaginatedResult](interfaces/PaginatedResult.md)
 - [QuasarConfig](interfaces/QuasarConfig.md)
-- [SignSessionParams](interfaces/SignSessionParams.md)
-- [SignSessionResult](interfaces/SignSessionResult.md)
-- [SolanaSignableMessage](interfaces/SolanaSignableMessage.md)
-- [SolanaSigner](interfaces/SolanaSigner.md)
-- [VerifySessionParams](interfaces/VerifySessionParams.md)
 
 ## Type Aliases
 
@@ -46,16 +33,9 @@ const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ## Variables
 
 - [BASE\_API\_URL](variables/BASE_API_URL.md)
-- [DEFAULT\_MAX\_AGE](variables/DEFAULT_MAX_AGE.md)
-- [NETWORK\_SAFETY\_BUFFER](variables/NETWORK_SAFETY_BUFFER.md)
 - [PULSAR\_HISTORY\_ENDPOINT](variables/PULSAR_HISTORY_ENDPOINT.md)
 - [PULSAR\_SYNC\_ENDPOINT](variables/PULSAR_SYNC_ENDPOINT.md)
-- [utils](variables/utils.md)
 
 ## Functions
 
-- [createMiniSessionMessage](functions/createMiniSessionMessage.md)
-- [createMiniSessionStore](functions/createMiniSessionStore.md)
-- [getMiniSessionAuth](functions/getMiniSessionAuth.md)
-- [signMiniSession](functions/signMiniSession.md)
-- [verifyMiniSession](functions/verifyMiniSession.md)
+- [preFlightTxCheck](functions/preFlightTxCheck.md)

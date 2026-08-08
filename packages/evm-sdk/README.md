@@ -19,9 +19,13 @@ It securely wraps `viem` and `@wagmi/core`, providing standardized adapters for 
 
 - **⛓️ EVM Native**: Full support for Wagmi config creation, Viem transports, and injected connectors.
 - **🌐 Ecosystem Adapters**: Packages OrbitEVM, PulsarEVM, SatelliteEVM, and EVMConnectorsWatcher under unified subpaths.
-- **⚡ Subpath Architecture**: Clean subpath imports (`@tuwaio/evm-sdk/satellite`, `@tuwaio/evm-sdk/pulsar`, `@tuwaio/evm-sdk/orbit`, `@tuwaio/evm-sdk/nova-connect`).
+- **⚡ Subpath Architecture**: Clean subpath imports (`@tuwaio/evm-sdk/satellite`, `@tuwaio/evm-sdk/pulsar`, `@tuwaio/evm-sdk/orbit`, `@tuwaio/evm-sdk/nova-connect`, `@tuwaio/evm-sdk/siwx`).
 - **🧩 Zero UI Bloat**: Focuses strictly on connection logic and transaction processing adapters.
 - **🔄 State Sync & Watchers**: Includes background watchers (`EVMConnectorsWatcher`) that automatically sync Wagmi state with Satellite's unified store.
+- **🔐 Headless SIWX Auth**: Provides the EVM-native message signer (`createEvmSiwxSigner`) for seamless CAIP-122 authentication (`@tuwaio/evm-sdk/siwx`).
+
+> [!WARNING]
+> **SIWE Deprecation Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Migrate to `@tuwaio/evm-sdk/siwx` (`createEvmSiwxSigner`) and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
 
 ---
 
@@ -218,6 +222,7 @@ export function SwapButton() {
 - **`@tuwaio/evm-sdk/pulsar`** — EVM Pulsar adapter (`pulsarEvmAdapter`).
 - **`@tuwaio/evm-sdk/orbit`** — EVM Orbit helpers & types.
 - **`@tuwaio/evm-sdk/nova-connect`** — EVM React watcher component (`EVMConnectorsWatcher`).
+- **`@tuwaio/evm-sdk/siwx`** — EVM CAIP-122 signer adapter (`createEvmSiwxSigner`).
 
 ---
 

@@ -17,50 +17,45 @@
  * @packageDocumentation
  */
 
+import { useSiwxSessionStore } from '@tuwaio/siwx-react';
+
+import { BASE_API_URL } from './constants';
 import { QuasarClient } from './core/client';
 import { PulsarModule } from './modules/pulsar';
 import { QuasarConfig } from './types';
-import * as authUtils from './utils';
 
 /**
- * Security and authentication utilities.
+ * Pre-flight check before initiating a transaction.
+ * Ensures the local SIWX Session is valid and verifies Quasar Engine health.
  *
- * Includes methods for creating, signing, and verifying Mini-Session signatures
- * to protect your API quota. These can be used without initializing the Quasar class.
+ * @param customApiUrl - Optional custom API URL to override the default.
+ * @throws {Error} If the session check fails or Quasar is unreachable.
  *
  * @public
  */
-export const utils = {
-  /**
-   * Standardizes the message format for Quasar Mini-Session login.
-   * @see {@link createMiniSessionMessage}
-   */
-  createMiniSessionMessage: authUtils.createMiniSessionMessage,
+export async function preFlightTxCheck(customApiUrl?: string): Promise<void> {
+  // 1. Ensure a valid session exists
+  const session = useSiwxSessionStore.getState().session;
+  if (!session) {
+    throw new Error('[QuasarSDK] No SIWX Session found. User must be signed in.');
+  }
 
-  /**
-   * Verifies a Mini-Session signature (EVM or Solana).
-   * @see {@link verifyMiniSession}
-   */
-  verifyMiniSession: authUtils.verifyMiniSession,
+  // 2. Ping /v1/engine/health to verify Quasar Cloud is reachable
+  const apiUrl = customApiUrl || BASE_API_URL;
 
-  /**
-   * Triggers a signature request in the connected wallet.
-   * @see {@link signMiniSession}
-   */
-  signMiniSession: authUtils.signMiniSession,
+  try {
+    const res = await fetch(`${apiUrl}/v1/engine/monitoring/health`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
 
-  /**
-   * Creates a persistent Zustand store for session management.
-   * @see {@link createMiniSessionStore}
-   */
-  createMiniSessionStore: authUtils.createMiniSessionStore,
-
-  /**
-   * Reusable helper to manage signing and session caching.
-   * @see {@link getMiniSessionAuth}
-   */
-  getMiniSessionAuth: authUtils.getMiniSessionAuth,
-};
+    if (!res.ok) {
+      throw new Error(`[QuasarSDK] API Health check failed with status: ${res.status}`);
+    }
+  } catch (error) {
+    throw new Error('[QuasarSDK] Quasar Cloud Engine is currently unreachable.', { cause: error });
+  }
+}
 
 /**
  * Main entry point for the Quasar SDK.
@@ -87,12 +82,6 @@ export const utils = {
  * @public
  */
 export class Quasar {
-  /**
-   * Security and authentication utilities.
-   * Shared across all instances and available statically.
-   */
-  public static readonly utils = utils;
-
   /**
    * The internal HTTP client used for authenticated requests.
    * @internal
@@ -130,4 +119,3 @@ export * from './constants';
 export { QuasarSDKError } from './core/client';
 export { PulsarModule } from './modules/pulsar';
 export * from './types';
-export * from './utils';

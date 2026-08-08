@@ -2,17 +2,17 @@
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/TuwaIO/sdk/release.yml?branch=main)](https://github.com/TuwaIO/sdk/actions)
 
-> The official umbrella SDKs and server-side Quasar client for the **TUWA Ecosystem**.
+> The official core SDKs and server-side Quasar client for the **TUWA Ecosystem**.
 
 ---
 
 ## Overview
 
-This monorepo contains the core TUWA SDKs — a production-grade toolkit for interacting with the TUWA ecosystem. It provides the umbrella packages that bundle Orbit, Pulsar, Satellite, and Nova UI into a single seamless installation point, alongside the server-side Quasar Cloud client.
+This monorepo contains the core TUWA SDKs — a production-grade toolkit for interacting with the TUWA ecosystem. It provides the unified packages that bundle Orbit, Pulsar, Satellite, and Nova UI into a single seamless installation point, alongside the server-side Quasar Cloud client.
 
 ### Key Features
 
-- 🧩 **Umbrella Architecture** — Install `@tuwaio/sdk` and get all TUWA functionality out of the box.
+- 🧩 **Unified Architecture** — Install `@tuwaio/sdk` and get all TUWA functionality out of the box.
 - ⚡ **Framework Agnostic** — Clean separation of EVM and Solana specific dependencies.
 - 🔐 **Iron Dome Protocol** — Server-side Quasar Cloud syncing via `@tuwaio/quasar-sdk`.
 - 📦 **Dual format** — Ships as both ESM and CJS (`tsup` powered).
@@ -25,7 +25,7 @@ This monorepo contains the core TUWA SDKs — a production-grade toolkit for int
 | Layer  | Package                                                     | Description                                                                                                                                                |
 | :----- | :---------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **L5** | **[`@tuwaio/quasar-sdk`](./packages/quasar-sdk/README.md)** | **Quasar Cloud Client (Server/Edge)** — Server-side Node.js & Edge SDK for transaction indexing, cloud sync, and signature verification.                   |
-| **L8** | **[`@tuwaio/sdk`](./packages/sdk/README.md)**               | **Core Umbrella SDK (UI & Logic)** — Bundles framework-agnostic logic (Orbit, Pulsar, Satellite) and Nova UI components into subpath-only entrypoints.     |
+| **L8** | **[`@tuwaio/sdk`](./packages/sdk/README.md)**               | **Core SDK (UI & Logic)** — Bundles framework-agnostic logic (Orbit, Pulsar, Satellite) and Nova UI components into subpath-only entrypoints.              |
 | **L9** | **[`@tuwaio/evm-sdk`](./packages/evm-sdk/README.md)**       | **EVM Network Adapter SDK** — EVM-specific transports (Wagmi/Viem), connectors, and background state watchers (`EVMConnectorsWatcher`).                    |
 | **L9** | **[`@tuwaio/solana-sdk`](./packages/solana-sdk/README.md)** | **Solana Network Adapter SDK** — Solana-specific transports (Gill/Wallet-Standard), connectors, and background state watchers (`SolanaConnectorsWatcher`). |
 
@@ -37,7 +37,7 @@ This monorepo contains the core TUWA SDKs — a production-grade toolkit for int
 sdk/
 ├── packages/
 │   ├── quasar-sdk/          # @tuwaio/quasar-sdk (L5 Cloud Client)
-│   ├── sdk/                 # @tuwaio/sdk (L8 Core Umbrella SDK)
+│   ├── sdk/                 # @tuwaio/sdk (L8 Core SDK)
 │   ├── evm-sdk/             # @tuwaio/evm-sdk (L9 EVM Adapter SDK)
 │   └── solana-sdk/          # @tuwaio/solana-sdk (L9 Solana Adapter SDK)
 ├── apps/
@@ -82,18 +82,18 @@ The Quasar SDK requires `ofetch` and `@tuwaio/pulsar-core` (for type definitions
 pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core
 ```
 
-_Note: If you plan to use the React Auth Bridges (`QuasarAuthBridge`), you will also need `react` and the respective Web3 singletons for your target network (e.g. `viem` / `gill`)._
+_Note: If you plan to use the client-side SIWX authentication hooks, you will also need `react` and the respective Web3 singletons for your target network (e.g. `viem` / `gill`)._
 
 ---
 
 ## 🚀 Explore the SDKs (Examples & Guides)
 
-The true power of the TUWA Umbrella SDKs is composability. Because the ecosystem is highly modular, each package has its own detailed documentation and integration examples.
+The true power of the TUWA SDKs is composability. Because the ecosystem is highly modular, each package has its own detailed documentation and integration examples.
 
 Dive into the specific READMEs below to see how to use them in detail:
 
 - **[Core SDK (`@tuwaio/sdk`)](./packages/sdk/README.md)** — The main client-side integration point. Shows how to combine EVM, Solana, and Nova UI.
-- **[Quasar Cloud SDK (`@tuwaio/quasar-sdk`)](./packages/quasar-sdk/README.md)** — The server-side backend client. Contains the **Full Architecture Example** showing how to sync transactions to the cloud securely via React Auth Bridges and Next.js Server Actions.
+- **[Quasar Cloud SDK (`@tuwaio/quasar-sdk`)](./packages/quasar-sdk/README.md)** — The server-side backend client. Contains the **Full Architecture Example** showing how to sync transactions to the cloud securely via Headless SIWX and Next.js Server Actions.
 - **[EVM SDK (`@tuwaio/evm-sdk`)](./packages/evm-sdk/README.md)** — EVM-specific implementations and Wagmi adapters.
 - **[Solana SDK (`@tuwaio/solana-sdk`)](./packages/solana-sdk/README.md)** — Solana-specific implementations and Gill/Wallet-Standard adapters.
 

@@ -14,26 +14,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    },
-    "./react": {
-      "types": "./dist/react.d.ts",
-      "import": "./dist/react.js",
-      "require": "./dist/react.cjs"
-    },
-    "./react/evm": {
-      "types": "./dist/react/evm.d.ts",
-      "import": "./dist/react/evm.js",
-      "require": "./dist/react/evm.cjs"
-    },
-    "./react/solana": {
-      "types": "./dist/react/solana.d.ts",
-      "import": "./dist/react/solana.js",
-      "require": "./dist/react/solana.cjs"
-    },
-    "./react/shared": {
-      "types": "./dist/react/shared.d.ts",
-      "import": "./dist/react/shared.js",
-      "require": "./dist/react/shared.cjs"
     }
   },
   "publishConfig": {
@@ -83,7 +63,6 @@
     "quasar",
     "cloud",
     "sdk",
-    "siwe",
     "next-auth",
     "cosmos",
     "playground",
@@ -105,15 +84,9 @@
     }
   ],
   "peerDependencies": {
-    "@solana/react": "6.x.x",
     "@tuwaio/pulsar-core": ">=0.6.0",
-    "@wagmi/core": "3.x.x",
-    "@wallet-standard/react": "1.x.x",
-    "gill": ">=0.14.0",
     "ofetch": ">=1.5.1",
-    "react": ">=19.2.0",
-    "viem": "2.x.x",
-    "zustand": "5.x.x"
+    "@tuwaio/siwx-react": ">=0.1.0"
   },
   "peerDependenciesMeta": {
     "@tuwaio/pulsar-core": {
@@ -122,38 +95,19 @@
     "ofetch": {
       "optional": false
     },
-    "viem": {
-      "optional": true
-    },
-    "gill": {
-      "optional": true
-    },
-    "zustand": {
-      "optional": true
-    },
-    "react": {
-      "optional": true
-    },
-    "@solana/react": {
-      "optional": true
-    },
-    "@wagmi/core": {
-      "optional": true
-    },
-    "@wallet-standard/react": {
+    "@tuwaio/siwx-react": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@solana/react": "^6.9.0",
-    "@tuwaio/pulsar-core": "^0.6.10",
-    "@types/react": "^19.2.18",
-    "@wagmi/core": "^3.6.4",
-    "@wallet-standard/react": "^1.0.3",
+    "@tuwaio/pulsar-core": "^0.6.11",
     "ofetch": "^1.5.1",
-    "react": "^19.2.8",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "zustand": "^5.0.14"
+    "@tuwaio/siwx-react": "^0.1.0"
+  },
+  "dependencies": {
+    "@tuwaio/siwx-core": "^0.1.0",
+    "@tuwaio/siwx-server": "^0.1.0"
   }
 }

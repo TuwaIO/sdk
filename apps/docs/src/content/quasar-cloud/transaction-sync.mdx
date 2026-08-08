@@ -4,14 +4,14 @@ The `@tuwaio/quasar-sdk` package enables your backend (Next.js Server Actions or
 
 ---
 
-## 🔐 The Mini-Session Security Model
+## 🔐 The SIWX Security Model
 
-When calling Quasar Cloud APIs from your server, your `QUASAR_SECRET_KEY` grants administrative access to the Quasar Engine. However, to prevent unauthorized clients from reading or spoofing another user's transaction history, every request sent to your backend should include a **Mini-Session Authentication payload** (`MiniSessionAuth`).
+When calling Quasar Cloud APIs from your server, your `QUASAR_SECRET_KEY` grants administrative access to the Quasar Engine. However, to prevent unauthorized clients from reading or spoofing another user's transaction history, every request sent to your backend should include a **SIWX Session payload** (`SiwxSession`).
 
-### Why Mini-Session Auth?
+### Why SIWX Auth?
 
-1. **Cryptographic Proof of Ownership**: Proves that the connected user actually owns the wallet address (`walletAddress`) without requiring heavy traditional session cookies.
-2. **Replay Attack Protection**: Every signature embeds an ISO timestamp (`Mini-Session Login: <timestamp>`). The `verifyMiniSession` method rejects any signature older than 5 minutes (`DEFAULT_MAX_AGE`).
+1. **Cryptographic Proof of Ownership**: Proves that the connected user actually owns the wallet address (`walletAddress`) using the standard CAIP-122 sign-in.
+2. **Replay Attack Protection**: Every signature embeds an ISO timestamp and a secure nonce. The `verifySiwxPayload` method from `@tuwaio/sdk/siwx/server` strictly validates the signature and its expiration.
 3. **Stateless Multi-Chain Verification**: Supports both EVM (`viem`) and Solana (`gill`) verification out of the box with zero database lookups on your server.
 
 ---
@@ -24,7 +24,9 @@ Use `quasar.pulsar.syncCreate` in your backend server action or API route to per
 // src/app/actions/syncTransaction.ts
 'use server';
 
-import { Quasar, MiniSessionAuth, utils, QuasarSDKError } from '@tuwaio/quasar-sdk';
+import { Quasar, QuasarSDKError } from '@tuwaio/quasar-sdk';
+import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
+import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import type { Transaction } from '@tuwaio/sdk/pulsar';
 
 // Initialize Quasar with your server-only Secret Key
@@ -34,18 +36,16 @@ const quasar = new Quasar({
 
 export async function syncTransactionServerAction(
   tx: Transaction,
-  authData: MiniSessionAuth,
+  session: SiwxClientSession | SiwxSession | null,
   appName: string = 'My dApp',
 ) {
-  try {
-    // Step 1: Cryptographically verify the client's signature
-    const isValid = await utils.verifyMiniSession(authData);
-    if (!isValid) {
-      throw new Error('Unauthorized: Wallet signature verification failed.');
-    }
+  if (!session) {
+    throw new Error('Unauthorized: Wallet signature verification failed.');
+  }
 
-    // Step 2: Ensure the transaction address matches the verified signer
-    if (tx.from.toLowerCase() !== authData.walletAddress.toLowerCase()) {
+  try {
+    // Step 2: Ensure the transaction address matches the verified signer (EVM case-insensitive / Solana case-sensitive)
+    if (tx.from && !isSessionMatchingTarget(session, tx.from, tx.chainId)) {
       throw new Error('Forbidden: Wallet address mismatch.');
     }
 
@@ -72,28 +72,31 @@ Query paginated transaction histories for a verified user across all their devic
 // src/app/actions/getHistory.ts
 'use server';
 
-import { Quasar, MiniSessionAuth, utils, QuasarSDKError } from '@tuwaio/quasar-sdk';
+import { Quasar, QuasarSDKError } from '@tuwaio/quasar-sdk';
+import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
+import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 
 const quasar = new Quasar({
   secretKey: process.env.QUASAR_SECRET_KEY ?? '',
 });
 
-export async function getHistoryServerAction(
-  params: {
-    walletAddress: string;
-    page?: number;
-    limit?: number;
-    appName?: string;
-  },
-  authData: MiniSessionAuth,
-) {
-  try {
-    // Step 1: Verify the wallet signature before returning private history logs
-    const isValid = await utils.verifyMiniSession(authData);
-    if (!isValid) {
-      throw new Error('Unauthorized: Invalid or expired signature.');
-    }
+export interface GetHistoryParams {
+  walletAddress: string;
+  page?: number;
+  limit?: number;
+  chainId?: string;
+  appName?: string;
+}
 
+export async function getHistoryServerAction(
+  params: GetHistoryParams,
+  session: SiwxClientSession | SiwxSession | null,
+) {
+  if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
+    throw new Error('Unauthorized: Invalid or expired signature.');
+  }
+
+  try {
     // Step 2: Query paginated history from Quasar Cloud Engine
     const history = await quasar.pulsar.getHistory({
       walletAddress: params.walletAddress,
@@ -123,6 +126,7 @@ All calls to `quasar.pulsar.*` throw typed `QuasarSDKError` instances when an AP
 import { QuasarSDKError } from '@tuwaio/quasar-sdk';
 
 try {
+  // @ts-expect-error - Assuming txData is a valid Transaction
   await quasar.pulsar.syncCreate(txData, 'My App');
 } catch (error) {
   if (error instanceof QuasarSDKError) {
@@ -137,22 +141,24 @@ try {
 
 ---
 
-## ⚡ 4. Full Client Integration with Pulsar Engine (`getMiniSessionAuth`)
+## ⚡ 4. Full Client Integration with Pulsar Engine
 
-Now that your server actions are ready, connect them to your client-side Pulsar transaction store. Using `getMiniSessionAuth()`, Pulsar automatically requests or reuses valid Mini-Session signatures during transaction execution and history queries:
+Now that your server actions are ready, connect them to your client-side Pulsar transaction store. Pulsar can automatically grab the current SIWX session during transaction execution and history queries:
 
 ```typescript
 // src/hooks/usePulsarStore.ts
 'use client';
 
-import { createPulsarStore } from '@tuwaio/pulsar-core';
-import { preFlightTxCheck, getMiniSessionAuth } from '@tuwaio/quasar-sdk/react';
-import { syncTransactionServerAction, getHistoryServerAction } from '@/app/actions';
+import { createPulsarStore } from '@tuwaio/sdk/pulsar';
+import { useSiwxSessionStore } from '@tuwaio/sdk/siwx';
+import { preFlightTxCheck } from '@tuwaio/quasar-sdk';
+import { syncTransactionServerAction } from '@/app/actions';
+import { TransactionUnion } from '@/types';
 
-export const pulsarStore = createPulsarStore({
+export const pulsarStore = createPulsarStore<TransactionUnion>({
   name: 'app-transaction-storage',
 
-  // 1. Ensure a valid signature exists before initiating transaction tracking
+  // 1. Ensure a valid session exists before initiating transaction tracking
   //    and ping Quasar Cloud to ensure the server is alive.
   beforeTxProcess: async () => {
     await preFlightTxCheck();
@@ -161,8 +167,8 @@ export const pulsarStore = createPulsarStore({
   // 2. Automatically sync transaction states to Quasar Cloud Engine
   onRemoteCreate: async (tx) => {
     try {
-      const auth = await getMiniSessionAuth();
-      await syncTransactionServerAction(tx, auth);
+      const session = useSiwxSessionStore.getState().session;
+      await syncTransactionServerAction(tx as TransactionUnion, session);
     } catch (err) {
       console.error('Remote transaction sync failed:', err);
       throw err; // Rethrow to inform pulsar-core that sync failed
