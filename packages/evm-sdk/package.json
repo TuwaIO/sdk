@@ -103,17 +103,17 @@
   "dependencies": {
     "@tuwaio/orbit-evm": "^0.2.21",
     "@tuwaio/pulsar-evm": "1.0.0-fix-docs-alpha.2.819c1d9",
-    "@tuwaio/satellite-evm": "1.0.0-fix-siwe-deprec-alpha.3.722e74d",
-    "@tuwaio/siwx-evm": "1.0.0-fix-initialize-alpha.6.21578d6"
+    "@tuwaio/satellite-evm": "1.0.0-fix-siwe-deprec-alpha.5.276bb07",
+    "@tuwaio/siwx-evm": "1.0.0-fix-initialize-alpha.7.25e4a00"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.2.9f77db49",
+    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.4.0735e7bf",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.2.9f77db49",
+    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.4.0735e7bf",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",

@@ -6,4 +6,4 @@
 
 > `const` **BASE\_API\_URL**: `"https://api.tuwa.io"` = `'https://api.tuwa.io'`
 
-Defined in: [packages/quasar-sdk/src/constants.ts:1](https://github.com/TuwaIO/sdk/blob/8ac56a8b9b16529523a722bbac9b29723181ee77/packages/quasar-sdk/src/constants.ts#L1)
+Defined in: [packages/quasar-sdk/src/constants.ts:1](https://github.com/TuwaIO/sdk/blob/38ebf9395e7703723a4e5fe05438178b47241053/packages/quasar-sdk/src/constants.ts#L1)

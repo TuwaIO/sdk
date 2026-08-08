@@ -103,12 +103,12 @@
   "dependencies": {
     "@tuwaio/orbit-solana": "^0.2.13",
     "@tuwaio/pulsar-solana": "1.0.0-fix-docs-alpha.2.819c1d9",
-    "@tuwaio/satellite-solana": "1.0.0-fix-siwe-deprec-alpha.3.722e74d",
-    "@tuwaio/siwx-solana": "1.0.0-fix-initialize-alpha.6.21578d6"
+    "@tuwaio/satellite-solana": "1.0.0-fix-siwe-deprec-alpha.5.276bb07",
+    "@tuwaio/siwx-solana": "1.0.0-fix-initialize-alpha.7.25e4a00"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.2.9f77db49",
+    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.4.0735e7bf",
     "@wallet-standard/app": "1.1.x",
     "@wallet-standard/base": "1.1.x",
     "@wallet-standard/core": "1.x.x",
@@ -119,7 +119,7 @@
     "gill": ">=0.14"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.2.9f77db49",
+    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.4.0735e7bf",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",
