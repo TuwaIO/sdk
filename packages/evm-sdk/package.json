@@ -108,16 +108,16 @@
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=0.5.2",
-    "@tuwaio/satellite-core": ">=0.4.1",
-    "@tuwaio/satellite-react": ">=0.4.2",
+    "@tuwaio/nova-connect": "^0.5.3",
+    "@tuwaio/satellite-core": "^0.4.1",
+    "@tuwaio/satellite-react": "^0.4.3",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.5.2",
+    "@tuwaio/nova-connect": "^0.5.3",
     "@tuwaio/satellite-core": "^0.4.1",
-    "@tuwaio/satellite-react": "^0.4.2",
+    "@tuwaio/satellite-react": "^0.4.3",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",

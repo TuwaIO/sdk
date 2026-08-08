@@ -84,9 +84,9 @@
     }
   ],
   "peerDependencies": {
-    "@tuwaio/pulsar-core": ">=0.6.0",
-    "ofetch": ">=1.5.1",
-    "@tuwaio/siwx-react": ">=0.1.0"
+    "@tuwaio/pulsar-core": "^0.6.11",
+    "ofetch": "^1.5.1",
+    "@tuwaio/siwx-react": "^0.1.0"
   },
   "peerDependenciesMeta": {
     "@tuwaio/pulsar-core": {
