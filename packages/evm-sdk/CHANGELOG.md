@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.2...evm-sdk-v0.1.3) (2026-08-08)
+
+
+### Bug Fixes
+
+* exports ([4e80215](https://github.com/TuwaIO/sdk/commit/4e802150a93f2783a193f749ed5aec08d853762d))
+
 ## [0.1.2](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.1...evm-sdk-v0.1.2) (2026-08-08)
 
 ### Bug Fixes
