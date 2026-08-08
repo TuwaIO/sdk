@@ -170,8 +170,8 @@ importers:
         version: 0.1.0(@tuwaio/siwx-core@0.1.0)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.11(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.11(typescript@6.0.3)(zod@4.4.3))
     devDependencies:
       '@tuwaio/nova-connect':
-        specifier: ^0.5.0
-        version: 0.5.0(e4d972e674226405fe2302cedb8ac358)
+        specifier: ^0.5.1
+        version: 0.5.1(e4d972e674226405fe2302cedb8ac358)
       '@tuwaio/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -228,8 +228,8 @@ importers:
         specifier: ^2.3.7
         version: 2.3.7(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tuwaio/nova-connect':
-        specifier: ^0.5.0
-        version: 0.5.0(f19418aa7e9068ca372c74102c9f01ae)
+        specifier: ^0.5.1
+        version: 0.5.1(f19418aa7e9068ca372c74102c9f01ae)
       '@tuwaio/nova-core':
         specifier: ^0.5.0
         version: 0.5.0(@radix-ui/react-dialog@1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@web3icons/common@0.11.49)(@web3icons/react@4.1.20(react@19.2.8))(clsx@2.1.1)(framer-motion@13.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(tailwind-merge@3.6.0)
@@ -323,8 +323,8 @@ importers:
         version: 0.1.0(@tuwaio/siwx-core@0.1.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
     devDependencies:
       '@tuwaio/nova-connect':
-        specifier: ^0.5.0
-        version: 0.5.0(e4d972e674226405fe2302cedb8ac358)
+        specifier: ^0.5.1
+        version: 0.5.1(e4d972e674226405fe2302cedb8ac358)
       '@tuwaio/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -2663,8 +2663,8 @@ packages:
       nextra-theme-docs: '>=4.6'
       react: '>=19.2.3'
 
-  '@tuwaio/nova-connect@0.5.0':
-    resolution: {integrity: sha512-yxUFgr8YaUDKQUzeuUgoeAzU2w8GHg707OV2Vi5si2KhLbPRYzYmvPiMCOUekfUVOqBIAfq+C/Q5CxiIrPPO2Q==}
+  '@tuwaio/nova-connect@0.5.1':
+    resolution: {integrity: sha512-ve47owo2GtX3MSfeFn6biItg6TIwc9zjH/BhSPfbsLcd36k+QdH29ve/q0tQS/TpX0qqm2C6VgZe7OEmFhSl0g==}
     peerDependencies:
       '@emotion/is-prop-valid': 1.x.x
       '@heroicons/react': 2.x.x
@@ -9677,7 +9677,7 @@ snapshots:
       - '@web3icons/react'
       - framer-motion
 
-  '@tuwaio/nova-connect@0.5.0(e4d972e674226405fe2302cedb8ac358)':
+  '@tuwaio/nova-connect@0.5.1(e4d972e674226405fe2302cedb8ac358)':
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       '@heroicons/react': 2.2.0(react@19.2.8)
@@ -9709,7 +9709,7 @@ snapshots:
       gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
       viem: 2.55.11(typescript@6.0.3)(zod@4.4.3)
 
-  '@tuwaio/nova-connect@0.5.0(f19418aa7e9068ca372c74102c9f01ae)':
+  '@tuwaio/nova-connect@0.5.1(f19418aa7e9068ca372c74102c9f01ae)':
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       '@heroicons/react': 2.2.0(react@19.2.8)
