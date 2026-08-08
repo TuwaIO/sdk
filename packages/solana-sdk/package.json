@@ -4,7 +4,7 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Layer 9 (L9) of the TUWA Ecosystem. The Solana Network Adapter SDK providing Gill/Wallet-Standard transports and state watchers.",
+  "description": "Layer 9 (L9) of the TUWA Ecosystem. The Solana Network Adapter SDK providing Gill/Wallet-Standard transports, connectors, and SIWX adapters.",
   "type": "module",
   "exports": {
     "./orbit": {
@@ -102,13 +102,13 @@
   ],
   "dependencies": {
     "@tuwaio/orbit-solana": "^0.2.13",
-    "@tuwaio/pulsar-solana": "1.0.0-fix-docs-alpha.3.3dc4a6c",
-    "@tuwaio/satellite-solana": "1.0.0-fix-siwe-deprec-alpha.11.6228cd5",
-    "@tuwaio/siwx-solana": "1.0.0-fix-initialize-alpha.13.937790a"
+    "@tuwaio/pulsar-solana": "^0.6.10",
+    "@tuwaio/satellite-solana": "^0.4.0",
+    "@tuwaio/siwx-solana": "^0.1.0"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.10.2a29c5b3",
+    "@tuwaio/nova-connect": ">=0.5.0",
     "@wallet-standard/app": "1.1.x",
     "@wallet-standard/base": "1.1.x",
     "@wallet-standard/core": "1.x.x",
@@ -119,7 +119,7 @@
     "gill": ">=0.14"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.10.2a29c5b3",
+    "@tuwaio/nova-connect": "^0.5.0",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",

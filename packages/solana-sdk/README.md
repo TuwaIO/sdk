@@ -22,7 +22,10 @@ It completely avoids legacy `@solana/web3.js` classes and is built from the grou
 - **⚡ Subpath Architecture**: Clean subpath imports (`@tuwaio/solana-sdk/satellite`, `@tuwaio/solana-sdk/pulsar`, `@tuwaio/solana-sdk/orbit`, `@tuwaio/solana-sdk/nova-connect`, `@tuwaio/solana-sdk/siwx`).
 - **🧩 Zero UI Bloat**: Focuses strictly on connection logic, standard wallet features, and transaction tracking adapters.
 - **🔄 Standardized Auto-Discovery**: Seamlessly detects and connects to any browser extension that supports Wallet Standard (`SolanaConnectorsWatcher`).
-- **🔐 Headless SIWX Auth**: Provides the Solana-native message signer (`createSolanaSiwxSigner`) for seamless CAIP-122 authentication.
+- **🔐 Headless SIWX Auth**: Provides the Solana-native message signer (`createSolanaSiwxSigner`) for seamless CAIP-122 authentication (`@tuwaio/solana-sdk/siwx`).
+
+> [!WARNING]
+> **SIWE Deprecation Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Migrate to `@tuwaio/solana-sdk/siwx` (`createSolanaSiwxSigner`) and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
 
 ---
 

@@ -4,7 +4,7 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Layer 9 (L9) of the TUWA Ecosystem. The EVM Network Adapter SDK providing Wagmi/Viem transports and state watchers.",
+  "description": "Layer 9 (L9) of the TUWA Ecosystem. The EVM Network Adapter SDK providing Wagmi/Viem transports, connectors, and SIWX adapters.",
   "type": "module",
   "exports": {
     "./orbit": {
@@ -101,23 +101,23 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-evm": "^0.2.21",
-    "@tuwaio/pulsar-evm": "1.0.0-fix-docs-alpha.3.3dc4a6c",
-    "@tuwaio/satellite-evm": "1.0.0-fix-siwe-deprec-alpha.11.6228cd5",
-    "@tuwaio/siwx-evm": "1.0.0-fix-initialize-alpha.13.937790a"
+    "@tuwaio/orbit-evm": "^0.2.22",
+    "@tuwaio/pulsar-evm": "^0.5.10",
+    "@tuwaio/satellite-evm": "^0.4.0",
+    "@tuwaio/siwx-evm": "^0.1.0"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": ">=1.0.0-fix-docs-alpha.10.2a29c5b3",
+    "@tuwaio/nova-connect": ">=0.5.0",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "1.0.0-fix-docs-alpha.10.2a29c5b3",
+    "@tuwaio/nova-connect": "^0.5.0",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.4",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "viem": "^2.55.10"
+    "viem": "^2.55.11"
   }
 }

@@ -17,10 +17,14 @@ It abstracts away complex dependency management (automatically handling `zustand
 
 ## ✨ Key Features
 
-- **📦 Zero-Config Integration**: Combines Orbit (adapters), Pulsar (tracking), Satellite (connections), and Nova (UI) out of the box.
-- **⚡ Modular Subpath Imports**: Clean exports for each domain (e.g. `@tuwaio/sdk/pulsar`, `@tuwaio/sdk/satellite`, `@tuwaio/sdk/orbit`, `@tuwaio/sdk/nova-connect`).
+- **📦 Zero-Config Integration**: Combines Orbit (adapters), Pulsar (tracking), Satellite (connections), Nova (UI), and SIWX (CAIP-122 Auth) out of the box.
+- **⚡ Modular Subpath Imports**: Clean exports for each domain (e.g. `@tuwaio/sdk/pulsar`, `@tuwaio/sdk/satellite`, `@tuwaio/sdk/siwx`, `@tuwaio/sdk/nova-connect`).
+- **🔐 Headless SIWX (CAIP-122) Auth**: Off-chain authentication across EVM and Solana with session management (`@tuwaio/sdk/siwx` and `@tuwaio/sdk/siwx/server`).
 - **🎨 Includes Nova UI & Styles**: Access beautifully styled wallet connection modals and transaction toasts with simple CSS imports (`@import '@tuwaio/sdk/styles/all.css'`).
 - **🛡️ Strict Singleton Contexts**: Uses intelligent peer dependencies to ensure you never run into multiple instances of React or Web3 singletons.
+
+> [!WARNING]
+> **SIWE Deprecation Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Use `@tuwaio/sdk/siwx` and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
 
 ---
 
