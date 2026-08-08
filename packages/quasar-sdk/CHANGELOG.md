@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.18...quasar-sdk-v0.1.0) (2026-08-08)
+
+
+### Features
+
+* SIWX integration; docs and packages updated ([#26](https://github.com/TuwaIO/sdk/issues/26)) ([0f11378](https://github.com/TuwaIO/sdk/commit/0f11378465b18854b404105cc5275b1c80cc5250))
+
 ## [0.0.18](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.0.17...quasar-sdk-v0.0.18) (2026-08-03)
 
 ### Bug Fixes
