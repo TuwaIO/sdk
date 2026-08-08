@@ -104,10 +104,10 @@
     "ofetch": "^1.5.1",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "@tuwaio/siwx-react": "1.0.0-fix-initialize-alpha.12.626c94c"
+    "@tuwaio/siwx-react": "1.0.0-fix-initialize-alpha.13.937790a"
   },
   "dependencies": {
-    "@tuwaio/siwx-core": "1.0.0-fix-initialize-alpha.12.626c94c",
-    "@tuwaio/siwx-server": "1.0.0-fix-initialize-alpha.12.626c94c"
+    "@tuwaio/siwx-core": "1.0.0-fix-initialize-alpha.13.937790a",
+    "@tuwaio/siwx-server": "1.0.0-fix-initialize-alpha.13.937790a"
   }
 }
