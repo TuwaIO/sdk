@@ -82,7 +82,7 @@ export async function getHistory(
 
 ## 🔐 Frontend Authentication (SIWX)
 
-The Quasar SDK relies on the standard **SIWX (CAIP-122)** protocol for authenticating requests. 
+The Quasar SDK relies on the standard **SIWX (CAIP-122)** protocol for authenticating requests.
 
 You should use the headless `useSatelliteSiwxAutoAuth` hook provided by `@tuwaio/sdk/siwx` on your frontend. This hook automatically prompts users to sign a CAIP-122 message when they connect their wallet, and establishes a secure session with your backend.
 

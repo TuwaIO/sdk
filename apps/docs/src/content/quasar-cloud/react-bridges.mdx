@@ -15,21 +15,18 @@ For a React application, `NovaConnectProvider` handles auto-authentication nativ
 ```tsx
 // src/components/Providers.tsx
 'use client';
- 
+
 import { ReactNode } from 'react';
 import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
 import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
 import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
- 
+
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <SatelliteConnectProvider
-      adapter={[
-        satelliteEVMAdapter(wagmiConfig, appEVMChains), 
-        satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })
-      ]}
+      adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
       autoConnect={true}
     >
       <NovaConnectProvider

@@ -84,7 +84,7 @@ import { createSiwxApiHandler } from '@tuwaio/sdk/siwx/server-next';
 const handler = createSiwxApiHandler({
   cookieOptions: {
     secure: process.env.NODE_ENV === 'production',
-  }
+  },
 });
 
 export const { GET, POST, DELETE } = handler;
@@ -97,22 +97,22 @@ export const { GET, POST, DELETE } = handler;
 ```typescript
 // src/app/actions.ts
 'use server';
- 
+
 import { Quasar } from '@tuwaio/quasar-sdk';
 import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import { TransactionUnion } from '@/types';
- 
+
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
- 
+
 export async function syncTransaction(tx: TransactionUnion, session: SiwxSession | null) {
   if (!session) throw new Error('Unauthorized');
- 
+
   // The SiwxSession in session is already verified by the SIWX API route and deserialized from the secure HttpOnly cookie.
 
   await quasar.pulsar.syncCreate(tx, 'My App');
   return { success: true };
 }
- 
+
 export interface GetHistoryParams {
   walletAddress: string;
   page?: number;
@@ -122,14 +122,12 @@ export interface GetHistoryParams {
 
 export async function getHistory(params: GetHistoryParams, session: SiwxSession | null) {
   if (!session) throw new Error('Unauthorized');
- 
+
   // The session is inherently trusted since it was decrypted from the HttpOnly session cookie.
 
   return quasar.pulsar.getHistory(params);
 }
 ```
-
-
 
 ## ⚙️ 5. Application Configuration (`appConfig.ts`)
 
