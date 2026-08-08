@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.3...solana-sdk-v0.1.4) (2026-08-08)
+
+
+### Bug Fixes
+
+* satellite module ([a2dfcdb](https://github.com/TuwaIO/sdk/commit/a2dfcdb072b3a3a5cc69f6d506c42add2b05270f))
+
 ## [0.1.3](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.2...solana-sdk-v0.1.3) (2026-08-08)
 
 
