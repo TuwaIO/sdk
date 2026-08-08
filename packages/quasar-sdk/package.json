@@ -100,14 +100,14 @@
     }
   },
   "devDependencies": {
-    "@tuwaio/pulsar-core": "1.0.0-fix-docs-alpha.2.819c1d9",
+    "@tuwaio/pulsar-core": "1.0.0-fix-docs-alpha.3.3dc4a6c",
     "ofetch": "^1.5.1",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "@tuwaio/siwx-react": "1.0.0-fix-initialize-alpha.9.ecff9ff"
+    "@tuwaio/siwx-react": "1.0.0-fix-initialize-alpha.12.626c94c"
   },
   "dependencies": {
-    "@tuwaio/siwx-core": "1.0.0-fix-initialize-alpha.9.ecff9ff",
-    "@tuwaio/siwx-server": "1.0.0-fix-initialize-alpha.9.ecff9ff"
+    "@tuwaio/siwx-core": "1.0.0-fix-initialize-alpha.12.626c94c",
+    "@tuwaio/siwx-server": "1.0.0-fix-initialize-alpha.12.626c94c"
   }
 }

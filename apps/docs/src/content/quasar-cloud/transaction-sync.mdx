@@ -25,6 +25,7 @@ Use `quasar.pulsar.syncCreate` in your backend server action or API route to per
 'use server';
 
 import { Quasar, QuasarSDKError } from '@tuwaio/quasar-sdk';
+import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
 import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import type { Transaction } from '@tuwaio/sdk/pulsar';
 
@@ -35,7 +36,7 @@ const quasar = new Quasar({
 
 export async function syncTransactionServerAction(
   tx: Transaction,
-  session: SiwxSession | null,
+  session: SiwxClientSession | SiwxSession | null,
   appName: string = 'My dApp',
 ) {
   if (!session) {
@@ -43,10 +44,8 @@ export async function syncTransactionServerAction(
   }
 
   try {
-    // The SiwxSession in session is already verified by the SIWX API route and deserialized from the secure HttpOnly cookie.
-
-    // Step 2: Ensure the transaction address matches the verified signer
-    if (tx.from.toLowerCase() !== session.message.address.toLowerCase()) {
+    // Step 2: Ensure the transaction address matches the verified signer (EVM case-insensitive / Solana case-sensitive)
+    if (tx.from && !isSessionMatchingTarget(session, tx.from, tx.chainId)) {
       throw new Error('Forbidden: Wallet address mismatch.');
     }
 
@@ -74,6 +73,7 @@ Query paginated transaction histories for a verified user across all their devic
 'use server';
 
 import { Quasar, QuasarSDKError } from '@tuwaio/quasar-sdk';
+import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
 import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 
 const quasar = new Quasar({
@@ -84,17 +84,19 @@ export interface GetHistoryParams {
   walletAddress: string;
   page?: number;
   limit?: number;
+  chainId?: string;
   appName?: string;
 }
 
-export async function getHistoryServerAction(params: GetHistoryParams, session: SiwxSession | null) {
-  if (!session) {
+export async function getHistoryServerAction(
+  params: GetHistoryParams,
+  session: SiwxClientSession | SiwxSession | null,
+) {
+  if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
     throw new Error('Unauthorized: Invalid or expired signature.');
   }
 
   try {
-    // The session is inherently trusted since it was decrypted from the HttpOnly session cookie.
-
     // Step 2: Query paginated history from Quasar Cloud Engine
     const history = await quasar.pulsar.getHistory({
       walletAddress: params.walletAddress,

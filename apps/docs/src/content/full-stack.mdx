@@ -99,33 +99,66 @@ export const { GET, POST, DELETE } = handler;
 'use server';
 
 import { Quasar } from '@tuwaio/quasar-sdk';
+import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
 import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
 import { TransactionUnion } from '@/types';
 
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 
-export async function syncTransaction(tx: TransactionUnion, session: SiwxSession | null) {
-  if (!session) throw new Error('Unauthorized');
+export async function syncTransaction(tx: TransactionUnion, session: SiwxClientSession | SiwxSession | null) {
+  if (!session) {
+    return { success: false, reason: 'unauthenticated' };
+  }
 
-  // The SiwxSession in session is already verified by the SIWX API route and deserialized from the secure HttpOnly cookie.
+  // Validate session address matches transaction sender to prevent quota draining
+  if (tx.from && !isSessionMatchingTarget(session, tx.from, tx.chainId)) {
+    return { success: false, reason: 'session_mismatch' };
+  }
 
-  await quasar.pulsar.syncCreate(tx, 'My App');
-  return { success: true };
+  try {
+    await quasar.pulsar.syncCreate(tx, 'My App');
+    return { success: true };
+  } catch (error) {
+    console.warn('[Quasar Engine Sync Error]', error instanceof Error ? error.message : error);
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
+  }
 }
 
 export interface GetHistoryParams {
   walletAddress: string;
   page?: number;
   limit?: number;
+  chainId?: string;
   appName?: string;
 }
 
-export async function getHistory(params: GetHistoryParams, session: SiwxSession | null) {
-  if (!session) throw new Error('Unauthorized');
+export async function getHistory(params: GetHistoryParams, session: SiwxClientSession | SiwxSession | null) {
+  if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
+    return {
+      docs: [],
+      totalDocs: 0,
+      limit: params.limit ?? 10,
+      page: params.page ?? 1,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPrevPage: false,
+    };
+  }
 
-  // The session is inherently trusted since it was decrypted from the HttpOnly session cookie.
-
-  return quasar.pulsar.getHistory(params);
+  try {
+    return await quasar.pulsar.getHistory(params);
+  } catch (error) {
+    console.warn('[Quasar Engine GetHistory Error]', error instanceof Error ? error.message : error);
+    return {
+      docs: [],
+      totalDocs: 0,
+      limit: params.limit ?? 10,
+      page: params.page ?? 1,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPrevPage: false,
+    };
+  }
 }
 ```
 
