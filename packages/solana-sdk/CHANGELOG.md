@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.10](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.9...solana-sdk-v0.1.10) (2026-08-09)
+
+
+### Bug Fixes
+
+* updated packages and docs ([076a87b](https://github.com/TuwaIO/sdk/commit/076a87b353680be6200e14df5e7bfffeb8f1a8f9))
+
 ## [0.1.9](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.8...solana-sdk-v0.1.9) (2026-08-09)
 
 
