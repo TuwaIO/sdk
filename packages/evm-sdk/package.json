@@ -108,14 +108,14 @@
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": "^0.5.5",
+    "@tuwaio/nova-connect": "^0.5.6",
     "@tuwaio/satellite-core": "^0.4.1",
     "@tuwaio/satellite-react": "^0.4.5",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.5.5",
+    "@tuwaio/nova-connect": "^0.5.6",
     "@tuwaio/satellite-core": "^0.4.1",
     "@tuwaio/satellite-react": "^0.4.5",
     "@tuwaio/sdk": "workspace:^",
