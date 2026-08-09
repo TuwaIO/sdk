@@ -40,6 +40,9 @@ export function Providers({ children }: { children: ReactNode }) {
             });
             return res.ok ? res.json() : null;
           },
+          destroyer: async () => {
+            await fetch('/api/siwx/logout', { method: 'POST' });
+          },
         }}
       >
         {children}
