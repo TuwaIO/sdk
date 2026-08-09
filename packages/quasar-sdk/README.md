@@ -31,10 +31,10 @@ It operates strictly on the server (Node.js, Next.js Server Actions, or Edge fun
 ## 💾 Installation
 
 ```bash
-pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core
+pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core @tuwaio/siwx-core @tuwaio/siwx-server @tuwaio/siwx-react
 ```
 
-_Note: `ofetch` and `@tuwaio/pulsar-core` are required as peer dependencies to ensure ultra-fast HTTP requests and strict TypeScript compatibility._
+_Note: `ofetch` and `@tuwaio/pulsar-core` are required peer dependencies. The `@tuwaio/siwx-*` packages are required if you intend to use the headless SIWX (CAIP-122) authentication integrations._
 
 ---
 
@@ -43,9 +43,8 @@ _Note: `ofetch` and `@tuwaio/pulsar-core` are required as peer dependencies to e
 This is a basic example of how to interact with the Quasar Cloud directly from your secure backend environments (like Next.js API Routes, Server Actions, or NestJS).
 
 ```typescript
-import { Quasar } from '@tuwaio/quasar-sdk';
+import { Quasar, type Transaction } from '@tuwaio/quasar-sdk';
 import { verifySiwxPayload, type SiwxSession } from '@tuwaio/sdk/siwx/server';
-import type { Transaction } from '@tuwaio/sdk/pulsar';
 
 // Initialize Quasar with your Secret Key from the Dashboard
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });

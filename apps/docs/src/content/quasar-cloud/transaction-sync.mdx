@@ -24,10 +24,9 @@ Use `quasar.pulsar.syncCreate` in your backend server action or API route to per
 // src/app/actions/syncTransaction.ts
 'use server';
 
-import { Quasar, QuasarSDKError } from '@tuwaio/quasar-sdk';
+import { Quasar, QuasarSDKError, type Transaction } from '@tuwaio/quasar-sdk';
 import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
 import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
-import type { Transaction } from '@tuwaio/sdk/pulsar';
 
 // Initialize Quasar with your server-only Secret Key
 const quasar = new Quasar({

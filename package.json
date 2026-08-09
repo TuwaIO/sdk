@@ -33,7 +33,7 @@
     }
   ],
   "devDependencies": {
-    "@tuwaio/pulsar-core": "^0.6.11",
+    "@tuwaio/pulsar-core": "^0.6.12",
     "@tuwaio/orbit-core": "^0.2.15",
     "@types/node": "^26.2.0",
     "@asteasolutions/zod-to-openapi": "^9.1.0",
