@@ -5,3 +5,4 @@
 **/_pagefind
 apps/docs/src/content/apiReference
 apps/docs/public/openapi.yaml
+pnpm-lock.yaml

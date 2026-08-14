@@ -43,8 +43,11 @@ _Note: `ofetch` and `@tuwaio/pulsar-core` are required peer dependencies. The `@
 This is a basic example of how to interact with the Quasar Cloud directly from your secure backend environments (like Next.js API Routes, Server Actions, or NestJS).
 
 ```typescript
+import { cookies } from 'next/headers';
 import { Quasar, type Transaction } from '@tuwaio/quasar-sdk';
-import { verifySiwxPayload, type SiwxSession } from '@tuwaio/sdk/siwx/server';
+import { isSessionMatchingTarget } from '@tuwaio/sdk/siwx';
+import { getSiwxServerSession } from '@tuwaio/sdk/siwx/server';
+import { sessionStore } from '@/lib/authStores';
 
 // Initialize Quasar with your Secret Key from the Dashboard
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
@@ -52,12 +55,19 @@ const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 /**
  * Example Next.js Server Action to Sync a Transaction
  */
-export async function syncTransaction(tx: Transaction, sessionData: SiwxSession) {
-  // 1. Verify the client's signature (prevent unauthorized spoofing)
-  const isValid = await verifySiwxPayload(sessionData);
-  if (!isValid) throw new Error('Invalid signature.');
+export async function syncTransaction(tx: Transaction) {
+  const session = await getSiwxServerSession({
+    cookieSource: await cookies(),
+    sessionStore,
+  });
+  if (!session) throw new Error('Unauthorized: No active session.');
 
-  // 2. Sync the transaction securely to the Quasar Cloud
+  // Verify that the transaction sender matches the authenticated session address
+  if (tx.from && !isSessionMatchingTarget(session, tx.from, tx.chainId)) {
+    throw new Error('Forbidden: Session address mismatch.');
+  }
+
+  // Sync the transaction securely to the Quasar Cloud
   await quasar.pulsar.syncCreate(tx, 'My Application');
   return { success: true };
 }
@@ -65,12 +75,20 @@ export async function syncTransaction(tx: Transaction, sessionData: SiwxSession)
 /**
  * Example Next.js Server Action to Fetch History
  */
-export async function getHistory(
-  params: { walletAddress: string; page: number; limit: number; appName: string },
-  sessionData: SiwxSession,
-) {
-  const isValid = await verifySiwxPayload(sessionData);
-  if (!isValid) throw new Error('Invalid signature.');
+export async function getHistory(params: {
+  walletAddress: string;
+  page?: number;
+  limit?: number;
+  appName?: string;
+  chainId?: string;
+}) {
+  const session = await getSiwxServerSession({
+    cookieSource: await cookies(),
+    sessionStore,
+  });
+  if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
+    throw new Error('Unauthorized: Session address mismatch.');
+  }
 
   // Return the paginated transaction history
   return quasar.pulsar.getHistory(params);
@@ -81,11 +99,11 @@ export async function getHistory(
 
 ## 🔐 Frontend Authentication (SIWX)
 
-The Quasar SDK relies on the standard **SIWX (CAIP-122)** protocol for authenticating requests.
+The Quasar SDK relies on the standard **SIWX (CAIP-122)** protocol for authenticating client requests.
 
-You should use the headless `useSatelliteSiwxAutoAuth` hook provided by `@tuwaio/sdk/siwx` on your frontend. This hook automatically prompts users to sign a CAIP-122 message when they connect their wallet, and establishes a secure session with your backend.
+You can use the headless `<NovaSiwxWatcher />` component or `useSiwx` / `useSiwxSession` hooks provided by `@tuwaio/sdk/siwx` (and `@tuwaio/sdk/nova-connect`). The auto-auth watcher automatically prompts users to sign a CAIP-122 message when they connect their wallet and synchronizes active session state.
 
-For detailed frontend integration, see the [SIWX Documentation](https://sdk.docs.tuwa.io/quasar-cloud/react-bridges).
+For detailed frontend integration, see the [SIWX Documentation](https://siwx.docs.tuwa.io/).
 
 ---
 
@@ -115,29 +133,49 @@ export type TransactionUnion = SwapTx;
 
 ### 2. Secure Server Proxy (`actions.ts`)
 
-Proxy calls to Quasar Cloud using your backend to protect secret keys.
+Proxy calls to Quasar Cloud using your backend to protect secret keys. Never accept client-side session credentials in Server Actions.
 
 ```ts
 // src/app/actions.ts
 'use server';
 
+import { cookies } from 'next/headers';
 import { Quasar } from '@tuwaio/quasar-sdk';
-import { verifySiwxPayload, type SiwxSession } from '@tuwaio/sdk/siwx/server';
+import { isSessionMatchingTarget } from '@tuwaio/sdk/siwx';
+import { getSiwxServerSession } from '@tuwaio/sdk/siwx/server';
+import { sessionStore } from '@/lib/authStores';
 import { TransactionUnion } from '@/types';
 
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 
-export async function syncTransaction(tx: TransactionUnion, sessionData: SiwxSession) {
-  const isValid = await verifySiwxPayload(sessionData);
-  if (!isValid) throw new Error('Invalid signature.');
+export async function syncTransaction(tx: TransactionUnion) {
+  const session = await getSiwxServerSession({
+    cookieSource: await cookies(),
+    sessionStore,
+  });
+  if (!session) throw new Error('Unauthorized: No active session.');
+  if (tx.from && !isSessionMatchingTarget(session, tx.from, tx.chainId)) {
+    throw new Error('Forbidden: Session address mismatch.');
+  }
 
   await quasar.pulsar.syncCreate(tx, 'My App');
   return { success: true };
 }
 
-export async function getHistory(params: any, sessionData: SiwxSession) {
-  const isValid = await verifySiwxPayload(sessionData);
-  if (!isValid) throw new Error('Invalid signature.');
+export async function getHistory(params: {
+  walletAddress: string;
+  page?: number;
+  limit?: number;
+  appName?: string;
+  chainId?: string;
+}) {
+  const session = await getSiwxServerSession({
+    cookieSource: await cookies(),
+    sessionStore,
+  });
+  if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
+    throw new Error('Unauthorized: Session address mismatch.');
+  }
 
   return quasar.pulsar.getHistory(params);
 }
@@ -150,7 +188,6 @@ export async function getHistory(params: any, sessionData: SiwxSession) {
 import { createPulsarStore, createTxInMemoryStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
 import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
 import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
-import { useSiwxSessionStore } from '@tuwaio/sdk/siwx';
 import { preFlightTxCheck } from '@tuwaio/quasar-sdk';
 
 import { getHistory, syncTransaction } from '@/app/actions';
@@ -169,10 +206,7 @@ const initialStore = createPulsarStore<TransactionUnion>({
   onRemoteCreate: async (tx) => {
     try {
       // Syncs the new transaction to Quasar via Next.js Server Actions
-      const session = useSiwxSessionStore.getState().session;
-      if (session) {
-        await syncTransaction(tx as TransactionUnion, session);
-      }
+      await syncTransaction(tx as TransactionUnion);
     } catch (err) {
       console.error('[PulsarHook] Remote sync failed:', err);
     }
@@ -186,10 +220,7 @@ const pulsarInMemoryStore = createTxInMemoryStore<TransactionUnion>({
   localTransactionsPool: initialStore.getState().transactionsPool,
   getHistory: async ({ page, walletAddress }) => {
     try {
-      const session = useSiwxSessionStore.getState().session;
-      if (!session) return null;
-
-      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' }, session);
+      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' });
 
       if (!history) return null;
 

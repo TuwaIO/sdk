@@ -24,22 +24,25 @@ Use `quasar.pulsar.syncCreate` in your backend server action or API route to per
 // src/app/actions/syncTransaction.ts
 'use server';
 
+import { cookies } from 'next/headers';
 import { Quasar, QuasarSDKError, type Transaction } from '@tuwaio/quasar-sdk';
-import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
-import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
+import { isSessionMatchingTarget } from '@tuwaio/sdk/siwx';
+import { getSiwxServerSession } from '@tuwaio/sdk/siwx/server';
+import { sessionStore } from '@/lib/authStores';
 
 // Initialize Quasar with your server-only Secret Key
 const quasar = new Quasar({
   secretKey: process.env.QUASAR_SECRET_KEY ?? '',
 });
 
-export async function syncTransactionServerAction(
-  tx: Transaction,
-  session: SiwxClientSession | SiwxSession | null,
-  appName: string = 'My dApp',
-) {
+export async function syncTransactionServerAction(tx: Transaction, appName: string = 'My dApp') {
+  // Step 1: Read and verify session server-side
+  const session = await getSiwxServerSession({
+    cookieSource: await cookies(),
+    sessionStore,
+  });
   if (!session) {
-    throw new Error('Unauthorized: Wallet signature verification failed.');
+    throw new Error('Unauthorized: No active session found.');
   }
 
   try {
@@ -71,9 +74,11 @@ Query paginated transaction histories for a verified user across all their devic
 // src/app/actions/getHistory.ts
 'use server';
 
+import { cookies } from 'next/headers';
 import { Quasar, QuasarSDKError } from '@tuwaio/quasar-sdk';
-import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
-import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
+import { isSessionMatchingTarget } from '@tuwaio/sdk/siwx';
+import { getSiwxServerSession } from '@tuwaio/sdk/siwx/server';
+import { sessionStore } from '@/lib/authStores';
 
 const quasar = new Quasar({
   secretKey: process.env.QUASAR_SECRET_KEY ?? '',
@@ -87,16 +92,17 @@ export interface GetHistoryParams {
   appName?: string;
 }
 
-export async function getHistoryServerAction(
-  params: GetHistoryParams,
-  session: SiwxClientSession | SiwxSession | null,
-) {
+export async function getHistoryServerAction(params: GetHistoryParams) {
+  const session = await getSiwxServerSession({
+    cookieSource: await cookies(),
+    sessionStore,
+  });
   if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
-    throw new Error('Unauthorized: Invalid or expired signature.');
+    throw new Error('Unauthorized: Session mismatch or unauthenticated.');
   }
 
   try {
-    // Step 2: Query paginated history from Quasar Cloud Engine
+    // Query paginated history from Quasar Cloud Engine
     const history = await quasar.pulsar.getHistory({
       walletAddress: params.walletAddress,
       page: params.page ?? 1,
@@ -142,14 +148,13 @@ try {
 
 ## ⚡ 4. Full Client Integration with Pulsar Engine
 
-Now that your server actions are ready, connect them to your client-side Pulsar transaction store. Pulsar can automatically grab the current SIWX session during transaction execution and history queries:
+Now that your server actions are ready, connect them to your client-side Pulsar transaction store. The server action automatically resolves the authenticated user session from HTTP-Only cookies:
 
 ```typescript
 // src/hooks/usePulsarStore.ts
 'use client';
 
 import { createPulsarStore } from '@tuwaio/sdk/pulsar';
-import { useSiwxSessionStore } from '@tuwaio/sdk/siwx';
 import { preFlightTxCheck } from '@tuwaio/quasar-sdk';
 import { syncTransactionServerAction } from '@/app/actions';
 import { TransactionUnion } from '@/types';
@@ -166,8 +171,7 @@ export const pulsarStore = createPulsarStore<TransactionUnion>({
   // 2. Automatically sync transaction states to Quasar Cloud Engine
   onRemoteCreate: async (tx) => {
     try {
-      const session = useSiwxSessionStore.getState().session;
-      await syncTransactionServerAction(tx as TransactionUnion, session);
+      await syncTransactionServerAction(tx as TransactionUnion);
     } catch (err) {
       console.error('Remote transaction sync failed:', err);
       throw err; // Rethrow to inform pulsar-core that sync failed

@@ -73,39 +73,131 @@ export type TransactionUnion = SwapTx;
 
 ---
 
-## 🔒 3. Backend SIWX Authentication API (`route.ts`)
+## 🔒 3. Backend SIWX Authentication API (`route.ts` & `authStores.ts`)
+
+### 3.1 Creating Backend Auth Stores (`src/lib/authStores.ts`)
+
+`createSiwxApiHandler` requires durable stores for session storage and single-use nonce consumption:
+
+```typescript
+// src/lib/authStores.ts (Production with Redis)
+import Redis from 'ioredis';
+import type { SiwxSessionStore, SiwxNonceStore, SiwxSession, SiwxSessionRecord } from '@tuwaio/sdk/siwx/server';
+import { generateServerNonce } from '@tuwaio/sdk/siwx/server';
+
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+
+export const sessionStore: SiwxSessionStore = {
+  async create({ session, ttlSeconds }: { session: SiwxSession; ttlSeconds: number }): Promise<SiwxSessionRecord> {
+    const id = generateServerNonce();
+    const createdAt = Date.now();
+    const expiresAt = createdAt + ttlSeconds * 1000;
+    const record: SiwxSessionRecord = { id, session, createdAt, expiresAt };
+
+    await redis.set(`siwx:session:${id}`, JSON.stringify(record), 'EX', ttlSeconds);
+    return record;
+  },
+
+  async get(id: string): Promise<SiwxSessionRecord | null> {
+    const data = await redis.get(`siwx:session:${id}`);
+    return data ? JSON.parse(data) : null;
+  },
+
+  async bindSubject(id: string, subjectId: string): Promise<boolean> {
+    const record = await this.get(id);
+    if (!record) return false;
+    record.subjectId = subjectId;
+    const ttl = Math.max(1, Math.floor((record.expiresAt - Date.now()) / 1000));
+    await redis.set(`siwx:session:${id}`, JSON.stringify(record), 'EX', ttl);
+    return true;
+  },
+
+  async revoke(id: string): Promise<void> {
+    await redis.del(`siwx:session:${id}`);
+  },
+};
+
+export const nonceStore: SiwxNonceStore = {
+  async issue({ nonce, ttlSeconds }: { nonce: string; ttlSeconds: number }): Promise<void> {
+    await redis.set(`siwx:nonce:${nonce}`, '1', 'EX', ttlSeconds);
+  },
+
+  async consume({ nonce }: { nonce: string }): Promise<boolean> {
+    const value = await redis.getdel(`siwx:nonce:${nonce}`);
+    return value !== null;
+  },
+};
+```
+
+> **Development / In-Memory Store Example (Zero Infrastructure):**
+>
+> ```typescript
+> // src/lib/authStores.dev.ts (Local testing only)
+> import { MemorySiwxSessionStore, MemorySiwxNonceStore } from '@tuwaio/sdk/siwx/server';
+>
+> export const sessionStore = new MemorySiwxSessionStore();
+> export const nonceStore = new MemorySiwxNonceStore();
+> ```
+
+### 3.2 Next.js App Router Route Handler
 
 Create a Next.js App Router API route to handle CAIP-122 SIWX verification and session management automatically.
 
 ```typescript
 // src/app/api/siwx/[...siwx]/route.ts
 import { createSiwxApiHandler } from '@tuwaio/sdk/siwx/server-next';
+import { sessionStore, nonceStore } from '@/lib/authStores';
 
+// Production Profile: Durable server-side sessions with atomic nonce consumption
 const handler = createSiwxApiHandler({
-  cookieOptions: {
-    secure: process.env.NODE_ENV === 'production',
+  sessionStore,
+  nonceStore,
+  policy: {
+    expectedDomain: 'app.tuwa.io',
+    requireExpirationTime: true,
   },
 });
 
 export const { GET, POST, DELETE } = handler;
 ```
 
+> **For Stateless Demo Environments (HMAC-SHA256 Signed Tokens):**
+>
+> ```typescript
+> import { createStatelessDemoSiwxHandler } from '@tuwaio/sdk/siwx/server-next';
+>
+> const handler = createStatelessDemoSiwxHandler({
+>   signingSecret: process.env.SIWX_DEMO_SIGNING_SECRET!,
+>   policy: { expectedDomain: 'app.tuwa.io' },
+> });
+>
+> export const { GET, POST, DELETE } = handler;
+> ```
+
 ---
 
 ## ☁️ 4. Backend Server Actions (`actions.ts`)
+
+Server Actions read and verify the active SIWX session strictly server-side using secure HTTP-Only cookies. Never trust a client-provided session object.
 
 ```typescript
 // src/app/actions.ts
 'use server';
 
+import { cookies } from 'next/headers';
 import { Quasar } from '@tuwaio/quasar-sdk';
-import { isSessionMatchingTarget, type SiwxClientSession } from '@tuwaio/sdk/siwx';
-import { type SiwxSession } from '@tuwaio/sdk/siwx/server';
+import { isSessionMatchingTarget } from '@tuwaio/sdk/siwx';
+import { getSiwxServerSession } from '@tuwaio/sdk/siwx/server';
+import { sessionStore } from '@/lib/authStores';
 import { TransactionUnion } from '@/types';
 
 const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
 
-export async function syncTransaction(tx: TransactionUnion, session: SiwxClientSession | SiwxSession | null) {
+export async function syncTransaction(tx: TransactionUnion) {
+  const session = await getSiwxServerSession({
+    cookieSource: await cookies(),
+    sessionStore,
+  });
   if (!session) {
     return { success: false, reason: 'unauthenticated' };
   }
@@ -132,7 +224,11 @@ export interface GetHistoryParams {
   appName?: string;
 }
 
-export async function getHistory(params: GetHistoryParams, session: SiwxClientSession | SiwxSession | null) {
+export async function getHistory(params: GetHistoryParams) {
+  const session = await getSiwxServerSession({
+    cookieSource: await cookies(),
+    sessionStore,
+  });
   if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
     return {
       docs: [],
@@ -199,7 +295,6 @@ export const wagmiConfig = createConfig({
 import { createPulsarStore, createTxInMemoryStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
 import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
 import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
-import { useSiwxSessionStore } from '@tuwaio/sdk/siwx';
 import { preFlightTxCheck } from '@tuwaio/quasar-sdk';
 
 import { getHistory, syncTransaction } from '@/app/actions';
@@ -216,8 +311,7 @@ const initialStore = createPulsarStore<TransactionUnion>({
   },
   onRemoteCreate: async (tx) => {
     try {
-      const auth = useSiwxSessionStore.getState().session;
-      await syncTransaction(tx as TransactionUnion, auth);
+      await syncTransaction(tx as TransactionUnion);
     } catch (err) {
       console.error('[PulsarHook] Remote sync failed:', err);
       throw err; // Rethrow to inform pulsar-core that sync failed
@@ -232,10 +326,7 @@ const pulsarInMemoryStore = createTxInMemoryStore<TransactionUnion>({
   reconcileUnsyncedTransactions: initialStore.getState().reconcileUnsyncedTransactions,
   getHistory: async ({ page, walletAddress }) => {
     try {
-      const session = useSiwxSessionStore.getState().session;
-      if (!session) return null;
-
-      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' }, session);
+      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' });
       if (!history) return null;
 
       return { ...history, docs: history.docs as TransactionUnion[] };
@@ -358,6 +449,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           verifier: async (payload) => {
             const res = await fetch('/api/siwx/verify', {
               method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload),
             });
             return res.ok ? res.json() : null;
@@ -368,6 +460,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         }}
       >
         {children}
+      </NovaConnectProvider>
+    </SatelliteConnectProvider>
   );
 }
 ```

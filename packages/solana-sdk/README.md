@@ -25,7 +25,7 @@ It completely avoids legacy `@solana/web3.js` classes and is built from the grou
 - **🔐 Headless SIWX Auth**: Provides the Solana-native message signer (`createSolanaSiwxSigner`) for seamless CAIP-122 authentication (`@tuwaio/solana-sdk/siwx`).
 
 > [!WARNING]
-> **SIWE Deprecation Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Migrate to `@tuwaio/solana-sdk/siwx` (`createSolanaSiwxSigner`) and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
+> **SIWX Migration Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Migrate to `@tuwaio/solana-sdk/siwx` (`createSolanaSiwxSigner`) and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
 
 ---
 
@@ -136,6 +136,7 @@ import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
 import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
+import { useSiwxSession } from '@tuwaio/sdk/siwx';
 
 import { solanaRPCUrls } from '@/configs/appConfig';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
@@ -144,20 +145,31 @@ import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const getAdapter = usePulsarStore((s) => s.getAdapter);
   const transactionsPool = usePulsarStore((s) => s.transactionsPool);
+  const siwxSession = useSiwxSession();
 
   return (
     <SatelliteConnectProvider adapter={[satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]} autoConnect={true}>
-      <SolanaConnectorsWatcher />
+      <SolanaConnectorsWatcher siwx={siwxSession} />
 
       <NovaTransactionsProvider />
 
       <NovaConnectProvider
         solanaRPCUrls={solanaRPCUrls}
         transactionPool={transactionsPool}
-        pulsarAdapter={getAdapter() as any}
+        pulsarAdapter={getAdapter()}
         withImpersonated
         withBalance
         withChain
+        siwx={{
+          verifier: async (payload) => {
+            const res = await fetch('/api/siwx/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            return res.ok ? res.json() : null;
+          },
+        }}
       >
         {children}
       </NovaConnectProvider>

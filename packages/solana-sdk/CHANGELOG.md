@@ -2,59 +2,51 @@
 
 ## [0.1.10](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.9...solana-sdk-v0.1.10) (2026-08-09)
 
-
 ### Bug Fixes
 
-* updated packages and docs ([076a87b](https://github.com/TuwaIO/sdk/commit/076a87b353680be6200e14df5e7bfffeb8f1a8f9))
+- updated packages and docs ([076a87b](https://github.com/TuwaIO/sdk/commit/076a87b353680be6200e14df5e7bfffeb8f1a8f9))
 
 ## [0.1.9](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.8...solana-sdk-v0.1.9) (2026-08-09)
 
-
 ### Bug Fixes
 
-* updated solana sdk packages ([bb92462](https://github.com/TuwaIO/sdk/commit/bb9246233f44949bea6029d3196b868040535f70))
+- updated solana sdk packages ([bb92462](https://github.com/TuwaIO/sdk/commit/bb9246233f44949bea6029d3196b868040535f70))
 
 ## [0.1.8](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.7...solana-sdk-v0.1.8) (2026-08-09)
 
-
 ### Bug Fixes
 
-* updated packages ([144630b](https://github.com/TuwaIO/sdk/commit/144630b55bdf571b2e89173cbd521b94c1b97f7b))
+- updated packages ([144630b](https://github.com/TuwaIO/sdk/commit/144630b55bdf571b2e89173cbd521b94c1b97f7b))
 
 ## [0.1.7](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.6...solana-sdk-v0.1.7) (2026-08-09)
 
-
 ### Bug Fixes
 
-* updated packages ([7026f8c](https://github.com/TuwaIO/sdk/commit/7026f8c282d55c9cde6f78cfd8c2c489bccf68de))
+- updated packages ([7026f8c](https://github.com/TuwaIO/sdk/commit/7026f8c282d55c9cde6f78cfd8c2c489bccf68de))
 
 ## [0.1.6](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.5...solana-sdk-v0.1.6) (2026-08-09)
 
-
 ### Bug Fixes
 
-* updated packages ([a347c2b](https://github.com/TuwaIO/sdk/commit/a347c2bce72bd3873bf195b72fb18f646b44bc25))
+- updated packages ([a347c2b](https://github.com/TuwaIO/sdk/commit/a347c2bce72bd3873bf195b72fb18f646b44bc25))
 
 ## [0.1.5](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.4...solana-sdk-v0.1.5) (2026-08-08)
 
-
 ### Bug Fixes
 
-* updated packages ([d1df225](https://github.com/TuwaIO/sdk/commit/d1df225326f3f534cb4c50aed292d186e9f79737))
+- updated packages ([d1df225](https://github.com/TuwaIO/sdk/commit/d1df225326f3f534cb4c50aed292d186e9f79737))
 
 ## [0.1.4](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.3...solana-sdk-v0.1.4) (2026-08-08)
 
-
 ### Bug Fixes
 
-* satellite module ([a2dfcdb](https://github.com/TuwaIO/sdk/commit/a2dfcdb072b3a3a5cc69f6d506c42add2b05270f))
+- satellite module ([a2dfcdb](https://github.com/TuwaIO/sdk/commit/a2dfcdb072b3a3a5cc69f6d506c42add2b05270f))
 
 ## [0.1.3](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.2...solana-sdk-v0.1.3) (2026-08-08)
 
-
 ### Bug Fixes
 
-* exports ([4e80215](https://github.com/TuwaIO/sdk/commit/4e802150a93f2783a193f749ed5aec08d853762d))
+- exports ([4e80215](https://github.com/TuwaIO/sdk/commit/4e802150a93f2783a193f749ed5aec08d853762d))
 
 ## [0.1.2](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.1.1...solana-sdk-v0.1.2) (2026-08-08)
 

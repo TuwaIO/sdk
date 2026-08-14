@@ -25,7 +25,8 @@
   ],
   "scripts": {
     "start": "tsup src/index.ts --watch",
-    "build": "tsup"
+    "build": "tsup",
+    "test": "node --import tsx --test src/__tests__/*.test.ts"
   },
   "keywords": [
     "tuwa",
@@ -86,9 +87,9 @@
   "peerDependencies": {
     "@tuwaio/pulsar-core": "^0.6.11",
     "ofetch": "^1.5.1",
-    "@tuwaio/siwx-react": "^0.1.0",
-    "@tuwaio/siwx-core": "^0.1.0",
-    "@tuwaio/siwx-server": "^0.1.0"
+    "@tuwaio/siwx-react": "^0.2.0",
+    "@tuwaio/siwx-core": "^0.2.0",
+    "@tuwaio/siwx-server": "^0.2.1"
   },
   "peerDependenciesMeta": {
     "@tuwaio/pulsar-core": {
@@ -112,8 +113,8 @@
     "ofetch": "^1.5.1",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "@tuwaio/siwx-react": "^0.1.1",
-    "@tuwaio/siwx-core": "^0.1.0",
-    "@tuwaio/siwx-server": "^0.1.0"
+    "@tuwaio/siwx-react": "^0.2.0",
+    "@tuwaio/siwx-core": "^0.2.0",
+    "@tuwaio/siwx-server": "^0.2.1"
   }
 }

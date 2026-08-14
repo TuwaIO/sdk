@@ -25,7 +25,7 @@ It securely wraps `viem` and `@wagmi/core`, providing standardized adapters for 
 - **🔐 Headless SIWX Auth**: Provides the EVM-native message signer (`createEvmSiwxSigner`) for seamless CAIP-122 authentication (`@tuwaio/evm-sdk/siwx`).
 
 > [!WARNING]
-> **SIWE Deprecation Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Migrate to `@tuwaio/evm-sdk/siwx` (`createEvmSiwxSigner`) and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
+> **SIWX Migration Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Migrate to `@tuwaio/evm-sdk/siwx` (`createEvmSiwxSigner`) and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
 
 ---
 
@@ -136,6 +136,7 @@ import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
 import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
 import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
 import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
+import { useSiwxSession } from '@tuwaio/sdk/siwx';
 
 import { appEVMChains, wagmiConfig } from '@/configs/appConfig';
 import { usePulsarStore } from '@/hooks/usePulsarStore';
@@ -144,20 +145,31 @@ import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const getAdapter = usePulsarStore((s) => s.getAdapter);
   const transactionsPool = usePulsarStore((s) => s.transactionsPool);
+  const siwxSession = useSiwxSession();
 
   return (
     <SatelliteConnectProvider adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains)]} autoConnect={true}>
-      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} siwx={siwxSession} />
 
       <NovaTransactionsProvider />
 
       <NovaConnectProvider
         appChains={appEVMChains}
         transactionPool={transactionsPool}
-        pulsarAdapter={getAdapter() as any}
+        pulsarAdapter={getAdapter()}
         withImpersonated
         withBalance
         withChain
+        siwx={{
+          verifier: async (payload) => {
+            const res = await fetch('/api/siwx/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            return res.ok ? res.json() : null;
+          },
+        }}
       >
         {children}
       </NovaConnectProvider>

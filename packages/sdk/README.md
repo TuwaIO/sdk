@@ -24,7 +24,7 @@ It abstracts away complex dependency management (automatically handling `zustand
 - **🛡️ Strict Singleton Contexts**: Uses intelligent peer dependencies to ensure you never run into multiple instances of React or Web3 singletons.
 
 > [!WARNING]
-> **SIWE Deprecation Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Use `@tuwaio/sdk/siwx` and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
+> **SIWX Migration Notice**: Legacy SIWE authorization flows in Satellite are **deprecated**. Use `@tuwaio/sdk/siwx` and `@tuwaio/sdk/siwx/server` for multi-chain CAIP-122 authentication.
 
 ---
 
@@ -159,13 +159,16 @@ Assembling the complete multi-chain ecosystem layout. Notice how both `EVMConnec
 // src/providers/AppProviders.tsx
 'use client';
 
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
+import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
 import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
 import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
-import { useSiwx, useSiwxSession } from '@tuwaio/sdk/siwx';
-import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
+import { useSiwxSession } from '@tuwaio/sdk/siwx';
 
 import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
-import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
+import { usePulsarStore } from '@/hooks/usePulsarStore';
 import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
@@ -173,19 +176,11 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const transactionsPool = usePulsarStore((state) => state.transactionsPool);
 
   const siwxSession = useSiwxSession();
-  const { signIn } = useSiwx();
 
   return (
     <SatelliteConnectProvider
       adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
       autoConnect={true}
-      callbackAfterConnected={async (connection) => {
-        const isEVM = getAdapterFromConnectorType(connection.connectorType) === OrbitAdapter.EVM;
-        if (isEVM && isSafeApp) return;
-
-        // Trigger SIWX flow
-        await signIn();
-      }}
     >
       <EVMConnectorsWatcher wagmiConfig={wagmiConfig} siwx={siwxSession} />
       <SolanaConnectorsWatcher siwx={siwxSession} />
@@ -200,6 +195,19 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         withImpersonated
         withBalance
         withChain
+        siwx={{
+          verifier: async (payload) => {
+            const res = await fetch('/api/siwx/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            return res.ok ? res.json() : null;
+          },
+          destroyer: async () => {
+            await fetch('/api/siwx/logout', { method: 'POST' });
+          },
+        }}
       >
         {children}
       </NovaConnectProvider>
