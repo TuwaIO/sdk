@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.11](https://github.com/TuwaIO/sdk/compare/sdk-v0.1.10...sdk-v0.1.11) (2026-08-14)
+
+
+### Bug Fixes
+
+* updated packages and added exports test ([c6d3577](https://github.com/TuwaIO/sdk/commit/c6d35771b1b2a04b57a3b5c28563feecd2b9abe7))
+
 ## [0.1.10](https://github.com/TuwaIO/sdk/compare/sdk-v0.1.9...sdk-v0.1.10) (2026-08-14)
 
 
