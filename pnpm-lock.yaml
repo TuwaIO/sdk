@@ -78,7 +78,7 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0(typedoc-plugin-markdown@4.12.0(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3))
       typescript:
-        specifier: ^6.0.3
+        specifier: 6.0.3
         version: 6.0.3
       typescript-eslint:
         specifier: ^8.67.0
@@ -164,17 +164,17 @@ importers:
         version: 0.4.4(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-evm@0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(immer@11.1.16)(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/siwx-evm':
         specifier: ^0.2.1
-        version: 0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
+        version: 0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
     devDependencies:
       '@tuwaio/nova-connect':
-        specifier: ^0.5.9
-        version: 0.5.9(6f347ec05ee5bd41eca5c7133c6e491a)
+        specifier: ^0.5.10
+        version: 0.5.10(cc7c60d52d16440515354bf48539cbff)
       '@tuwaio/satellite-core':
         specifier: ^0.4.3
         version: 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/satellite-react':
-        specifier: ^0.4.8
-        version: 0.4.8(a0edc823559a025ffdbe1c9604c6c241)
+        specifier: ^0.4.9
+        version: 0.4.9(56658a614e4b0b3ed91c8e1bb6d0d0c6)
       '@tuwaio/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -197,14 +197,14 @@ importers:
         specifier: ^0.6.12
         version: 0.6.12(@tuwaio/orbit-core@0.2.15)(dayjs@1.11.21)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/siwx-core':
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.2.2
+        version: 0.2.2
       '@tuwaio/siwx-react':
-        specifier: ^0.2.1
-        version: 0.2.1(@tuwaio/siwx-core@0.2.1)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+        specifier: ^0.2.2
+        version: 0.2.2(@tuwaio/siwx-core@0.2.2)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/siwx-server':
         specifier: ^0.2.2
-        version: 0.2.2(@tuwaio/siwx-core@0.2.1)
+        version: 0.2.2(@tuwaio/siwx-core@0.2.2)
       ofetch:
         specifier: ^1.5.1
         version: 1.5.1
@@ -230,8 +230,8 @@ importers:
         specifier: ^2.3.7
         version: 2.3.7(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tuwaio/nova-connect':
-        specifier: ^0.5.9
-        version: 0.5.9(591cad51ece241616344cfb231787db1)
+        specifier: ^0.5.10
+        version: 0.5.10(ef022d885202d0c09438ac510ad40a0b)
       '@tuwaio/nova-core':
         specifier: ^0.5.1
         version: 0.5.1(@radix-ui/react-dialog@1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@web3icons/common@0.11.49)(@web3icons/react@4.1.20(react@19.2.8))(clsx@2.1.1)(framer-motion@13.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(tailwind-merge@3.6.0)
@@ -251,17 +251,17 @@ importers:
         specifier: ^0.4.3
         version: 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/satellite-react':
-        specifier: ^0.4.8
-        version: 0.4.8(a0edc823559a025ffdbe1c9604c6c241)
+        specifier: ^0.4.9
+        version: 0.4.9(56658a614e4b0b3ed91c8e1bb6d0d0c6)
       '@tuwaio/siwx-core':
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.2.2
+        version: 0.2.2
       '@tuwaio/siwx-react':
-        specifier: ^0.2.1
-        version: 0.2.1(@tuwaio/siwx-core@0.2.1)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+        specifier: ^0.2.2
+        version: 0.2.2(@tuwaio/siwx-core@0.2.2)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/siwx-server':
         specifier: ^0.2.2
-        version: 0.2.2(@tuwaio/siwx-core@0.2.1)
+        version: 0.2.2(@tuwaio/siwx-core@0.2.2)
       '@web3icons/common':
         specifier: ^0.11.49
         version: 0.11.49
@@ -315,21 +315,21 @@ importers:
         specifier: ^0.6.10
         version: 0.6.10(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/pulsar-core@0.6.12(@tuwaio/orbit-core@0.2.15)(dayjs@1.11.21)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(dayjs@1.11.21)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/satellite-solana':
-        specifier: ^0.4.8
-        version: 0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+        specifier: ^0.4.9
+        version: 0.4.9(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/siwx-solana':
-        specifier: ^0.2.0
-        version: 0.2.0(@tuwaio/siwx-core@0.2.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
+        specifier: ^0.2.1
+        version: 0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
     devDependencies:
       '@tuwaio/nova-connect':
-        specifier: ^0.5.9
-        version: 0.5.9(68c6187b7d85091b403cc54cc5918569)
+        specifier: ^0.5.10
+        version: 0.5.10(cc7c60d52d16440515354bf48539cbff)
       '@tuwaio/satellite-core':
         specifier: ^0.4.3
         version: 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/satellite-react':
-        specifier: ^0.4.8
-        version: 0.4.8(746f4f0774b1cfe33753b175c5369286)
+        specifier: ^0.4.9
+        version: 0.4.9(56658a614e4b0b3ed91c8e1bb6d0d0c6)
       '@tuwaio/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -2663,8 +2663,8 @@ packages:
       nextra-theme-docs: '>=4.6'
       react: '>=19.2.3'
 
-  '@tuwaio/nova-connect@0.5.9':
-    resolution: {integrity: sha512-UmZQ7q5AXRTJmqzk4K1qiB6Y076f4tUcylkqzyTGntuDzg614Sy6rjZDkUj2NiYADQ5CtOVEaWLGs8zeB5YX0g==}
+  '@tuwaio/nova-connect@0.5.10':
+    resolution: {integrity: sha512-FDAYCw9cRdVqAEc6TJ5uYpaIk8EqhQH8gJoCkZsq1FEWn4v4JlJ6qaggqJeyOk73sT+0DE7/U/ybSNY0nGkV5Q==}
     peerDependencies:
       '@emotion/is-prop-valid': 1.x.x
       '@heroicons/react': 2.x.x
@@ -2830,8 +2830,8 @@ packages:
       viem: 2.x.x
       zustand: 5.x.x
 
-  '@tuwaio/satellite-react@0.4.8':
-    resolution: {integrity: sha512-O0lnH/1Fia6qFUT9WEzTkmVPVyOUK6m8z0rL9kofaTvjs7u3quxGB9PUgKnbg4bLgEViXgsVSZ73l+t9xmxLXA==}
+  '@tuwaio/satellite-react@0.4.9':
+    resolution: {integrity: sha512-Jy8tH9j0+S4BjUJOqPUsjHE371xRiVYhY7ptNQVYtzjZSzFmLV4iYXN9BFZ3N3pt7a4SUHWPcgnYDdA4oAO35A==}
     peerDependencies:
       '@tuwaio/orbit-core': '>=0.2.8'
       '@tuwaio/orbit-evm': '>=0.2.11'
@@ -2839,10 +2839,10 @@ packages:
       '@tuwaio/satellite-core': '>=0.3.2'
       '@tuwaio/satellite-evm': '>=0.3.2'
       '@tuwaio/satellite-solana': '>=0.3.2'
-      '@tuwaio/siwx-core': '>=0.2.0'
-      '@tuwaio/siwx-evm': '>=0.2.0'
-      '@tuwaio/siwx-react': '>=0.2.0'
-      '@tuwaio/siwx-solana': '>=0.2.0'
+      '@tuwaio/siwx-core': '>=0.2.2'
+      '@tuwaio/siwx-evm': '>=0.2.1'
+      '@tuwaio/siwx-react': '>=0.2.2'
+      '@tuwaio/siwx-solana': '>=0.2.1'
       '@wagmi/core': 3.x.x
       '@wallet-standard/react': 1.x.x
       gill: '>=0.14'
@@ -2876,13 +2876,13 @@ packages:
       viem:
         optional: true
 
-  '@tuwaio/satellite-solana@0.4.8':
-    resolution: {integrity: sha512-s7QtxUqoeAy5d0waW4GNgdbSSlr7/f5PCh24U0+718NRwYpx4UeDS2Qm7rbQb0t4YMWjaZ4R6JHJYnZvY3fXkQ==}
+  '@tuwaio/satellite-solana@0.4.9':
+    resolution: {integrity: sha512-J7uuJ9Ksdn9h10nSrUcSLDHcQ+cLKlPfhvs5z18nD4sO5WqjS6F2yts4GejY1qWhrHfaDRErafIXuaB/UYk6Bw==}
     peerDependencies:
       '@tuwaio/orbit-core': '>=0.2.8'
       '@tuwaio/orbit-solana': '>=0.2.4'
       '@tuwaio/satellite-core': '>=0.3.2'
-      '@tuwaio/siwx-solana': '>=0.2.0'
+      '@tuwaio/siwx-solana': '>=0.2.1'
       '@wallet-standard/app': 1.1.x
       '@wallet-standard/base': 1.1.x
       '@wallet-standard/core': 1.x.x
@@ -2893,11 +2893,8 @@ packages:
       immer: 11.x.x
       zustand: 5.x.x
 
-  '@tuwaio/siwx-core@0.2.0':
-    resolution: {integrity: sha512-IaP49WsCTkyWHq2CUeX+44ckcmLoLlyB9AUA62nByONOd1HIwf09RQvP6sDCNXGE7EypNNJTd9SZi0TxhVdl2Q==}
-
-  '@tuwaio/siwx-core@0.2.1':
-    resolution: {integrity: sha512-JW+j+n3l4MDmPSQlRGz2Hm8WsLqQNp2BC8SnOcEbwdsfOeQ9y/P5I+ebakF7Qw3wTt/45chu2IFkgLYxxKbX9w==}
+  '@tuwaio/siwx-core@0.2.2':
+    resolution: {integrity: sha512-v7yEqTTj4MhHZ2q6oMBlqbWF7p+L6pgh7JTlRJXOUujqtmOFql2OnlZkQRlo7RX1DF7ZOcsUcZuWHsLQPLjwnw==}
 
   '@tuwaio/siwx-evm@0.2.1':
     resolution: {integrity: sha512-tBDmAhNVoXGWcswK8eTukCuuebMusPrP/pAAlA3vZ4/mq7JAJBb9hnCE3Ax5RME8lVjxGIVGjOM7zgY+UvwDpA==}
@@ -2906,12 +2903,12 @@ packages:
       '@wagmi/core': ^3.0.0
       viem: ^2.0.0
 
-  '@tuwaio/siwx-react@0.2.1':
-    resolution: {integrity: sha512-PJln54NGl/DYUNUhEJHicDOLcCSPowaK+uqTIimHQrnST32Pvsld87GK3aKAlYz0aILRs38/obWV7h+zoKZUdw==}
+  '@tuwaio/siwx-react@0.2.2':
+    resolution: {integrity: sha512-4w0mISCmtv3NxZIR82prlOA2Y61prYiHpeDUcEARjnZ16VPagXOk2YwT+Y19TQpyX35XkRUjqId4bjLjrXcjag==}
     peerDependencies:
-      '@tuwaio/siwx-core': 0.2.1
+      '@tuwaio/siwx-core': 0.2.2
       '@tuwaio/siwx-evm': 0.2.1
-      '@tuwaio/siwx-solana': 0.2.0
+      '@tuwaio/siwx-solana': 0.2.1
       immer: ^10.0.0 || ^11.0.0
       react: ^19.0.0
       zustand: ^5.0.0
@@ -2926,10 +2923,10 @@ packages:
     peerDependencies:
       '@tuwaio/siwx-core': 0.2.1
 
-  '@tuwaio/siwx-solana@0.2.0':
-    resolution: {integrity: sha512-TjY9m3egjLfwtQiqCb53ONITVTYG3ifNCKs87AkzoO+kWnG7DksKN5GOLG6oj+hZZHENO0k2AzeiW5+YLGcQsA==}
+  '@tuwaio/siwx-solana@0.2.1':
+    resolution: {integrity: sha512-pFw6FNTDP/BntSO2IT2PVlH/oqQHWdko7S1JohkquRBkERzcQfyIpDr9RpJLZFXhSxuEfMCzctEEeCEniUCxLw==}
     peerDependencies:
-      '@tuwaio/siwx-core': 0.2.0
+      '@tuwaio/siwx-core': 0.2.2
       '@wallet-standard/base': ^1.0.0
       gill: ^0.14.0
 
@@ -9618,7 +9615,38 @@ snapshots:
       - '@web3icons/react'
       - framer-motion
 
-  '@tuwaio/nova-connect@0.5.9(591cad51ece241616344cfb231787db1)':
+  '@tuwaio/nova-connect@0.5.10(cc7c60d52d16440515354bf48539cbff)':
+    dependencies:
+      '@emotion/is-prop-valid': 1.4.0
+      '@heroicons/react': 2.2.0(react@19.2.8)
+      '@radix-ui/react-dialog': 1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@radix-ui/react-select': 2.3.7(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@tuwaio/nova-core': 0.5.1(@radix-ui/react-dialog@1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@web3icons/common@0.11.49)(@web3icons/react@4.1.20(react@19.2.8))(clsx@2.1.1)(framer-motion@12.43.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(tailwind-merge@3.6.0)
+      '@tuwaio/orbit-core': 0.2.15
+      '@tuwaio/pulsar-core': 0.6.12(@tuwaio/orbit-core@0.2.15)(dayjs@1.11.21)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+      '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+      '@tuwaio/satellite-react': 0.4.9(56658a614e4b0b3ed91c8e1bb6d0d0c6)
+      '@web3icons/common': 0.11.49
+      '@web3icons/react': 4.1.20(react@19.2.8)
+      ethereum-blockies-base64: 1.0.2
+      framer-motion: 12.43.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      immer: 11.1.16
+      react: 19.2.8
+      react-toastify: 11.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
+    optionalDependencies:
+      '@tuwaio/nova-transactions': 0.5.3(7a36893c108786f1f11c19f1fd053d60)
+      '@tuwaio/orbit-evm': 0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
+      '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
+      '@tuwaio/satellite-evm': 0.4.4(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-evm@0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(immer@11.1.16)(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+      '@tuwaio/satellite-solana': 0.4.9(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+      '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
+      '@wallet-standard/react': 1.0.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      dayjs: 1.11.21
+      gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
+      viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
+
+  '@tuwaio/nova-connect@0.5.10(ef022d885202d0c09438ac510ad40a0b)':
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       '@heroicons/react': 2.2.0(react@19.2.8)
@@ -9628,7 +9656,7 @@ snapshots:
       '@tuwaio/orbit-core': 0.2.15
       '@tuwaio/pulsar-core': 0.6.12(@tuwaio/orbit-core@0.2.15)(dayjs@1.11.21)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-react': 0.4.8(a0edc823559a025ffdbe1c9604c6c241)
+      '@tuwaio/satellite-react': 0.4.9(56658a614e4b0b3ed91c8e1bb6d0d0c6)
       '@web3icons/common': 0.11.49
       '@web3icons/react': 4.1.20(react@19.2.8)
       ethereum-blockies-base64: 1.0.2
@@ -9642,70 +9670,8 @@ snapshots:
       '@tuwaio/orbit-evm': 0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
       '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
       '@tuwaio/satellite-evm': 0.4.4(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-evm@0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(immer@11.1.16)(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-solana': 0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/siwx-react': 0.2.1(@tuwaio/siwx-core@0.2.1)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@wallet-standard/react': 1.0.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      dayjs: 1.11.21
-      gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
-      viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
-
-  '@tuwaio/nova-connect@0.5.9(68c6187b7d85091b403cc54cc5918569)':
-    dependencies:
-      '@emotion/is-prop-valid': 1.4.0
-      '@heroicons/react': 2.2.0(react@19.2.8)
-      '@radix-ui/react-dialog': 1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@radix-ui/react-select': 2.3.7(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@tuwaio/nova-core': 0.5.1(@radix-ui/react-dialog@1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@web3icons/common@0.11.49)(@web3icons/react@4.1.20(react@19.2.8))(clsx@2.1.1)(framer-motion@12.43.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(tailwind-merge@3.6.0)
-      '@tuwaio/orbit-core': 0.2.15
-      '@tuwaio/pulsar-core': 0.6.12(@tuwaio/orbit-core@0.2.15)(dayjs@1.11.21)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-react': 0.4.8(746f4f0774b1cfe33753b175c5369286)
-      '@web3icons/common': 0.11.49
-      '@web3icons/react': 4.1.20(react@19.2.8)
-      ethereum-blockies-base64: 1.0.2
-      framer-motion: 12.43.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      immer: 11.1.16
-      react: 19.2.8
-      react-toastify: 11.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
-    optionalDependencies:
-      '@tuwaio/nova-transactions': 0.5.3(7a36893c108786f1f11c19f1fd053d60)
-      '@tuwaio/orbit-evm': 0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
-      '@tuwaio/satellite-evm': 0.4.4(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-evm@0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(immer@11.1.16)(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-solana': 0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@wallet-standard/react': 1.0.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      dayjs: 1.11.21
-      gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
-      viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
-
-  '@tuwaio/nova-connect@0.5.9(6f347ec05ee5bd41eca5c7133c6e491a)':
-    dependencies:
-      '@emotion/is-prop-valid': 1.4.0
-      '@heroicons/react': 2.2.0(react@19.2.8)
-      '@radix-ui/react-dialog': 1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@radix-ui/react-select': 2.3.7(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@tuwaio/nova-core': 0.5.1(@radix-ui/react-dialog@1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@web3icons/common@0.11.49)(@web3icons/react@4.1.20(react@19.2.8))(clsx@2.1.1)(framer-motion@12.43.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(tailwind-merge@3.6.0)
-      '@tuwaio/orbit-core': 0.2.15
-      '@tuwaio/pulsar-core': 0.6.12(@tuwaio/orbit-core@0.2.15)(dayjs@1.11.21)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-react': 0.4.8(1da04515c60d915f0f13acecefbafafa)
-      '@web3icons/common': 0.11.49
-      '@web3icons/react': 4.1.20(react@19.2.8)
-      ethereum-blockies-base64: 1.0.2
-      framer-motion: 12.43.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      immer: 11.1.16
-      react: 19.2.8
-      react-toastify: 11.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
-    optionalDependencies:
-      '@tuwaio/nova-transactions': 0.5.3(7a36893c108786f1f11c19f1fd053d60)
-      '@tuwaio/orbit-evm': 0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
-      '@tuwaio/satellite-evm': 0.4.4(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-evm@0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(immer@11.1.16)(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-solana': 0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+      '@tuwaio/satellite-solana': 0.4.9(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+      '@tuwaio/siwx-react': 0.2.2(@tuwaio/siwx-core@0.2.2)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
       '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
       '@wallet-standard/react': 1.0.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       dayjs: 1.11.21
@@ -9837,7 +9803,7 @@ snapshots:
       viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
       zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
 
-  '@tuwaio/satellite-react@0.4.8(1da04515c60d915f0f13acecefbafafa)':
+  '@tuwaio/satellite-react@0.4.9(56658a614e4b0b3ed91c8e1bb6d0d0c6)':
     dependencies:
       '@tuwaio/orbit-core': 0.2.15
       '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
@@ -9848,62 +9814,22 @@ snapshots:
       '@tuwaio/orbit-evm': 0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
       '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
       '@tuwaio/satellite-evm': 0.4.4(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-evm@0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(immer@11.1.16)(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-solana': 0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/siwx-core': 0.2.1
-      '@tuwaio/siwx-evm': 0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@tuwaio/siwx-solana': 0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
+      '@tuwaio/satellite-solana': 0.4.9(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+      '@tuwaio/siwx-core': 0.2.2
+      '@tuwaio/siwx-evm': 0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
+      '@tuwaio/siwx-react': 0.2.2(@tuwaio/siwx-core@0.2.2)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
+      '@tuwaio/siwx-solana': 0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
       '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
       '@wallet-standard/react': 1.0.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
       viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
 
-  '@tuwaio/satellite-react@0.4.8(746f4f0774b1cfe33753b175c5369286)':
-    dependencies:
-      '@tuwaio/orbit-core': 0.2.15
-      '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      immer: 11.1.16
-      react: 19.2.8
-      zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
-    optionalDependencies:
-      '@tuwaio/orbit-evm': 0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
-      '@tuwaio/satellite-evm': 0.4.4(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-evm@0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(immer@11.1.16)(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-solana': 0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/siwx-core': 0.2.0
-      '@tuwaio/siwx-evm': 0.2.1(@tuwaio/siwx-core@0.2.0)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@tuwaio/siwx-solana': 0.2.0(@tuwaio/siwx-core@0.2.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
-      '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@wallet-standard/react': 1.0.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
-      viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
-
-  '@tuwaio/satellite-react@0.4.8(a0edc823559a025ffdbe1c9604c6c241)':
-    dependencies:
-      '@tuwaio/orbit-core': 0.2.15
-      '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      immer: 11.1.16
-      react: 19.2.8
-      zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
-    optionalDependencies:
-      '@tuwaio/orbit-evm': 0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
-      '@tuwaio/satellite-evm': 0.4.4(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-evm@0.2.22(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(immer@11.1.16)(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/satellite-solana': 0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/siwx-core': 0.2.1
-      '@tuwaio/siwx-evm': 0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@tuwaio/siwx-react': 0.2.1(@tuwaio/siwx-core@0.2.1)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/siwx-solana': 0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
-      '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@wallet-standard/react': 1.0.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
-      viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
-
-  '@tuwaio/satellite-solana@0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))':
+  '@tuwaio/satellite-solana@0.4.9(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))':
     dependencies:
       '@tuwaio/orbit-core': 0.2.15
       '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
       '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/siwx-solana': 0.2.0(@tuwaio/siwx-core@0.2.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
+      '@tuwaio/siwx-solana': 0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
       '@wallet-standard/app': 1.1.1
       '@wallet-standard/base': 1.1.1
       '@wallet-standard/core': 1.1.2
@@ -9914,66 +9840,33 @@ snapshots:
       immer: 11.1.16
       zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
 
-  '@tuwaio/satellite-solana@0.4.8(@tuwaio/orbit-core@0.2.15)(@tuwaio/orbit-solana@0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@tuwaio/satellite-core@0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(@wallet-standard/app@1.1.1)(@wallet-standard/base@1.1.1)(@wallet-standard/core@1.1.2)(@wallet-standard/features@1.1.1)(@wallet-standard/ui-registry@1.1.1)(@wallet-standard/ui@1.0.3)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))':
+  '@tuwaio/siwx-core@0.2.2': {}
+
+  '@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))':
     dependencies:
-      '@tuwaio/orbit-core': 0.2.15
-      '@tuwaio/orbit-solana': 0.2.13(@tuwaio/orbit-core@0.2.15)(@wallet-standard/app@1.1.1)(@wallet-standard/ui-core@1.0.1)(@wallet-standard/ui-registry@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
-      '@tuwaio/satellite-core': 0.4.3(@tuwaio/orbit-core@0.2.15)(immer@11.1.16)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))
-      '@tuwaio/siwx-solana': 0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
-      '@wallet-standard/app': 1.1.1
-      '@wallet-standard/base': 1.1.1
-      '@wallet-standard/core': 1.1.2
-      '@wallet-standard/features': 1.1.1
-      '@wallet-standard/ui': 1.0.3
-      '@wallet-standard/ui-registry': 1.1.1
-      gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
-      immer: 11.1.16
-      zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
-    optional: true
-
-  '@tuwaio/siwx-core@0.2.0': {}
-
-  '@tuwaio/siwx-core@0.2.1': {}
-
-  '@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.0)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))':
-    dependencies:
-      '@tuwaio/siwx-core': 0.2.0
-      '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
-    optional: true
-
-  '@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))':
-    dependencies:
-      '@tuwaio/siwx-core': 0.2.1
+      '@tuwaio/siwx-core': 0.2.2
       '@wagmi/core': 3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
       viem: 2.55.16(typescript@6.0.3)(zod@4.4.3)
 
-  '@tuwaio/siwx-react@0.2.1(@tuwaio/siwx-core@0.2.1)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))':
+  '@tuwaio/siwx-react@0.2.2(@tuwaio/siwx-core@0.2.2)(@tuwaio/siwx-evm@0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)))(immer@11.1.16)(react@19.2.8)(zustand@5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)))':
     dependencies:
-      '@tuwaio/siwx-core': 0.2.1
+      '@tuwaio/siwx-core': 0.2.2
       immer: 11.1.16
       react: 19.2.8
       zustand: 5.0.15(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
     optionalDependencies:
-      '@tuwaio/siwx-evm': 0.2.1(@tuwaio/siwx-core@0.2.1)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
-      '@tuwaio/siwx-solana': 0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
+      '@tuwaio/siwx-evm': 0.2.1(@tuwaio/siwx-core@0.2.2)(@wagmi/core@3.6.4(@tanstack/query-core@5.101.2)(@types/react@19.2.18)(immer@11.1.16)(react@19.2.8)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.8))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3)))(viem@2.55.16(typescript@6.0.3)(zod@4.4.3))
+      '@tuwaio/siwx-solana': 0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))
 
-  '@tuwaio/siwx-server@0.2.2(@tuwaio/siwx-core@0.2.1)':
+  '@tuwaio/siwx-server@0.2.2(@tuwaio/siwx-core@0.2.2)':
     dependencies:
-      '@tuwaio/siwx-core': 0.2.1
+      '@tuwaio/siwx-core': 0.2.2
 
-  '@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.0)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))':
+  '@tuwaio/siwx-solana@0.2.1(@tuwaio/siwx-core@0.2.2)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))':
     dependencies:
-      '@tuwaio/siwx-core': 0.2.0
+      '@tuwaio/siwx-core': 0.2.2
       '@wallet-standard/base': 1.1.1
       gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
-
-  '@tuwaio/siwx-solana@0.2.0(@tuwaio/siwx-core@0.2.1)(@wallet-standard/base@1.1.1)(gill@0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3))':
-    dependencies:
-      '@tuwaio/siwx-core': 0.2.1
-      '@wallet-standard/base': 1.1.1
-      gill: 0.14.0(@solana/sysvars@5.5.1(typescript@6.0.3))(typescript@6.0.3)
-    optional: true
 
   '@types/d3-array@3.2.2': {}
 
