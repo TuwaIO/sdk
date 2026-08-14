@@ -103,7 +103,7 @@
   "dependencies": {
     "@tuwaio/orbit-solana": "^0.2.13",
     "@tuwaio/pulsar-solana": "^0.6.10",
-    "@tuwaio/satellite-solana": "^0.4.7",
+    "@tuwaio/satellite-solana": "^0.4.8",
     "@tuwaio/siwx-solana": "^0.2.0"
   },
   "peerDependencies": {
@@ -121,9 +121,9 @@
     "gill": ">=0.14"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.5.8",
-    "@tuwaio/satellite-core": "^0.4.2",
-    "@tuwaio/satellite-react": "^0.4.7",
+    "@tuwaio/nova-connect": "^0.5.9",
+    "@tuwaio/satellite-core": "^0.4.3",
+    "@tuwaio/satellite-react": "^0.4.8",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",
@@ -134,6 +134,6 @@
     "@wallet-standard/ui-registry": "^1.1.1",
     "gill": "^0.14.0",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "typescript": "6.0.3"
   }
 }

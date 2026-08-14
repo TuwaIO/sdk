@@ -112,9 +112,9 @@
     "@tuwaio/pulsar-core": "^0.6.12",
     "ofetch": "^1.5.1",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
-    "@tuwaio/siwx-react": "^0.2.0",
-    "@tuwaio/siwx-core": "^0.2.0",
-    "@tuwaio/siwx-server": "^0.2.1"
+    "typescript": "6.0.3",
+    "@tuwaio/siwx-react": "^0.2.1",
+    "@tuwaio/siwx-core": "^0.2.1",
+    "@tuwaio/siwx-server": "^0.2.2"
   }
 }

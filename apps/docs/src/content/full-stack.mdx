@@ -255,8 +255,23 @@ export async function getHistory(params: GetHistoryParams) {
       hasPrevPage: false,
     };
   }
-}
 ```
+
+> **For Stateless Demo Environments (HMAC-SHA256 Token Verification):**
+>
+> In sandboxes or zero-infrastructure demos where Redis is not available, pass `signingSecret` instead of `sessionStore`:
+>
+> ```typescript
+> async function getVerifiedSession() {
+>   return getSiwxServerSession({
+>     cookieSource: await cookies(),
+>     signingSecret: process.env.SIWX_DEMO_SIGNING_SECRET!,
+>     cookieName: 'siwx-demo-session',
+>   });
+> }
+> ```
+
+---
 
 ## ⚙️ 5. Application Configuration (`appConfig.ts`)
 

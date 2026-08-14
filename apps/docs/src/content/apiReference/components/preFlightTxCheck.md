@@ -6,7 +6,7 @@
 
 > **preFlightTxCheck**(`customApiUrl?`): `Promise`\<`void`\>
 
-Defined in: [packages/quasar-sdk/src/index.ts:36](https://github.com/TuwaIO/sdk/blob/0bc8d2689c96c218e10c8432d0883bc7b04af4ff/packages/quasar-sdk/src/index.ts#L36)
+Defined in: [packages/quasar-sdk/src/index.ts:36](https://github.com/TuwaIO/sdk/blob/5ef5965a7ba40e2647c373d5b37f2197c615c50f/packages/quasar-sdk/src/index.ts#L36)
 
 Pre-flight check before initiating a transaction.
 Ensures the local SIWX Session is valid and verifies Quasar Engine health.
