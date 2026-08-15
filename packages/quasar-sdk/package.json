@@ -87,7 +87,7 @@
   "peerDependencies": {
     "@tuwaio/pulsar-core": "^0.6.11",
     "ofetch": "^1.5.1",
-    "@tuwaio/siwx-react": "^0.2.2",
+    "@tuwaio/siwx-react": "^0.2.3",
     "@tuwaio/siwx-core": "^0.2.2",
     "@tuwaio/siwx-server": "^0.2.2"
   },
@@ -113,7 +113,7 @@
     "ofetch": "^1.5.1",
     "tsup": "^8.5.1",
     "typescript": "6.0.3",
-    "@tuwaio/siwx-react": "^0.2.2",
+    "@tuwaio/siwx-react": "^0.2.3",
     "@tuwaio/siwx-core": "^0.2.2",
     "@tuwaio/siwx-server": "^0.2.2"
   }
