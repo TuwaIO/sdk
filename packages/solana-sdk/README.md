@@ -11,7 +11,7 @@ The **Layer 9 (L9)** Solana Network Adapter SDK for the TUWA Ecosystem. Packages
 
 `@tuwaio/solana-sdk` is **Layer 9 (L9)** of the TUWA ecosystem architecture — a **headless**, purely logical adapter SDK designed to teach the core `@tuwaio/sdk` (L8) how to interact with the Solana blockchain.
 
-It completely avoids legacy `@solana/web3.js` classes and is built from the ground up on modern primitives: **Gill** and **Wallet Standard**. It provides standardized adapters for Wallet Connection (Satellite) and Transaction Tracking (Pulsar). This modular subpath approach ensures your app only ships Solana dependencies when you actually need them.
+It completely avoids legacy `@solana/web3.js` classes and is built from the ground up on modern primitives: **@solana/kit** and **Wallet Standard**. It provides standardized adapters for Wallet Connection (Satellite) and Transaction Tracking (Pulsar). This modular subpath approach ensures your app only ships Solana dependencies when you actually need them.
 
 ---
 
@@ -34,7 +34,7 @@ It completely avoids legacy `@solana/web3.js` classes and is built from the grou
 Install this package alongside the core SDK and the required Web3 singletons:
 
 ```bash
-pnpm add @tuwaio/sdk @tuwaio/solana-sdk gill @wallet-standard/react @wallet-standard/app @wallet-standard/ui-core @wallet-standard/ui-registry
+pnpm add @tuwaio/sdk @tuwaio/solana-sdk @solana/kit @wallet-standard/react @wallet-standard/app @wallet-standard/base @wallet-standard/features
 ```
 
 ---

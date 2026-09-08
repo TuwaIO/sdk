@@ -4,7 +4,7 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Layer 9 (L9) of the TUWA Ecosystem. The Solana Network Adapter SDK providing Gill/Wallet-Standard transports, connectors, and SIWX adapters.",
+  "description": "Layer 9 (L9) of the TUWA Ecosystem. The Solana Network Adapter SDK providing @solana/kit/Wallet-Standard transports, connectors, and SIWX adapters.",
   "type": "module",
   "exports": {
     "./orbit": {
@@ -42,7 +42,8 @@
   ],
   "scripts": {
     "start": "tsup --watch",
-    "build": "tsup"
+    "build": "tsup",
+    "test": "vitest run"
   },
   "keywords": [
     "tuwa",
@@ -52,7 +53,7 @@
     "solana",
     "wagmi",
     "viem",
-    "gill",
+    "@solana/kit",
     "wallet-standard",
     "wallet",
     "wallet-connect",
@@ -101,16 +102,16 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-solana": "^0.2.13",
-    "@tuwaio/pulsar-solana": "^0.6.10",
-    "@tuwaio/satellite-solana": "^0.4.9",
-    "@tuwaio/siwx-solana": "^0.2.1"
+    "@tuwaio/orbit-solana": "^0.3.0",
+    "@tuwaio/pulsar-solana": "^0.7.0",
+    "@tuwaio/satellite-solana": "^0.5.0",
+    "@tuwaio/siwx-solana": "^0.3.0"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": "^0.5.11",
-    "@tuwaio/satellite-core": "^0.4.3",
-    "@tuwaio/satellite-react": "^0.4.10",
+    "@tuwaio/nova-connect": ">=0.6",
+    "@tuwaio/satellite-core": ">=0.5",
+    "@tuwaio/satellite-react": ">=0.5",
     "@wallet-standard/app": "1.1.x",
     "@wallet-standard/base": "1.1.x",
     "@wallet-standard/core": "1.x.x",
@@ -118,12 +119,12 @@
     "@wallet-standard/react": "1.x.x",
     "@wallet-standard/ui": "1.x.x",
     "@wallet-standard/ui-registry": "1.x.x",
-    "gill": ">=0.14"
+    "@solana/kit": ">=8.2"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.5.11",
-    "@tuwaio/satellite-core": "^0.4.3",
-    "@tuwaio/satellite-react": "^0.4.10",
+    "@tuwaio/nova-connect": "^0.6.0",
+    "@tuwaio/satellite-core": "^0.5.0",
+    "@tuwaio/satellite-react": "^0.5.0",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",
@@ -132,7 +133,7 @@
     "@wallet-standard/react": "^1.0.3",
     "@wallet-standard/ui": "^1.0.3",
     "@wallet-standard/ui-registry": "^1.1.1",
-    "gill": "^0.14.0",
+    "@solana/kit": "^8.2.0",
     "tsup": "^8.5.1",
     "typescript": "6.0.3"
   }

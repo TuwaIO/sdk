@@ -13,6 +13,11 @@ const quasar = new Quasar({ secretKey: 'sk_live_...' });
 const history = await quasar.pulsar.getHistory({ chainId: 1 });
 ```
 
+## Enumerations
+
+- [TransactionStatus](enumerations/TransactionStatus.md)
+- [TransactionTracker](enumerations/TransactionTracker.md)
+
 ## Classes
 
 - [PulsarModule](classes/PulsarModule.md)

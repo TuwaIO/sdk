@@ -4,8 +4,6 @@
  * Contains configuration interfaces, query parameters, and authentication structures.
  */
 
-import type { Transaction, UpdatableTransactionFields } from '@tuwaio/pulsar-core';
-
 /**
  * Configuration options for initializing the {@link Quasar} SDK client.
  *
@@ -65,4 +63,5 @@ export interface PaginatedResult<T> {
   hasPrevPage: boolean;
 }
 
-export type { Transaction, UpdatableTransactionFields };
+export type { Transaction, UpdatableTransactionFields } from '@tuwaio/pulsar-core';
+export { TransactionStatus, TransactionTracker } from '@tuwaio/pulsar-core';

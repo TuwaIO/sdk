@@ -25,7 +25,7 @@ The **TUWA Ecosystem** is built around a multi-tiered architecture that decouple
 |     Modular Subpaths: /orbit, /satellite, /pulsar, /nova-connect, /nova-transactions|
 +------------------------------------+----------------------------------------------+
 | L9: EVM Adapter SDK (@tuwaio/evm-sdk)| L9: Solana Adapter SDK (@tuwaio/solana-sdk)|
-|     Wagmi/Viem + EVMConnectorsWatcher|     Gill/Wallet Standard + SolanaWatcher  |
+|     Wagmi/Viem + EVMConnectorsWatcher|     Solana Kit/Wallet Standard + SolanaWatcher    |
 +------------------------------------+----------------------------------------------+
 ```
 
@@ -33,7 +33,7 @@ The **TUWA Ecosystem** is built around a multi-tiered architecture that decouple
 
 1. **L1 – L2: Foundation Primitives (Orbit & SIWX)**
    - **L1 Core (`@tuwaio/orbit-core`, `@tuwaio/siwx-core`)**: Low-level, framework-agnostic multi-chain communication primitives, formatting helpers, and pure CAIP-122 auth engines.
-   - **L2 Platforms & Adapters (`@tuwaio/orbit-evm`, `@tuwaio/orbit-solana`, `@tuwaio/siwx-*`)**: Chain-specific client creators and framework bindings (Viem, Wagmi, Gill, React).
+   - **L2 Platforms & Adapters (`@tuwaio/orbit-evm`, `@tuwaio/orbit-solana`, `@tuwaio/siwx-*`)**: Chain-specific client creators and framework bindings (Viem, Wagmi, Solana Kit, React).
 
 2. **L3 – L4: Headless Core Engines (Connection & Lifecycle)**
    - **L3 Engines (`@tuwaio/satellite-core`, `@tuwaio/pulsar-core`)**: Framework-agnostic state machines for wallet connectivity (Satellite) and transaction tracking lifecycles (Pulsar).

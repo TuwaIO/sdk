@@ -244,7 +244,7 @@ export function SwapButton() {
 
     await executeTxAction({
       actionFunction: async () => {
-        // Execute smart contract call (e.g. writeContract via Viem/Wagmi or sendTransaction via Gill)
+        // Execute smart contract call (e.g. writeContract via Viem/Wagmi or signAndSendSolanaTx via @solana/kit)
         /* return await swapTokensContractCall(); */
       },
       onSuccess: (tx) => {

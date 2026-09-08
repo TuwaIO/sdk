@@ -2,31 +2,27 @@
 
 ## [0.1.7](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.6...quasar-sdk-v0.1.7) (2026-08-15)
 
-
 ### Bug Fixes
 
-* updated packages ([0828c1f](https://github.com/TuwaIO/sdk/commit/0828c1fce0f691f4fdb5eed9ae763911f03fc2e5))
+- updated packages ([0828c1f](https://github.com/TuwaIO/sdk/commit/0828c1fce0f691f4fdb5eed9ae763911f03fc2e5))
 
 ## [0.1.6](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.5...quasar-sdk-v0.1.6) (2026-08-14)
 
-
 ### Bug Fixes
 
-* updated packages ([796e25d](https://github.com/TuwaIO/sdk/commit/796e25d37adb6790cba5c62fd4c78fa232fa90a8))
+- updated packages ([796e25d](https://github.com/TuwaIO/sdk/commit/796e25d37adb6790cba5c62fd4c78fa232fa90a8))
 
 ## [0.1.5](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.4...quasar-sdk-v0.1.5) (2026-08-14)
 
-
 ### Bug Fixes
 
-* updated packages and added exports test ([c6d3577](https://github.com/TuwaIO/sdk/commit/c6d35771b1b2a04b57a3b5c28563feecd2b9abe7))
+- updated packages and added exports test ([c6d3577](https://github.com/TuwaIO/sdk/commit/c6d35771b1b2a04b57a3b5c28563feecd2b9abe7))
 
 ## [0.1.4](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.3...quasar-sdk-v0.1.4) (2026-08-14)
 
-
 ### Bug Fixes
 
-* updated packages & docs & added tests ([b80dfe9](https://github.com/TuwaIO/sdk/commit/b80dfe9cba49e49c1ba917a2cd745090411e4964))
+- updated packages & docs & added tests ([b80dfe9](https://github.com/TuwaIO/sdk/commit/b80dfe9cba49e49c1ba917a2cd745090411e4964))
 
 ## [0.1.3](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.2...quasar-sdk-v0.1.3) (2026-08-09)
 

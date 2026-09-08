@@ -56,7 +56,13 @@ const ironDomeAuth = registry.registerComponent('securitySchemes', 'IronDomeAuth
 
 // --- Enums ---
 const TransactionTrackerSchema: z.ZodType<TransactionTracker> = z
-  .enum([TransactionTracker.Ethereum, TransactionTracker.Safe, TransactionTracker.Gelato, TransactionTracker.Solana])
+  .enum([
+    TransactionTracker.Ethereum,
+    TransactionTracker.Safe,
+    TransactionTracker.Gelato,
+    TransactionTracker.Solana,
+    TransactionTracker.ERC4337,
+  ])
   .openapi('TransactionTracker', { description: 'The tracking strategy used for monitoring the transaction.' });
 
 const TransactionStatusSchema: z.ZodType<TransactionStatus> = z
@@ -136,6 +142,11 @@ const EvmTransactionSchema = BaseTransactionSchema.extend({
   replacedTxHash: HexStringSchema.optional().openapi({ description: 'Hash of the transaction this one replaced.' }),
   to: HexStringSchema.optional().openapi({ description: "Recipient's address or contract address." }),
   value: z.string().optional().openapi({ description: 'Native currency amount in wei.' }),
+  bundlerUrl: z
+    .string()
+    .optional()
+    .openapi({ description: 'Custom bundler RPC URL for ERC-4337 UserOperation tracking.' }),
+  pimlicoApiKey: z.string().optional().openapi({ description: 'Pimlico API key for ERC-4337 UserOperation tracking.' }),
 }).openapi('EvmTransaction');
 
 // PHANTOM TYPE CHECK: Enforces 1:1 alignment with pulsar-core EvmTransaction

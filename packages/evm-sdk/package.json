@@ -42,7 +42,8 @@
   ],
   "scripts": {
     "start": "tsup --watch",
-    "build": "tsup"
+    "build": "tsup",
+    "test": "vitest run"
   },
   "keywords": [
     "tuwa",
@@ -52,7 +53,6 @@
     "solana",
     "wagmi",
     "viem",
-    "gill",
     "wallet-standard",
     "wallet",
     "wallet-connect",
@@ -101,27 +101,27 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-evm": "^0.2.22",
-    "@tuwaio/pulsar-evm": "^0.5.10",
-    "@tuwaio/satellite-evm": "^0.4.4",
-    "@tuwaio/siwx-evm": "^0.2.1"
+    "@tuwaio/orbit-evm": "^0.3.0",
+    "@tuwaio/pulsar-evm": "^0.6.0",
+    "@tuwaio/satellite-evm": "^0.5.0",
+    "@tuwaio/siwx-evm": "^0.3.0"
   },
   "peerDependencies": {
     "@tuwaio/sdk": "workspace:^",
-    "@tuwaio/nova-connect": "^0.5.11",
-    "@tuwaio/satellite-core": "^0.4.3",
-    "@tuwaio/satellite-react": "^0.4.10",
+    "@tuwaio/nova-connect": ">=0.6",
+    "@tuwaio/satellite-core": ">=0.5",
+    "@tuwaio/satellite-react": ">=0.5",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/nova-connect": "^0.5.11",
-    "@tuwaio/satellite-core": "^0.4.3",
-    "@tuwaio/satellite-react": "^0.4.10",
+    "@tuwaio/nova-connect": "^0.6.0",
+    "@tuwaio/satellite-core": "^0.5.0",
+    "@tuwaio/satellite-react": "^0.5.0",
     "@tuwaio/sdk": "workspace:^",
-    "@wagmi/core": "^3.6.4",
+    "@wagmi/core": "^3.6.5",
     "tsup": "^8.5.1",
     "typescript": "6.0.3",
-    "viem": "^2.55.16"
+    "viem": "^2.56.3"
   }
 }

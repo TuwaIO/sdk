@@ -1,6 +1,6 @@
 # Solana Network Adapter (`@tuwaio/solana-sdk`)
 
-`@tuwaio/solana-sdk` is **Layer 9 (L9)** of the TUWA ecosystem architecture — a headless network adapter SDK built on **Gill** and **Wallet Standard** for Solana.
+`@tuwaio/solana-sdk` is **Layer 9 (L9)** of the TUWA ecosystem architecture — a headless network adapter SDK built on **@solana/kit** and **Wallet Standard** for Solana.
 
 It provides modern Solana RPC connections, standard wallet auto-discovery, and signature tracking adapters without relying on legacy `@solana/web3.js` classes.
 
@@ -10,7 +10,7 @@ It provides modern Solana RPC connections, standard wallet auto-discovery, and s
 
 | Layer                | Subpath                           | Purpose & Documentation                                                                                                                      |
 | :------------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Orbit Solana**     | `@tuwaio/solana-sdk/orbit`        | 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — Gill RPC wrappers and Solana utilities.                                             |
+| **Orbit Solana**     | `@tuwaio/solana-sdk/orbit`        | 💫 **[Orbit Utils Docs](https://orbit.docs.tuwa.io/)** — `@solana/kit` RPC wrappers and Solana utilities.                                    |
 | **Satellite Solana** | `@tuwaio/solana-sdk/satellite`    | 📡 **[Satellite Connect Docs](https://satellite.docs.tuwa.io/)** — `satelliteSolanaAdapter({ rpcUrls })` for Wallet Standard Solana wallets. |
 | **Pulsar Solana**    | `@tuwaio/solana-sdk/pulsar`       | ⚡ **[Pulsar Engine Docs](https://pulsar.docs.tuwa.io/)** — `pulsarSolanaAdapter({ rpcUrls })` for Solana transaction confirmation.          |
 | **Nova UI Solana**   | `@tuwaio/solana-sdk/nova-connect` | 🎨 **[Nova UI Storybook](https://stories.tuwa.io/)** — `<SolanaConnectorsWatcher />` for extension wallet auto-discovery.                    |
@@ -23,7 +23,7 @@ It provides modern Solana RPC connections, standard wallet auto-discovery, and s
 Install `@tuwaio/solana-sdk` alongside the core SDK and required Solana singletons:
 
 ```bash
-pnpm add @tuwaio/sdk @tuwaio/solana-sdk gill @wallet-standard/react @wallet-standard/app @wallet-standard/ui-core @wallet-standard/ui-registry
+pnpm add @tuwaio/sdk @tuwaio/solana-sdk @solana/kit @wallet-standard/react @wallet-standard/app @wallet-standard/base @wallet-standard/features
 ```
 
 ---

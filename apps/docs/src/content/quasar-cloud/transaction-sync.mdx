@@ -12,7 +12,7 @@ When calling Quasar Cloud APIs from your server, your `QUASAR_SECRET_KEY` grants
 
 1. **Cryptographic Proof of Ownership**: Proves that the connected user actually owns the wallet address (`walletAddress`) using the standard CAIP-122 sign-in.
 2. **Replay Attack Protection**: Every signature embeds an ISO timestamp and a secure nonce. The `verifySiwxPayload` method from `@tuwaio/sdk/siwx/server` strictly validates the signature and its expiration.
-3. **Stateless Multi-Chain Verification**: Supports both EVM (`viem`) and Solana (`gill`) verification out of the box with zero database lookups on your server.
+3. **Stateless Multi-Chain Verification**: Supports both EVM (`viem`) and Solana (`@solana/kit` / SubtleCrypto) verification out of the box with zero database lookups on your server.
 
 ---
 

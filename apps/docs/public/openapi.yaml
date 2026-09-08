@@ -156,6 +156,12 @@ components:
         value:
           type: string
           description: Native currency amount in wei.
+        bundlerUrl:
+          type: string
+          description: Custom bundler RPC URL for ERC-4337 UserOperation tracking.
+        pimlicoApiKey:
+          type: string
+          description: Pimlico API key for ERC-4337 UserOperation tracking.
       required:
         - chainId
         - from
@@ -192,6 +198,7 @@ components:
         - safe
         - gelato
         - solana
+        - erc4337
       description: The tracking strategy used for monitoring the transaction.
     SolanaTransaction:
       type: object

@@ -1,5 +1,4 @@
-import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 import * as novaConnect from '../nova-connect.js';
 import * as novaConnectComponents from '../nova-connect-components.js';
@@ -17,40 +16,41 @@ import * as siwxServerNext from '../siwx-server-next.js';
 
 describe('Unified SDK Re-Exports', () => {
   it('exports core SIWX utilities from siwx-core', () => {
-    assert.strictEqual(typeof siwxCore.buildMessage, 'function');
-    assert.strictEqual(typeof siwxCore.parseMessage, 'function');
-    assert.strictEqual(typeof siwxCore.validateMessage, 'function');
-    assert.strictEqual(typeof siwxCore.validatePolicy, 'function');
-    assert.strictEqual(typeof siwxCore.generateNonce, 'function');
+    expect(typeof siwxCore.buildMessage).toBe('function');
+    expect(typeof siwxCore.parseMessage).toBe('function');
+    expect(typeof siwxCore.validateMessage).toBe('function');
+    expect(typeof siwxCore.validatePolicy).toBe('function');
+    expect(typeof siwxCore.generateNonce).toBe('function');
   });
 
   it('exports server SIWX utilities from siwx-server', () => {
-    assert.strictEqual(typeof siwxServer.getSiwxServerSession, 'function');
-    assert.strictEqual(typeof siwxServer.createClearCookie, 'function');
-    assert.strictEqual(typeof siwxServer.MemorySiwxSessionStore, 'function');
-    assert.strictEqual(typeof siwxServer.MemorySiwxNonceStore, 'function');
+    expect(typeof siwxServer.getSiwxServerSession).toBe('function');
+    expect(typeof siwxServer.createClearCookie).toBe('function');
+    expect(typeof siwxServer.MemorySiwxSessionStore).toBe('function');
+    expect(typeof siwxServer.MemorySiwxNonceStore).toBe('function');
   });
 
   it('exports Next.js route handlers from siwx-server-next', () => {
-    assert.strictEqual(typeof siwxServerNext.createSiwxApiHandler, 'function');
-    assert.strictEqual(typeof siwxServerNext.createStatelessDemoSiwxHandler, 'function');
+    expect(typeof siwxServerNext.createSiwxApiHandler).toBe('function');
+    expect(typeof siwxServerNext.createStatelessDemoSiwxHandler).toBe('function');
   });
 
   it('exports React SIWX hooks from siwx', () => {
-    assert.strictEqual(typeof siwxReact.useSiwx, 'function');
-    assert.strictEqual(typeof siwxReact.useSiwxSession, 'function');
-    assert.strictEqual(typeof siwxReact.useSiwxSessionStore, 'function');
+    expect(typeof siwxReact.useSiwx).toBe('function');
+    expect(typeof siwxReact.useSiwxSession).toBe('function');
+    expect(typeof siwxReact.useSiwxSessionStore).toBe('function');
   });
 
-  it('exports Pulsar, Satellite, Orbit, and Nova primitives', () => {
-    assert.strictEqual(typeof pulsar.createPulsarStore, 'function');
-    assert.strictEqual(typeof satellite.createSatelliteConnectStore, 'function');
-    assert.strictEqual(typeof orbit.OrbitAdapter, 'object');
-    assert.strictEqual(typeof novaCore.cn, 'function');
-    assert.strictEqual(typeof novaTransactionsProviders.NovaTransactionsProvider, 'function');
-    assert.ok(novaTransactions.TransactionsHistory !== undefined);
-    assert.strictEqual(typeof novaConnect.NovaConnectProvider, 'function');
-    assert.strictEqual(typeof novaConnectHooks.useNovaSiwx, 'function');
-    assert.ok(novaConnectComponents.ConnectButton !== undefined);
+  it('exports Pulsar, Satellite, Orbit, and Nova primitives with ERC4337 tracker', () => {
+    expect(typeof pulsar.createPulsarStore).toBe('function');
+    expect(pulsar.TransactionTracker.ERC4337).toBe('erc4337');
+    expect(typeof satellite.createSatelliteConnectStore).toBe('function');
+    expect(typeof orbit.OrbitAdapter).toBe('object');
+    expect(typeof novaCore.cn).toBe('function');
+    expect(typeof novaTransactionsProviders.NovaTransactionsProvider).toBe('function');
+    expect(novaTransactions.TransactionsHistory).toBeDefined();
+    expect(typeof novaConnect.NovaConnectProvider).toBe('function');
+    expect(typeof novaConnectHooks.useNovaSiwx).toBe('function');
+    expect(novaConnectComponents.ConnectButton).toBeDefined();
   });
 });

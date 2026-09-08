@@ -10,12 +10,12 @@ The TUWA SDK suite consists of 4 specialized packages that work together seamles
 
 All TUWA SDK packages enforce modular subpath entrypoints (e.g. `@tuwaio/sdk/satellite`, `@tuwaio/evm-sdk/nova-connect`, `@tuwaio/sdk/siwx`). This ensures your application only loads the exact code and dependencies it requires, preventing bundle bloat and Web3 context conflicts.
 
-| Layer  | Package                                            | Description                                                                                                                                                   |
-| :----- | :------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **L5** | **[`@tuwaio/quasar-sdk`](/quasar-cloud/overview)** | **Quasar Cloud Client** — Server-side Node.js & Edge SDK for transaction indexing, cloud sync, history pagination, and SIWX (CAIP-122) payload verification.  |
-| **L8** | **[`@tuwaio/sdk`](/core-sdk)**                     | **Core Client SDK** — Unified entrypoint bundling multi-chain logic (Orbit, Pulsar, Satellite) and React UI components (Nova) into clean subpaths.            |
-| **L9** | **[`@tuwaio/evm-sdk`](/evm-sdk)**                  | **EVM Network Adapter** — EVM-specific transports (`viem`, `@wagmi/core`), connectors, and background state watcher (`EVMConnectorsWatcher`).                 |
-| **L9** | **[`@tuwaio/solana-sdk`](/solana-sdk)**            | **Solana Network Adapter** — Solana-specific transports (`gill`, `@wallet-standard/*`), connectors, and background state watcher (`SolanaConnectorsWatcher`). |
+| Layer  | Package                                            | Description                                                                                                                                                          |
+| :----- | :------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **L5** | **[`@tuwaio/quasar-sdk`](/quasar-cloud/overview)** | **Quasar Cloud Client** — Server-side Node.js & Edge SDK for transaction indexing, cloud sync, history pagination, and SIWX (CAIP-122) payload verification.         |
+| **L8** | **[`@tuwaio/sdk`](/core-sdk)**                     | **Core Client SDK** — Unified entrypoint bundling multi-chain logic (Orbit, Pulsar, Satellite) and React UI components (Nova) into clean subpaths.                   |
+| **L9** | **[`@tuwaio/evm-sdk`](/evm-sdk)**                  | **EVM Network Adapter** — EVM-specific transports (`viem`, `@wagmi/core`), connectors, and background state watcher (`EVMConnectorsWatcher`).                        |
+| **L9** | **[`@tuwaio/solana-sdk`](/solana-sdk)**            | **Solana Network Adapter** — Solana-specific transports (`@solana/kit`, `@wallet-standard/*`), connectors, and background state watcher (`SolanaConnectorsWatcher`). |
 
 ---
 

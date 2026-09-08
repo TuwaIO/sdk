@@ -2,31 +2,27 @@
 
 ## [0.1.13](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.12...evm-sdk-v0.1.13) (2026-08-15)
 
-
 ### Bug Fixes
 
-* updated packages ([0828c1f](https://github.com/TuwaIO/sdk/commit/0828c1fce0f691f4fdb5eed9ae763911f03fc2e5))
+- updated packages ([0828c1f](https://github.com/TuwaIO/sdk/commit/0828c1fce0f691f4fdb5eed9ae763911f03fc2e5))
 
 ## [0.1.12](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.11...evm-sdk-v0.1.12) (2026-08-14)
 
-
 ### Bug Fixes
 
-* updated packages ([796e25d](https://github.com/TuwaIO/sdk/commit/796e25d37adb6790cba5c62fd4c78fa232fa90a8))
+- updated packages ([796e25d](https://github.com/TuwaIO/sdk/commit/796e25d37adb6790cba5c62fd4c78fa232fa90a8))
 
 ## [0.1.11](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.10...evm-sdk-v0.1.11) (2026-08-14)
 
-
 ### Bug Fixes
 
-* updated packages and added exports test ([c6d3577](https://github.com/TuwaIO/sdk/commit/c6d35771b1b2a04b57a3b5c28563feecd2b9abe7))
+- updated packages and added exports test ([c6d3577](https://github.com/TuwaIO/sdk/commit/c6d35771b1b2a04b57a3b5c28563feecd2b9abe7))
 
 ## [0.1.10](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.9...evm-sdk-v0.1.10) (2026-08-14)
 
-
 ### Bug Fixes
 
-* updated packages & docs & added tests ([b80dfe9](https://github.com/TuwaIO/sdk/commit/b80dfe9cba49e49c1ba917a2cd745090411e4964))
+- updated packages & docs & added tests ([b80dfe9](https://github.com/TuwaIO/sdk/commit/b80dfe9cba49e49c1ba917a2cd745090411e4964))
 
 ## [0.1.9](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.1.8...evm-sdk-v0.1.9) (2026-08-09)
 
