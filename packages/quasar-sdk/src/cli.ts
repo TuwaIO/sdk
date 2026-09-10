@@ -222,6 +222,8 @@ async function runListen(options: { secret: string; forwardTo: string; apiUrl: s
       const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let buffer = '';
+      let currentEvent = 'message';
+      let currentData = '';
 
       while (!isShuttingDown) {
         const { done, value } = await reader.read();
@@ -230,9 +232,6 @@ async function runListen(options: { secret: string; forwardTo: string; apiUrl: s
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
         buffer = lines.pop() || '';
-
-        let currentEvent = 'message';
-        let currentData = '';
 
         for (const line of lines) {
           const trimmed = line.trim();
@@ -243,6 +242,11 @@ async function runListen(options: { secret: string; forwardTo: string; apiUrl: s
               currentEvent = 'message';
               currentData = '';
             }
+            continue;
+          }
+
+          if (trimmed.startsWith(':')) {
+            // SSE comment / keepalive ping
             continue;
           }
 

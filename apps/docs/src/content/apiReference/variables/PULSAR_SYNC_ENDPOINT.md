@@ -6,4 +6,4 @@
 
 > `const` **PULSAR\_SYNC\_ENDPOINT**: `"/v1/engine/pulsar/sync"` = `'/v1/engine/pulsar/sync'`
 
-Defined in: [packages/quasar-sdk/src/constants.ts:2](https://github.com/TuwaIO/sdk/blob/54a28774741b66c3ef486c3b7884b7096d88a1e3/packages/quasar-sdk/src/constants.ts#L2)
+Defined in: [packages/quasar-sdk/src/constants.ts:2](https://github.com/TuwaIO/sdk/blob/1db4cddd8b400e659a8cc0f194b78efc98f9cf08/packages/quasar-sdk/src/constants.ts#L2)
