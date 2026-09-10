@@ -258,6 +258,14 @@ async function runListen(options: { secret: string; forwardTo: string; apiUrl: s
           }
         }
       }
+
+      if (!isShuttingDown) {
+        console.warn(
+          `\x1b[33m[warn]\x1b[0m SSE stream closed by remote server. Reconnecting in ${reconnectDelay}ms...`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, reconnectDelay));
+        reconnectDelay = Math.min(reconnectDelay * 2, 15000);
+      }
     } catch (err: unknown) {
       if (isShuttingDown) break;
 
@@ -283,7 +291,7 @@ export async function handleSseMessage(event: string, rawData: string, forwardTo
     const payload = JSON.parse(rawData);
 
     // Initial greeting from relay server
-    if (event === 'connected') {
+    if (event === 'connected' || event === 'ready') {
       return;
     }
 
