@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.12](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.11...quasar-sdk-v0.1.12) (2026-09-10)
+
+
+### Bug Fixes
+
+* quasar cli reconnect logic ([4d4cdf7](https://github.com/TuwaIO/sdk/commit/4d4cdf7c1330aaf1c32ed2bdbe56a5e77db10ab4))
+
 ## [0.1.11](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.10...quasar-sdk-v0.1.11) (2026-09-10)
 
 
