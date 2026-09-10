@@ -24,6 +24,7 @@
     "socket.json"
   ],
   "bin": {
+    "@tuwaio/quasar-sdk": "./dist/cli.cjs",
     "quasar-sdk": "./dist/cli.cjs"
   },
   "scripts": {

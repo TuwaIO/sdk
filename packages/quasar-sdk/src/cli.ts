@@ -9,6 +9,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
+import pkg from '../package.json';
+
 interface CliOptions {
   command?: string;
   secret?: string;
@@ -29,7 +31,7 @@ export interface WebhookRelayMessage {
 
 export const DEFAULT_FORWARD_URL = 'http://localhost:3000/api/webhooks/quasar';
 export const DEFAULT_API_URL = 'https://api.tuwa.io';
-export const CLI_VERSION = '0.1.8';
+export const CLI_VERSION = pkg.version || '0.0.0';
 
 /**
  * Parse simple .env file content without external dependencies.
@@ -387,14 +389,10 @@ export async function main(): Promise<void> {
   });
 }
 
-// Auto-run if executed directly as a script
-if (typeof process !== 'undefined' && process.argv && process.argv[1]) {
-  const isCli =
-    process.argv[1].endsWith('cli.js') || process.argv[1].endsWith('cli.cjs') || process.argv[1].endsWith('cli.ts');
-  if (isCli) {
-    main().catch((err) => {
-      console.error('\x1b[31mFatal error:\x1b[0m', err);
-      process.exit(1);
-    });
-  }
+// Auto-run when executed directly (not in vitest)
+if (!process.env.VITEST) {
+  void main().catch((err) => {
+    console.error('\x1b[31mFatal error:\x1b[0m', err);
+    process.exit(1);
+  });
 }
