@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.8...quasar-sdk-v0.1.9) (2026-09-10)
+
+
+### Bug Fixes
+
+* added quasar sdk listen script ([fe7ae98](https://github.com/TuwaIO/sdk/commit/fe7ae98bcf85a80c2c26817955bae140648ca6d1))
+
 ## [0.1.8](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.1.7...quasar-sdk-v0.1.8) (2026-09-08)
 
 
