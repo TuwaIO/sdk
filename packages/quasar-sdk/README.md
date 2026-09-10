@@ -22,6 +22,7 @@ It operates strictly on the server (Node.js, Next.js Server Actions, or Edge fun
 ## ✨ Key Features
 
 - **☁️ Cloud Sync**: Automatically persist pending and terminal transaction states to the Quasar Database for cross-device history.
+- **⚡ Native Webhook Local Dev Relay**: Stream production webhooks directly to your local machine via CLI with zero tunnels (no ngrok/cloudflared required).
 - **🔐 Headless SIWX (CAIP-122) Auth Ready**: Seamlessly pairs with `@tuwaio/sdk/siwx/server` for strict cryptographic verification of user sessions before allowing database writes.
 - **⚡ Edge Ready**: Uses `ofetch` and lightweight cryptography to run seamlessly in Cloudflare Workers and Vercel Edge.
 - **📦 InMemory Sync**: Perfectly pairs with `@tuwaio/sdk/pulsar` (`createTxInMemoryStore`) to fetch history and hydrate local React states.
@@ -35,6 +36,87 @@ pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core @tuwaio/siwx-core @tuwaio
 ```
 
 _Note: `ofetch` and `@tuwaio/pulsar-core` are required peer dependencies. The `@tuwaio/siwx-*` packages are required if you intend to use the headless SIWX (CAIP-122) authentication integrations._
+
+---
+
+## ⚡ Quasar Webhook Local Dev Relay (Native CLI)
+
+Testing Web3 webhooks locally against live cloud indexers usually requires spinning up temporary third-party tunnels (`ngrok`, `cloudflared`), pasting ephemeral URLs into dashboard forms, and restarting your workflow when tunnels expire.
+
+The **Quasar SDK CLI** provides a zero-tunnel local development relay. When you configure a `localhost` webhook endpoint in the Quasar Dashboard, Quasar Cloud streams incoming events to your local machine via real-time Server-Sent Events (SSE).
+
+### 1. Zero-Config Local Development
+
+Add your webhook signing secret from the Quasar Dashboard to `.env.local` or `.env`:
+
+```env
+# Signing secret copied from the Quasar Dashboard webhook endpoint
+QUASAR_WEBHOOK_SECRET=whsec_...
+
+# Optional Quasar API base URL (defaults to https://api.tuwa.io)
+NEXT_PUBLIC_QUASAR_BASE_URL=https://api.tuwa.io
+```
+
+Run the relay listener in your terminal:
+
+```bash
+npx @tuwaio/quasar-sdk listen
+```
+
+The CLI automatically reads `QUASAR_WEBHOOK_SECRET` and starts forwarding webhook payloads to the default Cosmos Playground endpoint (`http://localhost:3000/api/webhooks/quasar`).
+
+### 2. Custom Forwarding & CLI Options
+
+```bash
+# Forward to a custom port or path
+npx @tuwaio/quasar-sdk listen --forward-to http://localhost:8080/api/webhooks
+
+# Provide secret explicitly via flags
+npx @tuwaio/quasar-sdk listen --secret whsec_... --forward-to http://localhost:3000/api/webhooks/quasar
+
+# Specify custom .env file
+npx @tuwaio/quasar-sdk listen --env-file .env.development
+```
+
+| Flag           | Shorthand | Description                                   | Default                                     |
+| :------------- | :-------- | :-------------------------------------------- | :------------------------------------------ |
+| `--secret`     | `-s`      | Webhook endpoint signing secret (`whsec_...`) | `QUASAR_WEBHOOK_SECRET`                     |
+| `--forward-to` | `-f`      | Local destination endpoint                    | `http://localhost:3000/api/webhooks/quasar` |
+| `--api-url`    | `-a`      | Quasar Cloud API base URL                     | `https://api.tuwa.io`                       |
+| `--env-file`   | `-e`      | Custom path to `.env` file                    | Auto-detected (`.env.local`, `.env`)        |
+| `--help`       | `-h`      | Display help instructions                     | —                                           |
+| `--version`    | `-v`      | Display CLI version                           | —                                           |
+
+### 3. Local Webhook Route Handler (Next.js Example)
+
+```typescript
+// app/api/webhooks/quasar/route.ts
+import { NextResponse } from 'next/server';
+import crypto from 'node:crypto';
+
+export async function POST(req: Request) {
+  const secret = process.env.QUASAR_WEBHOOK_SECRET;
+  if (!secret) {
+    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+  }
+
+  const rawBody = await req.text();
+  const signature = req.headers.get('x-quasar-signature');
+  const event = req.headers.get('x-quasar-event');
+
+  // Verify HMAC-SHA256 signature
+  const expectedSignature = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+
+  if (signature !== expectedSignature) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+
+  const payload = JSON.parse(rawBody);
+  console.log(`[Webhook Received] ${event}:`, payload);
+
+  return NextResponse.json({ received: true });
+}
+```
 
 ---
 

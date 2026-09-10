@@ -4,7 +4,7 @@
 
 # QuasarConfig
 
-Defined in: [packages/quasar-sdk/src/types.ts:12](https://github.com/TuwaIO/sdk/blob/513499fd873155b2171f9381b8e8671e636352d7/packages/quasar-sdk/src/types.ts#L12)
+Defined in: [packages/quasar-sdk/src/types.ts:12](https://github.com/TuwaIO/sdk/blob/23a3f5339c89149d010d1f55ff7515fc8cf2bad4/packages/quasar-sdk/src/types.ts#L12)
 
 Configuration options for initializing the [Quasar](../classes/Quasar.md) SDK client.
 
@@ -14,7 +14,7 @@ Configuration options for initializing the [Quasar](../classes/Quasar.md) SDK cl
 
 > `optional` **baseUrl?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:18](https://github.com/TuwaIO/sdk/blob/513499fd873155b2171f9381b8e8671e636352d7/packages/quasar-sdk/src/types.ts#L18)
+Defined in: [packages/quasar-sdk/src/types.ts:18](https://github.com/TuwaIO/sdk/blob/23a3f5339c89149d010d1f55ff7515fc8cf2bad4/packages/quasar-sdk/src/types.ts#L18)
 
 The base URL of the Quasar Cloud API. Defaults to 'https://api.tuwa.io'.
 
@@ -24,7 +24,7 @@ The base URL of the Quasar Cloud API. Defaults to 'https://api.tuwa.io'.
 
 > `optional` **internalSecret?**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:16](https://github.com/TuwaIO/sdk/blob/513499fd873155b2171f9381b8e8671e636352d7/packages/quasar-sdk/src/types.ts#L16)
+Defined in: [packages/quasar-sdk/src/types.ts:16](https://github.com/TuwaIO/sdk/blob/23a3f5339c89149d010d1f55ff7515fc8cf2bad4/packages/quasar-sdk/src/types.ts#L16)
 
 Optional internal secret for system-to-system communication.
 
@@ -34,7 +34,7 @@ Optional internal secret for system-to-system communication.
 
 > **secretKey**: `string`
 
-Defined in: [packages/quasar-sdk/src/types.ts:14](https://github.com/TuwaIO/sdk/blob/513499fd873155b2171f9381b8e8671e636352d7/packages/quasar-sdk/src/types.ts#L14)
+Defined in: [packages/quasar-sdk/src/types.ts:14](https://github.com/TuwaIO/sdk/blob/23a3f5339c89149d010d1f55ff7515fc8cf2bad4/packages/quasar-sdk/src/types.ts#L14)
 
 Your secret API key starting with `sk_live_`.
 
@@ -44,6 +44,6 @@ Your secret API key starting with `sk_live_`.
 
 > `optional` **timeout?**: `number`
 
-Defined in: [packages/quasar-sdk/src/types.ts:20](https://github.com/TuwaIO/sdk/blob/513499fd873155b2171f9381b8e8671e636352d7/packages/quasar-sdk/src/types.ts#L20)
+Defined in: [packages/quasar-sdk/src/types.ts:20](https://github.com/TuwaIO/sdk/blob/23a3f5339c89149d010d1f55ff7515fc8cf2bad4/packages/quasar-sdk/src/types.ts#L20)
 
 Request timeout in milliseconds. Defaults to 10000.

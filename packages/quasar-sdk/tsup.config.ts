@@ -16,4 +16,14 @@ export default defineConfig([
     dts: true,
     external: [...Object.keys(pkg.peerDependencies || {}), ...Object.keys(pkg.devDependencies || {})],
   },
+  {
+    format: ['cjs'],
+    entry: {
+      cli: './src/cli.ts',
+    },
+    sourcemap: false,
+    clean: false,
+    dts: false,
+    minify: false,
+  },
 ]);
