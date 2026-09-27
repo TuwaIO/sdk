@@ -3,6 +3,10 @@
 [![NPM Version](https://img.shields.io/npm/v/@tuwaio/sdk.svg)](https://www.npmjs.com/package/@tuwaio/sdk)
 [![License](https://img.shields.io/npm/l/@tuwaio/sdk.svg)](./LICENSE)
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TuwaIO/workflows/refs/heads/main/preview/repos/sdk.png" alt="TUWA SDK" width="450" style="border-radius: 12px; margin: 24px auto;" />
+</p>
+
 The **Layer 8 (L8)** Core Umbrella SDK for the TUWA Ecosystem. It provides a unified entry point bundling `Orbit`, `Pulsar`, `Satellite`, and `Nova UI` core layers into modular subpath entrypoints, minimizing boilerplate while ensuring maximum type safety.
 
 ---

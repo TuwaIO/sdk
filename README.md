@@ -2,6 +2,10 @@
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/TuwaIO/sdk/release.yml?branch=main)](https://github.com/TuwaIO/sdk/actions)
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TuwaIO/workflows/refs/heads/main/preview/repos/sdk.png" alt="TUWA SDK" width="450" style="border-radius: 12px; margin: 24px auto;" />
+</p>
+
 > The official core SDKs and server-side Quasar client for the **TUWA Ecosystem**.
 
 ---
