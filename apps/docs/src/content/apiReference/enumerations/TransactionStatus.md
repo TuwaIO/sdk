@@ -4,9 +4,9 @@
 
 # TransactionStatus
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:34
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:40
 
-Represents the terminal status of a transaction after it has been processed.
+Terminal status of a transaction. Trackers set it together with `pending: false`.
 
 ## Enumeration Members
 
@@ -14,9 +14,9 @@ Represents the terminal status of a transaction after it has been processed.
 
 > **Failed**: `"Failed"`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:36
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:42
 
-The transaction failed to execute due to an on-chain error or rejection.
+The transaction reverted, was rejected, or tracking failed (for example, it was not found in time).
 
 ***
 
@@ -24,9 +24,9 @@ The transaction failed to execute due to an on-chain error or rejection.
 
 > **Replaced**: `"Replaced"`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:40
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:46
 
-The transaction was replaced by another with the same nonce (e.g., a speed-up or cancel).
+Another transaction with the same nonce was mined instead (a wallet speed-up or cancel).
 
 ***
 
@@ -34,6 +34,6 @@ The transaction was replaced by another with the same nonce (e.g., a speed-up or
 
 > **Success**: `"Success"`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:38
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:44
 
-The transaction was successfully mined and included in a block.
+The transaction was included on-chain and executed successfully.

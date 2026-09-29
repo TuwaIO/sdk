@@ -113,12 +113,12 @@
     }
   },
   "devDependencies": {
-    "@tuwaio/pulsar-core": "^0.7.0",
+    "@tuwaio/pulsar-core": "^0.8.0",
     "ofetch": "^1.5.1",
     "tsup": "^8.5.1",
     "typescript": "6.0.3",
-    "@tuwaio/siwx-react": "^0.3.0",
-    "@tuwaio/siwx-core": "^0.3.0",
-    "@tuwaio/siwx-server": "^0.3.0"
+    "@tuwaio/siwx-react": "^0.4.0",
+    "@tuwaio/siwx-core": "^0.4.0",
+    "@tuwaio/siwx-server": "^0.4.0"
   }
 }

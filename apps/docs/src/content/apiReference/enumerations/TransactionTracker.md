@@ -4,10 +4,10 @@
 
 # TransactionTracker
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:16
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:22
 
-Enum representing the different tracking strategies available for transactions.
-Each tracker corresponds to a specific method of monitoring a transaction's lifecycle.
+Tracking strategy of a transaction. The chain adapter picks it after the action returns (see
+`TxAdapter.checkTransactionsTracker`) and routes the transaction to the matching tracker.
 
 ## Enumeration Members
 
@@ -15,9 +15,9 @@ Each tracker corresponds to a specific method of monitoring a transaction's life
 
 > **ERC4337**: `"erc4337"`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:29
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:35
 
-For native ERC-4337 UserOperation transactions tracked via bundler RPC.
+An ERC-4337 UserOperation, tracked by its `userOpHash` through a bundler RPC and then on-chain.
 
 ***
 
@@ -25,9 +25,9 @@ For native ERC-4337 UserOperation transactions tracked via bundler RPC.
 
 > **Ethereum**: `"ethereum"`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:18
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:24
 
-For standard on-chain EVM transactions tracked by their hash.
+A standard EVM transaction, tracked by its hash through RPC (`@tuwaio/pulsar-evm`).
 
 ***
 
@@ -35,13 +35,13 @@ For standard on-chain EVM transactions tracked by their hash.
 
 > **Gelato**: `"gelato"`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:25
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:31
 
-For meta-transactions relayed and executed by the Gelato Network.
+A meta-transaction relayed by Gelato, tracked by its task ID through the Gelato API.
 
 #### Deprecated
 
-Gelato gasless relay is deprecated. Use TransactionTracker.ERC4337 instead.
+Gelato relay is deprecated. Use `TransactionTracker.ERC4337` instead.
 
 ***
 
@@ -49,9 +49,9 @@ Gelato gasless relay is deprecated. Use TransactionTracker.ERC4337 instead.
 
 > **Safe**: `"safe"`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:20
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:26
 
-For multi-signature transactions managed and executed via a Safe contract.
+A Safe multisig transaction, tracked by its `safeTxHash` through the Safe Transaction Service API.
 
 ***
 
@@ -59,6 +59,6 @@ For multi-signature transactions managed and executed via a Safe contract.
 
 > **Solana**: `"solana"`
 
-Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.7.0\_@tuwaio+orbit-core@0.3.0\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_b94ade1941b5512b5a8689165845619f/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:27
+Defined in: node\_modules/.pnpm/@tuwaio+pulsar-core@0.8.0\_@tuwaio+orbit-core@0.3.1\_dayjs@1.11.23\_immer@11.1.18\_zustand@\_85e7674b971640b29eedb130dab5d2c0/node\_modules/@tuwaio/pulsar-core/dist/index.d.ts:33
 
-The tracker for monitoring standard Solana transaction signatures.
+A Solana transaction, tracked by its signature through RPC (`@tuwaio/pulsar-solana`).
