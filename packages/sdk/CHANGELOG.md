@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.1.14...sdk-v0.2.0) (2026-09-30)
+
+
+### Features
+
+* packages docs layout and minor code fixes ([df3e083](https://github.com/TuwaIO/sdk/commit/df3e0832a38465f8a1bff104e6af626bd3f81e66))
+
+
+### Bug Fixes
+
+* added image to docs ([f39fbc8](https://github.com/TuwaIO/sdk/commit/f39fbc86343f741f6ec1f2a3480f634e4162bab4))
+* updated packages ([d72f8e7](https://github.com/TuwaIO/sdk/commit/d72f8e773eb96b75740fcc711cfbb1f45e5091d8))
+
 ## [0.1.14](https://github.com/TuwaIO/sdk/compare/sdk-v0.1.13...sdk-v0.1.14) (2026-09-08)
 
 
