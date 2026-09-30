@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * @module cli
- * @description Quasar SDK CLI - Native Webhook Local Dev Relay.
- * Enables local dApp development against Quasar Cloud webhooks without third-party tunnels.
+ * @file The `quasar-sdk` CLI (`npx @tuwaio/quasar-sdk listen`): the local relay for Quasar webhooks. Quasar cannot call
+ * an endpoint on `localhost`, so it streams the deliveries of webhook endpoints with a `localhost` URL to this command
+ * over Server-Sent Events, and the command posts them to the local app.
  */
 
 import * as fs from 'node:fs';
@@ -11,6 +11,7 @@ import * as path from 'node:path';
 
 import pkg from '../package.json';
 
+/** Options parsed from the command line by {@link parseArgs}. */
 interface CliOptions {
   command?: string;
   secret?: string;
@@ -21,6 +22,7 @@ interface CliOptions {
   version?: boolean;
 }
 
+/** A webhook delivery as sent by the relay stream of the Quasar API. */
 export interface WebhookRelayMessage {
   deliveryId: string;
   event: string;
@@ -29,12 +31,19 @@ export interface WebhookRelayMessage {
   signature: string;
 }
 
+/** Local URL that deliveries are posted to when neither `--forward-to` nor `QUASAR_WEBHOOK_FORWARD_TO` is set. */
 export const DEFAULT_FORWARD_URL = 'http://localhost:3000/api/webhooks/quasar';
+/** Quasar API that the relay connects to when neither `--api-url` nor a `*QUASAR_BASE_URL` variable is set. */
 export const DEFAULT_API_URL = 'https://api.tuwa.io';
+/** Version printed by `--version`, read from `package.json` at build time. */
 export const CLI_VERSION = pkg.version || '0.0.0';
 
 /**
- * Parse simple .env file content without external dependencies.
+ * Parses the content of a `.env` file: `KEY=value` lines, with optional single or double quotes around the value.
+ * Blank lines and lines starting with `#` are skipped.
+ *
+ * @param content - Content of the file.
+ * @returns The variables by name.
  */
 export function parseEnvFile(content: string): Record<string, string> {
   const env: Record<string, string> = {};
@@ -62,7 +71,12 @@ export function parseEnvFile(content: string): Record<string, string> {
 }
 
 /**
- * Load .env from disk prioritizing .env.local, .env.development, then .env.
+ * Reads environment variables from a `.env` file in the working directory: the given file, or the first of
+ * `.env.local`, `.env.development` and `.env` that exists. Side effect: reads the file system; prints a warning when the
+ * given file does not exist.
+ *
+ * @param customPath - Path of the file, absolute or relative to the working directory.
+ * @returns The variables by name, or an empty object when no file was found.
  */
 export function loadEnv(customPath?: string): Record<string, string> {
   const cwd = process.cwd();
@@ -88,7 +102,10 @@ export function loadEnv(customPath?: string): Record<string, string> {
 }
 
 /**
- * Parse CLI command-line arguments.
+ * Parses the command-line arguments: an optional command (`listen`) followed by flags.
+ *
+ * @param args - Arguments without the Node.js executable and script path (`process.argv.slice(2)`).
+ * @returns The parsed options; unknown flags are ignored.
  */
 export function parseArgs(args: string[]): CliOptions {
   const options: CliOptions = {};
@@ -122,8 +139,8 @@ export function parseArgs(args: string[]): CliOptions {
 function printHelp(): void {
   console.log(`
 \x1b[1m\x1b[36m⚡ Quasar Webhook Local Dev Relay\x1b[0m
-Stream production Quasar Cloud webhooks directly to your local dev machine.
-Zero tunnels, zero third-party proxies, zero friction.
+Receives the deliveries of a Quasar webhook endpoint with a localhost URL
+and posts them to your local app. No tunnel is needed.
 
 \x1b[1mUSAGE\x1b[0m
   $ npx @tuwaio/quasar-sdk listen [options]
@@ -150,12 +167,40 @@ Zero tunnels, zero third-party proxies, zero friction.
 }
 
 /**
- * Connect to SSE and stream webhook events to local endpoint.
+ * Builds the request that opens the relay stream. The signing secret is sent in the `x-webhook-secret` header, never in
+ * the URL, so it does not end up in proxy or server access logs.
+ *
+ * @param params - Request parameters.
+ * @param params.apiUrl - Base URL of the Quasar API; trailing slashes are removed.
+ * @param params.secret - Signing secret of the webhook endpoint (`whsec_...`).
+ * @param params.signal - Signal that aborts the request.
+ * @returns The URL and the `fetch` options.
+ */
+export function buildListenRequest(params: { apiUrl: string; secret: string; signal?: AbortSignal }): {
+  url: string;
+  init: RequestInit;
+} {
+  return {
+    url: `${params.apiUrl.replace(/\/+$/, '')}/v1/engine/webhooks/listen`,
+    init: {
+      method: 'GET',
+      headers: {
+        Accept: 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'x-webhook-secret': params.secret,
+      },
+      signal: params.signal,
+    },
+  };
+}
+
+/**
+ * Connects to the relay stream and posts every delivery to the local endpoint. Reconnects with an exponential backoff
+ * (1 s up to 15 s) until the process receives `SIGINT` or `SIGTERM`. Exits the process on a 401 or 404 response.
  */
 async function runListen(options: { secret: string; forwardTo: string; apiUrl: string }): Promise<void> {
   const { secret, forwardTo, apiUrl } = options;
   const cleanApiUrl = apiUrl.replace(/\/+$/, '');
-  const listenUrl = `${cleanApiUrl}/v1/engine/webhooks/listen?secret=${encodeURIComponent(secret)}`;
 
   console.log(`
 \x1b[36m┌──────────────────────────────────────────────────────────────┐\x1b[0m
@@ -186,14 +231,8 @@ async function runListen(options: { secret: string; forwardTo: string; apiUrl: s
       activeAbortController = new AbortController();
       console.log(`\x1b[90mConnecting to Quasar Cloud SSE stream...\x1b[0m`);
 
-      const response = await fetch(listenUrl, {
-        method: 'GET',
-        headers: {
-          Accept: 'text/event-stream',
-          'Cache-Control': 'no-cache',
-        },
-        signal: activeAbortController.signal,
-      });
+      const request = buildListenRequest({ apiUrl: cleanApiUrl, secret, signal: activeAbortController.signal });
+      const response = await fetch(request.url, request.init);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -279,7 +318,15 @@ async function runListen(options: { secret: string; forwardTo: string; apiUrl: s
 }
 
 /**
- * Handle a single SSE message block and forward payload if relevant.
+ * Handles one message of the relay stream. `payload`, `webhook` and `message` events are posted to `forwardTo` with the
+ * `x-quasar-signature`, `x-quasar-event` and `x-quasar-delivery-id` headers and the delivery body (`data`), so the local
+ * endpoint verifies the signature as for a direct delivery. Pings, greetings and malformed JSON are ignored. Side
+ * effects: one `POST` request to `forwardTo` and a log line; errors of that request are logged, not thrown.
+ *
+ * @param event - Name of the SSE event.
+ * @param rawData - The `data` of the event (JSON).
+ * @param forwardTo - Local URL to post the delivery to.
+ * @returns Resolves when the delivery was posted or skipped.
  */
 export async function handleSseMessage(event: string, rawData: string, forwardTo: string): Promise<void> {
   // Ignore keepalive pings and greetings
@@ -343,7 +390,11 @@ export async function handleSseMessage(event: string, rawData: string, forwardTo
 }
 
 /**
- * Main entry point.
+ * Runs the CLI with `process.argv`: prints the help or the version, or runs `listen`. The signing secret comes from
+ * `--secret`, `QUASAR_WEBHOOK_SECRET` in the environment or in a `.env` file. Side effect: exits the process on an
+ * unknown command or a missing secret.
+ *
+ * @returns Resolves when the command ends.
  */
 export async function main(): Promise<void> {
   const rawArgs = process.argv.slice(2);

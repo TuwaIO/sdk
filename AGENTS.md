@@ -1,81 +1,105 @@
-# 🤖 Agent Context: TUWA SDKs
+# 🤖 Agent Context: TUWA SDK (`@tuwaio/sdk`, `@tuwaio/evm-sdk`, `@tuwaio/solana-sdk`, `@tuwaio/quasar-sdk`)
 
 ## 1. Project Philosophy & Goal
 
-- **What is this?** A monorepo for **TUWA SDKs** — Layer 8 (L8 - Metapackages) & Layer 9 (L9 - Network Adapters) of the TUWA Ecosystem. It packages and orchestrates the modular TUWA stack into streamlined, ready-to-use developer kits.
-- **Role in TUWA:** Developer Experience & Integration Layer. It aggregates `orbit` (transports), `pulsar` (lifecycle tracking), `satellite` (wallet connection), `nova-uikit` (components), `siwx` (CAIP-122 auth), and `quasar` (cloud backend client) into unified entry points.
-- **Philosophy:** "Pure Web3", Headless-First, Modular, Zero Bloat, Type-Safe. Self-custody and sovereign individual values with zero reliance on centralized WaaS lock-in.
+- **What is this?** A monorepo for the **TUWA SDK**: `@tuwaio/sdk` re-exports the client packages of Orbit Utils, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths for React apps, its add-ons `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` re-export their EVM and Solana packages, and `@tuwaio/quasar-sdk` is the client of the Quasar API (Quasar Cloud or a self-hosted Quasar server).
+- **Role in TUWA:** Stage 5 ("SDK Integration"): `@tuwaio/sdk` is L8, `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` are L9 (TUWA-wide layer numbers, as in the hub). `@tuwaio/quasar-sdk` is L5 and belongs to Quasar (Stage 3). Nothing in the other TUWA projects depends on the SDK; the SDK depends on their released packages.
+- **Philosophy:** add no logic to the re-exported packages. The re-export packages decide which versions of the TUWA packages work together and give them one import path each; their behavior and reference are those of the re-exported package. Only the chains an app imports are loaded. Secrets (the Quasar secret key) stay on the server. Side effects (`localStorage`, network calls) must be explicit and documented.
 
 ## 2. Tech Stack (Verified)
 
-- **Core:** TypeScript v6.0+, Node.js (v20-v24), pnpm v11+ (Workspace).
-- **Testing:** `vitest` v5.x (Workspace configuration across packages).
-- **Web3 (EVM):** `viem` v2.x, `@wagmi/core` v3.x, `@tuwaio/orbit-evm`, `@tuwaio/pulsar-evm`.
-- **Web3 (Solana):** `@solana/kit` v8.x, `@wallet-standard/*`, `@tuwaio/orbit-solana`, `@tuwaio/pulsar-solana`.
-- **Frameworks:**
-  - `apps/docs`: Next.js v16, Nextra v4, Tailwind CSS v4.
-  - `packages/*`: Framework Agnostic (React / Vanilla JS / Node.js).
-- **Build/Monorepo:**
-  - `tsup`: Bundler for `packages/*` (ESM/CJS/DTS).
-  - `typedoc` + `typedoc-plugin-markdown`: API documentation generation.
-  - OpenAPI v3.1: Specification generation for Quasar SDK.
+- **Core:** TypeScript 6.0.3 (pinned exactly in the root and every `packages/*` `package.json`), Node.js 20+, pnpm 12 (workspace).
+- **`@tuwaio/sdk`:** dependencies: the TUWA packages it re-exports (`@tuwaio/orbit-core`, `pulsar-core`, `pulsar-react`, `satellite-core`, `satellite-react`, `siwx-core`, `siwx-react`, `siwx-server`, `nova-core`, `nova-connect`, `nova-transactions`) and the peers they share (`zustand`, `immer`, `framer-motion`, `@radix-ui/react-dialog`, `@radix-ui/react-select`, `@heroicons/react`, `@web3icons/*`, `react-toastify`, `dayjs`, `clsx`, `tailwind-merge`, `ethereum-blockies-base64`). Peers: `react`, `react-dom`; optional peers for `/nova-connect/evm` and `/nova-connect/solana`: `@tuwaio/orbit-evm`, `@tuwaio/orbit-solana`, `@tuwaio/satellite-evm`, `@tuwaio/satellite-solana`, `@wagmi/core`, `@wallet-standard/react`, `viem` (also devDependencies, for the build and the tests).
+- **`@tuwaio/evm-sdk`:** dependencies `@tuwaio/orbit-evm`, `pulsar-evm`, `satellite-evm`, `siwx-evm`. Peers: `@tuwaio/sdk` (`workspace:^`), `@tuwaio/satellite-core`, `@wagmi/core` (3.x), `viem` (2.x).
+- **`@tuwaio/solana-sdk`:** dependencies `@tuwaio/orbit-solana`, `pulsar-solana`, `satellite-solana`, `siwx-solana`. Peers: `@tuwaio/sdk`, `@tuwaio/satellite-core`, `@solana/kit` (>=8.2) and the `@wallet-standard` packages its dependencies import (`app`, `base`, `features`, `react`, `ui`, `ui-registry`).
+- **`@tuwaio/quasar-sdk`:** dependency `ofetch`. Peers: `@tuwaio/pulsar-core` (>=0.7, transaction types); `@tuwaio/siwx-react` (optional, only for `/react`).
+- **Testing:** `vitest` v5 (per package, `pnpm test`). No DOM library.
+- **Frameworks:** `apps/docs`: Next.js 16, Nextra 4, Tailwind CSS v4, `@tuwaio/docs-ui`, Pagefind.
+- **Docs generation:** TypeDoc 0.28 + `typedoc-plugin-markdown` 4 (root `typedoc.json`, local plugins and the page script in `apps/docs/typedoc/`). `scripts/generate-openapi.ts` (`zod`, `@asteasolutions/zod-to-openapi`, `yaml`) writes the OpenAPI description of the Quasar API into the docs hub checkout (`../docs/apps/docs-hub/public/quasar-openapi.yaml`).
+- **Build/Monorepo:** `tsup` for `packages/*` (ESM/CJS/DTS; `@tuwaio/sdk` then copies the Nova stylesheets with `scripts/bundle-styles.js`), `release-please` (stable releases from `main`) and `semantic-release` (`alpha.release.config.js`, prereleases).
 
 ## 3. Architecture & Directory Structure
 
 ```
 sdk/
 ├── apps/
-│   └── docs/                   # Documentation site (Next.js 16 + Nextra 4)
-│       ├── public/             # Static assets (openapi.yaml, etc.)
-│       └── src/content/        # MDX documentation & auto-generated API Reference
+│   └── docs/                          # sdk.docs.tuwa.io (Next.js 16 + Nextra 4)
+│       ├── src/content/               # index.mdx (Introduction), _meta.tsx
+│       │   └── packages/              # GENERATED by `pnpm docs:gen` — never edit by hand
+│       └── typedoc/                   # TypeDoc plugins, packagePages.mjs, packages-overview.md, meta/ (sidebar labels)
 ├── packages/
-│   ├── quasar-sdk/             # Layer 8 (L8). Headless HTTP client for TUWA Quasar backend.
-│   │   ├── src/client/         # QuasarClient class & API methods
-│   │   └── src/types.ts        # Quasar DTOs, Enums, and Pulsar re-exports
-│   ├── sdk/                    # Layer 8 (L8). Full-stack Metapackage aggregating all TUWA layers.
-│   │   └── src/                # Re-exports: orbit, pulsar, satellite, nova, siwx, quasar
-│   ├── evm-sdk/                # Layer 9 (L9). EVM Network Adapter bundle.
-│   │   └── src/                # Re-exports: orbit-evm, pulsar-evm, satellite-evm, nova-connect/evm, siwx-evm
-│   └── solana-sdk/             # Layer 9 (L9). Solana Network Adapter bundle.
-│       └── src/                # Re-exports: orbit-solana, pulsar-solana, satellite-solana, nova-connect/solana, siwx-solana
-├── scripts/                    # OpenAPI generator & tooling scripts
-├── package.json                # Root checks & scripts
-└── pnpm-workspace.yaml         # Workspace definition
+│   ├── sdk/                           # L8: one file per subpath in src/ (orbit.ts, pulsar.ts, satellite.ts, siwx*.ts, nova-*.ts)
+│   │   └── scripts/bundle-styles.js   # Copies dist/index.css of the Nova packages to dist/styles/
+│   ├── evm-sdk/                       # L9: src/{orbit,pulsar,satellite,siwx,nova-connect}.ts
+│   ├── solana-sdk/                    # L9: same subpaths for Solana
+│   └── quasar-sdk/                    # L5
+│       └── src/
+│           ├── index.ts               # Entry `.` (@module server)
+│           ├── quasar.ts              # Quasar client
+│           ├── core/client.ts         # HTTP client (internal) and QuasarSDKError
+│           ├── modules/pulsar/        # PulsarModule: syncCreate, getHistory
+│           ├── react/index.ts         # Entry `./react` (@module react): preFlightTxCheck
+│           └── cli.ts                 # `quasar-sdk listen` (bin, built to dist/cli.cjs)
+├── scripts/generate-openapi.ts        # OpenAPI description of the Quasar API
+├── typedoc.json                       # Reference generation for @tuwaio/quasar-sdk
+└── package.json                       # Root scripts
 ```
 
 ### Module Breakdown
 
-- **`@tuwaio/quasar-sdk` (L8)**: Pure TypeScript client for interacting with Quasar SaaS & Cloud APIs (transaction tracking, indexing, webhooks, AML screening). Zero Web3/blockchain dependencies.
-- **`@tuwaio/sdk` (L8)**: The all-in-one developer bundle. Re-exports core modules from Orbit, Pulsar, Satellite, Nova UIKit, SIWX, and Quasar with full tree-shaking support.
-- **`@tuwaio/evm-sdk` (L9)**: Pre-bundled EVM stack combining Viem transports, Wagmi connectors, ERC-4337 bundler utilities, EVM transaction tracking, and EIP-191/1271 SIWX verification.
-- **`@tuwaio/solana-sdk` (L9)**: Pre-bundled Solana stack combining `@solana/kit` RPCs, Wallet Standard connectors, Solana signature transaction tracking, and Ed25519 SIWX verification.
+- **`@tuwaio/sdk`**: `/orbit` (`orbit-core`), `/pulsar` (`pulsar-core` + `pulsar-react`), `/satellite` (`satellite-core` + `satellite-react`, whose `Connector` type is renamed `SatelliteReactConnector`), `/siwx` (`siwx-react`), `/siwx/core`, `/siwx/server`, `/siwx/server-next`, `/nova-core`, `/nova-connect` (+ `/components`, `/hooks`, `/i18n`, `/satellite`), `/nova-transactions` (+ `/providers`), `/styles/*.css`. `/nova-connect/evm` and `/nova-connect/solana` exist for the add-ons.
+- **`@tuwaio/evm-sdk` / `@tuwaio/solana-sdk`**: `/orbit`, `/satellite`, `/pulsar`, `/siwx` re-export the chain package; `/nova-connect` re-exports `@tuwaio/sdk/nova-connect/evm` (or `/solana`). Importing it registers the chain helpers of Nova Connect (a registry on `globalThis`) and augments `NovaConnectChainConfigTypes` of `@tuwaio/nova-connect` and `AllConnections`/`AllConnectors` of `@tuwaio/satellite-react`. Going through `@tuwaio/sdk` makes the augmentation apply to the same copy of those packages that `@tuwaio/sdk` re-exports; a direct `@tuwaio/nova-connect` dependency of the add-ons gives pnpm a second copy with other peers, and the types of `NovaConnectProvider` and `SatelliteConnectProvider` then miss the chain.
+- **`@tuwaio/quasar-sdk`**: `Quasar` (`pulsar: PulsarModule`), `QuasarSDKError` (HTTP `status`, `originalError`), `BASE_API_URL`, `PULSAR_SYNC_ENDPOINT`, `PULSAR_HISTORY_ENDPOINT`, `QuasarConfig`, `HistoryQuery`, `PaginatedResult`, and the re-exported Pulsar `Transaction` types and enums. Requests send the secret key in `x-tuwa-secret-key` (and `x-internal-secret` when set; only the Quasar dashboard uses it). `/react`: `preFlightTxCheck` (SIWX session in `useSiwxSessionStore` + `GET /v1/engine/monitoring/health`). CLI: `quasar-sdk listen` streams the deliveries of webhook endpoints with a `localhost` URL from `/v1/engine/webhooks/listen` (signing secret in the `x-webhook-secret` header) and posts them to `--forward-to`.
+
+### Documentation Model
+
+- The docs site has an **Introduction** (hand-written), a **Packages** section (generated) and sidebar links to the TUWA guides (`docs.tuwa.io/guides`) and the Quasar docs (`docs.tuwa.io/quasar`).
+- The re-export packages are not documented by TypeDoc: their exports are documented on the sites of Orbit, Pulsar, Satellite Connect, SIWX (`*.docs.tuwa.io/packages/...`) and in the Nova Storybook (`stories.tuwa.io/?path=/docs/packages-...`). Their page at `/packages/<package>` is their README with a table "subpath → re-exported package → reference link". Keep the tables in sync with `package.json` `exports`.
+- `@tuwaio/quasar-sdk` is documented by TypeDoc: its page is the README followed by the modules `server` (`@tuwaio/quasar-sdk`) and `react` (`@tuwaio/quasar-sdk/react`), labeled with their import paths through `apps/docs/typedoc/meta/quasar-sdk/**/_meta.tsx`.
+- **No duplicates:** the full-stack React guide (`docs.tuwa.io/guides/full-stack-react`), the Quasar sync guide (`docs.tuwa.io/guides/quasar-transaction-sync`) and the Quasar docs (apps and keys, quotas, webhooks, self-hosting, API reference at `docs.tuwa.io/quasar/api`) live in the docs hub (`TuwaIO/docs`). READMEs have a short example and an absolute link to them; the Introduction repeats no TypeScript code.
+- This layout follows Orbit, SIWX, Satellite Connect and Pulsar. Keep it consistent.
 
 ## 4. Coding Standards (STRICT)
 
-- **Language:** English ONLY (Code, Comments, Commits).
-- **Style:** Functional programming preferred. Clean re-exports and high-cohesion wrappers.
+- **Language:** English ONLY (Code, Comments, Commits, Docs).
 - **Types:** Strict TypeScript. **NO `any`**. Usage of `ts-expect-error` must be justified.
-- **Comments:** JSDoc required for **all** exported functions, classes, and types.
-  - Must explain _inputs_, _outputs_, and _side effects_.
-- **Naming:**
-  - Files: `camelCase.ts` (utils, helpers), `PascalCase.tsx` (components).
-  - Variables/Functions: `camelCase`.
-  - Types/Interfaces/Classes: `PascalCase`.
+- **Re-export files:** one subpath per file, `export * from '<package entry>'` (or a named list when two `export *` would clash, as in `satellite.ts`). No JSDoc on them; a `//` comment only where a re-export carries a side effect (`nova-connect*.ts`).
+- **Comments:** JSDoc required for **all** exports of `packages/quasar-sdk/src` (it is published as the reference).
+  - Must explain _inputs_ (`@param`), _outputs_ (`@returns`), _errors_ (`@throws`) and _side effects_ (requests with their headers, `localStorage` reads, process exits in the CLI).
+  - Use only standard TSDoc tags (no `@name`, no `@description`; use `@file` for file headers, `@module` only in the two entry files). `@param` names must match the real parameters.
+  - Use `{@link X}` only for symbols exported by the same package. For other packages, write the name as code with its package.
+  - Mark exports that are not part of the public API with `@internal`.
+- **Package READMEs** (`packages/*/README.md`) are both the npm page and the docs page:
+  - Use **absolute URLs** for all links, including the LICENSE link and anchors.
+  - Do **not** hand-write lists of exports or signatures; the re-export packages list their subpaths with reference links instead.
+  - Document what is saved to `localStorage` (🗄️ Browser Storage) and which hosts are contacted (🌐 External Services).
+  - Every code example must compile against the current packages.
+- **Naming:** Files `camelCase.ts` (utils, modules) or the subpath name for re-export files (`nova-connect-evm.ts`); Variables/Functions `camelCase`; Types/Classes `PascalCase`.
 
 ## 5. Key Workflows
 
-- **Build:** `pnpm build` (Builds all packages via `tsup` and processes styles).
-- **Test:** `pnpm test` (Runs `vitest run` across all packages in workspace).
-- **Lint/Format:** `pnpm lint` (ESLint) / `pnpm format` (Prettier).
-- **Docs:** `pnpm docs:gen` (Generates TypeDoc API reference) and `pnpm generate:docs` (Generates OpenAPI spec).
+- **Build:** `pnpm build` (tsup in every package; `@tuwaio/sdk` then copies the Nova stylesheets). The tests of `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` import the built `@tuwaio/sdk`: rebuild it after changing it.
+- **Test:** `pnpm test` (`vitest run` in every package).
+- **Lint/Format:** `pnpm lint` / `pnpm lint:fix` (ESLint) and `pnpm format` (Prettier; `CHANGELOG.md`, `next-env.d.ts`, `pnpm-lock.yaml` and the generated pages are ignored).
+- **Docs:** `pnpm docs:gen` (TypeDoc for `@tuwaio/quasar-sdk`, then `packagePages.mjs` and the sidebar labels; also runs in the pre-commit hook). `pnpm --filter @tuwaio/sdk-docs dev` runs the site.
+- **OpenAPI:** `pnpm openapi:gen` after changing the Quasar API types or endpoints; it writes `quasar-openapi.yaml` into the docs hub checkout next to this repository (`../docs`), which serves it at `docs.tuwa.io/quasar/api`.
 - **Clean:** `pnpm clean` (Nukes `node_modules` and `dist` dirs).
 
 ## 6. AI Agent Behavior (Mandatory)
 
-- **Post-Work Routine:** After generating or modifying code, you **MUST** run `pnpm lint:fix` (and `pnpm format`) to ensure code quality.
+- **Post-Work Routine:** After generating or modifying code, you **MUST** run `pnpm lint:fix` and `pnpm format`.
+- **Docs Routine:** After changing exports, JSDoc, a package README or `exports`, run `pnpm docs:gen` and check that it reports no warnings. Run it again after `pnpm format`.
+- **Consumer Routine:** After changing re-exports, peers or dependencies, check an app that uses the packages: typecheck and bundle an EVM-only, a Solana-only, a both-chains and a no-chain app (for example with esbuild), and check that no Solana code reaches the EVM bundle and the reverse, and that `appChains`/`solanaRPCUrls` of `NovaConnectProvider` and `adapter` of `SatelliteConnectProvider` are typed for the imported chains.
 - **Dependency Rule:** Never install new packages without explicit user permission.
+- **Peer Rule:** a package declares as peers only what it imports (check the built `dist`), plus the peers of its dependencies that the app must share. The TUWA packages are dependencies of the SDK packages; `react`, `react-dom`, `viem`, `@wagmi/core`, `@solana/kit` and the Wallet Standard packages are peers.
 - **Hallucination Check:**
-  - Do **NOT** import `ethers.js` (We use `viem`).
-  - Do **NOT** import `gill` (Eradicated; we use `@solana/kit` and `@wallet-standard/*`).
-  - Do **NOT** import legacy `@solana/web3.js` methods.
-  - Do **NOT** break parity with the 5 core TUWA repos (`orbit`, `siwx`, `satellite-connect`, `pulsar-core`, `nova-uikit`).
+  - Do **NOT** use `typedoc-plugin-react` (it files functions under `components/` and breaks reference links), and do **NOT** generate TypeDoc pages for the re-export packages.
+  - Do **NOT** add `"sideEffects": false` to any package: importing `/nova-connect` of an add-on registers the chain helpers, and bundlers would drop it.
+  - Do **NOT** import `@tuwaio/nova-connect/evm` or `/solana` directly in the add-ons, and do **NOT** add `@tuwaio/nova-connect` or `@tuwaio/satellite-react` to their dependencies or peers: go through `@tuwaio/sdk/nova-connect/evm` (or `/solana`).
+  - Do **NOT** import EVM or Solana packages in the `@tuwaio/sdk` subpaths other than `/nova-connect/evm` and `/nova-connect/solana`, or Solana packages in `@tuwaio/evm-sdk` (and the reverse).
+  - Do **NOT** import React or SIWX packages in the root entry point of `@tuwaio/quasar-sdk`; browser code goes to `@tuwaio/quasar-sdk/react`.
+  - Do **NOT** put secrets in URLs (the CLI sends the signing secret in the `x-webhook-secret` header), and do **NOT** document creating `Quasar` in the browser.
+  - Do **NOT** use marketing names or claims in JSDoc and READMEs ("Iron Dome", "zero vendor lock-in", "production-grade"); describe what the code does. Do **NOT** claim Starknet support: Pulsar ships no Starknet adapter.
+  - Do **NOT** import `ethers.js`, `gill` or legacy `@solana/web3.js` classes.
+  - Do **NOT** add redirects for moved or removed documentation pages; update every link in all TUWA repositories instead.
+  - Do **NOT** edit `CHANGELOG.md` files (release-please writes them).

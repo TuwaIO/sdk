@@ -1,20 +1,15 @@
 /**
- * @module core/client
- * @description Core HTTP client for the Quasar SDK.
- * Handles authenticated requests through the Iron Dome security perimeter
- * and provides structured error handling for all API interactions.
+ * @file HTTP client of the Quasar SDK: authentication headers, timeout and errors.
  */
 
 import { type FetchError, type FetchOptions, ofetch } from 'ofetch';
 
 import { BASE_API_URL } from '../constants';
-import { QuasarConfig } from '../types';
+import type { QuasarConfig } from '../types';
 
 /**
- * Custom error class for all Quasar SDK API failures.
- *
- * Wraps the underlying HTTP error with a structured format including
- * status code, human-readable message, and the original error reference.
+ * Error thrown by the methods of the {@link Quasar} client when a request fails: an HTTP error status, a timeout or a
+ * network error.
  *
  * @example
  * ```typescript
@@ -23,25 +18,26 @@ import { QuasarConfig } from '../types';
  * } catch (err) {
  *   if (err instanceof QuasarSDKError) {
  *     console.error(err.status);        // e.g. 401
- *     console.error(err.message);       // "[Quasar SDK] Request Failed (401): Unauthorized"
- *     console.error(err.originalError); // Raw FetchError from ofetch
+ *     console.error(err.message);       // "[Quasar SDK] Request Failed (401): <error of the API>"
+ *     console.error(err.originalError); // FetchError from ofetch
  *   }
  * }
  * ```
  */
 export class QuasarSDKError extends Error {
-  /** HTTP status code returned by the API, if available. */
+  /** HTTP status code of the response, or `undefined` when no response was received. */
   public readonly status: number | undefined;
 
-  /** The original error thrown by the HTTP client. */
+  /** The error thrown by `ofetch`. */
   public readonly originalError: Error;
 
   /**
-   * Creates a new QuasarSDKError instance.
+   * Creates the error.
    *
-   * @param message - Formatted error message with SDK prefix and status.
-   * @param status - HTTP status code, or `undefined` if unavailable.
-   * @param originalError - The raw error from the HTTP layer.
+   * @param message - Message: `[Quasar SDK] Request Failed (<status>): <error>`, where `<error>` is the `error` field of
+   *   the response body or the message of the fetch error.
+   * @param status - HTTP status code, or `undefined` when no response was received.
+   * @param originalError - The error thrown by `ofetch`.
    */
   constructor(message: string, status: number | undefined, originalError: Error) {
     super(message);
@@ -52,15 +48,8 @@ export class QuasarSDKError extends Error {
 }
 
 /**
- * Internal HTTP client for the Quasar Cloud API.
- *
- * Manages authenticated requests by injecting the `x-tuwa-secret-key` header
- * into every outgoing request. Optionally injects `x-internal-secret`
- * when it is provided in the SDK config. Uses `ofetch` as the transport layer.
- *
- * @remarks
- * This class is not exported from the public API surface.
- * Consumers interact with it indirectly through the {@link Quasar} entry point.
+ * HTTP client shared by the modules of the {@link Quasar} client. Sends every request with the `x-tuwa-secret-key`
+ * header (and `x-internal-secret` when configured) through `ofetch`.
  *
  * @internal
  */
@@ -78,14 +67,14 @@ export class QuasarClient {
   private readonly timeout: number;
 
   /**
-   * Creates a new QuasarClient instance.
+   * Creates the client.
    *
-   * @param config - SDK configuration containing the secret key and optional overrides.
-   * @throws {Error} If `config.secretKey` is missing or empty.
+   * @param config - Secret key and optional overrides.
+   * @throws {Error} If `config.secretKey` is empty.
    */
   constructor(config: QuasarConfig) {
     if (!config.secretKey) {
-      throw new Error('[Quasar SDK] Missing API Key. Provide a secretKey starting with sk_live_.');
+      throw new Error('[Quasar SDK] Missing API Key. Provide the secretKey of your Quasar app (sk_live_ or sk_test_).');
     }
 
     this.secretKey = config.secretKey;
@@ -95,18 +84,14 @@ export class QuasarClient {
   }
 
   /**
-   * Sends an authenticated request to the Quasar Cloud API.
+   * Sends a request with the `Content-Type: application/json` and `x-tuwa-secret-key` headers (and
+   * `x-internal-secret` when configured).
    *
-   * Automatically injects Iron Dome headers (`x-tuwa-secret-key`, `Content-Type`)
-   * and optionally injects `x-internal-secret` when the SDK was configured with it.
-   * Wraps all transport errors into {@link QuasarSDKError}.
-   *
-   * @typeParam T - Expected response body type.
-   * @param path - API endpoint path (e.g. `/api/v1/engine/tx-sync`).
-   * @param options - Fetch options (method, body, query, headers, etc.).
-   *                  `baseURL` and `timeout` are managed internally and cannot be overridden.
-   * @returns The parsed JSON response body typed as `T`.
-   * @throws {QuasarSDKError} On any HTTP or network error.
+   * @typeParam T - Type of the response body.
+   * @param path - Endpoint path, for example `/v1/engine/pulsar/sync`.
+   * @param options - `ofetch` options (method, body, query, headers). `baseURL` and `timeout` come from the config.
+   * @returns The parsed JSON response body.
+   * @throws {QuasarSDKError} On an HTTP error status, a timeout or a network error.
    */
   public async request<T>(path: string, options: Omit<FetchOptions<'json'>, 'baseURL' | 'timeout'> = {}): Promise<T> {
     try {
@@ -127,13 +112,10 @@ export class QuasarClient {
   }
 
   /**
-   * Transforms a raw fetch error into a structured {@link QuasarSDKError}.
+   * Wraps an `ofetch` error in a {@link QuasarSDKError}. Side effect: logs a `console.error` on a 401 or 403 status.
    *
-   * Extracts status code and error message from the response body or fallback fields.
-   * Logs a console warning for authentication failures (401/403).
-   *
-   * @param error - The raw error caught from `ofetch`.
-   * @returns A formatted QuasarSDKError instance.
+   * @param error - The error thrown by `ofetch`.
+   * @returns The wrapped error.
    */
   private buildError(error: unknown): QuasarSDKError {
     const fetchError = error as FetchError;

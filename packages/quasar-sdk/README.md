@@ -1,509 +1,102 @@
 # @tuwaio/quasar-sdk
 
 [![NPM Version](https://img.shields.io/npm/v/@tuwaio/quasar-sdk.svg)](https://www.npmjs.com/package/@tuwaio/quasar-sdk)
-[![License](https://img.shields.io/npm/l/@tuwaio/quasar-sdk.svg)](./LICENSE)
+[![License](https://img.shields.io/npm/l/@tuwaio/quasar-sdk.svg)](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/LICENSE)
 
-<p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/preview/repos/quasar_sdk.png" alt="Quasar SDK Architecture" width="100%" />
-</p>
-
-> The official **Layer 5 (L5)** server-side Node.js & Edge SDK for the **TUWA Quasar Cloud**.
+`@tuwaio/quasar-sdk` is the Layer 5 (L5) package of the **TUWA SDK**: the client of the API of **Quasar**, the TUWA backend that tracks the transactions of your app on the server and keeps their history. It works with Quasar Cloud (`https://api.tuwa.io`) and with a self-hosted Quasar server. It has three parts: the `Quasar` client for your server, a check for the browser (`@tuwaio/quasar-sdk/react`), and the `quasar-sdk` CLI that relays webhooks to `localhost`.
 
 ---
 
-## 🏛️ What is `@tuwaio/quasar-sdk`?
+## 🏛️ Core Capabilities
 
-`@tuwaio/quasar-sdk` is **Layer 5 (L5)** of the TUWA ecosystem architecture — the official backend companion to the TUWA client libraries. It serves as the gateway to the **Quasar Cloud Engine**, allowing your server to securely push transaction logs, query paginated transaction histories, and sync infrastructure states.
-
-It operates strictly on the server (Node.js, Next.js Server Actions, or Edge functions) and uses Secret Keys to communicate with Quasar's iron-dome guarded endpoints.
-
----
-
-## ✨ Key Features
-
-- **☁️ Cloud Sync**: Automatically persist pending and terminal transaction states to the Quasar Database for cross-device history.
-- **⚡ Native Webhook Local Dev Relay**: Stream production webhooks directly to your local machine via CLI with zero tunnels (no ngrok/cloudflared required).
-- **🔐 Headless SIWX (CAIP-122) Auth Ready**: Seamlessly pairs with `@tuwaio/sdk/siwx/server` for strict cryptographic verification of user sessions before allowing database writes.
-- **⚡ Edge Ready**: Uses `ofetch` and lightweight cryptography to run seamlessly in Cloudflare Workers and Vercel Edge.
-- **📦 InMemory Sync**: Perfectly pairs with `@tuwaio/sdk/pulsar` (`createTxInMemoryStore`) to fetch history and hydrate local React states.
+- **Transaction sync:** `quasar.pulsar.syncCreate` sends a transaction created by Pulsar to Quasar, which tracks it until it reaches a final status (so the status survives a closed tab) and sends your webhooks.
+- **History:** `quasar.pulsar.getHistory` returns the transactions of your app, newest first, filtered by wallet address, chain, status, transaction key or application name.
+- **Errors:** every failed request throws a `QuasarSDKError` with the HTTP `status`.
+- **Pre-flight check:** `preFlightTxCheck` from `@tuwaio/quasar-sdk/react` stops a Pulsar transaction in the browser when the user is not signed in with SIWX or the Quasar API does not respond.
+- **Webhook relay:** `npx @tuwaio/quasar-sdk listen` receives the deliveries of a webhook endpoint with a `localhost` URL and posts them to your local app, without a tunnel.
 
 ---
 
 ## 💾 Installation
 
 ```bash
-pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core @tuwaio/siwx-core @tuwaio/siwx-server @tuwaio/siwx-react
+pnpm add @tuwaio/quasar-sdk @tuwaio/pulsar-core
 ```
 
-_Note: `ofetch` and `@tuwaio/pulsar-core` are required peer dependencies. The `@tuwaio/siwx-*` packages are required if you intend to use the headless SIWX (CAIP-122) authentication integrations._
+| Import path                | Provides                                                                     | Peer dependencies                                        |
+| -------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `@tuwaio/quasar-sdk`       | `Quasar`, `PulsarModule`, `QuasarSDKError`, the endpoint constants and types | `@tuwaio/pulsar-core` (>=0.7), for the transaction types |
+| `@tuwaio/quasar-sdk/react` | `preFlightTxCheck`                                                           | Also `@tuwaio/siwx-react` (>=0.3, optional for the root) |
+
+The root entry point imports neither React nor SIWX packages, so it runs in Node.js, Next.js Server Actions and route handlers, and Edge runtimes. Its HTTP client, `ofetch`, is a dependency.
 
 ---
 
-## ⚡ Quasar Webhook Local Dev Relay (Native CLI)
+## 🚀 Usage
 
-Testing Web3 webhooks locally against live cloud indexers usually requires spinning up temporary third-party tunnels (`ngrok`, `cloudflared`), pasting ephemeral URLs into dashboard forms, and restarting your workflow when tunnels expire.
-
-The **Quasar SDK CLI** provides a zero-tunnel local development relay. When you configure a `localhost` webhook endpoint in the Quasar Dashboard, Quasar Cloud streams incoming events to your local machine via real-time Server-Sent Events (SSE).
-
-### 1. Zero-Config Local Development
-
-Add your webhook signing secret from the Quasar Dashboard to `.env.local` or `.env`:
-
-```env
-# Signing secret copied from the Quasar Dashboard webhook endpoint
-QUASAR_WEBHOOK_SECRET=whsec_...
-
-# Optional Quasar API base URL (defaults to https://api.tuwa.io)
-NEXT_PUBLIC_QUASAR_BASE_URL=https://api.tuwa.io
-```
-
-Run the relay listener in your terminal:
-
-```bash
-npx @tuwaio/quasar-sdk listen
-```
-
-The CLI automatically reads `QUASAR_WEBHOOK_SECRET` and starts forwarding webhook payloads to the default Cosmos Playground endpoint (`http://localhost:3000/api/webhooks/quasar`).
-
-### 2. Custom Forwarding & CLI Options
-
-```bash
-# Forward to a custom port or path
-npx @tuwaio/quasar-sdk listen --forward-to http://localhost:8080/api/webhooks
-
-# Provide secret explicitly via flags
-npx @tuwaio/quasar-sdk listen --secret whsec_... --forward-to http://localhost:3000/api/webhooks/quasar
-
-# Specify custom .env file
-npx @tuwaio/quasar-sdk listen --env-file .env.development
-```
-
-| Flag           | Shorthand | Description                                   | Default                                     |
-| :------------- | :-------- | :-------------------------------------------- | :------------------------------------------ |
-| `--secret`     | `-s`      | Webhook endpoint signing secret (`whsec_...`) | `QUASAR_WEBHOOK_SECRET`                     |
-| `--forward-to` | `-f`      | Local destination endpoint                    | `http://localhost:3000/api/webhooks/quasar` |
-| `--api-url`    | `-a`      | Quasar Cloud API base URL                     | `https://api.tuwa.io`                       |
-| `--env-file`   | `-e`      | Custom path to `.env` file                    | Auto-detected (`.env.local`, `.env`)        |
-| `--help`       | `-h`      | Display help instructions                     | —                                           |
-| `--version`    | `-v`      | Display CLI version                           | —                                           |
-
-### 3. Local Webhook Route Handler (Next.js Example)
-
-```typescript
-// app/api/webhooks/quasar/route.ts
-import { NextResponse } from 'next/server';
-import crypto from 'node:crypto';
-
-export async function POST(req: Request) {
-  const secret = process.env.QUASAR_WEBHOOK_SECRET;
-  if (!secret) {
-    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
-  }
-
-  const rawBody = await req.text();
-  const signature = req.headers.get('x-quasar-signature');
-  const event = req.headers.get('x-quasar-event');
-
-  // Verify HMAC-SHA256 signature
-  const expectedSignature = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-
-  if (signature !== expectedSignature) {
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-  }
-
-  const payload = JSON.parse(rawBody);
-  console.log(`[Webhook Received] ${event}:`, payload);
-
-  return NextResponse.json({ received: true });
-}
-```
-
----
-
-## 🚀 Quick Start (Node.js / Edge)
-
-This is a basic example of how to interact with the Quasar Cloud directly from your secure backend environments (like Next.js API Routes, Server Actions, or NestJS).
-
-```typescript
-import { cookies } from 'next/headers';
-import { Quasar, type Transaction } from '@tuwaio/quasar-sdk';
-import { isSessionMatchingTarget } from '@tuwaio/sdk/siwx';
-import { getSiwxServerSession } from '@tuwaio/sdk/siwx/server';
-import { sessionStore } from '@/lib/authStores';
-
-// Initialize Quasar with your Secret Key from the Dashboard
-const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
-
-/**
- * Example Next.js Server Action to Sync a Transaction
- */
-export async function syncTransaction(tx: Transaction) {
-  const session = await getSiwxServerSession({
-    cookieSource: await cookies(),
-    sessionStore,
-  });
-  if (!session) throw new Error('Unauthorized: No active session.');
-
-  // Verify that the transaction sender matches the authenticated session address
-  if (tx.from && !isSessionMatchingTarget(session, tx.from, tx.chainId)) {
-    throw new Error('Forbidden: Session address mismatch.');
-  }
-
-  // Sync the transaction securely to the Quasar Cloud
-  await quasar.pulsar.syncCreate(tx, 'My Application');
-  return { success: true };
-}
-
-/**
- * Example Next.js Server Action to Fetch History
- */
-export async function getHistory(params: {
-  walletAddress: string;
-  page?: number;
-  limit?: number;
-  appName?: string;
-  chainId?: string;
-}) {
-  const session = await getSiwxServerSession({
-    cookieSource: await cookies(),
-    sessionStore,
-  });
-  if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
-    throw new Error('Unauthorized: Session address mismatch.');
-  }
-
-  // Return the paginated transaction history
-  return quasar.pulsar.getHistory(params);
-}
-```
-
----
-
-## 🔐 Frontend Authentication (SIWX)
-
-The Quasar SDK relies on the standard **SIWX (CAIP-122)** protocol for authenticating client requests.
-
-You can use the headless `<NovaSiwxWatcher />` component or `useSiwx` / `useSiwxSession` hooks provided by `@tuwaio/sdk/siwx` (and `@tuwaio/sdk/nova-connect`). The auto-auth watcher automatically prompts users to sign a CAIP-122 message when they connect their wallet and synchronizes active session state.
-
-For detailed frontend integration, see the [SIWX Documentation](https://siwx.docs.tuwa.io/).
-
----
-
-## 🌍 The Full Flow (Production Architecture)
-
-To see how incredibly powerful `@tuwaio/quasar-sdk` is when combined with `@tuwaio/sdk`, here is a complete architectural overview without any skipped steps. Notice how the **Pulsar Store** and **Headless SIWX** dance together effortlessly:
-
-### 1. Define Your Transaction Types (`types.ts`)
-
-First, define the strict union of all possible transactions your app supports.
+Create the client on the server with the secret key of your Quasar app (`sk_live_...` or `sk_test_...`, from the dashboard). Never create it in the browser: the key authorizes writes to your app.
 
 ```ts
-// src/types.ts
-import type { Transaction } from '@tuwaio/sdk/pulsar';
-
-export enum AppTxType {
-  SWAP = 'SWAP',
-}
-
-export type SwapTx = Transaction & {
-  type: AppTxType.SWAP;
-  payload: { tokenIn: string; tokenOut: string; amount: number };
-};
-
-export type TransactionUnion = SwapTx;
-```
-
-### 2. Secure Server Proxy (`actions.ts`)
-
-Proxy calls to Quasar Cloud using your backend to protect secret keys. Never accept client-side session credentials in Server Actions.
-
-```ts
-// src/app/actions.ts
 'use server';
 
-import { cookies } from 'next/headers';
-import { Quasar } from '@tuwaio/quasar-sdk';
-import { isSessionMatchingTarget } from '@tuwaio/sdk/siwx';
-import { getSiwxServerSession } from '@tuwaio/sdk/siwx/server';
-import { sessionStore } from '@/lib/authStores';
-import { TransactionUnion } from '@/types';
+import { Quasar, type Transaction } from '@tuwaio/quasar-sdk';
 
-const quasar = new Quasar({ secretKey: process.env.QUASAR_SDK_SK ?? '' });
+const quasar = new Quasar({ secretKey: process.env.QUASAR_SECRET_KEY ?? '' });
 
-export async function syncTransaction(tx: TransactionUnion) {
-  const session = await getSiwxServerSession({
-    cookieSource: await cookies(),
-    sessionStore,
-  });
-  if (!session) throw new Error('Unauthorized: No active session.');
-  if (tx.from && !isSessionMatchingTarget(session, tx.from, tx.chainId)) {
-    throw new Error('Forbidden: Session address mismatch.');
-  }
-
-  await quasar.pulsar.syncCreate(tx, 'My App');
-  return { success: true };
+export async function syncTransaction(tx: Transaction) {
+  const { txKey } = await quasar.pulsar.syncCreate(tx, 'my-app');
+  return txKey;
 }
 
-export async function getHistory(params: {
-  walletAddress: string;
-  page?: number;
-  limit?: number;
-  appName?: string;
-  chainId?: string;
-}) {
-  const session = await getSiwxServerSession({
-    cookieSource: await cookies(),
-    sessionStore,
-  });
-  if (!session || !isSessionMatchingTarget(session, params.walletAddress, params.chainId)) {
-    throw new Error('Unauthorized: Session address mismatch.');
-  }
-
-  return quasar.pulsar.getHistory(params);
+export async function getHistory(walletAddress: string, page = 1) {
+  return quasar.pulsar.getHistory({ walletAddress, page, limit: 10, appName: 'my-app' });
 }
 ```
 
-```ts
-// src/hooks/usePulsarStore.ts
-'use client';
+Before calling Quasar for a user, check on the server that the user owns the wallet (for example with `getSiwxServerSession` and `isSessionMatchingTarget` from `@tuwaio/siwx-server`), so nobody can sync or read the transactions of another address. The complete flow — SIWX sessions, the Pulsar callbacks `onRemoteCreate` and `beforeTxProcess`, the history in Nova Transactions — is the **[Quasar transaction sync guide](https://docs.tuwa.io/guides/quasar-transaction-sync)**; Quasar itself (apps and keys, quotas, webhooks, self-hosting) is described in the **[Quasar docs](https://docs.tuwa.io/quasar)**.
 
-import { createPulsarStore, createTxInMemoryStore, createBoundedUseStore } from '@tuwaio/sdk/pulsar';
-import { pulsarEvmAdapter } from '@tuwaio/evm-sdk/pulsar';
-import { pulsarSolanaAdapter } from '@tuwaio/solana-sdk/pulsar';
-import { preFlightTxCheck } from '@tuwaio/quasar-sdk';
+### Webhook relay
 
-import { getHistory, syncTransaction } from '@/app/actions';
-import { wagmiConfig, appEVMChains, solanaRPCUrls } from '@/configs/appConfig';
-import { TransactionUnion } from '@/types';
+Add a webhook endpoint with a `localhost` URL in the Quasar dashboard, put its signing secret in `.env.local` and start the relay next to your dev server:
 
-const storageName = 'transactions-tracking-storage';
-
-const initialStore = createPulsarStore<TransactionUnion>({
-  name: storageName,
-  adapter: [pulsarEvmAdapter(wagmiConfig, appEVMChains), pulsarSolanaAdapter({ rpcUrls: solanaRPCUrls })],
-  beforeTxProcess: async () => {
-    // Ensures we have a valid SIWX session and Quasar Cloud is reachable before executing blockchain logic
-    await preFlightTxCheck();
-  },
-  onRemoteCreate: async (tx) => {
-    try {
-      // Syncs the new transaction to Quasar via Next.js Server Actions
-      await syncTransaction(tx as TransactionUnion);
-    } catch (err) {
-      console.error('[PulsarHook] Remote sync failed:', err);
-    }
-  },
-});
-
-export const usePulsarStore = createBoundedUseStore(initialStore);
-
-// Wrap with inMemoryStore to enable remote history fetching & pagination
-const pulsarInMemoryStore = createTxInMemoryStore<TransactionUnion>({
-  localTransactionsPool: initialStore.getState().transactionsPool,
-  getHistory: async ({ page, walletAddress }) => {
-    try {
-      const history = await getHistory({ walletAddress, page, limit: 10, appName: 'My App' });
-
-      if (!history) return null;
-
-      return { ...history, docs: history.docs as TransactionUnion[] };
-    } catch (error) {
-      console.error('[PulsarHook] Failed to fetch history:', error);
-      throw error;
-    }
-  },
-  onHistoryFetched: async (remoteTxs) => {
-    await initialStore.getState().injectExternalPendingTxs(remoteTxs);
-  },
-});
-
-initialStore.subscribe((state) => pulsarInMemoryStore.getState().syncWithLocalPool(state.transactionsPool));
-
-export const usePulsarInMemoryStore = createBoundedUseStore(pulsarInMemoryStore);
+```bash
+# .env.local: QUASAR_WEBHOOK_SECRET=whsec_...
+npx @tuwaio/quasar-sdk listen --forward-to http://localhost:3000/api/webhooks/quasar
 ```
 
-### 4. Nova Transactions Provider (`NovaTransactionsProvider.tsx`)
+| Flag           | Short | Default                                                                           |
+| -------------- | ----- | --------------------------------------------------------------------------------- |
+| `--secret`     | `-s`  | `QUASAR_WEBHOOK_SECRET` from the environment or the `.env` file                   |
+| `--forward-to` | `-f`  | `QUASAR_WEBHOOK_FORWARD_TO`, else `http://localhost:3000/api/webhooks/quasar`     |
+| `--api-url`    | `-a`  | `NEXT_PUBLIC_QUASAR_BASE_URL` or `QUASAR_BASE_URL`, else `https://api.tuwa.io`    |
+| `--env-file`   | `-e`  | The first of `.env.local`, `.env.development` and `.env` in the working directory |
+| `--help`       | `-h`  |                                                                                   |
+| `--version`    | `-v`  |                                                                                   |
 
-```tsx
-// src/providers/NovaTransactionsProvider.tsx
-'use client';
-
-import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
-import { useInitializeTransactionsPool, type TxInMemoryPagination } from '@tuwaio/sdk/pulsar';
-import { getAdapterFromConnectorType } from '@tuwaio/sdk/orbit';
-import { NovaTransactionsProvider as NTP } from '@tuwaio/sdk/nova-transactions/providers';
-import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
-
-export function NovaTransactionsProvider({ pagination }: { pagination: TxInMemoryPagination }) {
-  const initialTx = usePulsarStore((state) => state.initialTx);
-  const closeTxTrackedModal = usePulsarStore((state) => state.closeTxTrackedModal);
-  const executeTxAction = usePulsarStore((state) => state.executeTxAction);
-  const initializeTransactionsPool = usePulsarStore((state) => state.initializeTransactionsPool);
-
-  const activeConnection = useSatelliteConnectStore((state) => state.activeConnection);
-  const getAdapter = usePulsarStore((state) => state.getAdapter);
-  const transactionsPool = usePulsarInMemoryStore((state) => state.transactionsPool);
-
-  useInitializeTransactionsPool({ initializeTransactionsPool });
-
-  return (
-    <NTP
-      transactionsPool={transactionsPool}
-      initialTx={initialTx}
-      closeTxTrackedModal={closeTxTrackedModal}
-      executeTxAction={executeTxAction}
-      connectedWalletAddress={activeConnection?.isConnected ? activeConnection.address : undefined}
-      connectedAdapterType={getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:')}
-      adapter={getAdapter()}
-      pagination={pagination}
-    />
-  );
-}
-```
-
-### 5. The Seamless UI Integration (`AppProviders.tsx`)
-
-```tsx
-// src/providers/AppProviders.tsx
-'use client';
-
-import { SatelliteConnectProvider, useSatelliteConnection } from '@tuwaio/sdk/satellite';
-import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
-import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
-import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
-import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
-import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
-import { useSiwx, useSiwxSession } from '@tuwaio/sdk/siwx';
-import { isSafeApp, getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
-
-import { appEVMChains, solanaRPCUrls, wagmiConfig } from '@/configs/appConfig';
-import { usePulsarInMemoryStore, usePulsarStore } from '@/hooks/usePulsarStore';
-import { NovaTransactionsProvider } from '@/providers/NovaTransactionsProvider';
-
-export function AppProviders({ children }: { children: React.ReactNode }) {
-  const getAdapter = usePulsarStore((state) => state.getAdapter);
-  const transactionsPool = usePulsarInMemoryStore((state) => state.transactionsPool);
-
-  const isLoading = usePulsarInMemoryStore((state) => state.isLoading);
-  const isError = usePulsarInMemoryStore((state) => state.isError);
-  const currentPage = usePulsarInMemoryStore((state) => state.currentPage);
-  const hasMore = usePulsarInMemoryStore((state) => state.hasMore);
-  const fetchNextPage = usePulsarInMemoryStore((state) => state.fetchNextPage);
-  const fetchInitial = usePulsarInMemoryStore((state) => state.fetchInitial);
-
-  const pagination = { isLoading, isError, currentPage, hasMore, fetchNextPage };
-
-  // Watch SIWX session to keep connection state aligned
-  const siwxSession = useSiwxSession();
-  const { signIn } = useSiwx();
-
-  return (
-    <SatelliteConnectProvider
-      adapter={[satelliteEVMAdapter(wagmiConfig, appEVMChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })]}
-      autoConnect={true}
-      callbackAfterConnected={async (connection) => {
-        const isEVM = getAdapterFromConnectorType(connection.connectorType) === OrbitAdapter.EVM;
-        if (isEVM && isSafeApp) return;
-
-        // Trigger SIWX flow
-        await signIn();
-
-        // Fetch history slightly after connection and sign-in
-        setTimeout(() => fetchInitial(connection.address), 2000);
-      }}
-    >
-      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} siwx={siwxSession} />
-      <SolanaConnectorsWatcher siwx={siwxSession} />
-
-      <NovaTransactionsProvider pagination={pagination} />
-
-      <NovaConnectProvider
-        appChains={appEVMChains}
-        solanaRPCUrls={solanaRPCUrls}
-        transactionPool={transactionsPool}
-        pulsarAdapter={getAdapter()}
-        withImpersonated
-        withBalance
-        withChain
-        pagination={pagination}
-      >
-        {children}
-      </NovaConnectProvider>
-    </SatelliteConnectProvider>
-  );
-}
-```
-
-### 6. Creating a Transaction (Usage)
-
-Now you can safely execute strictly-typed, cross-chain transactions anywhere in your app. The store automatically routes the transaction to the correct adapter, and Quasar syncs it to the cloud.
-
-```tsx
-// src/components/SwapButton.tsx
-'use client';
-
-import { getAdapterFromConnectorType, OrbitAdapter } from '@tuwaio/sdk/orbit';
-import { useSatelliteConnectStore } from '@tuwaio/sdk/satellite';
-import { TxActionButton } from '@tuwaio/sdk/nova-transactions';
-import { usePulsarStore, usePulsarInMemoryStore } from '@/hooks/usePulsarStore';
-import { AppTxType } from '@/types';
-
-export function SwapButton() {
-  const executeTxAction = usePulsarStore((s) => s.executeTxAction);
-  const getLastTxKey = usePulsarStore((s) => s.getLastTxKey);
-  const transactionsPool = usePulsarInMemoryStore((s) => s.transactionsPool);
-  const activeConnection = useSatelliteConnectStore((s) => s.activeConnection);
-
-  const handleSwapAction = async () => {
-    // Dynamically determine the adapter based on the currently connected wallet
-    const adapterType = getAdapterFromConnectorType(activeConnection?.connectorType ?? 'evm:');
-
-    await executeTxAction({
-      actionFunction: async () => {
-        /* your wagmi/solana contract call */
-      },
-      params: {
-        adapter: adapterType,
-        type: AppTxType.SWAP,
-        title: 'Token Swap',
-        desiredChainID: adapterType === OrbitAdapter.EVM ? 1 : undefined,
-        payload: { tokenIn: 'USDC', tokenOut: adapterType === OrbitAdapter.EVM ? 'ETH' : 'SOL', amount: 100 },
-      },
-    });
-  };
-
-  return (
-    <TxActionButton
-      action={handleSwapAction}
-      getLastTxKey={getLastTxKey}
-      transactionsPool={transactionsPool}
-      walletAddress={activeConnection?.address}
-    >
-      Cross-Chain Swap
-    </TxActionButton>
-  );
-}
-```
+The relay posts each delivery with the `x-quasar-signature`, `x-quasar-event` and `x-quasar-delivery-id` headers and the same body as a direct delivery, so your endpoint verifies the signature the same way. It reconnects with a backoff of up to 15 seconds and stops on a `401` (wrong secret) or `404` (no endpoint with that secret).
 
 ---
 
-## 📦 Available Namespaces
+## 🗄️ Browser Storage
 
-This package provides the following server-side utilities and React helpers:
+Nothing is written. `preFlightTxCheck` reads the SIWX session from the store of `@tuwaio/siwx-react`, which keeps it in `localStorage` under `siwx-react:session`.
 
-- `Quasar` — The main server-side client class instance used to access `quasar.pulsar.*` methods.
-- `preFlightTxCheck` — A client-side helper to ensure the user has a valid SIWX session and Quasar Cloud is reachable before prompting wallet signatures.
+## 🌐 External Services
+
+| Part                | Host                                                             | Request                                                                                                                                                             |
+| ------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Quasar` client     | `baseUrl` (default `https://api.tuwa.io`)                        | `POST /v1/engine/pulsar/sync` and `GET /v1/engine/pulsar/history`, with the secret key in the `x-tuwa-secret-key` header                                            |
+| `preFlightTxCheck`  | Its `customApiUrl` (default `https://api.tuwa.io`)               | `GET /v1/engine/monitoring/health`, without credentials                                                                                                             |
+| `quasar-sdk listen` | `--api-url` (default `https://api.tuwa.io`), then `--forward-to` | A Server-Sent Events stream from `/v1/engine/webhooks/listen` with the signing secret in the `x-webhook-secret` header; a `POST` to the local URL for each delivery |
+
+The transactions you sync, with their `payload`, are stored by Quasar.
 
 ---
 
-## 🤝 Contributing & Support
+## 📚 API Reference
 
-Contributions are welcome! Please read our main **[Contribution Guidelines](https://github.com/TuwaIO/workflows/blob/main/CONTRIBUTING.md)**.
-
-If you find this library useful, please consider supporting its development. Every contribution helps!
-
-[**➡️ View Support Options**](https://github.com/TuwaIO/workflows/blob/main/Donation.md)
+Every export, with signatures and types generated from the source, is documented at **[sdk.docs.tuwa.io/packages/quasar-sdk](https://sdk.docs.tuwa.io/packages/quasar-sdk)**. The HTTP API is described in the **[Quasar API reference](https://docs.tuwa.io/quasar/api)**.
 
 ## 📄 License
 
-This project is licensed under the **Apache-2.0 License** - see the [LICENSE](./LICENSE) file for details.
+Licensed under the **Apache-2.0 License**. See the [LICENSE](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/LICENSE) file for details.

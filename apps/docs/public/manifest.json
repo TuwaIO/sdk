@@ -1,7 +1,7 @@
 {
   "name": "TUWA SDK Documentation",
   "short_name": "TUWA SDK",
-  "description": "The official documentation for SDK of the TUWA Ecosystem.",
+  "description": "Documentation for the TUWA SDK packages.",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",

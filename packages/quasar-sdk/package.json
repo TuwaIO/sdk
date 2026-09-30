@@ -4,7 +4,7 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Layer 5 (L5) of the TUWA Ecosystem. The Quasar Cloud SDK providing server-side Node.js & Edge utilities for transaction indexing, billing, and backend API integration.",
+  "description": "Layer 5 (L5) of the TUWA Ecosystem. The client of the Quasar API (Quasar Cloud or a self-hosted Quasar server): transaction sync and history for Pulsar, and the quasar-sdk CLI that relays webhooks to localhost.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -14,6 +14,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
     }
   },
   "publishConfig": {
@@ -24,7 +29,6 @@
     "socket.json"
   ],
   "bin": {
-    "@tuwaio/quasar-sdk": "./dist/cli.cjs",
     "quasar-sdk": "./dist/cli.cjs"
   },
   "scripts": {
@@ -35,43 +39,21 @@
   "keywords": [
     "tuwa",
     "web3",
-    "evm",
-    "ethereum",
-    "solana",
-    "wagmi",
-    "viem",
-    "@solana/kit",
-    "wallet-standard",
-    "wallet",
-    "wallet-connect",
-    "wallets",
+    "quasar",
+    "quasar-cloud",
+    "pulsar",
     "transaction",
     "tracking",
     "transaction-tracking",
-    "react",
-    "ui",
-    "ui-kit",
-    "design-system",
-    "hooks",
-    "utils",
-    "components",
-    "tailwind",
-    "tailwindcss",
-    "typescript",
-    "core",
-    "headless",
-    "zustand",
-    "immer",
-    "i18n",
-    "modal",
-    "toast",
-    "quasar",
-    "cloud",
+    "transaction-history",
+    "webhooks",
+    "api-client",
     "sdk",
-    "next-auth",
-    "cosmos",
-    "playground",
-    "cli"
+    "cli",
+    "typescript",
+    "evm",
+    "solana",
+    "siwx"
   ],
   "repository": {
     "type": "git",
@@ -88,37 +70,22 @@
       "url": "https://github.com/Argeare5"
     }
   ],
+  "dependencies": {
+    "ofetch": "^1.5.1"
+  },
   "peerDependencies": {
     "@tuwaio/pulsar-core": ">=0.7",
-    "ofetch": "^1.5.1",
-    "@tuwaio/siwx-react": ">=0.3",
-    "@tuwaio/siwx-core": ">=0.3",
-    "@tuwaio/siwx-server": ">=0.3"
+    "@tuwaio/siwx-react": ">=0.3"
   },
   "peerDependenciesMeta": {
-    "@tuwaio/pulsar-core": {
-      "optional": false
-    },
-    "ofetch": {
-      "optional": false
-    },
-    "@tuwaio/siwx-core": {
-      "optional": true
-    },
-    "@tuwaio/siwx-server": {
-      "optional": true
-    },
     "@tuwaio/siwx-react": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@tuwaio/pulsar-core": "^0.8.0",
-    "ofetch": "^1.5.1",
+    "@tuwaio/pulsar-core": "^0.8.2",
     "tsup": "^8.5.1",
     "typescript": "6.0.3",
-    "@tuwaio/siwx-react": "^0.4.0",
-    "@tuwaio/siwx-core": "^0.4.0",
-    "@tuwaio/siwx-server": "^0.4.0"
+    "@tuwaio/siwx-react": "^0.4.0"
   }
 }

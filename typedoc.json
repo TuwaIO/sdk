@@ -1,22 +1,30 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["packages/quasar-sdk/src/index.ts"],
-  "entryPointStrategy": "expand",
+  "name": "@tuwaio/quasar-sdk",
+  "entryPoints": ["packages/quasar-sdk/src/index.ts", "packages/quasar-sdk/src/react/index.ts"],
+  "sortEntryPoints": false,
   "tsconfig": "tsconfig.json",
-  "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-react"],
-  "out": "apps/docs/src/content/apiReference",
-  "readme": "none",
-  "githubPages": false,
-  "hideGenerator": true,
-  "cleanOutputDir": true,
-  "categorizeByGroup": true,
-  "hideBreadcrumbs": true,
-  "externalSymbolLinkMappings": {
-    "@tuwaio/quasar-sdk": {
-      "QuasarClient": "#"
-    }
-  },
+  "exclude": ["**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"],
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "gitRevision": "main",
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "./apps/docs/typedoc/preserveTypeAnnotations.mjs",
+    "./apps/docs/typedoc/nextraRoutes.mjs"
+  ],
+  "out": "apps/docs/src/content/packages/quasar-sdk",
+  "publicPath": "/packages/quasar-sdk/",
+  "readme": "packages/quasar-sdk/README.md",
+  "mergeReadme": true,
+  "entryFileName": "index",
+  "excludeScopesInPaths": true,
   "pageTitleTemplates": {
     "member": "{name}"
-  }
+  },
+  "githubPages": false,
+  "hideGenerator": true,
+  "hideBreadcrumbs": true,
+  "hidePageHeader": true,
+  "cleanOutputDir": true
 }

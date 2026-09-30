@@ -1,12 +1,10 @@
 /**
- * @module scripts/generate-openapi
+ * @file Generates the OpenAPI 3.1 description of the endpoints of the Quasar API that `@tuwaio/quasar-sdk` calls, from
+ * Zod schemas checked against the Pulsar transaction types, with `@asteasolutions/zod-to-openapi`.
  *
- * Generates the OpenAPI v3.1 specification for the Quasar Cloud API.
- * Uses Zod schemas mirroring @tuwaio/quasar-sdk types and
- * @asteasolutions/zod-to-openapi for spec generation.
- *
- * Output: apps/docs/public/openapi.yaml
- * Run: pnpm generate:docs
+ * Output: `quasar-openapi.yaml` in the public folder of the docs hub checkout next to this repository
+ * (`../docs/apps/docs-hub/public/`), served at `docs.tuwa.io/quasar/api`. Pass another path as the first argument.
+ * Run: `pnpm openapi:gen`
  */
 
 import * as fs from 'node:fs';
@@ -22,7 +20,7 @@ import type {
   StarknetTransaction,
   Transaction,
 } from '@tuwaio/pulsar-core';
-import { TransactionStatus, TransactionTracker, UpdatableTransactionFields } from '@tuwaio/pulsar-core';
+import { TransactionStatus, TransactionTracker } from '@tuwaio/pulsar-core';
 import * as YAML from 'yaml';
 import { z } from 'zod';
 
@@ -41,13 +39,14 @@ extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
 
 // ---------------------------------------------------------------------------
-// Security: Iron Dome Auth
+// Security: secret key of a Quasar app
 // ---------------------------------------------------------------------------
-const ironDomeAuth = registry.registerComponent('securitySchemes', 'IronDomeAuth', {
+const secretKeyAuth = registry.registerComponent('securitySchemes', 'SecretKey', {
   type: 'apiKey',
   in: 'header',
   name: 'x-tuwa-secret-key',
-  description: 'Server-side secret key starting with `sk_live_`. Passed through the Iron Dome security perimeter.',
+  description:
+    'Secret key of the Quasar app (`sk_live_...` for a live app, `sk_test_...` for a test app). Send it from your server only.',
 });
 
 // ---------------------------------------------------------------------------
@@ -87,7 +86,7 @@ const BaseTransactionSchema = z.object({
   appName: z.string().optional(),
   chainId: z
     .union([z.number(), z.string()])
-    .openapi({ description: 'Chain identifier (e.g. 1 for Ethereum Mainnet, "SN_MAIN" for Starknet).' }),
+    .openapi({ description: 'EVM chain ID (1) or Solana cluster ("mainnet").' }),
   description: z
     .union([z.string(), z.tuple([z.string(), z.string(), z.string(), z.string()])])
     .optional()
@@ -110,11 +109,11 @@ const BaseTransactionSchema = z.object({
     .optional()
     .openapi({ description: 'User-facing title. Single string or [pending, success, error, replaced].' }),
   tracker: TransactionTrackerSchema,
-  txKey: z.string().openapi({ description: 'Unique transaction identifier assigned by Quasar.' }),
-  type: z.string().openapi({ description: 'Application-specific transaction category (e.g. "SWAP", "APPROVE").' }),
-  connectorType: z
+  txKey: z
     .string()
-    .openapi({ description: 'Connector used to sign the transaction (e.g. "injected", "walletConnect").' }),
+    .openapi({ description: 'Unique key of the transaction, set by Pulsar (for example the transaction hash).' }),
+  type: z.string().openapi({ description: 'Application-specific transaction category (e.g. "SWAP", "APPROVE").' }),
+  connectorType: z.string().openapi({ description: 'Connector type of the wallet, e.g. "evm:metamask".' }),
   requiredConfirmations: z.number().optional().openapi({ description: 'Number of confirmations required.' }),
   confirmations: z
     .union([z.number(), z.string(), z.null()])
@@ -166,7 +165,7 @@ const SolanaTransactionSchema = BaseTransactionSchema.extend({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _checkSolanaTx: z.ZodType<SolanaTransaction> = SolanaTransactionSchema;
 
-// --- Starknet Transaction ---
+// --- Starknet Transaction (reserved in pulsar-core; Quasar has no Starknet tracker) ---
 const StarknetTransactionSchema = BaseTransactionSchema.extend({
   adapter: z.literal(OrbitAdapter.Starknet),
   actualFee: z
@@ -174,7 +173,10 @@ const StarknetTransactionSchema = BaseTransactionSchema.extend({
     .optional()
     .openapi({ description: 'Actual fee paid for the transaction.' }),
   contractAddress: z.string().optional().openapi({ description: 'Contract address interacted with.' }),
-}).openapi('StarknetTransaction');
+}).openapi('StarknetTransaction', {
+  description:
+    'Reserved by the Pulsar types for a Starknet adapter. Neither Pulsar nor Quasar tracks Starknet transactions.',
+});
 
 // PHANTOM TYPE CHECK: Enforces 1:1 alignment with pulsar-core StarknetTransaction
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -199,55 +201,34 @@ const CreateTransactionRequestSchema = TransactionSchema.openapi('CreateTransact
 });
 registry.register('CreateTransactionRequest', CreateTransactionRequestSchema);
 
-const UpdateTransactionRequestSchema: z.ZodType<UpdatableTransactionFields> = z
-  .object({
-    txKey: z.string().openapi({ description: 'The unique transaction key to update.' }),
-    // Updatable EVM fields
-    to: HexStringSchema.optional(),
-    nonce: z.number().optional(),
-    pending: z.boolean().optional(),
-    hash: HexStringSchema.optional(),
-    status: TransactionStatusSchema.optional(),
-    replacedTxHash: HexStringSchema.optional(),
-    error: ErrorStateSchema.optional(),
-    finishedTimestamp: z.number().optional(),
-    isTrackedModalOpen: z.boolean().optional(),
-    isError: z.boolean().optional(),
-    maxPriorityFeePerGas: z.string().optional(),
-    maxFeePerGas: z.string().optional(),
-    input: HexStringSchema.optional(),
-    value: z.string().optional(),
-    confirmations: z.union([z.number(), z.string(), z.null()]).optional(),
-    requiredConfirmations: z.number().optional(),
-    // Updatable Solana fields
-    slot: z.number().optional(),
-    fee: z.number().optional(),
-    instructions: z.array(z.unknown()).optional(),
-    recentBlockhash: z.string().optional(),
-    rpcUrl: z.string().optional(),
-    syncStatus: z.enum(['synced', 'pending-sync']).optional(),
-  })
-  .openapi('UpdateTransactionRequest', {
-    description:
-      'Request body for updating an existing transaction. Only `txKey` is required; all other fields are optional patches.',
-  });
-registry.register('UpdateTransactionRequest', UpdateTransactionRequestSchema);
-
 // --- Response schemas ---
 const SuccessCreateResponseSchema = z
   .object({
     success: z.literal(true),
-    txKey: z.string().openapi({ description: 'The unique key assigned to the synced transaction.' }),
+    txKey: z.string().openapi({ description: 'Key of the synced transaction.' }),
+    mode: z.enum(['fast', 'lazy']).openapi({
+      description:
+        '`fast`: tracking starts right away. `lazy`: queued, because the quota of the organization is used up.',
+    }),
+    duplicate: z.literal(true).optional().openapi({ description: 'Quasar already had this `txKey`; no new record.' }),
   })
   .openapi('SuccessCreateResponse');
 registry.register('SuccessCreateResponse', SuccessCreateResponseSchema);
 
-const SuccessResponseSchema = z
+const HealthResponseSchema = z
   .object({
-    success: z.literal(true),
+    success: z.boolean(),
+    status: z.string().openapi({ description: '`operational`, or `degraded_replica` when the read replica is down.' }),
+    database: z.string(),
+    readReplica: z.string(),
+    redis: z.string(),
+    workers: z.string(),
+    workerBacklog: z.number(),
+    latency: z.string(),
+    timestamp: z.string(),
   })
-  .openapi('SuccessResponse');
-registry.register('SuccessResponse', SuccessResponseSchema);
+  .openapi('HealthResponse');
+registry.register('HealthResponse', HealthResponseSchema);
 
 const PaginatedHistoryResponseSchema = z
   .object({
@@ -265,7 +246,8 @@ registry.register('PaginatedHistoryResponse', PaginatedHistoryResponseSchema);
 
 const ErrorResponseSchema = z
   .object({
-    error: z.string().openapi({ description: 'Human-readable error message.' }),
+    error: z.string().optional().openapi({ description: 'Error message.' }),
+    message: z.string().optional().openapi({ description: 'Error message (NestJS errors).' }),
   })
   .openapi('ErrorResponse');
 registry.register('ErrorResponse', ErrorResponseSchema);
@@ -277,10 +259,11 @@ registry.register('ErrorResponse', ErrorResponseSchema);
 registry.registerPath({
   method: 'post',
   path: PULSAR_SYNC_ENDPOINT,
-  summary: 'Sync a new pending transaction',
-  description: 'Creates a new transaction entry in the Quasar Cloud. The full transaction object is required.',
-  tags: ['Pulsar Engine'],
-  security: [{ [ironDomeAuth.name]: [] }],
+  summary: 'Sync a transaction',
+  description:
+    'Sends a transaction created by Pulsar to Quasar, which tracks it on the server until it reaches a final status and then sends the webhooks of the app. Used by `quasar.pulsar.syncCreate`.',
+  tags: ['Pulsar'],
+  security: [{ [secretKeyAuth.name]: [] }],
   request: {
     body: {
       content: {
@@ -293,19 +276,27 @@ registry.registerPath({
   },
   responses: {
     200: {
-      description: 'Transaction synced successfully.',
+      description: 'Synced; tracking started (`mode: fast`).',
       content: { 'application/json': { schema: SuccessCreateResponseSchema } },
     },
+    202: {
+      description: 'Synced; tracking queued (`mode: lazy`).',
+      content: { 'application/json': { schema: SuccessCreateResponseSchema } },
+    },
+    400: {
+      description: 'The body is not a valid transaction or exceeds the safety limits.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
     401: {
-      description: 'Authentication failed — invalid or missing secret key.',
+      description: 'Missing or invalid key.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
     403: {
-      description: 'Forbidden — key lacks required scope.',
+      description: 'Public key (read-only), disabled app, or IP address or origin not allowed by the app settings.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
-    422: {
-      description: 'Validation error — malformed request body.',
+    429: {
+      description: 'Too many requests per second for the app.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
   },
@@ -314,18 +305,33 @@ registry.registerPath({
 registry.registerPath({
   method: 'get',
   path: PULSAR_HISTORY_ENDPOINT,
-  summary: 'Retrieve transaction history',
+  summary: 'Read the transaction history',
   description:
-    'Returns paginated transaction history with optional filters for chain, status, and specific transaction key.',
-  tags: ['Pulsar Engine'],
-  security: [{ [ironDomeAuth.name]: [] }],
+    'Returns the transactions of the app, newest first, filtered by every given filter. Used by `quasar.pulsar.getHistory`.',
+  tags: ['Pulsar'],
+  security: [{ [secretKeyAuth.name]: [] }],
   request: {
     query: z.object({
       page: z.coerce.number().optional().default(1).openapi({ description: 'Page number (1-indexed).', example: 1 }),
-      limit: z.coerce.number().optional().default(10).openapi({ description: 'Results per page.', example: 10 }),
-      chainId: z.string().optional().openapi({ description: 'Filter by chain ID.', example: '1' }),
-      status: z.string().optional().openapi({ description: 'Filter by transaction status.', example: 'Success' }),
-      txKey: z.string().optional().openapi({ description: 'Filter by specific transaction key.' }),
+      limit: z.coerce
+        .number()
+        .optional()
+        .default(10)
+        .openapi({ description: 'Transactions per page, at most 100.', example: 10 }),
+      walletAddress: z
+        .string()
+        .optional()
+        .openapi({ description: 'Sender address, compared exactly as it was synced.' }),
+      chainId: z.string().optional().openapi({ description: 'Chain of the transactions.', example: '1' }),
+      status: z
+        .string()
+        .optional()
+        .openapi({ description: 'Final status: `Success`, `Failed` or `Replaced`.', example: 'Success' }),
+      txKey: z.string().optional().openapi({ description: 'Key of one transaction.' }),
+      appName: z
+        .string()
+        .optional()
+        .openapi({ description: 'Application name passed when the transaction was synced.' }),
     }),
   },
   responses: {
@@ -334,8 +340,33 @@ registry.registerPath({
       content: { 'application/json': { schema: PaginatedHistoryResponseSchema } },
     },
     401: {
-      description: 'Authentication failed.',
+      description: 'Missing or invalid key.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    402: {
+      description: 'The quota of the organization is used up.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    429: {
+      description: 'Too many requests per second for the app.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/v1/engine/monitoring/health',
+  summary: 'Check the health of the API',
+  description: 'Public, without a key. Used by `preFlightTxCheck` from `@tuwaio/quasar-sdk/react`.',
+  tags: ['Monitoring'],
+  responses: {
+    200: {
+      description: 'The database and Redis respond.',
+      content: { 'application/json': { schema: HealthResponseSchema } },
+    },
+    503: {
+      description: 'The primary database or Redis does not respond.',
     },
   },
 });
@@ -348,10 +379,10 @@ const generator = new OpenApiGeneratorV31(registry.definitions);
 const document = generator.generateDocument({
   openapi: '3.1.0',
   info: {
-    title: 'Quasar Cloud API',
+    title: 'Quasar API',
     version: '1.0.0',
     description:
-      'The Quasar Cloud API powers the TUWA SDK, providing endpoints for blockchain transaction lifecycle management — syncing, updating, and querying transactions across EVM, Solana, and Starknet chains. All requests are authenticated through the Iron Dome security perimeter.',
+      'The endpoints of the Quasar API that `@tuwaio/quasar-sdk` calls: syncing Pulsar transactions (EVM and Solana), which Quasar then tracks on the server, and reading their history. Quasar Cloud serves it at `https://api.tuwa.io`; a self-hosted Quasar server serves the same endpoints at its own URL.',
     contact: {
       name: 'TUWA Team',
       url: 'https://github.com/TuwaIO',
@@ -364,21 +395,32 @@ const document = generator.generateDocument({
   servers: [
     {
       url: BASE_API_URL,
-      description: 'Production',
+      description: 'Quasar Cloud',
     },
   ],
   tags: [
     {
-      name: 'Pulsar Engine',
-      description: 'Transaction sync and history endpoints.',
+      name: 'Pulsar',
+      description: 'Transaction sync and history.',
+    },
+    {
+      name: 'Monitoring',
+      description: 'Health of the API.',
     },
   ],
 });
 
 const yamlOutput = YAML.stringify(document, { lineWidth: 120 });
-const outputPath = path.resolve(__dirname, '..', 'apps', 'docs', 'public', 'openapi.yaml');
+const outputPath = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.resolve(__dirname, '..', '..', 'docs', 'apps', 'docs-hub', 'public', 'quasar-openapi.yaml');
 
-fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+if (!fs.existsSync(path.dirname(outputPath))) {
+  console.error(
+    `✖ ${path.dirname(outputPath)} does not exist. Clone TuwaIO/docs next to this repository or pass a path.`,
+  );
+  process.exit(1);
+}
 fs.writeFileSync(outputPath, yamlOutput, 'utf-8');
 
 console.log(`✅ OpenAPI spec generated → ${path.relative(process.cwd(), outputPath)}`);

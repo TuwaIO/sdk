@@ -1,65 +1,65 @@
 /**
- * @module types
- * @description Shared type definitions for the Quasar SDK.
- * Contains configuration interfaces, query parameters, and authentication structures.
+ * @file Configuration, query and response types of the Quasar client, and the Pulsar transaction types it syncs.
  */
 
 /**
- * Configuration options for initializing the {@link Quasar} SDK client.
- *
- * @public
+ * Options of the {@link Quasar} client.
  */
 export interface QuasarConfig {
-  /** Your secret API key starting with `sk_live_`. */
+  /**
+   * Secret key of your Quasar app (`sk_live_...` for a live app, `sk_test_...` for a test app), sent in the
+   * `x-tuwa-secret-key` header of every request. Keep it on the server.
+   */
   secretKey: string;
-  /** Optional internal secret for system-to-system communication. */
+  /**
+   * Secret of the internal endpoints of a Quasar deployment, sent in the `x-internal-secret` header when set. The
+   * Quasar dashboard uses it to call its own server; apps leave it unset.
+   */
   internalSecret?: string;
-  /** The base URL of the Quasar Cloud API. Defaults to 'https://api.tuwa.io'. */
+  /** Base URL of the Quasar API: Quasar Cloud or your self-hosted server. Defaults to {@link BASE_API_URL}. */
   baseUrl?: string;
-  /** Request timeout in milliseconds. Defaults to 10000. */
+  /** Request timeout in milliseconds. Defaults to `10000`. */
   timeout?: number;
 }
 
 /**
- * Query parameters for filtering and paginating transaction history.
- *
- * @public
+ * Filters and pagination of {@link PulsarModule.getHistory}. Every filter is optional; the API returns the
+ * transactions of your app that match all given filters.
  */
 export interface HistoryQuery {
-  /** Page number for pagination (1-indexed). */
+  /** Page number, starting at 1. Defaults to `1`. */
   page?: number;
-  /** Maximum number of results to return per page. */
+  /** Number of transactions per page. Defaults to `10`. */
   limit?: number;
-  /** Filter by blockchain chain ID (e.g., 1, 'solana'). */
+  /** Chain of the transactions: an EVM chain ID (`1`) or a Solana cluster (`'mainnet'`). */
   chainId?: string | number;
-  /** Filter by transaction status (e.g., 'Success', 'Failed'). */
+  /** Final status of the transactions (`'Success'`, `'Failed'` or `'Replaced'`, see `TransactionStatus`). */
   status?: string;
-  /** Filter by a specific Quasar transaction key. */
+  /** Key of one transaction (`txKey` of the Pulsar transaction). */
   txKey?: string;
-  /** Filter by the application name. */
+  /** Application name that was passed to {@link PulsarModule.syncCreate}. */
   appName?: string;
-  /** Filter by the sender's wallet address. */
+  /** Address of the wallet that sent the transactions. */
   walletAddress?: string;
 }
 
 /**
- * Generic wrapper for paginated API responses.
+ * One page of results.
  *
- * @typeParam T - The type of the documents contained in the result set.
- * @public
+ * @typeParam T - Type of the documents on the page.
  */
 export interface PaginatedResult<T> {
-  /** Array of documents for the current page. */
+  /** Documents of the current page. */
   docs: T[];
-  /** Total number of documents matching the query. */
+  /** Number of documents that match the query. */
   totalDocs: number;
-  /** Total number of available pages. */
+  /** Number of pages. */
   totalPages: number;
-  /** The current page number (1-indexed). */
+  /** Current page number, starting at 1. */
   page: number;
-  /** Indicates if a subsequent page is available. */
+  /** Whether a next page exists. */
   hasNextPage: boolean;
-  /** Indicates if a preceding page is available. */
+  /** Whether a previous page exists. */
   hasPrevPage: boolean;
 }
 

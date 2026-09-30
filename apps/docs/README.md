@@ -1,113 +1,96 @@
-# TUWA SDK - Documentation Site
+# TUWA SDK — Documentation Site
 
-> 🔴 **Private Repository:** This repository contains the source code for the official TUWA SDK documentation website, available at **[sdk.docs.tuwa.io](https://sdk.docs.tuwa.io)**.
+Source of the official TUWA SDK documentation at **[sdk.docs.tuwa.io](https://sdk.docs.tuwa.io)**. It covers `@tuwaio/sdk`, `@tuwaio/evm-sdk`, `@tuwaio/solana-sdk` and `@tuwaio/quasar-sdk`.
 
-## About This Project
-
-This project houses the official documentation for the entire **TUWA SDK** ecosystem. It's built using **Next.js** with the **Nextra** documentation theme (`nextra-theme-docs`), a powerful framework that allows us to write content in **MDX** (Markdown with JSX) and generate a fast, searchable, and user-friendly static website]/page.jsx].
-
-The goal is to provide clear, comprehensive, and easy-to-navigate documentation for all packages within the `@tuwaio/sdk` monorepo.
+The site follows the TUWA **Packages** layout used by Orbit Utils, SIWX, Satellite Connect and Pulsar: a hand-written Introduction plus one page per npm package. Guides that combine several TUWA projects (the full-stack React app, Quasar sync) and the Quasar documentation live in the docs hub at [docs.tuwa.io](https://docs.tuwa.io).
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Framework**: Next.js 16+
-- **Documentation Theme**: Nextra 4+ (`nextra`, `nextra-theme-docs`)
-- **Styling**: Tailwind CSS 4+ with PostCSS and TUWA's `@tuwaio/nova-core` styles.
-- **UI Components**: React 19+, Headless UI (`@headlessui/react`), Heroicons (`@heroicons/react`).
-- **Code Highlighting**: `react-syntax-highlighter`.
-- **State/Theme Management**: `next-themes` for dark/light mode.
-- **Client-Side Search**: Pagefind (integrated via `postbuild` script).
-- **Deployment**: Vercel.
+- **Framework:** Next.js 16 (App Router)
+- **Docs theme:** Nextra 4 (`nextra`, `nextra-theme-docs`)
+- **Shared TUWA UI:** `@tuwaio/docs-ui` (navbar, footer, logo, design tokens)
+- **Styling:** Tailwind CSS 4
+- **Search:** Pagefind (built in the `postbuild` step)
+- **Reference generation:** TypeDoc + `typedoc-plugin-markdown`, plus two local plugins and a page script in [`typedoc/`](./typedoc)
+- **Deployment:** Vercel
 
 ---
 
 ## 🚀 Getting Started
 
-To run the documentation website locally, follow these steps.
-
-### 1. Prerequisites
-
-Ensure you have installed all dependencies from the **root of the monorepo** using `pnpm`:
+Install dependencies from the **monorepo root** (this also builds all packages through the root `postinstall` script):
 
 ```bash
-# Run from the monorepo root (tuwaio/orbit/), not from apps/docs/
 pnpm install
 ```
 
-This command installs dependencies for all packages in the workspace, including the necessary build steps (`postinstall` script in root `package.json`).
-
-### 2. Running the Dev Server
-
-Run the following command from the **root of the monorepo** to start the Next.js development server for the docs site using Turbopack:
+Start the dev server from the monorepo root:
 
 ```bash
 pnpm --filter @tuwaio/sdk-docs dev
 ```
 
-_(Note: The filter `@tuwaio/sdk-docs` targets this specific application based on its `name` in `apps/docs/package.json`)_
-
-The documentation site will then be available, typically at **[http://localhost:3000](http://localhost:3000)**. The site uses `nextjs-toploader` for a loading bar during navigation.
+The site runs at **[http://localhost:3000](http://localhost:3000)**.
 
 ---
 
-## ✍️ How to Add and Edit Content
+## 🗂 Content Structure
 
-Content creation leverages Nextra's file-based routing and MDX capabilities.
-
-### Creating Pages
-
-All documentation pages are **MDX files** (`.mdx` or `.jsx` if primarily components) located within the `src/content` directory. The structure of files and folders here directly maps to the URL paths on the site.
-
-- `src/content/index.mdx` → `/`
-- `src/content/apiReference/quasar-sdk/src/index.md` → `/apiReference/quasar-sdk/src/` (Note: `.md` files from TypeDoc are also used here)
-
-### Managing Sidebar Navigation
-
-Sidebar navigation, page titles, and grouping are primarily controlled by `_meta.jsx` files within each content directory. These files export a default object defining the structure.
-
-**Example: `src/content/_meta.jsx`**
-
-```jsx
-export default {
-  index: 'Introduction', // Maps index.mdx to 'Introduction' title
-  '--': {
-    // Creates a visual separator
-    type: 'separator',
-  },
-  apiReference: 'API reference', // Maps the apiReference folder
-};
+```
+apps/docs/
+├── src/content/
+│   ├── _meta.tsx              # Sidebar: Introduction, Packages, Guides and Quasar (links to docs.tuwa.io)
+│   ├── index.mdx              # Introduction (hand-written)
+│   └── packages/              # GENERATED — do not edit by hand
+│       ├── _meta.tsx          # Copied from typedoc/meta/_meta.tsx
+│       ├── index.md           # Packages overview (typedoc/packages-overview.md)
+│       ├── sdk/index.md       # README of @tuwaio/sdk
+│       ├── evm-sdk/index.md   # README of @tuwaio/evm-sdk
+│       ├── solana-sdk/index.md # README of @tuwaio/solana-sdk
+│       └── quasar-sdk/        # TypeDoc output
+│           ├── index.md       # Package README + list of modules
+│           ├── server/        # Exports of `@tuwaio/quasar-sdk`
+│           └── react/         # Exports of `@tuwaio/quasar-sdk/react`
+└── typedoc/
+    ├── meta/                      # Sidebar labels, copied over the generated tree (same relative paths)
+    ├── packages-overview.md       # Intro text of the /packages page
+    ├── packagePages.mjs           # Writes the overview page and the three README pages
+    ├── preserveTypeAnnotations.mjs # Keeps named library types from being inlined
+    └── nextraRoutes.mjs           # Rewrites `.../index.md` links to Nextra folder routes
 ```
 
-_(For deeper nesting, like API Reference, `_meta.json` or `_meta.jsx` files are used within those subdirectories as well)_.
+Hand-written pages are MDX files in `src/content`; the folder structure maps to URLs, and `_meta.tsx` files control sidebar titles and order. The **Introduction** (`index.mdx`) explains what the SDK is, where it fits in TUWA, its principles, the packages and the installation, and links to the package pages and guides instead of repeating code.
 
-### API Reference Generation
+---
 
-The API reference content within `src/content/apiReference` is automatically generated using **TypeDoc** with `typedoc-plugin-markdown`. The generation is triggered by the `docs:gen` script in the root `package.json` and runs automatically on pre-commit via Husky. Manual regeneration can be done by running `pnpm docs:gen` from the monorepo root.
+## 📦 Packages Pages
 
-### Using Custom Components
+Everything under `src/content/packages` is generated by `pnpm docs:gen` (run from the monorepo root; it also runs in the pre-commit hook):
 
-Custom React components enhance the documentation. They are located in `src/components` (e.g., `CodeBlock.tsx`, `PackageInstallationTabs.tsx`) and can be imported directly into MDX files. The site uses `src/mdx-components.ts` to merge Nextra's default components with custom ones. NoSSR component is used to prevent Server-Side Rendering issues for certain components.
+- **Re-export packages:** `@tuwaio/sdk`, `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` add no code of their own, and their exports are documented on the sites of the re-exported projects. Their page is their README, copied by `typedoc/packagePages.mjs`; each README lists its subpaths with a link to the reference behind every one of them.
+- **`@tuwaio/quasar-sdk`:** TypeDoc (root [`typedoc.json`](../../typedoc.json)) documents its two entry points, `src/index.ts` and `src/react/index.ts`. They are named with `@module` tags (`server`, `react`) because a folder named `index` cannot be served by Nextra; `typedoc/meta/quasar-sdk/` labels them with their import paths. The README becomes the package page, followed by the list of modules.
+- **Source of truth:** the package READMEs and the JSDoc in the source. Never edit the generated Markdown.
+- **README rules:** use absolute URLs for links (TypeDoc copies relative link targets into the output, and Nextra cannot render them), and do not hand-write lists of exports or signatures.
+- **Stable output:** source links point to `main`, members inherited from external types are excluded, and exports marked `@internal` are left out.
 
 ---
 
 ## 🚀 Deployment
 
-The documentation site is automatically deployed to **Vercel**.
-
-- **Production URL:** [**https://sdk.docs.tuwa.io**](https://sdk.docs.tuwa.io)
-- The client-side search index is generated by **Pagefind** during the `postbuild` step defined in `apps/docs/package.json` and requires no extra configuration on Vercel.
+The site is deployed to **Vercel**. The Pagefind search index is generated in the `postbuild` step of `apps/docs/package.json` and needs no extra configuration.
 
 ## 🔗 Quick Links
 
-| Resource                   | Link                                                           |
-| -------------------------- | -------------------------------------------------------------- |
-| **Live Docs Site**         | [**orbit.docs.tuwa.io**](https://orbit.docs.tuwa.io)           |
-| **Nextra Documentation**   | [`https://nextra.site/docs`](https://nextra.site/docs)         |
-| **Pagefind Documentation** | [`https://pagefind.app/`](https://pagefind.app/)               |
-| **Tailwind CSS Docs**      | [`https://tailwindcss.com/docs`](https://tailwindcss.com/docs) |
-| **TypeDoc Docs**           | [`https://typedoc.org/`](https://typedoc.org/)                 |
+| Resource                         | Link                                                               |
+| -------------------------------- | ------------------------------------------------------------------ |
+| **Live Docs Site**               | [sdk.docs.tuwa.io](https://sdk.docs.tuwa.io)                       |
+| **TUWA Guides**                  | [docs.tuwa.io/guides](https://docs.tuwa.io/guides)                 |
+| **Quasar Docs**                  | [docs.tuwa.io/quasar](https://docs.tuwa.io/quasar)                 |
+| **Nova UI Kit Storybook**        | [stories.tuwa.io](https://stories.tuwa.io/)                        |
+| **Nextra Documentation**         | [nextra.site/docs](https://nextra.site/docs)                       |
+| **TypeDoc Markdown Plugin Docs** | [typedoc-plugin-markdown.org](https://typedoc-plugin-markdown.org) |
 
 ## 📄 License
 

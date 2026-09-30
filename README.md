@@ -1,131 +1,133 @@
 # TUWA SDK
 
+[![License](https://img.shields.io/npm/l/@tuwaio/sdk.svg)](./LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/TuwaIO/sdk/release.yml?branch=main)](https://github.com/TuwaIO/sdk/actions)
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/TuwaIO/workflows/refs/heads/main/preview/repos/sdk.png" alt="TUWA SDK" width="450" style="border-radius: 12px; margin: 24px auto;" />
-</p>
+<img src="https://raw.githubusercontent.com/TuwaIO/workflows/refs/heads/main/preview/repos/sdk.png" alt="TUWA SDK" width="400" style="border-radius: 10px; text-align: center; margin-bottom: 20px; margin-top: 20px; margin-left: auto; margin-right: auto; display: block;" />
 
-> The official core SDKs and server-side Quasar client for the **TUWA Ecosystem**.
+The **TUWA SDK** is the shortest way to use TUWA in a React app. `@tuwaio/sdk` re-exports the client packages of Orbit Utils, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths, and its add-ons `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` add the chains your app uses. This repository also holds `@tuwaio/quasar-sdk`, the client of the Quasar API for your server.
 
----
-
-## Overview
-
-This monorepo contains the core TUWA SDKs — a production-grade toolkit for interacting with the TUWA ecosystem. It provides the unified packages that bundle Orbit, Pulsar, Satellite, and Nova UI into a single seamless installation point, alongside the server-side Quasar Cloud client.
-
-### Key Features
-
-- 🧩 **Unified Architecture** — Install `@tuwaio/sdk` and get all TUWA functionality out of the box.
-- ⚡ **Framework Agnostic** — Clean separation of EVM and Solana specific dependencies.
-- 🔐 **Iron Dome Protocol** — Server-side Quasar Cloud syncing via `@tuwaio/quasar-sdk`.
-- 📦 **Dual format** — Ships as both ESM and CJS (`tsup` powered).
-- 📖 **Auto-generated API docs** — TypeDoc → Markdown → Nextra docs site.
+📖 **Documentation:** [sdk.docs.tuwa.io](https://sdk.docs.tuwa.io)
 
 ---
 
 ## 🏛️ Ecosystem Layer Architecture
 
-| Layer  | Package                                                     | Description                                                                                                                                                       |
-| :----- | :---------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **L5** | **[`@tuwaio/quasar-sdk`](./packages/quasar-sdk/README.md)** | **Quasar Cloud Client (Server/Edge)** — Server-side Node.js & Edge SDK for transaction indexing, cloud sync, and signature verification.                          |
-| **L8** | **[`@tuwaio/sdk`](./packages/sdk/README.md)**               | **Core SDK (UI & Logic)** — Bundles framework-agnostic logic (Orbit, Pulsar, Satellite) and Nova UI components into subpath-only entrypoints.                     |
-| **L9** | **[`@tuwaio/evm-sdk`](./packages/evm-sdk/README.md)**       | **EVM Network Adapter SDK** — EVM-specific transports (Wagmi/Viem), connectors, and background state watchers (`EVMConnectorsWatcher`).                           |
-| **L9** | **[`@tuwaio/solana-sdk`](./packages/solana-sdk/README.md)** | **Solana Network Adapter SDK** — Solana-specific transports (@solana/kit/Wallet-Standard), connectors, and background state watchers (`SolanaConnectorsWatcher`). |
+TUWA is built in stages. The SDK is **Stage 5 (SDK Integration)**: it adds no logic of its own and packages the client projects of the stages below it — [Orbit Utils](https://orbit.docs.tuwa.io/) and [SIWX](https://siwx.docs.tuwa.io/) (Stage 1), [Satellite Connect](https://satellite.docs.tuwa.io/) and [Pulsar](https://pulsar.docs.tuwa.io/) (Stage 2), [Nova UI Kit](https://stories.tuwa.io/) (Stage 4). `@tuwaio/quasar-sdk` belongs to [Quasar](https://docs.tuwa.io/quasar) (Stage 3).
+
+### Layer 8: SDK (L8)
+
+- **[`@tuwaio/sdk`](./packages/sdk)**: Orbit, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths (`@tuwaio/sdk/pulsar`, `@tuwaio/sdk/nova-connect`, …) and the Nova stylesheets. The TUWA packages are dependencies; peer dependencies: `react`, `react-dom`.
+
+### Layer 9: Chain add-ons (L9)
+
+- **[`@tuwaio/evm-sdk`](./packages/evm-sdk)**: the EVM packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect. Peer dependencies: `@tuwaio/sdk`, `@wagmi/core`, `viem`.
+- **[`@tuwaio/solana-sdk`](./packages/solana-sdk)**: the Solana packages of the same projects. Peer dependencies: `@tuwaio/sdk`, `@solana/kit` and the `@wallet-standard` packages.
+
+### Layer 5: Quasar client (L5)
+
+- **[`@tuwaio/quasar-sdk`](./packages/quasar-sdk)**: the `Quasar` client for your server (transaction sync and history), the browser check `@tuwaio/quasar-sdk/react` and the `quasar-sdk` CLI that relays webhooks to `localhost`. Peer dependencies: `@tuwaio/pulsar-core`; `@tuwaio/siwx-react` for `/react`.
 
 ---
 
-## Repository Structure
+## 🔧 Monorepo Structure
 
 ```
 sdk/
-├── packages/
-│   ├── quasar-sdk/          # @tuwaio/quasar-sdk (L5 Cloud Client)
-│   ├── sdk/                 # @tuwaio/sdk (L8 Core SDK)
-│   ├── evm-sdk/             # @tuwaio/evm-sdk (L9 EVM Adapter SDK)
-│   └── solana-sdk/          # @tuwaio/solana-sdk (L9 Solana Adapter SDK)
 ├── apps/
-│   └── docs/                # Nextra-based documentation site
-├── typedoc.json             # TypeDoc config
-└── .github/workflows/       # CI: Release Please + npm publish
+│   └── docs/                   # sdk.docs.tuwa.io (Next.js 16 + Nextra 4)
+│       ├── src/content/        # Introduction (MDX) + generated `packages/` pages
+│       └── typedoc/            # TypeDoc plugins, Packages overview page, page script and sidebar templates
+├── packages/
+│   ├── sdk/                    # L8: re-exports of the TUWA client packages and the Nova stylesheets
+│   ├── evm-sdk/                # L9: re-exports of the EVM packages
+│   ├── solana-sdk/             # L9: re-exports of the Solana packages
+│   └── quasar-sdk/             # L5: Quasar API client (entry points ., ./react) and the quasar-sdk CLI
+├── scripts/generate-openapi.ts # OpenAPI description of the Quasar API, written to the docs hub
+└── typedoc.json                # Reference generation for @tuwaio/quasar-sdk
 ```
 
 ---
 
-## Installation
-
-### 1. Base SDK
-
-Install the core SDK and the required React peer dependencies:
+## 💾 Installation
 
 ```bash
+# React app
 pnpm add @tuwaio/sdk react react-dom
-```
 
-### 2. Network Adapters
+# EVM chains
+pnpm add @tuwaio/evm-sdk @wagmi/core viem
 
-Depending on your target blockchain, install the network-specific SDK and its Web3 singletons:
+# Solana
+pnpm add @tuwaio/solana-sdk @solana/kit @wallet-standard/react @wallet-standard/app @wallet-standard/base @wallet-standard/features @wallet-standard/ui @wallet-standard/ui-registry
 
-**For EVM:**
-
-```bash
-pnpm add @tuwaio/evm-sdk viem @wagmi/core
-```
-
-**For Solana:**
-
-```bash
-pnpm add @tuwaio/solana-sdk @solana/kit @wallet-standard/react @wallet-standard/app @wallet-standard/base @wallet-standard/features
-```
-
-### 3. Quasar Cloud Client (Server-side)
-
-The Quasar SDK requires `ofetch` and `@tuwaio/pulsar-core` (for type definitions) as peer dependencies.
-
-```bash
-pnpm add @tuwaio/quasar-sdk ofetch @tuwaio/pulsar-core
-```
-
-_Note: If you plan to use the client-side SIWX authentication hooks, you will also need `react` and the respective Web3 singletons for your target network (e.g. `viem` / `@solana/kit`)._
-
----
-
-## 🚀 Explore the SDKs (Examples & Guides)
-
-The true power of the TUWA SDKs is composability. Because the ecosystem is highly modular, each package has its own detailed documentation and integration examples.
-
-Dive into the specific READMEs below to see how to use them in detail:
-
-- **[Core SDK (`@tuwaio/sdk`)](./packages/sdk/README.md)** — The main client-side integration point. Shows how to combine EVM, Solana, and Nova UI.
-- **[Quasar Cloud SDK (`@tuwaio/quasar-sdk`)](./packages/quasar-sdk/README.md)** — The server-side backend client. Contains the **Full Architecture Example** showing how to sync transactions to the cloud securely via Headless SIWX and Next.js Server Actions.
-- **[EVM SDK (`@tuwaio/evm-sdk`)](./packages/evm-sdk/README.md)** — EVM-specific implementations and Wagmi adapters.
-- **[Solana SDK (`@tuwaio/solana-sdk`)](./packages/solana-sdk/README.md)** — Solana-specific implementations and @solana/kit/Wallet-Standard adapters.
-
----
-
-## Documentation
-
-The full documentation site lives at **[sdk.docs.tuwa.io](https://sdk.docs.tuwa.io/)**.
-
-### API Reference Generation
-
-API reference documentation is auto-generated from TypeDoc annotations using `typedoc-plugin-markdown`:
-
-```bash
-# Generate API reference pages
-pnpm docs:gen
+# Server that syncs transactions to Quasar
+pnpm add @tuwaio/quasar-sdk @tuwaio/pulsar-core
 ```
 
 ---
 
-## 🤝 Contributing & Support
+## 🚀 Architectural Usage Example
 
-Contributions are welcome! Please read our main **[Contribution Guidelines](https://github.com/TuwaIO/workflows/blob/main/CONTRIBUTING.md)**.
+The providers of a React app with EVM and Solana wallets and a connect button:
 
-If you find this library useful, please consider supporting its development. Every contribution helps!
+```tsx
+'use client';
 
-[**➡️ View Support Options**](https://github.com/TuwaIO/workflows/blob/main/Donation.md)
+import { EVMConnectorsWatcher } from '@tuwaio/evm-sdk/nova-connect';
+import { satelliteEVMAdapter } from '@tuwaio/evm-sdk/satellite';
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { ConnectButton } from '@tuwaio/sdk/nova-connect/components';
+import { SatelliteConnectProvider } from '@tuwaio/sdk/satellite';
+import { SolanaConnectorsWatcher } from '@tuwaio/solana-sdk/nova-connect';
+import { satelliteSolanaAdapter } from '@tuwaio/solana-sdk/satellite';
+import { createConfig, http, injected } from '@wagmi/core';
+import type { ReactNode } from 'react';
+import { mainnet } from 'viem/chains';
+
+const appChains = [mainnet] as const;
+const solanaRPCUrls = { devnet: 'https://api.devnet.solana.com' };
+const wagmiConfig = createConfig({ chains: appChains, connectors: [injected()], transports: { [mainnet.id]: http() } });
+const adapters = [satelliteEVMAdapter(wagmiConfig, appChains), satelliteSolanaAdapter({ rpcUrls: solanaRPCUrls })];
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <SatelliteConnectProvider adapter={adapters} autoConnect>
+      <EVMConnectorsWatcher wagmiConfig={wagmiConfig} />
+      <SolanaConnectorsWatcher />
+      <NovaConnectProvider appChains={appChains} solanaRPCUrls={solanaRPCUrls}>
+        <ConnectButton />
+        {children}
+      </NovaConnectProvider>
+    </SatelliteConnectProvider>
+  );
+}
+```
+
+Transaction tracking, SIWX sign-in and Quasar sync are added in the **[Full-Stack React guide](https://docs.tuwa.io/guides/full-stack-react)**.
+
+---
+
+## 🛠️ Development
+
+```bash
+pnpm install                          # installs dependencies and builds all packages
+pnpm build                            # builds packages with tsup (ESM, CJS, types) and copies the Nova stylesheets
+pnpm test                             # runs vitest in every package
+pnpm lint                             # runs ESLint
+pnpm docs:gen                         # regenerates the Packages pages in apps/docs
+pnpm openapi:gen                      # writes the OpenAPI description of the Quasar API to ../docs (the docs hub)
+pnpm --filter @tuwaio/sdk-docs dev    # runs the docs site locally
+```
+
+The Packages pages are regenerated by the pre-commit hook: TypeDoc documents `@tuwaio/quasar-sdk` from its entry points and JSDoc, and the pages of the three re-export packages are their READMEs. The tests of `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` import the built `@tuwaio/sdk`: run `pnpm build` after changing it.
+
+---
+
+## 🤝 Contribution & Auditing
+
+Please review our ecosystem **[Contribution Guidelines](https://github.com/TuwaIO/workflows/blob/main/CONTRIBUTING.md)**.
 
 ## 📄 License
 
-This project is licensed under the **Apache-2.0 License** — see the [LICENSE](./LICENSE) file for details.
+Licensed under the **Apache-2.0 License**. See the [LICENSE](./LICENSE) file for details.

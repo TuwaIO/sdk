@@ -17,6 +17,8 @@ export default defineConfig([
       './src/nova-connect-components.ts',
       './src/nova-connect-hooks.ts',
       './src/nova-connect-i18n.ts',
+      './src/nova-connect-evm.ts',
+      './src/nova-connect-solana.ts',
       './src/nova-transactions.ts',
       './src/nova-transactions-providers.ts',
       './src/nova-core.ts',

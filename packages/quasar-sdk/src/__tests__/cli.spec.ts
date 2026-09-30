@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { DEFAULT_FORWARD_URL, handleSseMessage, parseArgs, parseEnvFile } from '../cli';
+import { buildListenRequest, DEFAULT_FORWARD_URL, handleSseMessage, parseArgs, parseEnvFile } from '../cli';
 
 describe('Quasar CLI - Webhook Local Dev Relay', () => {
   beforeEach(() => {
@@ -76,6 +76,20 @@ EMPTY_LINE=
       expect(parseArgs(['-h']).help).toBe(true);
       expect(parseArgs(['--version']).version).toBe(true);
       expect(parseArgs(['-v']).version).toBe(true);
+    });
+  });
+
+  describe('buildListenRequest', () => {
+    it('sends the signing secret in the x-webhook-secret header, not in the URL', () => {
+      const { url, init } = buildListenRequest({ apiUrl: 'https://api.tuwa.io/', secret: 'whsec_abc+/=' });
+
+      expect(url).toBe('https://api.tuwa.io/v1/engine/webhooks/listen');
+      expect(url).not.toContain('whsec_');
+      expect(init.headers).toEqual({
+        Accept: 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'x-webhook-secret': 'whsec_abc+/=',
+      });
     });
   });
 

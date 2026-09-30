@@ -7,6 +7,7 @@ export default defineConfig([
     format: ['cjs', 'esm'],
     entry: {
       index: './src/index.ts',
+      react: './src/react/index.ts',
     },
     sourcemap: false,
     splitting: true,
@@ -14,7 +15,11 @@ export default defineConfig([
     minify: true,
     clean: true,
     dts: true,
-    external: [...Object.keys(pkg.peerDependencies || {}), ...Object.keys(pkg.devDependencies || {})],
+    external: [
+      ...Object.keys(pkg.dependencies || {}),
+      ...Object.keys(pkg.peerDependencies || {}),
+      ...Object.keys(pkg.devDependencies || {}),
+    ],
   },
   {
     format: ['cjs'],

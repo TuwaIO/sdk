@@ -5,7 +5,7 @@
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
   "packageManager": "pnpm@12.8.1",
-  "description": "Monorepo for TUWA SDKs: Layer 5 (L5), Layer 8 (L8), and Layer 9 (L9) official server-side Node.js, Edge, and multi-chain frontend SDKs for the TUWA Ecosystem.",
+  "description": "Monorepo for the TUWA SDK: @tuwaio/sdk (L8) and its EVM and Solana add-ons (L9), which re-export the TUWA projects for React apps, and @tuwaio/quasar-sdk (L5), the client of the Quasar API.",
   "scripts": {
     "build": "pnpm --filter \"./packages/**\" build",
     "postinstall": "pnpm build",
@@ -14,8 +14,8 @@
     "format": "prettier --write .",
     "test": "pnpm --filter \"./packages/**\" test",
     "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && find . -name dist -type d -prune -exec rm -rf '{}' + && rm -rf .turbo",
-    "docs:gen": "typedoc",
-    "generate:docs": "tsx scripts/generate-openapi.ts",
+    "docs:gen": "rm -rf apps/docs/src/content/packages && typedoc && node apps/docs/typedoc/packagePages.mjs && cp -R apps/docs/typedoc/meta/. apps/docs/src/content/packages/",
+    "openapi:gen": "tsx scripts/generate-openapi.ts",
     "prepare": "husky"
   },
   "repository": {
@@ -33,7 +33,7 @@
     }
   ],
   "devDependencies": {
-    "@tuwaio/pulsar-core": "^0.8.0",
+    "@tuwaio/pulsar-core": "^0.8.2",
     "@tuwaio/orbit-core": "^0.3.1",
     "@types/node": "^26.6.3",
     "@asteasolutions/zod-to-openapi": "^9.1.0",
@@ -55,7 +55,6 @@
     "tsx": "^4.23.15",
     "typedoc": "^0.28.20",
     "typedoc-plugin-markdown": "^4.13.1",
-    "typedoc-plugin-react": "^0.1.0",
     "typescript": "6.0.3",
     "typescript-eslint": "^8.71.0",
     "yaml": "^2.9.1",

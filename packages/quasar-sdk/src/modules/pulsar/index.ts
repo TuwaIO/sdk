@@ -1,8 +1,5 @@
 /**
- * @module modules/pulsar
- * @description Pulsar Transaction Engine module.
- * Provides methods for syncing transaction states to the Quasar Cloud
- * and retrieving paginated transaction history.
+ * @file Pulsar module of the Quasar client: transaction sync and history.
  */
 
 import { PULSAR_HISTORY_ENDPOINT, PULSAR_SYNC_ENDPOINT } from '../../constants';
@@ -10,65 +7,47 @@ import type { QuasarClient } from '../../core/client';
 import type { HistoryQuery, PaginatedResult, Transaction } from '../../types';
 
 /**
- * Pulsar module — the transaction engine interface for Quasar Cloud.
- *
- * The `PulsarModule` handles the lifecycle of blockchain transactions within the Quasar ecosystem.
- * It allows developers to sync transaction states (EVM, Solana, Starknet) to the cloud for
- * persistent tracking and to retrieve comprehensive transaction histories.
- *
- * @remarks
- * Access this module via `quasar.pulsar` after initializing the {@link Quasar} SDK.
- * All methods are authenticated automatically using the configured secret key.
+ * Transaction sync and history of the Quasar API, available as `quasar.pulsar` on a {@link Quasar} client. Quasar
+ * tracks every synced transaction on the server until it reaches a final status, so the status survives a closed tab,
+ * and returns the history of your app for any device.
  *
  * @example
- * ```typescript
- * const quasar = new Quasar({ secretKey: 'sk_live_...' });
+ * ```ts
+ * import { Quasar, type Transaction } from '@tuwaio/quasar-sdk';
  *
- * // Sync a new transaction to start tracking
- * const { txKey } = await quasar.pulsar.syncCreate(transaction);
+ * const quasar = new Quasar({ secretKey: process.env.QUASAR_SECRET_KEY ?? '' });
  *
- * // Retrieve transaction history with filters
- * const history = await quasar.pulsar.getHistory({
- *   chainId: 1,
- *   status: 'Success',
- * });
+ * // Called by the `onRemoteCreate` callback of the Pulsar store (through a Server Action) with the new transaction.
+ * export async function syncTransaction(tx: Transaction) {
+ *   const { txKey } = await quasar.pulsar.syncCreate(tx, 'my-app');
+ *   return txKey;
+ * }
  * ```
  */
 export class PulsarModule {
   /**
-   * Creates a new PulsarModule instance.
+   * Creates the module. The {@link Quasar} client creates it for you.
    *
-   * @param client - The internal {@link QuasarClient} instance for making authenticated API calls.
+   * @param client - The HTTP client of the Quasar client.
    * @internal
    */
   constructor(private readonly client: QuasarClient) {}
 
   /**
-   * Syncs a newly created or pending transaction to the Quasar Cloud.
+   * Sends a new Pulsar transaction to Quasar, which starts tracking it on the server (`POST /v1/engine/pulsar/sync`).
+   * Sending a transaction with a `txKey` that Quasar already has does not create a second record: the response has
+   * `duplicate: true`.
    *
-   * This method sends the full transaction object to the Pulsar sync engine.
-   * Once synced, the transaction is indexed and tracked through the Iron Dome infrastructure.
-   *
-   * @param tx - The complete transaction object to sync. Must conform to the {@link Transaction} type.
-   * @param appName - Optional application name to associate with this transaction for filtering purposes.
-   * @returns A promise that resolves to an object containing the assigned `txKey`.
-   * @throws {QuasarSDKError} If the request fails due to authentication, validation, or network issues.
-   *
-   * @example
-   * ```typescript
-   * const result = await quasar.pulsar.syncCreate({
-   *   hash: '0xabc...',
-   *   chainId: 1,
-   *   status: 'pending',
-   *   from: '0x123...',
-   *   to: '0x456...',
-   *   // ... other transaction fields
-   * }, 'My Dashboard');
-   *
-   * console.log(result.txKey); // The unique key for this transaction
-   * ```
+   * @param tx - The transaction created by Pulsar, as passed to `onRemoteCreate` of `createPulsarStore`.
+   * @param appName - Application name saved with the transaction; filter the history by it with `appName`.
+   * @returns `txKey` of the transaction and the tracking `mode`: `fast` (tracked right away) or `lazy` (queued, for
+   *   example when the quota of the organization is used up).
+   * @throws {QuasarSDKError} On an invalid transaction (400), an invalid key (401, 403), a timeout or a network error.
    */
-  async syncCreate(tx: Transaction, appName?: string): Promise<{ success: true; txKey: string }> {
+  async syncCreate(
+    tx: Transaction,
+    appName?: string,
+  ): Promise<{ success: true; txKey: string; mode: 'fast' | 'lazy'; duplicate?: true }> {
     return this.client.request(PULSAR_SYNC_ENDPOINT, {
       method: 'POST',
       body: {
@@ -79,24 +58,17 @@ export class PulsarModule {
   }
 
   /**
-   * Retrieves a paginated list of transactions from the Quasar Cloud.
+   * Reads the transactions of your app, newest first (`GET /v1/engine/pulsar/history`).
    *
-   * Supports advanced filtering by chain, status, wallet address, and more.
-   * Results are returned in a typed {@link PaginatedResult} wrapper.
-   *
-   * @param query - Optional query parameters for filtering and pagination. See {@link HistoryQuery}.
-   * @returns A promise that resolves to a {@link PaginatedResult} containing an array of {@link Transaction} documents.
-   * @throws {QuasarSDKError} If the request fails (e.g., 401 Unauthorized, 404 Not Found).
+   * @param query - Filters and pagination. `walletAddress` is compared with the sender address exactly as it was
+   *   synced; the API returns at most 100 transactions per page.
+   * @returns One page of transactions.
+   * @throws {QuasarSDKError} On an invalid key (401, 403), a timeout or a network error.
    *
    * @example
-   * ```typescript
-   * const result = await quasar.pulsar.getHistory({
-   *   page: 1,
-   *   limit: 20,
-   *   walletAddress: '6x...',
-   * });
-   *
-   * result.docs.forEach(tx => console.log(tx.txKey, tx.status));
+   * ```ts
+   * const page = await quasar.pulsar.getHistory({ walletAddress: '0x...', page: 1, limit: 20 });
+   * page.docs.forEach((tx) => console.log(tx.txKey, tx.status));
    * ```
    */
   async getHistory(query: HistoryQuery = {}): Promise<PaginatedResult<Transaction>> {

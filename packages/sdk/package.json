@@ -4,7 +4,7 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Layer 8 (L8) of the TUWA Ecosystem. The Core SDK bundling logic and Nova UI components into clean subpath entrypoints.",
+  "description": "Layer 8 (L8) of the TUWA Ecosystem. One package for React apps: re-exports Orbit, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths, with their stylesheets. Add @tuwaio/evm-sdk or @tuwaio/solana-sdk for the chains.",
   "type": "module",
   "exports": {
     "./pulsar": {
@@ -41,6 +41,16 @@
       "types": "./dist/nova-connect-i18n.d.ts",
       "import": "./dist/nova-connect-i18n.js",
       "require": "./dist/nova-connect-i18n.cjs"
+    },
+    "./nova-connect/evm": {
+      "types": "./dist/nova-connect-evm.d.ts",
+      "import": "./dist/nova-connect-evm.js",
+      "require": "./dist/nova-connect-evm.cjs"
+    },
+    "./nova-connect/solana": {
+      "types": "./dist/nova-connect-solana.d.ts",
+      "import": "./dist/nova-connect-solana.js",
+      "require": "./dist/nova-connect-solana.cjs"
     },
     "./nova-transactions": {
       "types": "./dist/nova-transactions.d.ts",
@@ -132,12 +142,7 @@
     "i18n",
     "modal",
     "toast",
-    "quasar",
-    "cloud",
     "sdk",
-    "cosmos",
-    "playground",
-    "cli",
     "siwx"
   ],
   "repository": {
@@ -156,21 +161,20 @@
     }
   ],
   "dependencies": {
-    "@emotion/is-prop-valid": "^1.4.0",
     "@heroicons/react": "^2.2.0",
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-select": "^2.3.7",
-    "@tuwaio/nova-connect": "^0.7.0",
-    "@tuwaio/nova-core": "^0.7.0",
-    "@tuwaio/nova-transactions": "^0.7.0",
+    "@tuwaio/nova-connect": "^0.7.2",
+    "@tuwaio/nova-core": "^0.7.1",
+    "@tuwaio/nova-transactions": "^0.7.2",
     "@tuwaio/orbit-core": "^0.3.1",
-    "@tuwaio/pulsar-core": "^0.8.0",
-    "@tuwaio/pulsar-react": "^0.6.0",
-    "@tuwaio/satellite-core": "^0.6.1",
-    "@tuwaio/satellite-react": "^0.6.1",
+    "@tuwaio/pulsar-core": "^0.8.2",
+    "@tuwaio/pulsar-react": "^0.6.1",
+    "@tuwaio/satellite-core": "^0.6.2",
+    "@tuwaio/satellite-react": "^0.6.2",
     "@tuwaio/siwx-core": "^0.4.0",
     "@tuwaio/siwx-react": "^0.4.0",
-    "@tuwaio/siwx-server": "^0.4.0",
+    "@tuwaio/siwx-server": "^0.4.1",
     "@web3icons/common": "^0.11.51",
     "@web3icons/react": "^4.1.22",
     "clsx": "^2.1.1",
@@ -184,12 +188,49 @@
   },
   "peerDependencies": {
     "react": ">=19.2.3",
-    "react-dom": ">=19.2.3"
+    "react-dom": ">=19.2.3",
+    "@tuwaio/orbit-evm": ">=0.3",
+    "@tuwaio/orbit-solana": ">=0.3",
+    "@tuwaio/satellite-evm": ">=0.6",
+    "@tuwaio/satellite-solana": ">=0.6",
+    "@wagmi/core": "3.x.x",
+    "@wallet-standard/react": "1.x.x",
+    "viem": "2.x.x"
+  },
+  "peerDependenciesMeta": {
+    "@tuwaio/orbit-evm": {
+      "optional": true
+    },
+    "@tuwaio/orbit-solana": {
+      "optional": true
+    },
+    "@tuwaio/satellite-evm": {
+      "optional": true
+    },
+    "@tuwaio/satellite-solana": {
+      "optional": true
+    },
+    "@wagmi/core": {
+      "optional": true
+    },
+    "@wallet-standard/react": {
+      "optional": true
+    },
+    "viem": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@tuwaio/orbit-evm": "^0.3.2",
+    "@tuwaio/orbit-solana": "^0.3.3",
+    "@tuwaio/satellite-evm": "^0.6.1",
+    "@tuwaio/satellite-solana": "^0.6.1",
+    "@wagmi/core": "^3.6.5",
+    "@wallet-standard/react": "^1.0.3",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "tsup": "^8.5.1",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "viem": "^2.57.1"
   }
 }
