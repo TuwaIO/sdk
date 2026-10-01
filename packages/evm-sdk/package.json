@@ -85,7 +85,7 @@
   "dependencies": {
     "@tuwaio/orbit-evm": "^0.3.2",
     "@tuwaio/pulsar-evm": "^0.7.2",
-    "@tuwaio/satellite-evm": "^0.6.1",
+    "@tuwaio/satellite-evm": "^0.6.2",
     "@tuwaio/siwx-evm": "^0.4.1"
   },
   "peerDependencies": {
@@ -100,6 +100,6 @@
     "@wagmi/core": "^3.6.5",
     "tsup": "^8.5.1",
     "typescript": "6.0.3",
-    "viem": "^2.57.1"
+    "viem": "^2.57.2"
   }
 }
