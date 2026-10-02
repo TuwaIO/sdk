@@ -371,8 +371,8 @@ importers:
         specifier: ^2.3.7
         version: 2.3.7(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@tuwaio/nova-connect':
-        specifier: ^0.7.3
-        version: 0.7.3(42a96d35aa36c036f6accbe698c1a2cb)
+        specifier: ^0.7.4
+        version: 0.7.4(42a96d35aa36c036f6accbe698c1a2cb)
       '@tuwaio/nova-core':
         specifier: ^0.7.3
         version: 0.7.3(@radix-ui/react-dialog@1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@web3icons/common@0.11.52)(@web3icons/react@4.1.23(react@19.3.0))(clsx@2.1.1)(framer-motion@13.5.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)(tailwind-merge@3.7.0)
@@ -2709,13 +2709,13 @@ packages:
       nextra-theme-docs: '>=4.6'
       react: '>=19.2.3'
 
-  '@tuwaio/nova-connect@0.7.3':
-    resolution: {integrity: sha512-Cp4GTPK0LeJKF85YBQWPRY0bUTRP1HBgnBFfLUP1M+5AXFP11uC4CxOaMB5PEurSuo9ANMWHZSLKJiJKuvbDJQ==}
+  '@tuwaio/nova-connect@0.7.4':
+    resolution: {integrity: sha512-+yzVaDO22ShHDTDsVsvQfibcseo4TrZsQYMSRgbsnHDvEOm8L43FPNbVbc2vywcGRV490N6wSpFTq/oHEvaHrg==}
     peerDependencies:
       '@heroicons/react': 2.x.x
       '@radix-ui/react-select': 2.x.x
-      '@tuwaio/nova-core': ^0.7.2
-      '@tuwaio/nova-transactions': ^0.7.3
+      '@tuwaio/nova-core': ^0.7.3
+      '@tuwaio/nova-transactions': ^0.7.4
       '@tuwaio/orbit-core': '>=0.3'
       '@tuwaio/orbit-evm': '>=0.3'
       '@tuwaio/orbit-solana': '>=0.3'
@@ -3060,9 +3060,6 @@ packages:
 
   '@types/node@26.1.1':
     resolution: {integrity: sha512-nxAkRSVkN1Y0JC1W8ky/fTfkGsMmcrRsbx+3XoZE+rMOX71kLYTV7fLXpqud1GpbpP5TuffXFqfX7fH2GgZREw==}
-
-  '@types/node@26.6.3':
-    resolution: {integrity: sha512-dsqMQQoeTLqu9wynDD00q573mNzso3IdQOAfHRJqLCcmCFPoGo9A1bDpUcv/9tnKpErQWv9uKeGfl37EIS02Yg==}
 
   '@types/node@26.6.4':
     resolution: {integrity: sha512-ldVPDCzj7fsaGZrLB0NuHuTvJcsNasysBAqMolr/cgxrLd1xbqxIr3XJiPnHHJUCxj5sNF1vnRj9aWnrVh5Jcg==}
@@ -9027,7 +9024,7 @@ snapshots:
       - '@web3icons/react'
       - framer-motion
 
-  '@tuwaio/nova-connect@0.7.3(42a96d35aa36c036f6accbe698c1a2cb)':
+  '@tuwaio/nova-connect@0.7.4(42a96d35aa36c036f6accbe698c1a2cb)':
     dependencies:
       '@heroicons/react': 2.2.0(react@19.3.0)
       '@radix-ui/react-select': 2.3.7(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -9367,10 +9364,6 @@ snapshots:
   '@types/node@26.1.1':
     dependencies:
       undici-types: 8.3.0
-
-  '@types/node@26.6.3':
-    dependencies:
-      undici-types: 8.9.0
 
   '@types/node@26.6.4':
     dependencies:
@@ -11093,7 +11086,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 26.6.3
+      '@types/node': 26.6.4
       merge-stream: 2.0.0
       supports-color: 8.1.1
 

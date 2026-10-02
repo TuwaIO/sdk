@@ -164,7 +164,7 @@
     "@heroicons/react": "^2.2.0",
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-select": "^2.3.7",
-    "@tuwaio/nova-connect": "^0.7.3",
+    "@tuwaio/nova-connect": "^0.7.4",
     "@tuwaio/nova-core": "^0.7.3",
     "@tuwaio/nova-transactions": "^0.7.4",
     "@tuwaio/orbit-core": "^0.3.1",
