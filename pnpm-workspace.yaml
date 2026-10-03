@@ -56,3 +56,8 @@ minimumReleaseAgeExclude:
   - '@tuwaio/docs-ui@0.0.39'
   - '@web3icons/common@0.11.52'
   - '@web3icons/react@4.1.23'
+overrides:
+  # nextra-theme-docs 4.6.1 validates its Layout props with zod; with zod 4.4 and newer the validation rejects them
+  # ("expected nonoptional ... at children"). Scalar needs zod >= 4.4, so keep 4.3 for Nextra only.
+  nextra>zod: 4.3.6
+  nextra-theme-docs>zod: 4.3.6
