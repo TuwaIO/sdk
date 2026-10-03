@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.2.2...evm-sdk-v0.3.0) (2026-10-03)
+
+
+### Features
+
+* move to the genesis-hash Solana chain ID releases ([71f83c2](https://github.com/TuwaIO/sdk/commit/71f83c272dcc79d9b5d3b9d72617a96c822c661b))
+
 ## [0.2.2](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.2.1...evm-sdk-v0.2.2) (2026-10-02)
 
 
