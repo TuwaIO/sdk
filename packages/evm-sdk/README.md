@@ -21,7 +21,7 @@
 pnpm add @tuwaio/sdk @tuwaio/evm-sdk @wagmi/core viem react react-dom
 ```
 
-Peer dependencies: `@tuwaio/sdk` (the same release line), `@wagmi/core` (3.x), `viem` (2.x) and `@tuwaio/satellite-core` (>=0.6, a dependency of `@tuwaio/sdk`).
+Peer dependencies: `@tuwaio/sdk` (>=0.3, the same release line), `@wagmi/core` (3.x), `viem` (2.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
 
 | Import path                    | Re-exports                                         | Reference                                                                                 |
 | ------------------------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------------- |

@@ -25,8 +25,8 @@ pnpm add @tuwaio/quasar-sdk @tuwaio/pulsar-core
 
 | Import path                | Provides                                                                     | Peer dependencies                                        |
 | -------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `@tuwaio/quasar-sdk`       | `Quasar`, `PulsarModule`, `QuasarSDKError`, the endpoint constants and types | `@tuwaio/pulsar-core` (>=0.7), for the transaction types |
-| `@tuwaio/quasar-sdk/react` | `preFlightTxCheck`                                                           | Also `@tuwaio/siwx-react` (>=0.3, optional for the root) |
+| `@tuwaio/quasar-sdk`       | `Quasar`, `PulsarModule`, `QuasarSDKError`, the endpoint constants and types | `@tuwaio/pulsar-core` (>=0.9), for the transaction types |
+| `@tuwaio/quasar-sdk/react` | `preFlightTxCheck`                                                           | Also `@tuwaio/siwx-react` (>=0.5, optional for the root) |
 
 The root entry point imports neither React nor SIWX packages, so it runs in Node.js, Next.js Server Actions and route handlers, and Edge runtimes. Its HTTP client, `ofetch`, is a dependency.
 

@@ -33,8 +33,8 @@
     }
   ],
   "devDependencies": {
-    "@tuwaio/pulsar-core": "^0.8.3",
-    "@tuwaio/orbit-core": "^0.3.1",
+    "@tuwaio/pulsar-core": "^0.9.0",
+    "@tuwaio/orbit-core": "^0.4.0",
     "@types/node": "^26.6.4",
     "@asteasolutions/zod-to-openapi": "^9.1.0",
     "@eslint/js": "^10.0.1",

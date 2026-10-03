@@ -84,9 +84,10 @@ const HexStringSchema = z
 // --- Base Transaction ---
 const BaseTransactionSchema = z.object({
   appName: z.string().optional(),
-  chainId: z
-    .union([z.number(), z.string()])
-    .openapi({ description: 'EVM chain ID (1) or Solana cluster ("mainnet").' }),
+  chainId: z.union([z.number(), z.string()]).openapi({
+    description:
+      'EVM chain ID (1), or for Solana the CAIP-2 chain ID with the genesis hash ("solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp", Pulsar 0.9 and later); transactions synced by older Pulsar versions carry "solana:mainnet".',
+  }),
   description: z
     .union([z.string(), z.tuple([z.string(), z.string(), z.string(), z.string()])])
     .optional()
@@ -321,8 +322,12 @@ registry.registerPath({
       walletAddress: z
         .string()
         .optional()
-        .openapi({ description: 'Sender address, compared exactly as it was synced.' }),
-      chainId: z.string().optional().openapi({ description: 'Chain of the transactions.', example: '1' }),
+        .openapi({ description: 'Sender address. EVM addresses match in any letter case, Solana addresses exactly.' }),
+      chainId: z.string().optional().openapi({
+        description:
+          'Chain of the transactions: an EVM chain ID, or a Solana chain ID in either form ("solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp" or "solana:mainnet"), which match the same cluster.',
+        example: '1',
+      }),
       status: z
         .string()
         .optional()

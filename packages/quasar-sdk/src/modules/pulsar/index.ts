@@ -60,8 +60,9 @@ export class PulsarModule {
   /**
    * Reads the transactions of your app, newest first (`GET /v1/engine/pulsar/history`).
    *
-   * @param query - Filters and pagination. `walletAddress` is compared with the sender address exactly as it was
-   *   synced; the API returns at most 100 transactions per page.
+   * @param query - Filters and pagination. `walletAddress` matches EVM addresses in any letter case and Solana
+   *   addresses exactly; a Solana `chainId` matches its cluster under both chain ID forms. The API returns at most 100
+   *   transactions per page.
    * @returns One page of transactions.
    * @throws {QuasarSDKError} On an invalid key (401, 403), a timeout or a network error.
    *

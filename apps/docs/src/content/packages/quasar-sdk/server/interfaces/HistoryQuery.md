@@ -11,7 +11,7 @@ transactions of your app that match all given filters.
 
 > `optional` **appName?**: `string`
 
-Defined in: [types.ts:41](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L41)
+Defined in: [types.ts:46](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L46)
 
 Application name that was passed to [PulsarModule.syncCreate](/packages/quasar-sdk/server/classes/PulsarModule.md#synccreate).
 
@@ -21,9 +21,12 @@ Application name that was passed to [PulsarModule.syncCreate](/packages/quasar-s
 
 > `optional` **chainId?**: `string` \| `number`
 
-Defined in: [types.ts:35](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L35)
+Defined in: [types.ts:40](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L40)
 
-Chain of the transactions: an EVM chain ID (`1`) or a Solana cluster (`'mainnet'`).
+Chain of the transactions: an EVM chain ID (`1`), or a Solana chain ID — the CAIP-2 chain ID with the genesis hash
+that Pulsar 0.9 saves (`'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp'`, `SOLANA_CHAIN_IDS.mainnet` of
+`@tuwaio/orbit-core`) or `'solana:mainnet'`. The API matches a Solana cluster under both forms, so transactions
+synced by older Pulsar versions are found too.
 
 ***
 
@@ -51,7 +54,7 @@ Page number, starting at 1. Defaults to `1`.
 
 > `optional` **status?**: `string`
 
-Defined in: [types.ts:37](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L37)
+Defined in: [types.ts:42](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L42)
 
 Final status of the transactions (`'Success'`, `'Failed'` or `'Replaced'`, see `TransactionStatus`).
 
@@ -61,7 +64,7 @@ Final status of the transactions (`'Success'`, `'Failed'` or `'Replaced'`, see `
 
 > `optional` **txKey?**: `string`
 
-Defined in: [types.ts:39](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L39)
+Defined in: [types.ts:44](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L44)
 
 Key of one transaction (`txKey` of the Pulsar transaction).
 
@@ -71,6 +74,6 @@ Key of one transaction (`txKey` of the Pulsar transaction).
 
 > `optional` **walletAddress?**: `string`
 
-Defined in: [types.ts:43](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L43)
+Defined in: [types.ts:48](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/types.ts#L48)
 
-Address of the wallet that sent the transactions.
+Address of the wallet that sent the transactions. EVM addresses match in any letter case, Solana addresses exactly.

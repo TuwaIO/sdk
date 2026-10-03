@@ -31,7 +31,12 @@ export interface HistoryQuery {
   page?: number;
   /** Number of transactions per page. Defaults to `10`. */
   limit?: number;
-  /** Chain of the transactions: an EVM chain ID (`1`) or a Solana cluster (`'mainnet'`). */
+  /**
+   * Chain of the transactions: an EVM chain ID (`1`), or a Solana chain ID — the CAIP-2 chain ID with the genesis hash
+   * that Pulsar 0.9 saves (`'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp'`, `SOLANA_CHAIN_IDS.mainnet` of
+   * `@tuwaio/orbit-core`) or `'solana:mainnet'`. The API matches a Solana cluster under both forms, so transactions
+   * synced by older Pulsar versions are found too.
+   */
   chainId?: string | number;
   /** Final status of the transactions (`'Success'`, `'Failed'` or `'Replaced'`, see `TransactionStatus`). */
   status?: string;
@@ -39,7 +44,7 @@ export interface HistoryQuery {
   txKey?: string;
   /** Application name that was passed to {@link PulsarModule.syncCreate}. */
   appName?: string;
-  /** Address of the wallet that sent the transactions. */
+  /** Address of the wallet that sent the transactions. EVM addresses match in any letter case, Solana addresses exactly. */
   walletAddress?: string;
 }
 

@@ -26,7 +26,7 @@ export async function syncTransaction(tx: Transaction) {
 
 > **getHistory**(`query?`): `Promise`\<[`PaginatedResult`](/packages/quasar-sdk/server/interfaces/PaginatedResult.md)\<`Transaction`\>\>
 
-Defined in: [modules/pulsar/index.ts:74](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/pulsar/index.ts#L74)
+Defined in: [modules/pulsar/index.ts:75](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/pulsar/index.ts#L75)
 
 Reads the transactions of your app, newest first (`GET /v1/engine/pulsar/history`).
 
@@ -36,8 +36,9 @@ Reads the transactions of your app, newest first (`GET /v1/engine/pulsar/history
 
 [`HistoryQuery`](/packages/quasar-sdk/server/interfaces/HistoryQuery.md) = `{}`
 
-Filters and pagination. `walletAddress` is compared with the sender address exactly as it was
-  synced; the API returns at most 100 transactions per page.
+Filters and pagination. `walletAddress` matches EVM addresses in any letter case and Solana
+  addresses exactly; a Solana `chainId` matches its cluster under both chain ID forms. The API returns at most 100
+  transactions per page.
 
 #### Returns
 
