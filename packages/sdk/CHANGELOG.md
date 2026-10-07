@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.3.0...sdk-v0.4.0) (2026-10-07)
+
+
+### Features
+
+* TUWA packages from the orbit 0.5 and SIWX 0.6 wave ([aaec6af](https://github.com/TuwaIO/sdk/commit/aaec6afb2c77bb5ea96032a6e3b9cb6cb8db7f78))
+
 ## [0.3.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.2.3...sdk-v0.3.0) (2026-10-03)
 
 
