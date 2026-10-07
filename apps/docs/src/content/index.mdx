@@ -43,9 +43,9 @@ The Stage 5 packages add no logic of their own: every subpath is one entry point
 | Package                                      | Layer | Provides                                                                                    | Peer dependencies                                                                |
 | -------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | [`@tuwaio/sdk`](/packages/sdk)               | L8    | Orbit, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths; the Nova stylesheets | `react`, `react-dom` (>=19.2.3)                                                  |
-| [`@tuwaio/evm-sdk`](/packages/evm-sdk)       | L9    | The EVM packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect                 | `@tuwaio/sdk`, `@wagmi/core` 3.x, `viem` 2.x                                     |
-| [`@tuwaio/solana-sdk`](/packages/solana-sdk) | L9    | The Solana packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect              | `@tuwaio/sdk`, `@solana/kit` ≥ 8.2, the Wallet Standard packages                 |
-| [`@tuwaio/quasar-sdk`](/packages/quasar-sdk) | L5    | The Quasar API client, the browser pre-flight check and the webhook relay CLI               | `@tuwaio/pulsar-core` ≥ 0.7; `@tuwaio/siwx-react` for `@tuwaio/quasar-sdk/react` |
+| [`@tuwaio/evm-sdk`](/packages/evm-sdk)       | L9    | The EVM packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect                 | `@tuwaio/sdk` ≥ 0.4, `@wagmi/core` 3.x, `viem` 2.x                               |
+| [`@tuwaio/solana-sdk`](/packages/solana-sdk) | L9    | The Solana packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect              | `@tuwaio/sdk` ≥ 0.4, `@solana/kit` ≥ 8.2, the Wallet Standard packages           |
+| [`@tuwaio/quasar-sdk`](/packages/quasar-sdk) | L5    | The Quasar API client, the browser pre-flight check and the webhook relay CLI               | `@tuwaio/pulsar-core` ≥ 0.9; `@tuwaio/siwx-react` for `@tuwaio/quasar-sdk/react` |
 
 The pages of `@tuwaio/sdk`, `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` list their subpaths with a link to the reference of each re-exported package. The page of `@tuwaio/quasar-sdk` is followed by a reference of every export, generated from the TypeScript source.
 

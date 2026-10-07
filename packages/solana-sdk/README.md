@@ -21,7 +21,7 @@
 pnpm add @tuwaio/sdk @tuwaio/solana-sdk @solana/kit @wallet-standard/react @wallet-standard/app @wallet-standard/base @wallet-standard/features @wallet-standard/ui @wallet-standard/ui-registry react react-dom
 ```
 
-Peer dependencies: `@tuwaio/sdk` (>=0.3, the same release line), `@solana/kit` (>=8.2), the Wallet Standard packages above (1.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
+Peer dependencies: `@tuwaio/sdk` (>=0.4, the same release line), `@solana/kit` (>=8.2), the Wallet Standard packages above (1.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
 
 | Import path                       | Re-exports                                            | Reference                                                                                    |
 | --------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |

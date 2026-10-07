@@ -30,6 +30,29 @@ describe('Unified SDK Re-Exports', () => {
     expect(typeof siwxServer.MemorySiwxNonceStore).toBe('function');
   });
 
+  it('exports the JWT and JWKS helpers of siwx-server', () => {
+    for (const name of [
+      'generateSiwxJwtKey',
+      'importSiwxJwtKey',
+      'siwxJwkThumbprint',
+      'createSiwxJwks',
+      'siwxJwtSubject',
+      'signSiwxJwt',
+      'verifySiwxJwt',
+    ] as const) {
+      expect(typeof siwxServer[name]).toBe('function');
+    }
+  });
+
+  it('exports the CAIP helpers of orbit-core', () => {
+    expect(orbit.toCaip2ChainId(8453)).toBe('eip155:8453');
+    expect(orbit.toEvmChainId('eip155:8453')).toBe(8453);
+    expect(orbit.parseCaip10AccountId('eip155:1:0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B')?.address).toBe(
+      '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B',
+    );
+    expect(orbit.formatCaip19AssetId(1, 'slip44', '60')).toBe('eip155:1/slip44:60');
+  });
+
   it('exports Next.js route handlers from siwx-server-next', () => {
     expect(typeof siwxServerNext.createSiwxApiHandler).toBe('function');
     expect(typeof siwxServerNext.createStatelessDemoSiwxHandler).toBe('function');
