@@ -4,7 +4,7 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Layer 9 (L9) of the TUWA Ecosystem. The EVM add-on of @tuwaio/sdk: re-exports the EVM packages of Orbit, Pulsar, Satellite Connect, SIWX and Nova Connect under subpaths.",
+  "description": "L9 EVM add-on of the TUWA SDK: re-exports the EVM packages of Orbit Utils, SIWX, Satellite Connect, Pulsar and Nova Connect under subpaths.",
   "type": "module",
   "exports": {
     "./orbit": {

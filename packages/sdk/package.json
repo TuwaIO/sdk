@@ -4,7 +4,7 @@
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Layer 8 (L8) of the TUWA Ecosystem. One package for React apps: re-exports Orbit, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths, with their stylesheets. Add @tuwaio/evm-sdk or @tuwaio/solana-sdk for the chains.",
+  "description": "L8 core of the TUWA SDK: one package for React apps that re-exports Orbit Utils, SIWX, Satellite Connect, Pulsar and Nova UI Kit under subpaths, with their stylesheets. Add @tuwaio/evm-sdk or @tuwaio/solana-sdk for the network.",
   "type": "module",
   "exports": {
     "./pulsar": {
