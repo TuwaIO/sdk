@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.4.1...evm-sdk-v0.5.0) (2026-10-10)
+
+
+### Features
+
+* update to the latest TUWA packages and shorten the Solana install command ([9865af2](https://github.com/TuwaIO/sdk/commit/9865af20e4cfb578fcff8179e275b0661f7b8991))
+
 ## [0.4.1](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.4.0...evm-sdk-v0.4.1) (2026-10-08)
 
 
