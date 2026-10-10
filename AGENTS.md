@@ -43,7 +43,8 @@ sdk/
 │           ├── react/index.ts         # Entry `./react` (@module react): preFlightTxCheck
 │           ├── checkout/              # Entry `./checkout` (@module checkout): createCheckoutStore, createRefundStore
 │           └── cli.ts                 # `quasar-sdk listen` (bin, built to dist/cli.cjs)
-├── scripts/generate-openapi.ts        # OpenAPI description of the Quasar API
+├── scripts/generate-openapi.ts        # OpenAPI description of the Quasar API (Pulsar, monitoring)
+├── scripts/openapi/payments.ts        # Its Payments, checkout and `payments.v1` webhook part
 ├── typedoc.json                       # Reference generation for @tuwaio/quasar-sdk
 └── package.json                       # Root scripts
 ```
@@ -86,7 +87,7 @@ sdk/
 - **Test:** `pnpm test` (`vitest run` in every package).
 - **Lint/Format:** `pnpm lint` / `pnpm lint:fix` (ESLint) and `pnpm format` (Prettier; `CHANGELOG.md`, `next-env.d.ts`, `pnpm-lock.yaml` and the generated pages are ignored).
 - **Docs:** `pnpm docs:gen` (TypeDoc for `@tuwaio/quasar-sdk`, then `packagePages.mjs` and the sidebar labels; also runs in the pre-commit hook). `pnpm --filter @tuwaio/sdk-docs dev` runs the site.
-- **OpenAPI:** `pnpm openapi:gen` after changing the Quasar API types or endpoints; it writes `quasar-openapi.yaml` into the docs hub checkout next to this repository (`../docs`), which serves it at `docs.tuwa.io/quasar/api`.
+- **OpenAPI:** `pnpm openapi:gen` after changing the Quasar API types or endpoints; it writes `quasar-openapi.yaml` into the docs hub checkout next to this repository (`../docs`), which serves it at `docs.tuwa.io/quasar/api`. Every response schema is assigned to the type the SDK returns for it (`const _checkX: z.ZodType<X> = XSchema`): the root `tsconfig.json` includes `scripts`, so `tsc` fails when the description and the SDK types drift apart.
 - **Clean:** `pnpm clean` (Nukes `node_modules` and `dist` dirs).
 
 ## 6. AI Agent Behavior (Mandatory)

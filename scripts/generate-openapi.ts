@@ -25,6 +25,7 @@ import * as YAML from 'yaml';
 import { z } from 'zod';
 
 import { BASE_API_URL, PULSAR_HISTORY_ENDPOINT, PULSAR_SYNC_ENDPOINT } from '../packages/quasar-sdk/src';
+import { registerPayments } from './openapi/payments';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -444,6 +445,8 @@ registry.registerPath({
   },
 });
 
+registerPayments(registry, secretKeyAuth.name);
+
 // ---------------------------------------------------------------------------
 // Generate & Write
 // ---------------------------------------------------------------------------
@@ -455,7 +458,7 @@ const document = generator.generateDocument({
     title: 'Quasar API',
     version: '1.0.0',
     description:
-      'The endpoints of the Quasar API that `@tuwaio/quasar-sdk` calls: syncing Pulsar transactions (EVM and Solana), which Quasar then tracks on the server, and reading their history. Quasar Cloud serves it at `https://api.tuwa.io`; a self-hosted Quasar server serves the same endpoints at its own URL.',
+      "The endpoints of the Quasar API that `@tuwaio/quasar-sdk` calls: syncing Pulsar transactions (EVM and Solana), which Quasar then tracks on the server, and reading their history; and, for a Payments app, invoices, refunds and subscriptions paid in crypto straight to your wallets, with the checkout that the buyer's browser calls with a checkout token. Quasar Cloud serves it at `https://api.tuwa.io`; a self-hosted Quasar server serves the same endpoints at its own URL (Payments where it runs with `PAYMENTS_ENABLED=true`).",
     contact: {
       name: 'TUWA Team',
       url: 'https://github.com/TuwaIO',
@@ -475,6 +478,26 @@ const document = generator.generateDocument({
     {
       name: 'Pulsar',
       description: 'Transaction sync and history.',
+    },
+    {
+      name: 'Invoices',
+      description: 'Invoices of a Payments app: issue, read, cancel, release, correct, documents, quotes and methods.',
+    },
+    {
+      name: 'Refunds',
+      description: 'Refunds sent from your wallet, verified by Quasar, with credit notes.',
+    },
+    {
+      name: 'Subscriptions',
+      description: 'Plans billed every period as one invoice.',
+    },
+    {
+      name: 'Checkout',
+      description: "The buyer's browser, with the checkout token of an invoice (no key).",
+    },
+    {
+      name: 'Webhooks',
+      description: 'Payment events (`payments.v1`) sent to your endpoints.',
     },
     {
       name: 'Monitoring',
