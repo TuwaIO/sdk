@@ -61,8 +61,12 @@ const TransactionTrackerSchema: z.ZodType<TransactionTracker> = z
     TransactionTracker.Gelato,
     TransactionTracker.Solana,
     TransactionTracker.ERC4337,
+    TransactionTracker.EIP5792,
   ])
-  .openapi('TransactionTracker', { description: 'The tracking strategy used for monitoring the transaction.' });
+  .openapi('TransactionTracker', {
+    description:
+      'The tracking strategy used for monitoring the transaction. `eip5792`: a batch of calls sent with `wallet_sendCalls`, synced by its batch ID and tracked on-chain once the app sends the hash of its transaction (`POST /v1/engine/pulsar/sync/{txKey}/hash`).',
+  });
 
 const TransactionStatusSchema: z.ZodType<TransactionStatus> = z
   .enum([TransactionStatus.Failed, TransactionStatus.Success, TransactionStatus.Replaced])
@@ -160,6 +164,14 @@ const SolanaTransactionSchema = BaseTransactionSchema.extend({
   instructions: z.array(z.unknown()).optional().openapi({ description: 'Transaction instructions.' }),
   recentBlockhash: z.string().optional().openapi({ description: 'Recent blockhash used.' }),
   slot: z.number().optional().openapi({ description: 'Slot in which the transaction was processed.' }),
+  confirmationStatus: z.enum(['processed', 'confirmed', 'finalized']).optional().openapi({
+    description:
+      'Commitment the transaction reached. Quasar records `confirmed` once a supermajority voted on it and `finalized` when it marks it `Success`.',
+  }),
+  lastValidBlockHeight: z.number().int().optional().openapi({
+    description:
+      'Last block height at which the blockhash of the transaction is valid (saved by `signAndSendSolanaTx` of `@tuwaio/pulsar-solana`). When the chain passes it and the signature is still unknown, Quasar marks the transaction `Failed` as expired; without it, after one hour.',
+  }),
 }).openapi('SolanaTransaction');
 
 // PHANTOM TYPE CHECK: Enforces 1:1 alignment with pulsar-core SolanaTransaction
@@ -215,6 +227,26 @@ const SuccessCreateResponseSchema = z
   })
   .openapi('SuccessCreateResponse');
 registry.register('SuccessCreateResponse', SuccessCreateResponseSchema);
+
+const BatchHashRequestSchema = z
+  .object({
+    hash: z
+      .string()
+      .regex(/^0x[a-fA-F0-9]{64}$/)
+      .openapi({ description: 'Hash of the transaction that executed the batch.', example: `0x${'ab'.repeat(32)}` }),
+  })
+  .openapi('BatchHashRequest');
+registry.register('BatchHashRequest', BatchHashRequestSchema);
+
+const BatchHashResponseSchema = z
+  .object({
+    success: z.literal(true),
+    txKey: z.string().openapi({ description: 'The batch ID.' }),
+    hash: z.string().openapi({ description: 'The hash Quasar tracks the batch by.' }),
+    duplicate: z.literal(true).optional().openapi({ description: 'Quasar already had this hash.' }),
+  })
+  .openapi('BatchHashResponse');
+registry.register('BatchHashResponse', BatchHashResponseSchema);
 
 const HealthResponseSchema = z
   .object({
@@ -298,6 +330,42 @@ registry.registerPath({
     },
     429: {
       description: 'Too many requests per second for the app.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: `${PULSAR_SYNC_ENDPOINT}/{txKey}/hash`,
+  summary: 'Send the hash of an EIP-5792 batch',
+  description:
+    'Sends the hash of the transaction that executed an EIP-5792 batch (`tracker: eip5792`), which was synced by its batch ID. Quasar then tracks the batch on-chain by the hash, like an Ethereum transaction; the record keeps the batch ID as `txKey`. A batch whose hash never arrives is marked `Failed` an hour after it was synced. Used by `quasar.pulsar.syncHash`.',
+  tags: ['Pulsar'],
+  security: [{ [secretKeyAuth.name]: [] }],
+  request: {
+    params: z.object({ txKey: z.string().openapi({ description: 'The batch ID, the `txKey` of the transaction.' }) }),
+    body: { content: { 'application/json': { schema: BatchHashRequestSchema } }, required: true },
+  },
+  responses: {
+    200: {
+      description: 'The hash is recorded and on-chain tracking started, or Quasar already had it (`duplicate: true`).',
+      content: { 'application/json': { schema: BatchHashResponseSchema } },
+    },
+    400: {
+      description: 'The hash is malformed, or the transaction is not an EIP-5792 batch.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    401: {
+      description: 'Missing or invalid key.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    404: {
+      description: 'The app has no transaction with this `txKey`.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    409: {
+      description: 'The batch has another hash, or it is already final.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
   },

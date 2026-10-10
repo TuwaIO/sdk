@@ -1,6 +1,6 @@
 # Quasar
 
-Defined in: [quasar.ts:21](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/quasar.ts#L21)
+Defined in: [quasar.ts:22](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/quasar.ts#L22)
 
 Client of the Quasar API (Quasar Cloud at `https://api.tuwa.io`, or a self-hosted Quasar server). Create it on the
 server: it sends the secret key of your Quasar app with every request.
@@ -20,7 +20,7 @@ const history = await quasar.pulsar.getHistory({ walletAddress: '0x...', limit: 
 
 > **new Quasar**(`config`): `Quasar`
 
-Defined in: [quasar.ts:38](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/quasar.ts#L38)
+Defined in: [quasar.ts:42](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/quasar.ts#L42)
 
 Creates the client. Sends no request.
 
@@ -42,10 +42,20 @@ If `config.secretKey` is empty.
 
 ## Properties
 
+### payments
+
+> `readonly` **payments**: [`PaymentsModule`](/packages/quasar-sdk/server/classes/PaymentsModule.md)
+
+Defined in: [quasar.ts:34](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/quasar.ts#L34)
+
+Invoices, refunds, documents and subscriptions of a Payments app.
+
+***
+
 ### pulsar
 
 > `readonly` **pulsar**: [`PulsarModule`](/packages/quasar-sdk/server/classes/PulsarModule.md)
 
-Defined in: [quasar.ts:30](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/quasar.ts#L30)
+Defined in: [quasar.ts:31](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/quasar.ts#L31)
 
 Syncs Pulsar transactions to Quasar and reads their history.

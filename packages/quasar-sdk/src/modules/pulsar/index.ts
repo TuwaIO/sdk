@@ -2,7 +2,7 @@
  * @file Pulsar module of the Quasar client: transaction sync and history.
  */
 
-import { PULSAR_HISTORY_ENDPOINT, PULSAR_SYNC_ENDPOINT } from '../../constants';
+import { PULSAR_HISTORY_ENDPOINT, PULSAR_SYNC_ENDPOINT, pulsarSyncHashEndpoint } from '../../constants';
 import type { QuasarClient } from '../../core/client';
 import type { HistoryQuery, PaginatedResult, Transaction } from '../../types';
 
@@ -55,6 +55,33 @@ export class PulsarModule {
         appName,
       },
     });
+  }
+
+  /**
+   * Sends the hash of the transaction that executed an EIP-5792 batch (`POST /v1/engine/pulsar/sync/:txKey/hash`). A
+   * batch is synced by its batch ID (`TransactionTracker.EIP5792`), which only the wallet can resolve; with the hash,
+   * Quasar tracks it on-chain until it reaches a final status. Get the hashes in the browser with
+   * {@link watchBatchHashes} and send each through a Server Action. Without a hash, Quasar marks the batch `Failed`
+   * an hour after it was synced.
+   *
+   * @param txKey - The batch ID, the `txKey` of the transaction.
+   * @param hash - The hash of the transaction that executed the batch (`hash` that Pulsar writes to it).
+   * @returns `duplicate: true` when Quasar already had this hash.
+   * @throws {QuasarSDKError} On a malformed hash or a transaction that is not a batch (400), an invalid key (401, 403),
+   *   an unknown batch (404), a batch that has another hash or is already final (409), a timeout or a network error.
+   *
+   * @example
+   * ```ts
+   * export async function syncBatchHash(txKey: string, hash: `0x${string}`) {
+   *   await quasar.pulsar.syncHash(txKey, hash);
+   * }
+   * ```
+   */
+  async syncHash(
+    txKey: string,
+    hash: `0x${string}`,
+  ): Promise<{ success: true; txKey: string; hash: `0x${string}`; duplicate?: true }> {
+    return this.client.request(pulsarSyncHashEndpoint(txKey), { method: 'POST', body: { hash } });
   }
 
   /**

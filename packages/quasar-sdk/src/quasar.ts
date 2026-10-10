@@ -3,6 +3,7 @@
  */
 
 import { QuasarClient } from './core/client';
+import { PaymentsModule } from './modules/payments';
 import { PulsarModule } from './modules/pulsar';
 import type { QuasarConfig } from './types';
 
@@ -29,6 +30,9 @@ export class Quasar {
   /** Syncs Pulsar transactions to Quasar and reads their history. */
   public readonly pulsar: PulsarModule;
 
+  /** Invoices, refunds, documents and subscriptions of a Payments app. */
+  public readonly payments: PaymentsModule;
+
   /**
    * Creates the client. Sends no request.
    *
@@ -38,5 +42,6 @@ export class Quasar {
   constructor(config: QuasarConfig) {
     this.client = new QuasarClient(config);
     this.pulsar = new PulsarModule(this.client);
+    this.payments = new PaymentsModule(this.client);
   }
 }

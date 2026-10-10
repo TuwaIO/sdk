@@ -7,7 +7,11 @@
  */
 
 export * from './constants';
-export { QuasarSDKError } from './core/client';
+export { type QuasarRequestIssue, QuasarSDKError } from './core/client';
+export { PaymentsModule } from './modules/payments';
+export type * from './modules/payments/types';
 export { PulsarModule } from './modules/pulsar';
+export { type PulsarPoolStore, watchBatchHashes } from './modules/pulsar/batches';
 export { Quasar } from './quasar';
 export * from './types';
+export * from './webhooks';
