@@ -1,6 +1,6 @@
 # QuasarSDKError
 
-Defined in: [core/client.ts:36](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L36)
+Defined in: [core/errors.ts:33](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L33)
 
 Error thrown by the methods of the [Quasar](/packages/quasar-sdk/server/classes/Quasar.md) client when a request fails: an HTTP error status, a timeout or a
 network error. The Payments API also names the refusal with a stable `code` and, for an invalid request, the fields
@@ -30,7 +30,7 @@ try {
 
 > **new QuasarSDKError**(`message`, `status`, `originalError`, `refusal?`): `QuasarSDKError`
 
-Defined in: [core/client.ts:61](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L61)
+Defined in: [core/errors.ts:58](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L58)
 
 Creates the error.
 
@@ -85,7 +85,7 @@ The code, issues and further fields of the refusal, when the API named them.
 
 > `readonly` **code**: `string` \| `undefined`
 
-Defined in: [core/client.ts:44](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L44)
+Defined in: [core/errors.ts:41](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L41)
 
 Stable code of the refusal, for example `invoice_not_found`; `undefined` when the API gave none.
 
@@ -95,7 +95,7 @@ Stable code of the refusal, for example `invoice_not_found`; `undefined` when th
 
 > `readonly` **details**: `Record`\<`string`, `unknown`\> \| `undefined`
 
-Defined in: [core/client.ts:50](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L50)
+Defined in: [core/errors.ts:47](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L47)
 
 Further fields of the refusal (for example `reason` of `auto_charge_unavailable`).
 
@@ -105,7 +105,7 @@ Further fields of the refusal (for example `reason` of `auto_charge_unavailable`
 
 > `readonly` **issues**: [`QuasarRequestIssue`](/packages/quasar-sdk/server/interfaces/QuasarRequestIssue.md)[] \| `undefined`
 
-Defined in: [core/client.ts:47](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L47)
+Defined in: [core/errors.ts:44](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L44)
 
 The fields of an invalid request and why each was refused (code `invalid_request`).
 
@@ -115,7 +115,7 @@ The fields of an invalid request and why each was refused (code `invalid_request
 
 > `readonly` **originalError**: `Error`
 
-Defined in: [core/client.ts:41](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L41)
+Defined in: [core/errors.ts:38](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L38)
 
 The error thrown by `ofetch`.
 
@@ -125,6 +125,6 @@ The error thrown by `ofetch`.
 
 > `readonly` **status**: `number` \| `undefined`
 
-Defined in: [core/client.ts:38](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L38)
+Defined in: [core/errors.ts:35](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L35)
 
 HTTP status code of the response, or `undefined` when no response was received.

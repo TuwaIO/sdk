@@ -35,6 +35,21 @@ describe('Quasar SDK', () => {
     }
   });
 
+  it('loads the root entry point without zustand, which only the checkout needs', async () => {
+    vi.resetModules();
+    vi.doMock('zustand/vanilla', () => {
+      throw new Error('zustand must not be imported by the root entry point');
+    });
+    try {
+      const root = await import('../index');
+      expect(typeof root.Quasar).toBe('function');
+      expect('createCheckoutStore' in root).toBe(false);
+    } finally {
+      vi.doUnmock('zustand/vanilla');
+      vi.resetModules();
+    }
+  });
+
   it('correctly re-exports TransactionTracker and TransactionStatus enums', () => {
     expect(TransactionTracker.ERC4337).toBe('erc4337');
     expect(TransactionTracker.Ethereum).toBe('ethereum');

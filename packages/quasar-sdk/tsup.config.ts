@@ -8,6 +8,7 @@ export default defineConfig([
     entry: {
       index: './src/index.ts',
       react: './src/react/index.ts',
+      checkout: './src/checkout/index.ts',
     },
     sourcemap: false,
     splitting: true,

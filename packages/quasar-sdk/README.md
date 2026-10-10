@@ -3,7 +3,7 @@
 [![NPM Version](https://img.shields.io/npm/v/@tuwaio/quasar-sdk.svg)](https://www.npmjs.com/package/@tuwaio/quasar-sdk)
 [![License](https://img.shields.io/npm/l/@tuwaio/quasar-sdk.svg)](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/LICENSE)
 
-`@tuwaio/quasar-sdk` is the Layer 5 (L5) package of the **TUWA SDK**: the client of the API of **Quasar**, the TUWA backend that tracks the transactions of your app on the server, keeps their history and, for a Payments app, issues invoices paid in crypto straight to your wallets. It works with Quasar Cloud (`https://api.tuwa.io`) and with a self-hosted Quasar server. It has three parts: the `Quasar` client for your server (with webhook verification), a check for the browser (`@tuwaio/quasar-sdk/react`), and the `quasar-sdk` CLI that relays webhooks to `localhost`.
+`@tuwaio/quasar-sdk` is the Layer 5 (L5) package of the **TUWA SDK**: the client of the API of **Quasar**, the TUWA backend that tracks the transactions of your app on the server, keeps their history and, for a Payments app, issues invoices paid in crypto straight to your wallets. It works with Quasar Cloud (`https://api.tuwa.io`) and with a self-hosted Quasar server. It has four parts: the `Quasar` client for your server (with webhook verification), the headless checkout for the browser (`@tuwaio/quasar-sdk/checkout`), a check for the browser (`@tuwaio/quasar-sdk/react`), and the `quasar-sdk` CLI that relays webhooks to `localhost`.
 
 ---
 
@@ -13,6 +13,7 @@
 - **History:** `quasar.pulsar.getHistory` returns the transactions of your app, newest first, filtered by wallet address, chain, status, transaction key or application name.
 - **EIP-5792 batches:** a batch sent with `wallet_sendCalls` is synced by its batch ID; `watchBatchHashes` reads the hash of its transaction from the Pulsar store in the browser, and `quasar.pulsar.syncHash` sends it to Quasar from the server.
 - **Payments:** `quasar.payments` issues invoices (with their PDF and e-invoice documents and a payment page), lists and reads them with their hash-chained ledger, cancels, releases and corrects them, refunds payments, prices amounts, and runs subscriptions billed every period.
+- **Headless checkout:** `createCheckoutStore` from `@tuwaio/quasar-sdk/checkout` follows the payment of one invoice in the buyer's browser (methods, AML-screened quote, buyer details, language, the transaction or gasless signature, live status) with its checkout token and no key; `createRefundStore` refunds a payment from the merchant's wallet through calls the app runs on its server. Neither sends a transaction: Pulsar or the wallet does.
 - **Webhook verification:** `verifyWebhook` checks the signature of a webhook (and, for a payment event, the time it was sent) and returns its typed body.
 - **Errors:** every failed request throws a `QuasarSDKError` with the HTTP `status` and, from the Payments API, a stable `code` and the fields at fault (`issues`).
 - **Pre-flight check:** `preFlightTxCheck` from `@tuwaio/quasar-sdk/react` stops a Pulsar transaction in the browser when the user is not signed in with SIWX or the Quasar API does not respond.
@@ -26,12 +27,13 @@
 pnpm add @tuwaio/quasar-sdk @tuwaio/pulsar-core
 ```
 
-| Import path                | Provides                                                                                                                            | Peer dependencies                                         |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `@tuwaio/quasar-sdk`       | `Quasar`, `PulsarModule`, `PaymentsModule`, `verifyWebhook`, `watchBatchHashes`, `QuasarSDKError`, the endpoint constants and types | `@tuwaio/pulsar-core` (>=0.10), for the transaction types |
-| `@tuwaio/quasar-sdk/react` | `preFlightTxCheck`                                                                                                                  | Also `@tuwaio/siwx-react` (>=0.5, optional for the root)  |
+| Import path                   | Provides                                                                                                                            | Peer dependencies                                         |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `@tuwaio/quasar-sdk`          | `Quasar`, `PulsarModule`, `PaymentsModule`, `verifyWebhook`, `watchBatchHashes`, `QuasarSDKError`, the endpoint constants and types | `@tuwaio/pulsar-core` (>=0.10), for the transaction types |
+| `@tuwaio/quasar-sdk/checkout` | `createCheckoutStore`, `createRefundStore` and their types                                                                          | Also `zustand` (5.x, optional for the other entries)      |
+| `@tuwaio/quasar-sdk/react`    | `preFlightTxCheck`                                                                                                                  | Also `@tuwaio/siwx-react` (>=0.5, optional for the root)  |
 
-The root entry point imports neither React nor SIWX packages, so it runs in Node.js, Next.js Server Actions and route handlers, and Edge runtimes. Its HTTP client, `ofetch`, is a dependency.
+The root entry point imports neither React, SIWX nor `zustand`, so it runs in Node.js, Next.js Server Actions and route handlers, and Edge runtimes. Its HTTP client, `ofetch`, is a dependency.
 
 ---
 
@@ -103,6 +105,27 @@ export async function POST(request: Request) {
 }
 ```
 
+### Checkout in the browser
+
+The payment page of an invoice is its `payUrl`; to embed the checkout in your own page instead, pass its `checkoutToken` to the checkout store. The store holds where the payment stands; the wallet sends the transaction (with Pulsar, or `@tuwaio/nova-payments`, which renders the store).
+
+```ts
+import { createCheckoutStore } from '@tuwaio/quasar-sdk/checkout';
+
+const checkout = createCheckoutStore({ token: checkoutToken });
+await checkout.getState().load();
+
+const { checkout: view } = checkout.getState();
+checkout.getState().selectMethod(view?.methods[0]?.id ?? '');
+checkout.getState().setPayer('eip155:8453:0x1111111111111111111111111111111111111111');
+const quote = await checkout.getState().requestQuote();
+// Send quote.instructions (the amount in base units to `to`) with the wallet, then hand over its hash:
+await checkout.getState().submit({ txKey: '0x…' });
+checkout.subscribe(({ phase }) => console.log(phase)); // confirming, then paid
+```
+
+The page's origin must be one of the domains of your Quasar app, when the app lists any.
+
 ### Webhook relay
 
 Add a webhook endpoint with a `localhost` URL in the Quasar dashboard, put its signing secret in `.env.local` and start the relay next to your dev server:
@@ -127,13 +150,14 @@ The relay posts each delivery with the `x-quasar-signature`, `x-quasar-event` an
 
 ## 🗄️ Browser Storage
 
-Nothing is written. `preFlightTxCheck` reads the SIWX session from the store of `@tuwaio/siwx-react`, which keeps it in `localStorage` under `siwx-react:session`.
+Nothing is written. The checkout and refund stores keep their state in memory only. `preFlightTxCheck` reads the SIWX session from the store of `@tuwaio/siwx-react`, which keeps it in `localStorage` under `siwx-react:session`.
 
 ## 🌐 External Services
 
 | Part                | Host                                                             | Request                                                                                                                                                                                                    |
 | ------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Quasar` client     | `baseUrl` (default `https://api.tuwa.io`)                        | `POST /v1/engine/pulsar/sync`, `POST /v1/engine/pulsar/sync/:txKey/hash`, `GET /v1/engine/pulsar/history` and the Payments API under `/v1/payments`, with the secret key in the `x-tuwa-secret-key` header |
+| Checkout stores     | `baseUrl` (default `https://api.tuwa.io`)                        | The checkout routes `/v1/payments/checkout/:token` and their `events` stream, with the token in the path and no key; the refund store calls only the functions you pass                                    |
 | `preFlightTxCheck`  | Its `customApiUrl` (default `https://api.tuwa.io`)               | `GET /v1/engine/monitoring/health`, without credentials                                                                                                                                                    |
 | `quasar-sdk listen` | `--api-url` (default `https://api.tuwa.io`), then `--forward-to` | A Server-Sent Events stream from `/v1/engine/webhooks/listen` with the signing secret in the `x-webhook-secret` header; a `POST` to the local URL for each delivery                                        |
 

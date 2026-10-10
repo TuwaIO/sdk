@@ -1,7 +1,11 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "name": "@tuwaio/quasar-sdk",
-  "entryPoints": ["packages/quasar-sdk/src/index.ts", "packages/quasar-sdk/src/react/index.ts"],
+  "entryPoints": [
+    "packages/quasar-sdk/src/index.ts",
+    "packages/quasar-sdk/src/react/index.ts",
+    "packages/quasar-sdk/src/checkout/index.ts"
+  ],
   "sortEntryPoints": false,
   "tsconfig": "tsconfig.json",
   "exclude": ["**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"],

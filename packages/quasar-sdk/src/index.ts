@@ -7,7 +7,7 @@
  */
 
 export * from './constants';
-export { type QuasarRequestIssue, QuasarSDKError } from './core/client';
+export { type QuasarRequestIssue, QuasarSDKError } from './core/errors';
 export { PaymentsModule } from './modules/payments';
 export type * from './modules/payments/types';
 export { PulsarModule } from './modules/pulsar';

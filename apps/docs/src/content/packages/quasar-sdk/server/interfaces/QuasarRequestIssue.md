@@ -1,6 +1,6 @@
 # QuasarRequestIssue
 
-Defined in: [core/client.ts:11](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L11)
+Defined in: [core/errors.ts:8](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L8)
 
 A field of a request the API refused, and why: `path` names it with dots (`buyer.country`).
 
@@ -10,7 +10,7 @@ A field of a request the API refused, and why: `path` names it with dots (`buyer
 
 > **message**: `string`
 
-Defined in: [core/client.ts:15](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L15)
+Defined in: [core/errors.ts:12](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L12)
 
 Why it was refused.
 
@@ -20,6 +20,6 @@ Why it was refused.
 
 > **path**: `string`
 
-Defined in: [core/client.ts:13](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/client.ts#L13)
+Defined in: [core/errors.ts:10](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/core/errors.ts#L10)
 
 The field, for example `buyer.country`.

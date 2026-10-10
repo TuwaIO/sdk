@@ -19,6 +19,11 @@
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js",
       "require": "./dist/react.cjs"
+    },
+    "./checkout": {
+      "types": "./dist/checkout.d.ts",
+      "import": "./dist/checkout.js",
+      "require": "./dist/checkout.cjs"
     }
   },
   "publishConfig": {
@@ -75,17 +80,22 @@
   },
   "peerDependencies": {
     "@tuwaio/pulsar-core": ">=0.10",
-    "@tuwaio/siwx-react": ">=0.5"
+    "@tuwaio/siwx-react": ">=0.5",
+    "zustand": "5.x.x"
   },
   "peerDependenciesMeta": {
     "@tuwaio/siwx-react": {
+      "optional": true
+    },
+    "zustand": {
       "optional": true
     }
   },
   "devDependencies": {
     "@tuwaio/pulsar-core": "^0.10.0",
+    "@tuwaio/siwx-react": "^0.6.2",
     "tsup": "^8.5.1",
     "typescript": "6.0.3",
-    "@tuwaio/siwx-react": "^0.6.2"
+    "zustand": "^5.0.15"
   }
 }
