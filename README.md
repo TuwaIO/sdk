@@ -59,11 +59,13 @@ pnpm add @tuwaio/sdk react react-dom
 pnpm add @tuwaio/evm-sdk @wagmi/core viem
 
 # Solana
-pnpm add @tuwaio/solana-sdk @solana/kit @wallet-standard/react @wallet-standard/app @wallet-standard/base @wallet-standard/features @wallet-standard/ui @wallet-standard/ui-registry
+pnpm add @tuwaio/solana-sdk @solana/kit
 
 # Server that syncs transactions to Quasar
 pnpm add @tuwaio/quasar-sdk @tuwaio/pulsar-core
 ```
+
+pnpm (8 and later), npm (7 and later) and Bun also install the Wallet Standard peers of `@tuwaio/solana-sdk` (`@wallet-standard/app`, `base`, `features`, `react`, `ui` and `ui-registry`); with Yarn, add them to the command.
 
 ---
 

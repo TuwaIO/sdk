@@ -28,8 +28,10 @@ Then add the chains of your app:
 pnpm add @tuwaio/evm-sdk @wagmi/core viem
 
 # Solana
-pnpm add @tuwaio/solana-sdk @solana/kit @wallet-standard/react @wallet-standard/app @wallet-standard/base @wallet-standard/features @wallet-standard/ui @wallet-standard/ui-registry
+pnpm add @tuwaio/solana-sdk @solana/kit
 ```
+
+pnpm (8 and later), npm (7 and later) and Bun also install the Wallet Standard peers of `@tuwaio/solana-sdk` (`@wallet-standard/app`, `base`, `features`, `react`, `ui` and `ui-registry`); with Yarn, add them to the command.
 
 Do not install the re-exported TUWA packages separately at other versions: two copies of a package with a store or a React context, such as `@tuwaio/satellite-react` or `@tuwaio/nova-connect`, do not share their state or their types.
 
