@@ -7,7 +7,7 @@ import { ofetch } from 'ofetch';
 import { BASE_API_URL } from '../constants';
 import { toQuasarSDKError } from '../core/errors';
 import type { Buyer, InvoiceLocale } from '../modules/payments/types';
-import type { CheckoutQuote, CheckoutView, GrantPermissionParams } from './types';
+import type { CheckoutApi, CheckoutQuote, CheckoutView, GrantPermissionParams } from './types';
 
 /** Path of a checkout route: `/v1/payments/checkout/:token` and below. */
 export const checkoutPath = (token: string, route = '') =>
@@ -21,7 +21,7 @@ export const checkoutPath = (token: string, route = '') =>
  * @returns The calls.
  * @internal
  */
-export function checkoutApi(token: string, baseUrl: string = BASE_API_URL) {
+export function checkoutApi(token: string, baseUrl: string = BASE_API_URL): CheckoutApi {
   const call = async <T>(route: string, body?: object): Promise<T> => {
     try {
       return await ofetch<T>(checkoutPath(token, route), {
@@ -46,6 +46,3 @@ export function checkoutApi(token: string, baseUrl: string = BASE_API_URL) {
     url: (route: string) => `${baseUrl.replace(/\/+$/, '')}${checkoutPath(token, route)}`,
   };
 }
-
-/** The calls of {@link checkoutApi}. @internal */
-export type CheckoutApi = ReturnType<typeof checkoutApi>;

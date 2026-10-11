@@ -1,6 +1,6 @@
 # ListSubscriptionsParams
 
-Defined in: [modules/payments/types.ts:755](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L755)
+Defined in: [modules/payments/types.ts:757](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L757)
 
 Filters and paging of [PaymentsModule.listSubscriptions](/packages/quasar-sdk/server/classes/PaymentsModule.md#listsubscriptions).
 
@@ -10,7 +10,7 @@ Filters and paging of [PaymentsModule.listSubscriptions](/packages/quasar-sdk/se
 
 > `optional` **cursor?**: `string`
 
-Defined in: [modules/payments/types.ts:761](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L761)
+Defined in: [modules/payments/types.ts:763](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L763)
 
 `nextCursor` of the previous page.
 
@@ -20,7 +20,7 @@ Defined in: [modules/payments/types.ts:761](https://github.com/TuwaIO/sdk/blob/m
 
 > `optional` **limit?**: `number`
 
-Defined in: [modules/payments/types.ts:759](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L759)
+Defined in: [modules/payments/types.ts:761](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L761)
 
 Page size, 1 to 100. Defaults to `20`.
 
@@ -30,6 +30,6 @@ Page size, 1 to 100. Defaults to `20`.
 
 > `optional` **status?**: [`SubscriptionStatus`](/packages/quasar-sdk/server/type-aliases/SubscriptionStatus.md) \| [`SubscriptionStatus`](/packages/quasar-sdk/server/type-aliases/SubscriptionStatus.md)[]
 
-Defined in: [modules/payments/types.ts:757](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L757)
+Defined in: [modules/payments/types.ts:759](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L759)
 
 One status or several.

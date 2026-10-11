@@ -1,6 +1,6 @@
 # CheckoutLine
 
-Defined in: [checkout/types.ts:15](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L15)
+Defined in: [checkout/types.ts:18](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L18)
 
 A line of the invoice as the checkout shows it; amounts are decimal strings, `netMinor` in cents.
 
@@ -10,7 +10,7 @@ A line of the invoice as the checkout shows it; amounts are decimal strings, `ne
 
 > `optional` **description?**: `string`
 
-Defined in: [checkout/types.ts:19](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L19)
+Defined in: [checkout/types.ts:22](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L22)
 
 Details under the name.
 
@@ -20,7 +20,7 @@ Details under the name.
 
 > **name**: `string`
 
-Defined in: [checkout/types.ts:17](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L17)
+Defined in: [checkout/types.ts:20](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L20)
 
 What is sold.
 
@@ -30,7 +30,7 @@ What is sold.
 
 > **netMinor**: `string`
 
-Defined in: [checkout/types.ts:29](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L29)
+Defined in: [checkout/types.ts:32](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L32)
 
 Net amount of the line in minor units (cents).
 
@@ -40,7 +40,7 @@ Net amount of the line in minor units (cents).
 
 > **quantity**: `string`
 
-Defined in: [checkout/types.ts:21](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L21)
+Defined in: [checkout/types.ts:24](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L24)
 
 Quantity.
 
@@ -50,7 +50,7 @@ Quantity.
 
 > **taxCategory**: [`TaxCategory`](/packages/quasar-sdk/server/type-aliases/TaxCategory.md)
 
-Defined in: [checkout/types.ts:25](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L25)
+Defined in: [checkout/types.ts:28](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L28)
 
 VAT category.
 
@@ -60,7 +60,7 @@ VAT category.
 
 > **taxRate**: `string`
 
-Defined in: [checkout/types.ts:27](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L27)
+Defined in: [checkout/types.ts:30](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L30)
 
 VAT rate in percent.
 
@@ -70,6 +70,6 @@ VAT rate in percent.
 
 > **unitPrice**: `string`
 
-Defined in: [checkout/types.ts:23](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L23)
+Defined in: [checkout/types.ts:26](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L26)
 
 Price of one unit.

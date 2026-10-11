@@ -580,6 +580,8 @@ export interface PaymentMethod {
   finality: string | null;
   /** `off` or `auto`. */
   gasless: string | null;
+  /** Marked "Popular" in the checkout. */
+  featured: boolean;
 }
 
 /** The billing period unit of a subscription. */

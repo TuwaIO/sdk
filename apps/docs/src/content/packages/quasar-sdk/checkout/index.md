@@ -7,14 +7,18 @@ merchant's wallet, whose calls run on the app's server. It needs `zustand` (5.x)
 
 ## Interfaces
 
+- [CheckoutApi](/packages/quasar-sdk/checkout/interfaces/CheckoutApi.md)
 - [CheckoutError](/packages/quasar-sdk/checkout/interfaces/CheckoutError.md)
 - [CheckoutInvoice](/packages/quasar-sdk/checkout/interfaces/CheckoutInvoice.md)
 - [CheckoutLine](/packages/quasar-sdk/checkout/interfaces/CheckoutLine.md)
+- [CheckoutMerchant](/packages/quasar-sdk/checkout/interfaces/CheckoutMerchant.md)
 - [CheckoutMethod](/packages/quasar-sdk/checkout/interfaces/CheckoutMethod.md)
 - [CheckoutQuote](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md)
 - [CheckoutState](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md)
 - [CheckoutStatusEvent](/packages/quasar-sdk/checkout/interfaces/CheckoutStatusEvent.md)
 - [CheckoutStoreOptions](/packages/quasar-sdk/checkout/interfaces/CheckoutStoreOptions.md)
+- [CheckoutSubscription](/packages/quasar-sdk/checkout/interfaces/CheckoutSubscription.md)
+- [CheckoutTheme](/packages/quasar-sdk/checkout/interfaces/CheckoutTheme.md)
 - [CheckoutView](/packages/quasar-sdk/checkout/interfaces/CheckoutView.md)
 - [EventSourceLike](/packages/quasar-sdk/checkout/interfaces/EventSourceLike.md)
 - [GaslessOffer](/packages/quasar-sdk/checkout/interfaces/GaslessOffer.md)

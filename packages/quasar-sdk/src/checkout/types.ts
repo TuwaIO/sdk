@@ -3,11 +3,14 @@
  */
 
 import type {
+  Buyer,
   InvoiceLocale,
   InvoiceStatus,
   PaymentsCurrency,
   PaymentsEnvironment,
+  SubscriptionInterval,
   SubscriptionPermission,
+  SubscriptionStatus,
   TaxCategory,
 } from '../modules/payments/types';
 
@@ -51,10 +54,81 @@ export interface CheckoutInvoice {
   locale: InvoiceLocale | null;
   /** When it stops being payable. */
   dueAt: string | null;
-  /** Where to send the buyer after paying. */
+  /** Where to send the buyer after paying (http(s) only). */
   successUrl: string | null;
-  /** Where to send a buyer who gives up. */
+  /** Where to send a buyer who gives up (http(s) only). */
   cancelUrl: string | null;
+  /** Base units of the quoted asset received so far: an underpaid invoice asks for the rest. */
+  amountPaid: string | null;
+  /**
+   * Why a payment waits for, or was flagged to, the seller: `screening` (the sender did not pass the check after
+   * paying; no details reach the buyer), `late` (it arrived after the invoice expired or was cancelled), `overpaid`.
+   */
+  review: { reason: 'screening' | 'late' | 'overpaid' } | null;
+  /** What was refunded, in minor units (cents) of the invoice currency. */
+  refundedTotalMinor: string | null;
+  /**
+   * The invoice that replaced this one after the seller corrected it: its number and, while it can be paid, its
+   * checkout token.
+   */
+  replacedBy: { number: string | null; checkoutToken: string | null } | null;
+  /** The subscription period this invoice bills; `null` for a one-off invoice. */
+  subscription: CheckoutSubscription | null;
+}
+
+/** The subscription period an invoice bills, as the checkout shows it. */
+export interface CheckoutSubscription {
+  /** State of the subscription. */
+  status: SubscriptionStatus;
+  /** Unit of a period. */
+  interval: SubscriptionInterval;
+  /** Units in a period (`3` with `month` is a quarter). */
+  intervalCount: number;
+  /** The period this invoice bills, from 1. */
+  period: number;
+  /** When the period starts. */
+  periodStart: string;
+  /** When it ends, which is when the next one is billed. */
+  periodEnd: string;
+  /** How many periods the subscription runs; `null` until it is cancelled. */
+  cycles: number | null;
+  /** When it ends at the latest, if set. */
+  endsAt: string | null;
+  /** Whether it ends with the current period. */
+  cancelAtPeriodEnd: boolean;
+}
+
+/** Who is paid and on what terms, as the checkout shows it. */
+export interface CheckoutMerchant {
+  /** The name buyers know. */
+  name: string;
+  /** Website, as an http(s) link. */
+  website: string | null;
+  /** Where buyers ask for help. */
+  supportEmail: string | null;
+  /** Whether the merchant has a logo: read it from the `logo` route ({@link CheckoutState.logoUrl}). */
+  logo: boolean;
+  /** The seller as the invoice document names them. */
+  seller: {
+    legalName: string | null;
+    tradingName: string | null;
+    address: string | null;
+    country: string | null;
+    registrationNumber: string | null;
+    taxId: string | null;
+  } | null;
+  /** The merchant's terms, refund policy and privacy notice (http(s) links only). */
+  links: { terms: string | null; refundPolicy: string | null; privacy: string | null };
+  /** A page where buyers get the token to pay, shown when the wallet has too little. */
+  fundingUrl: string | null;
+}
+
+/** The look of the checkout the merchant chose. */
+export interface CheckoutTheme {
+  /** `system` follows the buyer's device. */
+  mode: 'system' | 'light' | 'dark';
+  /** Main button and selection color (`#rrggbb`); `null` for the default. */
+  accentColor: string | null;
 }
 
 /** A payment method the invoice can be paid with. */
@@ -73,6 +147,8 @@ export interface CheckoutMethod {
   decimals: number;
   /** `auto` when the merchant may sponsor the gas, `off` otherwise. */
   gasless: string | null;
+  /** Marked "Popular" by the merchant. */
+  featured: boolean;
 }
 
 /** What a wallet needs to pay a locked quote: the exact amount in base units, never rounded again. */
@@ -223,8 +299,10 @@ export type AutoChargeOffer =
 export interface CheckoutView {
   /** Always `checkout`. */
   object: 'checkout';
-  /** Who is paid. */
-  merchant: { name: string; website: string | null; supportEmail: string | null };
+  /** Who is paid and on what terms. */
+  merchant: CheckoutMerchant;
+  /** The look the merchant chose. */
+  theme: CheckoutTheme;
   /** The invoice. */
   invoice: CheckoutInvoice;
   /**
@@ -238,6 +316,34 @@ export interface CheckoutView {
   quote: CheckoutQuote | null;
   /** The automatic-charge offer of a subscription invoice; `null` otherwise. */
   autoCharge: AutoChargeOffer | null;
+}
+
+/**
+ * The calls a checkout store makes, one per checkout route. {@link createCheckoutStore} makes them over HTTP; pass
+ * your own as `api` to drive the store without a network, as tests and the TUWA docs Playground do. A call rejects with
+ * a `QuasarSDKError` that carries the Payments `code` when Quasar refuses it.
+ */
+export interface CheckoutApi {
+  /** Reads the checkout (`GET`). */
+  view: () => Promise<CheckoutView>;
+  /** Locks a quote for a method and, when connected, the payer (`POST quote`). */
+  quote: (body: { methodId: string; payer?: string }) => Promise<CheckoutQuote>;
+  /** Sends the buyer details (`POST buyer`) and answers with the checkout. */
+  buyer: (body: { buyer: Buyer; company?: boolean }) => Promise<CheckoutView>;
+  /** Sets the language of the page and the documents still to be issued (`POST locale`). */
+  locale: (locale: InvoiceLocale) => Promise<{ locale: InvoiceLocale }>;
+  /** Hands over the transaction the wallet sent (`POST submit`). */
+  submit: (body: {
+    txKey: string;
+    from?: string;
+    connectorType?: string;
+  }) => Promise<{ txKey: string; status: string }>;
+  /** Relays the signed EIP-3009 authorization (`POST relay`). */
+  relay: (signature: string) => Promise<{ status: 'submitted' | 'sending'; userOpHash?: string; txHash?: string }>;
+  /** Sends the ERC-7715 permission the wallet granted (`POST permission`). */
+  permission: (body: GrantPermissionParams) => Promise<{ permission: unknown }>;
+  /** The URL of a route that is read without the store: `receipt`, `logo`, `paymaster`, `events`. */
+  url: (route: string) => string;
 }
 
 /** The answer of the wallet to `wallet_grantPermissions`, as {@link CheckoutState.grantPermission} takes it. */

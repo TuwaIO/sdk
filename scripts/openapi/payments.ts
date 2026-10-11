@@ -374,6 +374,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       discount: z.union([z.string(), z.number()]).nullable(),
       finality: z.string().nullable(),
       gasless: z.string().nullable(),
+      featured: z.boolean().openapi({ description: 'Marked "Popular" in the checkout.' }),
     })
     .openapi('PaymentMethod');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -922,7 +923,42 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   const CheckoutView = z
     .object({
       object: z.literal('checkout'),
-      merchant: z.object({ name: z.string(), website: z.string().nullable(), supportEmail: z.string().nullable() }),
+      merchant: z
+        .object({
+          name: z.string(),
+          website: z.string().nullable().openapi({ description: 'http(s) link.' }),
+          supportEmail: z.string().nullable(),
+          logo: z.boolean().openapi({ description: 'Whether `GET /v1/payments/checkout/{token}/logo` serves a logo.' }),
+          seller: z
+            .object({
+              legalName: z.string().nullable(),
+              tradingName: z.string().nullable(),
+              address: z.string().nullable(),
+              country: z.string().nullable(),
+              registrationNumber: z.string().nullable(),
+              taxId: z.string().nullable(),
+            })
+            .nullable()
+            .openapi({ description: 'The seller as the invoice document names them.' }),
+          links: z
+            .object({
+              terms: z.string().nullable(),
+              refundPolicy: z.string().nullable(),
+              privacy: z.string().nullable(),
+            })
+            .openapi({ description: "The merchant's policies; http(s) links only." }),
+          fundingUrl: z
+            .string()
+            .nullable()
+            .openapi({ description: 'A page where buyers get the token, for a wallet with too little.' }),
+        })
+        .openapi({ description: 'Who is paid and on what terms.' }),
+      theme: z
+        .object({
+          mode: z.enum(['system', 'light', 'dark']),
+          accentColor: z.string().nullable().openapi({ description: '`#rrggbb`; `null` for the default.' }),
+        })
+        .openapi({ description: 'The look the merchant chose; `system` follows the buyer device.' }),
       invoice: z.object({
         id: z.string(),
         number: z.string().nullable(),
@@ -946,6 +982,32 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         dueAt: z.string().nullable(),
         successUrl: z.string().nullable(),
         cancelUrl: z.string().nullable(),
+        amountPaid: z.string().nullable().openapi({ description: 'Base units of the quoted asset received so far.' }),
+        review: z
+          .object({ reason: z.enum(['screening', 'late', 'overpaid']) })
+          .nullable()
+          .openapi({ description: 'Why a payment waits for, or was flagged to, the seller.' }),
+        refundedTotalMinor: z.string().nullable().openapi({ description: 'Refunded, in minor units (cents).' }),
+        replacedBy: z
+          .object({ number: z.string().nullable(), checkoutToken: z.string().nullable() })
+          .nullable()
+          .openapi({
+            description: 'The invoice that replaced this one after a correction; its checkout token while payable.',
+          }),
+        subscription: z
+          .object({
+            status: SubscriptionStatus,
+            interval: Interval,
+            intervalCount: z.number(),
+            period: z.number(),
+            periodStart: z.string(),
+            periodEnd: z.string(),
+            cycles: z.number().nullable(),
+            endsAt: z.string().nullable(),
+            cancelAtPeriodEnd: z.boolean(),
+          })
+          .nullable()
+          .openapi({ description: 'The subscription period this invoice bills.' }),
       }),
       buyer: z.object({
         collect: z.enum(['off', 'email', 'full']),
@@ -961,6 +1023,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           assetId: z.string().nullable(),
           decimals: z.number(),
           gasless: z.string().nullable(),
+          featured: z.boolean(),
         }),
       ),
       quote: CheckoutQuote.nullable(),
@@ -1161,6 +1224,19 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       200: file('The PDF.'),
       ...checkoutErrors,
       404: refused('`receipt_not_issued`, `checkout_not_found`.'),
+    },
+  });
+  checkout('get', '/logo', "Get the merchant's logo", "The merchant's PNG or JPEG logo; any site may show it.", {
+    responses: {
+      200: {
+        description: 'The image, cacheable for five minutes.',
+        content: {
+          'image/png': { schema: z.string().openapi({ format: 'binary' }) },
+          'image/jpeg': { schema: z.string().openapi({ format: 'binary' }) },
+        },
+      },
+      ...checkoutErrors,
+      404: refused('`logo_not_set`, `checkout_not_found`.'),
     },
   });
   const StatusEvent = z

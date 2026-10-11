@@ -1,6 +1,6 @@
 # TransferAuthorizationTypedData
 
-Defined in: [checkout/types.ts:118](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L118)
+Defined in: [checkout/types.ts:194](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L194)
 
 EIP-712 typed data of an EIP-3009 transfer authorization, ready for `eth_signTypedData_v4`.
 
@@ -10,7 +10,7 @@ EIP-712 typed data of an EIP-3009 transfer authorization, ready for `eth_signTyp
 
 > **domain**: `Record`\<`string`, `unknown`\>
 
-Defined in: [checkout/types.ts:120](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L120)
+Defined in: [checkout/types.ts:196](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L196)
 
 The token's EIP-712 domain.
 
@@ -20,7 +20,7 @@ The token's EIP-712 domain.
 
 > **message**: `Record`\<`string`, `string`\>
 
-Defined in: [checkout/types.ts:126](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L126)
+Defined in: [checkout/types.ts:202](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L202)
 
 The authorization: from the payer to the merchant, the quoted amount, a validity window and a nonce.
 
@@ -30,7 +30,7 @@ The authorization: from the payer to the merchant, the quoted amount, a validity
 
 > **primaryType**: `string`
 
-Defined in: [checkout/types.ts:124](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L124)
+Defined in: [checkout/types.ts:200](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L200)
 
 `TransferWithAuthorization`.
 
@@ -40,6 +40,6 @@ Defined in: [checkout/types.ts:124](https://github.com/TuwaIO/sdk/blob/main/pack
 
 > **types**: `Record`\<`string`, `object`[]\>
 
-Defined in: [checkout/types.ts:122](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L122)
+Defined in: [checkout/types.ts:198](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L198)
 
 The types, with `EIP712Domain`.

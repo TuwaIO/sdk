@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createCheckoutStore } from '../checkout';
+import { type CheckoutApi, createCheckoutStore } from '../checkout';
 import type { CheckoutView } from '../checkout/types';
 
 const BASE = 'https://quasar.example';
@@ -44,7 +44,16 @@ class FakeEventSource {
 
 const view = (overrides: Partial<CheckoutView> = {}): CheckoutView => ({
   object: 'checkout',
-  merchant: { name: 'Acme', website: null, supportEmail: null },
+  merchant: {
+    name: 'Acme',
+    website: null,
+    supportEmail: null,
+    logo: false,
+    seller: null,
+    links: { terms: null, refundPolicy: null, privacy: null },
+    fundingUrl: null,
+  },
+  theme: { mode: 'system', accentColor: null },
   invoice: {
     id: 'inv_1',
     number: 'INV-2026-7',
@@ -58,6 +67,11 @@ const view = (overrides: Partial<CheckoutView> = {}): CheckoutView => ({
     dueAt: null,
     successUrl: null,
     cancelUrl: null,
+    amountPaid: null,
+    review: null,
+    refundedTotalMinor: null,
+    replacedBy: null,
+    subscription: null,
   },
   buyer: { collect: 'off', required: false, companyInvoice: false },
   methods: [
@@ -69,6 +83,7 @@ const view = (overrides: Partial<CheckoutView> = {}): CheckoutView => ({
       assetId: null,
       decimals: 6,
       gasless: 'auto',
+      featured: true,
     },
   ],
   quote: null,
@@ -319,6 +334,50 @@ describe('createCheckoutStore', () => {
     expect(await checkout.getState().grantPermission(granted)).toBe(true);
     expect(await sent(2)).toEqual({ method: 'POST', path: '/v1/payments/checkout/tok_1/permission', body: granted });
     expect(checkout.getState().checkout?.autoCharge).toMatchObject({ status: 'active' });
+    checkout.getState().destroy();
+  });
+
+  it("points to the merchant's logo only when the merchant has one", async () => {
+    fetchMock.mockResolvedValueOnce(json(view()));
+    const without = store();
+    expect(without.getState().logoUrl).toBeNull();
+    await without.getState().load();
+    expect(without.getState().logoUrl).toBeNull();
+    without.getState().destroy();
+
+    fetchMock.mockResolvedValueOnce(json(view({ merchant: { ...view().merchant, logo: true } })));
+    const withLogo = store();
+    await withLogo.getState().load();
+    expect(withLogo.getState().logoUrl).toBe(`${BASE}/v1/payments/checkout/tok_1/logo`);
+    withLogo.getState().destroy();
+  });
+
+  it('talks to an API the app supplies instead of the network, as a simulation does', async () => {
+    const api: CheckoutApi = {
+      view: vi.fn().mockResolvedValue(view({ merchant: { ...view().merchant, logo: true } })),
+      quote: vi.fn().mockResolvedValue(QUOTE),
+      buyer: vi.fn(),
+      locale: vi.fn().mockResolvedValue({ locale: 'uk' }),
+      submit: vi.fn().mockResolvedValue({ txKey: '0xbeef', status: 'processing' }),
+      relay: vi.fn(),
+      permission: vi.fn(),
+      url: (route: string) => `sim://checkout/${route}`,
+    };
+    const checkout = createCheckoutStore({ token: 'tok_1', api, EventSource: null, pollMs: 1_000 });
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_1');
+    checkout.getState().setPayer(QUOTE.payer);
+    await checkout.getState().requestQuote();
+    await checkout.getState().setLocale('uk');
+    expect(api.quote).toHaveBeenCalledWith({ methodId: 'ap_1', payer: QUOTE.payer });
+    expect(api.locale).toHaveBeenCalledWith('uk');
+    expect(checkout.getState()).toMatchObject({
+      phase: 'awaitingPayment',
+      locale: 'uk',
+      logoUrl: 'sim://checkout/logo',
+    });
+    expect(checkout.getState().paymasterUrl).toBe('sim://checkout/paymaster');
+    expect(fetchMock).not.toHaveBeenCalled();
     checkout.getState().destroy();
   });
 });

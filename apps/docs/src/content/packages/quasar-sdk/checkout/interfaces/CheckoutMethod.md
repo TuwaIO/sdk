@@ -1,6 +1,6 @@
 # CheckoutMethod
 
-Defined in: [checkout/types.ts:61](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L61)
+Defined in: [checkout/types.ts:135](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L135)
 
 A payment method the invoice can be paid with.
 
@@ -10,7 +10,7 @@ A payment method the invoice can be paid with.
 
 > **assetId**: `string` \| `null`
 
-Defined in: [checkout/types.ts:71](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L71)
+Defined in: [checkout/types.ts:145](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L145)
 
 CAIP-19 asset.
 
@@ -20,7 +20,7 @@ CAIP-19 asset.
 
 > **chainId**: `string`
 
-Defined in: [checkout/types.ts:69](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L69)
+Defined in: [checkout/types.ts:143](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L143)
 
 CAIP-2 chain (`eip155:8453`, `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp`).
 
@@ -30,9 +30,19 @@ CAIP-2 chain (`eip155:8453`, `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp`).
 
 > **decimals**: `number`
 
-Defined in: [checkout/types.ts:73](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L73)
+Defined in: [checkout/types.ts:147](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L147)
 
 Decimals of the token.
+
+***
+
+### featured
+
+> **featured**: `boolean`
+
+Defined in: [checkout/types.ts:151](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L151)
+
+Marked "Popular" by the merchant.
 
 ***
 
@@ -40,7 +50,7 @@ Decimals of the token.
 
 > **gasless**: `string` \| `null`
 
-Defined in: [checkout/types.ts:75](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L75)
+Defined in: [checkout/types.ts:149](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L149)
 
 `auto` when the merchant may sponsor the gas, `off` otherwise.
 
@@ -50,7 +60,7 @@ Defined in: [checkout/types.ts:75](https://github.com/TuwaIO/sdk/blob/main/packa
 
 > **id**: `string`
 
-Defined in: [checkout/types.ts:63](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L63)
+Defined in: [checkout/types.ts:137](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L137)
 
 Method ID, for [CheckoutState.selectMethod](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#selectmethod).
 
@@ -60,7 +70,7 @@ Method ID, for [CheckoutState.selectMethod](/packages/quasar-sdk/checkout/interf
 
 > **name**: `string`
 
-Defined in: [checkout/types.ts:65](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L65)
+Defined in: [checkout/types.ts:139](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L139)
 
 Its name.
 
@@ -70,6 +80,6 @@ Its name.
 
 > **symbol**: `string`
 
-Defined in: [checkout/types.ts:67](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L67)
+Defined in: [checkout/types.ts:141](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L141)
 
 Token symbol.

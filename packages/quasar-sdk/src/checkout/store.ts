@@ -8,7 +8,7 @@ import { BASE_API_URL } from '../constants';
 import { type QuasarRequestIssue, QuasarSDKError } from '../core/errors';
 import type { Buyer, InvoiceLocale, InvoiceStatus } from '../modules/payments/types';
 import { checkoutApi } from './api';
-import type { CheckoutQuote, CheckoutStatusEvent, CheckoutView, GrantPermissionParams } from './types';
+import type { CheckoutApi, CheckoutQuote, CheckoutStatusEvent, CheckoutView, GrantPermissionParams } from './types';
 
 /**
  * Where the payment stands:
@@ -85,6 +85,8 @@ export interface CheckoutState {
   receiptUrl: string | null;
   /** The ERC-7677 paymaster URL for `wallet_sendCalls` when the quote offers sponsored calls; `null` otherwise. */
   paymasterUrl: string | null;
+  /** The merchant's logo (PNG or JPEG, a plain `GET` for an `<img>`); `null` when the merchant has none. */
+  logoUrl: string | null;
   /**
    * Reads the checkout (`GET`) and, while the invoice can change, follows it (server-sent events, else a read every
    * `pollMs`). Sets `phase` `error` when the link is wrong or retired.
@@ -183,6 +185,11 @@ export interface CheckoutStoreOptions {
    * instead.
    */
   EventSource?: EventSourceConstructor | null;
+  /**
+   * The calls to make instead of the HTTP ones of `token` and `baseUrl`, for tests and simulations (the TUWA docs
+   * Playground). With your own calls, pass `EventSource: null` too, or the store opens `api.url('events')`.
+   */
+  api?: CheckoutApi;
 }
 
 /** The store {@link createCheckoutStore} returns: a vanilla Zustand store (use it with `useStore` of `zustand`). */
@@ -263,7 +270,7 @@ function errorOf(error: unknown): CheckoutError {
  * ```
  */
 export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStore {
-  const api = checkoutApi(options.token, options.baseUrl ?? BASE_API_URL);
+  const api = options.api ?? checkoutApi(options.token, options.baseUrl ?? BASE_API_URL);
   const pollMs = options.pollMs ?? 5_000;
   const EventSourceClass =
     options.EventSource === undefined
@@ -282,6 +289,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         ...partial,
         receiptUrl: next.phase === 'paid' || next.phase === 'refunded' ? api.url('receipt') : null,
         paymasterUrl: next.quote?.gasless?.paymaster ? api.url('paymaster') : null,
+        logoUrl: next.checkout?.merchant.logo ? api.url('logo') : null,
       });
     };
 
@@ -373,6 +381,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       error: null,
       receiptUrl: null,
       paymasterUrl: null,
+      logoUrl: null,
 
       load: async () => {
         update({ phase: 'loading', error: null });
