@@ -191,6 +191,26 @@ describe('createCheckoutStore', () => {
     checkout.getState().destroy();
   });
 
+  it('goes back to the methods from a locked price, but not once the payment is on its way', async () => {
+    const qrQuote = { ...QUOTE, payer: null } as CheckoutView['quote'];
+    fetchMock
+      .mockResolvedValueOnce(json(view({ quote: qrQuote })))
+      .mockResolvedValueOnce(json(view({ quote: qrQuote, invoice: { ...view().invoice, status: 'processing' } })));
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState()).toMatchObject({ phase: 'awaitingPayment', quote: { methodId: 'ap_1' } });
+
+    checkout.getState().releaseQuote();
+    expect(checkout.getState()).toMatchObject({ phase: 'selectMethod', quote: null, methodId: 'ap_1' });
+    checkout.getState().destroy();
+
+    const paying = store();
+    await paying.getState().load();
+    paying.getState().releaseQuote();
+    expect(paying.getState()).toMatchObject({ phase: 'confirming', quote: { methodId: 'ap_1' } });
+    paying.getState().destroy();
+  });
+
   it('stops a payer that AML blocks, and asks for the buyer details when they come first', async () => {
     fetchMock
       .mockResolvedValueOnce(json(view()))

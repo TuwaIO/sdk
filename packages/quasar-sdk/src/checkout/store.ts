@@ -108,6 +108,12 @@ export interface CheckoutState {
    */
   setPayer: (payer: string | null) => void;
   /**
+   * Forgets the locked quote and goes back to choosing a method ("Back to methods"), also for a Solana Pay QR quote
+   * that no other action drops. Nothing changes once the payment is on its way (`submitting`, `confirming`) or done.
+   * Quasar keeps the lock until it ends: a payment of the old quote that still arrives is credited.
+   */
+  releaseQuote: () => void;
+  /**
    * Screens the payer and locks the price (`POST quote`).
    *
    * @returns The quote, or `null` with `error` set (`phase` `blocked` when AML refuses the wallet, `buyer` when the
@@ -419,6 +425,11 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           payer,
           ...(drop ? { quote: null, phase: phase === 'awaitingPayment' ? 'selectMethod' : phase } : {}),
         });
+      },
+
+      releaseQuote: () => {
+        if (get().phase !== 'awaitingPayment') return;
+        update({ quote: null, error: null, phase: 'selectMethod' });
       },
 
       requestQuote: async () => {
