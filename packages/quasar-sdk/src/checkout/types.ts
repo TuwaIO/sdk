@@ -149,6 +149,10 @@ export interface CheckoutMethod {
   gasless: string | null;
   /** Marked "Popular" by the merchant. */
   featured: boolean;
+  /** How much more the method costs than the invoice total, in basis points (`150` is 1.5 %). */
+  markupBps: number;
+  /** How much less the method costs than the invoice total, in basis points. */
+  discountBps: number;
 }
 
 /** What a wallet needs to pay a locked quote: the exact amount in base units, never rounded again. */
@@ -312,6 +316,8 @@ export interface CheckoutView {
   buyer: { collect: 'off' | 'email' | 'full'; required: boolean; companyInvoice: boolean };
   /** The methods that take this invoice. */
   methods: CheckoutMethod[];
+  /** How long a quote holds once locked, in seconds (never past the invoice deadline). */
+  quoteTtlSeconds: number;
   /** The locked quote, if any. */
   quote: CheckoutQuote | null;
   /** The automatic-charge offer of a subscription invoice; `null` otherwise. */

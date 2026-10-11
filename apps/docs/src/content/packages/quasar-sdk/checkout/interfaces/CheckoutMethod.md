@@ -36,6 +36,16 @@ Decimals of the token.
 
 ***
 
+### discountBps
+
+> **discountBps**: `number`
+
+Defined in: [checkout/types.ts:155](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L155)
+
+How much less the method costs than the invoice total, in basis points.
+
+***
+
 ### featured
 
 > **featured**: `boolean`
@@ -63,6 +73,16 @@ Defined in: [checkout/types.ts:149](https://github.com/TuwaIO/sdk/blob/main/pack
 Defined in: [checkout/types.ts:137](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L137)
 
 Method ID, for [CheckoutState.selectMethod](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#selectmethod).
+
+***
+
+### markupBps
+
+> **markupBps**: `number`
+
+Defined in: [checkout/types.ts:153](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L153)
+
+How much more the method costs than the invoice total, in basis points (`150` is 1.5 %).
 
 ***
 

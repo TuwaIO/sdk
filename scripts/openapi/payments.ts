@@ -1024,8 +1024,11 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           decimals: z.number(),
           gasless: z.string().nullable(),
           featured: z.boolean(),
+          markupBps: z.number().openapi({ description: 'Costs this much more than the total, in basis points.' }),
+          discountBps: z.number().openapi({ description: 'Costs this much less than the total, in basis points.' }),
         }),
       ),
+      quoteTtlSeconds: z.number().openapi({ description: 'How long a locked quote holds, in seconds.' }),
       quote: CheckoutQuote.nullable(),
       autoCharge: z
         .discriminatedUnion('status', [

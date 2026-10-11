@@ -2,7 +2,7 @@
 
 > **PaymentInstructions** = \{ `amount`: `string`; `chainId`: `number`; `decimals`: `number`; `family`: `"eip155"`; `symbol`: `string`; `to`: `string`; `token`: `string`; \} \| \{ `amount`: `string`; `chainId`: `string`; `decimals`: `number`; `family`: `"solana"`; `reference`: `string`; `solanaPayUrl`: `string`; `symbol`: `string`; `to`: `string`; `token`: `string`; \}
 
-Defined in: [checkout/types.ts:155](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L155)
+Defined in: [checkout/types.ts:159](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L159)
 
 What a wallet needs to pay a locked quote: the exact amount in base units, never rounded again.
 
