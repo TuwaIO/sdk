@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.5.0...quasar-sdk-v0.6.0) (2026-10-14)
+
+
+### Features
+
+* EIP-5792 batch hashes ([0426cb4](https://github.com/TuwaIO/sdk/commit/0426cb4f1661941d11d4c4abaf01a41f2d8537f5))
+
 ## [0.5.0](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.4.1...quasar-sdk-v0.5.0) (2026-10-10)
 
 
