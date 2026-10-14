@@ -22,6 +22,7 @@ export default defineConfig([
       './src/nova-transactions.ts',
       './src/nova-transactions-providers.ts',
       './src/nova-core.ts',
+      './src/nova-core-utils.ts',
       './src/orbit.ts',
     ],
     sourcemap: false,
