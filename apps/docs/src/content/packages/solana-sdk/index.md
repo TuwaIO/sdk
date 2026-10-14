@@ -1,8 +1,5 @@
 # @tuwaio/solana-sdk
 
-[![NPM Version](https://img.shields.io/npm/v/@tuwaio/solana-sdk.svg)](https://www.npmjs.com/package/@tuwaio/solana-sdk)
-[![License](https://img.shields.io/npm/l/@tuwaio/solana-sdk.svg)](https://github.com/TuwaIO/sdk/blob/main/packages/solana-sdk/LICENSE)
-
 `@tuwaio/solana-sdk` is the Solana add-on (Layer 9, L9) of [`@tuwaio/sdk`](https://sdk.docs.tuwa.io/packages/sdk). It re-exports the Solana packages of the TUWA projects under subpaths — Orbit Utils, Satellite Connect, Pulsar, SIWX and Nova Connect — built on [`@solana/kit`](https://github.com/anza-xyz/kit) and the [Wallet Standard](https://github.com/wallet-standard/wallet-standard), without `@solana/web3.js`. An app with Solana wallets installs `@tuwaio/sdk` and this package; nothing of it is loaded in an EVM-only app.
 
 ---

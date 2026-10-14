@@ -1,8 +1,5 @@
 # @tuwaio/sdk
 
-[![NPM Version](https://img.shields.io/npm/v/@tuwaio/sdk.svg)](https://www.npmjs.com/package/@tuwaio/sdk)
-[![License](https://img.shields.io/npm/l/@tuwaio/sdk.svg)](https://github.com/TuwaIO/sdk/blob/main/packages/sdk/LICENSE)
-
 `@tuwaio/sdk` is the Layer 8 (L8) package of the **TUWA SDK**: one package for React apps that re-exports the client packages of the TUWA projects under subpaths — Orbit Utils, Pulsar (transaction tracking), Satellite Connect (wallet connection), SIWX (sign-in with a wallet) and Nova UI Kit (connect and transaction components) — with the Nova stylesheets. Chain support comes from its two add-ons, [`@tuwaio/evm-sdk`](https://sdk.docs.tuwa.io/packages/evm-sdk) and [`@tuwaio/solana-sdk`](https://sdk.docs.tuwa.io/packages/solana-sdk); none of the subpaths below loads EVM or Solana code.
 
 ---
