@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/TuwaIO/sdk/compare/sdk-v0.5.0...sdk-v0.5.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* @tuwaio/sdk/nova-core/utils entry with the helpers of Nova Core only ([df860a9](https://github.com/TuwaIO/sdk/commit/df860a997c8773fb1beeae89becefa803ba8f286))
+
 ## [0.5.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.4.1...sdk-v0.5.0) (2026-10-10)
 
 
