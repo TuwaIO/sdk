@@ -14,6 +14,7 @@ package; the browser helper for React apps is in `@tuwaio/quasar-sdk/react`.
 
 - [HistoryQuery](/packages/quasar-sdk/server/interfaces/HistoryQuery.md)
 - [PaginatedResult](/packages/quasar-sdk/server/interfaces/PaginatedResult.md)
+- [PulsarPoolStore](/packages/quasar-sdk/server/interfaces/PulsarPoolStore.md)
 - [QuasarConfig](/packages/quasar-sdk/server/interfaces/QuasarConfig.md)
 
 ## Variables
@@ -21,3 +22,8 @@ package; the browser helper for React apps is in `@tuwaio/quasar-sdk/react`.
 - [BASE\_API\_URL](/packages/quasar-sdk/server/variables/BASE_API_URL.md)
 - [PULSAR\_HISTORY\_ENDPOINT](/packages/quasar-sdk/server/variables/PULSAR_HISTORY_ENDPOINT.md)
 - [PULSAR\_SYNC\_ENDPOINT](/packages/quasar-sdk/server/variables/PULSAR_SYNC_ENDPOINT.md)
+
+## Functions
+
+- [pulsarSyncHashEndpoint](/packages/quasar-sdk/server/functions/pulsarSyncHashEndpoint.md)
+- [watchBatchHashes](/packages/quasar-sdk/server/functions/watchBatchHashes.md)

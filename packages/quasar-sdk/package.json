@@ -74,7 +74,7 @@
     "ofetch": "^1.5.1"
   },
   "peerDependencies": {
-    "@tuwaio/pulsar-core": ">=0.9",
+    "@tuwaio/pulsar-core": ">=0.10",
     "@tuwaio/siwx-react": ">=0.5"
   },
   "peerDependenciesMeta": {

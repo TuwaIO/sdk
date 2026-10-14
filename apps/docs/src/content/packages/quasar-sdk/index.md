@@ -23,10 +23,10 @@
 pnpm add @tuwaio/quasar-sdk @tuwaio/pulsar-core
 ```
 
-| Import path                | Provides                                                                     | Peer dependencies                                        |
-| -------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `@tuwaio/quasar-sdk`       | `Quasar`, `PulsarModule`, `QuasarSDKError`, the endpoint constants and types | `@tuwaio/pulsar-core` (>=0.9), for the transaction types |
-| `@tuwaio/quasar-sdk/react` | `preFlightTxCheck`                                                           | Also `@tuwaio/siwx-react` (>=0.5, optional for the root) |
+| Import path                | Provides                                                                                         | Peer dependencies                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| `@tuwaio/quasar-sdk`       | `Quasar`, `PulsarModule`, `watchBatchHashes`, `QuasarSDKError`, the endpoint constants and types | `@tuwaio/pulsar-core` (>=0.10), for the transaction types |
+| `@tuwaio/quasar-sdk/react` | `preFlightTxCheck`                                                                               | Also `@tuwaio/siwx-react` (>=0.5, optional for the root)  |
 
 The root entry point imports neither React nor SIWX packages, so it runs in Node.js, Next.js Server Actions and route handlers, and Edge runtimes. Its HTTP client, `ofetch`, is a dependency.
 
@@ -54,6 +54,25 @@ export async function getHistory(walletAddress: string, page = 1) {
 ```
 
 Before calling Quasar for a user, check on the server that the user owns the wallet (for example with `getSiwxServerSession` and `isSessionMatchingTarget` from `@tuwaio/siwx-server`), so nobody can sync or read the transactions of another address. The complete flow — SIWX sessions, the Pulsar callbacks `onRemoteCreate` and `beforeTxProcess`, the history in Nova Transactions — is the **[Quasar transaction sync guide](https://docs.tuwa.io/guides/quasar-transaction-sync)**; Quasar itself (apps and keys, quotas, webhooks, self-hosting) is described in the **[Quasar docs](https://docs.tuwa.io/quasar)**.
+
+### EIP-5792 batches
+
+A batch of calls sent with `wallet_sendCalls` (`TransactionTracker.EIP5792`) is synced by its batch ID; Quasar tracks it on-chain once it gets the hash of the transaction that executed the batch, and marks it `Failed` an hour after the sync if the hash never arrives. Pulsar learns the hash in the browser, so watch the store there and send each hash through a Server Action:
+
+```ts
+'use server';
+
+export async function syncBatchHash(txKey: string, hash: `0x${string}`) {
+  await quasar.pulsar.syncHash(txKey, hash);
+}
+```
+
+```ts
+import { watchBatchHashes } from '@tuwaio/quasar-sdk';
+
+// In the browser, next to the Pulsar store
+const stop = watchBatchHashes(pulsarStore, (tx) => syncBatchHash(tx.txKey, tx.hash));
+```
 
 ### Webhook relay
 
@@ -85,7 +104,7 @@ Nothing is written. `preFlightTxCheck` reads the SIWX session from the store of 
 
 | Part                | Host                                                             | Request                                                                                                                                                             |
 | ------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Quasar` client     | `baseUrl` (default `https://api.tuwa.io`)                        | `POST /v1/engine/pulsar/sync` and `GET /v1/engine/pulsar/history`, with the secret key in the `x-tuwa-secret-key` header                                            |
+| `Quasar` client     | `baseUrl` (default `https://api.tuwa.io`)                        | `POST /v1/engine/pulsar/sync`, `POST /v1/engine/pulsar/sync/:txKey/hash` and `GET /v1/engine/pulsar/history`, with the secret key in the `x-tuwa-secret-key` header |
 | `preFlightTxCheck`  | Its `customApiUrl` (default `https://api.tuwa.io`)               | `GET /v1/engine/monitoring/health`, without credentials                                                                                                             |
 | `quasar-sdk listen` | `--api-url` (default `https://api.tuwa.io`), then `--forward-to` | A Server-Sent Events stream from `/v1/engine/webhooks/listen` with the signing secret in the `x-webhook-secret` header; a `POST` to the local URL for each delivery |
 
