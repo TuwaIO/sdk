@@ -111,11 +111,12 @@ The full setup — EVM and Solana, transaction tracking with Pulsar and Nova Tra
 
 ## 🗄️ Browser Storage
 
-`@tuwaio/sdk` saves nothing itself. The re-exported packages use these `localStorage` keys; each page lists when they are written:
+`@tuwaio/sdk` saves nothing itself. The re-exported packages use these browser storage keys; each page lists when they are written:
 
-- `orbit-core:lastConnectedConnector`, `orbit-core:recentlyConnectedConnectorsListHelpers` and `satellite-connect:impersonatedAddress`: the last connection, the recent wallets and the impersonated address ([`@tuwaio/satellite-core`](https://satellite.docs.tuwa.io/packages/satellite-core), read by Nova Connect);
-- the `name` passed to `createPulsarStore`: the tracked transactions ([`@tuwaio/pulsar-core`](https://pulsar.docs.tuwa.io/packages/pulsar-core));
-- `siwx-react:session`: the SIWX session shown in the UI ([`@tuwaio/siwx-react`](https://siwx.docs.tuwa.io/packages/siwx-react)).
+- `orbit-core:lastConnectedConnector`, `orbit-core:recentlyConnectedConnectorsListHelpers`: the last connection and the recent wallets, in `localStorage`, or in `sessionStorage` until the tab closes when `rememberWallet` of `SatelliteConnectProvider` is `false` or "Remember this wallet" of Nova Connect is unticked ([`@tuwaio/satellite-core`](https://satellite.docs.tuwa.io/packages/satellite-core), read by Nova Connect);
+- `satellite-connect:impersonatedAddress` in `localStorage`: the impersonated address ([`@tuwaio/satellite-core`](https://satellite.docs.tuwa.io/packages/satellite-core));
+- the `name` passed to `createPulsarStore` in `localStorage`: the tracked transactions ([`@tuwaio/pulsar-core`](https://pulsar.docs.tuwa.io/packages/pulsar-core));
+- `siwx-react:session` in `localStorage`: the SIWX session shown in the UI ([`@tuwaio/siwx-react`](https://siwx.docs.tuwa.io/packages/siwx-react)).
 
 ## 🌐 External Services
 
