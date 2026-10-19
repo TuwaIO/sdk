@@ -60,6 +60,25 @@ export async function getHistory(walletAddress: string, page = 1) {
 
 Before calling Quasar for a user, check on the server that the user owns the wallet (for example with `getSiwxServerSession` and `isSessionMatchingTarget` from `@tuwaio/siwx-server`), so nobody can sync or read the transactions of another address. The complete flow — SIWX sessions, the Pulsar callbacks `onRemoteCreate` and `beforeTxProcess`, the history in Nova Transactions — is the **[Quasar transaction sync guide](https://docs.tuwa.io/guides/quasar-transaction-sync)**; Quasar itself (apps and keys, quotas, webhooks, self-hosting) is described in the **[Quasar docs](https://docs.tuwa.io/quasar)**.
 
+### EIP-5792 batches
+
+A batch of calls sent with `wallet_sendCalls` (`TransactionTracker.EIP5792`) is synced by its batch ID; Quasar tracks it on-chain once it gets the hash of the transaction that executed the batch, and marks it `Failed` an hour after the sync if the hash never arrives. Pulsar learns the hash in the browser, so watch the store there and send each hash through a Server Action:
+
+```ts
+'use server';
+
+export async function syncBatchHash(txKey: string, hash: `0x${string}`) {
+  await quasar.pulsar.syncHash(txKey, hash);
+}
+```
+
+```ts
+import { watchBatchHashes } from '@tuwaio/quasar-sdk';
+
+// In the browser, next to the Pulsar store
+const stop = watchBatchHashes(pulsarStore, (tx) => syncBatchHash(tx.txKey, tx.hash));
+```
+
 ### Payments
 
 A Payments app (chosen when the app is created, on a node that runs Payments) issues invoices that buyers pay in crypto on its payment page; Quasar checks the payment on-chain, issues the receipt and sends `payments.v1` webhooks.

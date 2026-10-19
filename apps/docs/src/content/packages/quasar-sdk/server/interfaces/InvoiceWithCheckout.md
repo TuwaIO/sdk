@@ -1,6 +1,6 @@
 # InvoiceWithCheckout
 
-Defined in: [modules/payments/types.ts:323](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L323)
+Defined in: modules/payments/types.ts:323
 
 An invoice with its checkout token and payment page.
 
@@ -14,7 +14,7 @@ An invoice with its checkout token and payment page.
 
 > **checkoutToken**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:327](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L327)
+Defined in: modules/payments/types.ts:327
 
 The checkout token, `null` when the invoice can no longer be paid.
 
@@ -24,7 +24,7 @@ The checkout token, `null` when the invoice can no longer be paid.
 
 > **invoice**: [`Invoice`](/packages/quasar-sdk/server/interfaces/Invoice.md)
 
-Defined in: [modules/payments/types.ts:325](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L325)
+Defined in: modules/payments/types.ts:325
 
 The invoice.
 
@@ -34,6 +34,6 @@ The invoice.
 
 > **payUrl**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:329](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L329)
+Defined in: modules/payments/types.ts:329
 
 The payment page, `null` without a token or when the node has no dashboard URL.

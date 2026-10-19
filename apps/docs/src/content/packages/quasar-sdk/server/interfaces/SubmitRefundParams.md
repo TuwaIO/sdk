@@ -1,6 +1,6 @@
 # SubmitRefundParams
 
-Defined in: [modules/payments/types.ts:491](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L491)
+Defined in: modules/payments/types.ts:491
 
 What [PaymentsModule.submitRefund](/packages/quasar-sdk/server/classes/PaymentsModule.md#submitrefund) takes.
 
@@ -10,7 +10,7 @@ What [PaymentsModule.submitRefund](/packages/quasar-sdk/server/classes/PaymentsM
 
 > **from**: `string`
 
-Defined in: [modules/payments/types.ts:495](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L495)
+Defined in: modules/payments/types.ts:495
 
 Your wallet it was sent from.
 
@@ -20,6 +20,6 @@ Your wallet it was sent from.
 
 > **txHash**: `string`
 
-Defined in: [modules/payments/types.ts:493](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L493)
+Defined in: modules/payments/types.ts:493
 
 The refund transaction (hash or Solana signature).

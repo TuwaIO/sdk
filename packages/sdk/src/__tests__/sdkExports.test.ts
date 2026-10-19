@@ -4,6 +4,7 @@ import * as novaConnect from '../nova-connect.js';
 import * as novaConnectComponents from '../nova-connect-components.js';
 import * as novaConnectHooks from '../nova-connect-hooks.js';
 import * as novaCore from '../nova-core.js';
+import * as novaCoreUtils from '../nova-core-utils.js';
 import * as novaTransactions from '../nova-transactions.js';
 import * as novaTransactionsProviders from '../nova-transactions-providers.js';
 import * as orbit from '../orbit.js';
@@ -75,5 +76,13 @@ describe('Unified SDK Re-Exports', () => {
     expect(typeof novaConnect.NovaConnectProvider).toBe('function');
     expect(typeof novaConnectHooks.useNovaSiwx).toBe('function');
     expect(novaConnectComponents.ConnectButton).toBeDefined();
+  });
+
+  it('exports only the helpers of nova-core from nova-core-utils, without components and icons', async () => {
+    const helpers = await import('@tuwaio/nova-core/utils');
+
+    expect(Object.keys(novaCoreUtils).sort()).toEqual(Object.keys(helpers).sort());
+    expect(typeof novaCoreUtils.cn).toBe('function');
+    expect('NetworkIcon' in novaCoreUtils).toBe(false);
   });
 });

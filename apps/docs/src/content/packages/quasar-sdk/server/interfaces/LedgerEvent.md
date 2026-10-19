@@ -1,6 +1,6 @@
 # LedgerEvent
 
-Defined in: [modules/payments/types.ts:379](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L379)
+Defined in: modules/payments/types.ts:379
 
 One step of an invoice ledger. Each step's `hash` covers the step and `prevHash`.
 
@@ -10,7 +10,7 @@ One step of an invoice ledger. Each step's `hash` covers the step and `prevHash`
 
 > **actor**: `string`
 
-Defined in: [modules/payments/types.ts:389](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L389)
+Defined in: modules/payments/types.ts:389
 
 Who acted: `merchant_api`, `system`, `checkout`, `dashboard:<userId>`, `admin:<userId>`…
 
@@ -20,7 +20,7 @@ Who acted: `merchant_api`, `system`, `checkout`, `dashboard:<userId>`, `admin:<u
 
 > **chainId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:391](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L391)
+Defined in: modules/payments/types.ts:391
 
 Chain of an on-chain step.
 
@@ -30,7 +30,7 @@ Chain of an on-chain step.
 
 > **createdAt**: `string`
 
-Defined in: [modules/payments/types.ts:395](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L395)
+Defined in: modules/payments/types.ts:395
 
 When.
 
@@ -40,7 +40,7 @@ When.
 
 > **data**: `unknown`
 
-Defined in: [modules/payments/types.ts:387](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L387)
+Defined in: modules/payments/types.ts:387
 
 Details of the step.
 
@@ -50,7 +50,7 @@ Details of the step.
 
 > **hash**: `string`
 
-Defined in: [modules/payments/types.ts:399](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L399)
+Defined in: modules/payments/types.ts:399
 
 Hash of this step.
 
@@ -60,7 +60,7 @@ Hash of this step.
 
 > **id**: `string`
 
-Defined in: [modules/payments/types.ts:381](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L381)
+Defined in: modules/payments/types.ts:381
 
 Event ID; webhooks of this step carry it as their `id`.
 
@@ -70,7 +70,7 @@ Event ID; webhooks of this step carry it as their `id`.
 
 > **prevHash**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:397](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L397)
+Defined in: modules/payments/types.ts:397
 
 Hash of the previous step.
 
@@ -80,7 +80,7 @@ Hash of the previous step.
 
 > **seq**: `number`
 
-Defined in: [modules/payments/types.ts:383](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L383)
+Defined in: modules/payments/types.ts:383
 
 Position in the ledger, from 1.
 
@@ -90,7 +90,7 @@ Position in the ledger, from 1.
 
 > **txHash**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:393](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L393)
+Defined in: modules/payments/types.ts:393
 
 Transaction of an on-chain step.
 
@@ -100,6 +100,6 @@ Transaction of an on-chain step.
 
 > **type**: `string`
 
-Defined in: [modules/payments/types.ts:385](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L385)
+Defined in: modules/payments/types.ts:385
 
 What happened, for example `invoice.issued`, `quote.locked`, `invoice.paid`.

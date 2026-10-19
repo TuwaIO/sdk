@@ -1,6 +1,6 @@
 # InvoiceLine
 
-Defined in: [modules/payments/types.ts:144](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L144)
+Defined in: modules/payments/types.ts:144
 
 A line of an issued invoice, with its net amount.
 
@@ -10,7 +10,7 @@ A line of an issued invoice, with its net amount.
 
 > `optional` **description?**: `string`
 
-Defined in: [modules/payments/types.ts:148](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L148)
+Defined in: modules/payments/types.ts:148
 
 Details under the name.
 
@@ -20,7 +20,7 @@ Details under the name.
 
 > **name**: `string`
 
-Defined in: [modules/payments/types.ts:146](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L146)
+Defined in: modules/payments/types.ts:146
 
 What is sold.
 
@@ -30,7 +30,7 @@ What is sold.
 
 > **net**: `string`
 
-Defined in: [modules/payments/types.ts:158](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L158)
+Defined in: modules/payments/types.ts:158
 
 Net amount of the line.
 
@@ -40,7 +40,7 @@ Net amount of the line.
 
 > **quantity**: `string`
 
-Defined in: [modules/payments/types.ts:150](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L150)
+Defined in: modules/payments/types.ts:150
 
 Quantity as a decimal string.
 
@@ -50,7 +50,7 @@ Quantity as a decimal string.
 
 > **taxCategory**: [`TaxCategory`](/packages/quasar-sdk/server/type-aliases/TaxCategory.md)
 
-Defined in: [modules/payments/types.ts:154](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L154)
+Defined in: modules/payments/types.ts:154
 
 VAT category.
 
@@ -60,7 +60,7 @@ VAT category.
 
 > **taxRate**: `string`
 
-Defined in: [modules/payments/types.ts:156](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L156)
+Defined in: modules/payments/types.ts:156
 
 VAT rate in percent.
 
@@ -70,7 +70,7 @@ VAT rate in percent.
 
 > `optional` **unitCode?**: `string`
 
-Defined in: [modules/payments/types.ts:160](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L160)
+Defined in: modules/payments/types.ts:160
 
 Unit code, when given.
 
@@ -80,6 +80,6 @@ Unit code, when given.
 
 > **unitPrice**: `string`
 
-Defined in: [modules/payments/types.ts:152](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L152)
+Defined in: modules/payments/types.ts:152
 
 Price of one unit.

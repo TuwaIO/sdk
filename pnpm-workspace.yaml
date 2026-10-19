@@ -35,27 +35,32 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/utils@8.70.0 || 8.71.0'
   - '@typescript-eslint/visitor-keys@8.70.0 || 8.71.0'
   - typescript-eslint@8.70.0 || 8.71.0
-  - '@next/env@16.3.7 || 16.3.8'
-  - '@next/swc-darwin-arm64@16.3.7 || 16.3.8'
-  - '@next/swc-darwin-x64@16.3.7 || 16.3.8'
-  - '@next/swc-linux-arm64-gnu@16.3.7 || 16.3.8'
-  - '@next/swc-linux-arm64-musl@16.3.7 || 16.3.8'
-  - '@next/swc-linux-x64-gnu@16.3.7 || 16.3.8'
-  - '@next/swc-linux-x64-musl@16.3.7 || 16.3.8'
-  - '@next/swc-win32-arm64-msvc@16.3.7 || 16.3.8'
-  - '@next/swc-win32-x64-msvc@16.3.7 || 16.3.8'
+  - '@next/env@16.3.7 || 16.3.8 || 16.4.1'
+  - '@next/swc-darwin-arm64@16.3.7 || 16.3.8 || 16.4.1'
+  - '@next/swc-darwin-x64@16.3.7 || 16.3.8 || 16.4.1'
+  - '@next/swc-linux-arm64-gnu@16.3.7 || 16.3.8 || 16.4.1'
+  - '@next/swc-linux-arm64-musl@16.3.7 || 16.3.8 || 16.4.1'
+  - '@next/swc-linux-x64-gnu@16.3.7 || 16.3.8 || 16.4.1'
+  - '@next/swc-linux-x64-musl@16.3.7 || 16.3.8 || 16.4.1'
+  - '@next/swc-win32-arm64-msvc@16.3.7 || 16.3.8 || 16.4.1'
+  - '@next/swc-win32-x64-msvc@16.3.7 || 16.3.8 || 16.4.1'
   - '@scalar/localization@0.2.4'
   - '@scalar/openapi-to-markdown@1.4.0'
   - '@scalar/openapi-upgrader@0.4.1'
   - '@scalar/themes@0.18.1'
-  - framer-motion@13.4.6 || 13.5.1 || 14.0.0
-  - motion-dom@13.4.5 || 13.5.1 || 14.0.0
+  - framer-motion@13.4.6 || 13.5.1 || 14.0.0 || 14.3.0
+  - motion-dom@13.4.5 || 13.5.1 || 14.0.0 || 14.3.0
   - motion-utils@14.0.0
-  - next@16.3.7 || 16.3.8
-  - viem@2.57.0 || 2.57.1 || 2.57.2
+  - next@16.3.7 || 16.3.8 || 16.4.1
+  - viem@2.57.0 || 2.57.1 || 2.57.2 || 2.57.7
   - '@tuwaio/docs-ui@0.0.39 || 0.1.0'
   - '@web3icons/common@0.11.52'
   - '@web3icons/react@4.1.23'
+  - '@vitest/mocker@5.0.5'
+  - '@vitest/spy@5.0.5'
+  - react-dom@19.3.1
+  - react@19.3.1
+  - vitest@5.0.5
 overrides:
   # nextra-theme-docs 4.6.1 validates its Layout props with zod; with zod 4.4 and newer the validation rejects them
   # ("expected nonoptional ... at children"). Scalar needs zod >= 4.4, so keep 4.3 for Nextra only.

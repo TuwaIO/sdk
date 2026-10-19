@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.6.1](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.0...sdk-v0.6.1) (2026-10-16)
+
+
+### Bug Fixes
+
+* updated packages ([03c3c9b](https://github.com/TuwaIO/sdk/commit/03c3c9bcc3f0c315ed9dd5e45d070aa4a512aa8a))
+
+## [0.6.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.5.1...sdk-v0.6.0) (2026-10-15)
+
+
+### Features
+
+* updated packages ([5e4fc8f](https://github.com/TuwaIO/sdk/commit/5e4fc8f3c5768cfd431bd2da1d1017069bf2dd3c))
+
+## [0.5.1](https://github.com/TuwaIO/sdk/compare/sdk-v0.5.0...sdk-v0.5.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* @tuwaio/sdk/nova-core/utils entry with the helpers of Nova Core only ([df860a9](https://github.com/TuwaIO/sdk/commit/df860a997c8773fb1beeae89becefa803ba8f286))
+
 ## [0.5.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.4.1...sdk-v0.5.0) (2026-10-10)
 
 

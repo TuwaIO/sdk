@@ -2,7 +2,7 @@
 
 > **watchBatchHashes**\<`T`\>(`store`, `onHash`): () => `void`
 
-Defined in: [modules/pulsar/batches.ts:44](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/pulsar/batches.ts#L44)
+Defined in: modules/pulsar/batches.ts:44
 
 Watches a Pulsar store for EIP-5792 batches whose transaction became known and calls `onHash` once for each, so the
 app can send the hash to Quasar with `PulsarModule.syncHash` (through a Server Action, since that call needs the

@@ -1,6 +1,6 @@
 import '@/styles/app.css';
 
-import { Footer, Navbar, RemoteLogo } from '@tuwaio/docs-ui';
+import { Footer, Navbar, PreferenceExpiry, RemoteLogo } from '@tuwaio/docs-ui';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
     'Documentation for the TUWA SDK: @tuwaio/sdk and its EVM and Solana add-ons, one set of packages for React apps built on the TUWA ecosystem, and @tuwaio/quasar-sdk, the client of the Quasar API.',
   manifest: '/manifest.json',
   icons: {
-    icon: 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/favicon/icon0.svg',
-    shortcut: 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/favicon/web-app-manifest-512x512.png',
-    apple: 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/favicon/web-app-manifest-512x512.png',
+    icon: 'https://tuwa.io/brand/icon0.svg',
+    shortcut: 'https://tuwa.io/brand/web-app-manifest-512x512.png',
+    apple: 'https://tuwa.io/brand/web-app-manifest-512x512.png',
   },
   keywords: [
     'tuwa',
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     siteName: 'TUWA SDK Docs',
     images: [
       {
-        url: 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/preview/preview-logo.png',
+        url: 'https://tuwa.io/brand/preview-logo.png',
         width: 1200,
         height: 630,
       },
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     title: 'TUWA SDK Documentation',
     description:
       'Documentation for the TUWA SDK: @tuwaio/sdk and its EVM and Solana add-ons, one set of packages for React apps built on the TUWA ecosystem, and @tuwaio/quasar-sdk, the client of the Quasar API.',
-    images: ['https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/preview/preview-logo.png'],
+    images: ['https://tuwa.io/brand/preview-logo.png'],
   },
 };
 
@@ -89,6 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head>
         <meta name="apple-mobile-web-app-title" content="TUWA SDK Docs" />
+        <PreferenceExpiry />
       </Head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <Layout

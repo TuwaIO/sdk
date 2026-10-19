@@ -1,6 +1,6 @@
 {
   "name": "@tuwaio/evm-sdk",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
@@ -83,23 +83,23 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-evm": "^0.3.3",
-    "@tuwaio/pulsar-evm": "^0.9.0",
-    "@tuwaio/satellite-evm": "^0.9.0",
+    "@tuwaio/orbit-evm": "^0.4.0",
+    "@tuwaio/pulsar-evm": "^0.9.1",
+    "@tuwaio/satellite-evm": "^0.10.0",
     "@tuwaio/siwx-evm": "^0.5.1"
   },
   "peerDependencies": {
     "@tuwaio/satellite-core": ">=0.7",
-    "@tuwaio/sdk": ">=0.5",
+    "@tuwaio/sdk": ">=0.6",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/satellite-core": "^0.9.0",
+    "@tuwaio/satellite-core": "^0.10.0",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.5",
-    "tsup": "^8.5.1",
+    "tsup": "^9.0.0",
     "typescript": "6.0.3",
-    "viem": "^2.57.3"
+    "viem": "^2.57.7"
   }
 }

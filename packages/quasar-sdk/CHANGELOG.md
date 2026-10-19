@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.7.1](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.7.0...quasar-sdk-v0.7.1) (2026-10-16)
+
+
+### Bug Fixes
+
+* updated packages ([03c3c9b](https://github.com/TuwaIO/sdk/commit/03c3c9bcc3f0c315ed9dd5e45d070aa4a512aa8a))
+
+## [0.7.0](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.6.0...quasar-sdk-v0.7.0) (2026-10-15)
+
+
+### Features
+
+* updated packages ([5e4fc8f](https://github.com/TuwaIO/sdk/commit/5e4fc8f3c5768cfd431bd2da1d1017069bf2dd3c))
+
+## [0.6.0](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.5.0...quasar-sdk-v0.6.0) (2026-10-14)
+
+
+### Features
+
+* EIP-5792 batch hashes ([0426cb4](https://github.com/TuwaIO/sdk/commit/0426cb4f1661941d11d4c4abaf01a41f2d8537f5))
+
 ## [0.5.0](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.4.1...quasar-sdk-v0.5.0) (2026-10-10)
 
 

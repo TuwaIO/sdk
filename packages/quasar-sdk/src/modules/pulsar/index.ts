@@ -56,7 +56,6 @@ export class PulsarModule {
       },
     });
   }
-
   /**
    * Sends the hash of the transaction that executed an EIP-5792 batch (`POST /v1/engine/pulsar/sync/:txKey/hash`). A
    * batch is synced by its batch ID (`TransactionTracker.EIP5792`), which only the wallet can resolve; with the hash,

@@ -1,6 +1,6 @@
 # Buyer
 
-Defined in: [modules/payments/types.ts:34](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L34)
+Defined in: modules/payments/types.ts:34
 
 The buyer of an invoice (EN 16931 BT-44 to BT-55). Every field is optional; an e-invoice is issued only when the
 fields it needs are there (otherwise the invoice says what was missing in `eInvoiceSkipped`).
@@ -11,7 +11,7 @@ fields it needs are there (otherwise the invoice says what was missing in `eInvo
 
 > `optional` **addressLine1?**: `string`
 
-Defined in: [modules/payments/types.ts:40](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L40)
+Defined in: modules/payments/types.ts:40
 
 First address line.
 
@@ -21,7 +21,7 @@ First address line.
 
 > `optional` **addressLine2?**: `string`
 
-Defined in: [modules/payments/types.ts:42](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L42)
+Defined in: modules/payments/types.ts:42
 
 Second address line.
 
@@ -31,7 +31,7 @@ Second address line.
 
 > `optional` **city?**: `string`
 
-Defined in: [modules/payments/types.ts:46](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L46)
+Defined in: modules/payments/types.ts:46
 
 City.
 
@@ -41,7 +41,7 @@ City.
 
 > `optional` **country?**: `string`
 
-Defined in: [modules/payments/types.ts:50](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L50)
+Defined in: modules/payments/types.ts:50
 
 ISO 3166-1 alpha-2 country code, for example `DE`.
 
@@ -51,7 +51,7 @@ ISO 3166-1 alpha-2 country code, for example `DE`.
 
 > `optional` **email?**: `string`
 
-Defined in: [modules/payments/types.ts:38](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L38)
+Defined in: modules/payments/types.ts:38
 
 Email address; Quasar Cloud sends the invoice, receipt and credit notes to it.
 
@@ -61,7 +61,7 @@ Email address; Quasar Cloud sends the invoice, receipt and credit notes to it.
 
 > `optional` **externalId?**: `string`
 
-Defined in: [modules/payments/types.ts:56](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L56)
+Defined in: modules/payments/types.ts:56
 
 Your ID of the buyer; filter invoices by it with `externalId`.
 
@@ -71,7 +71,7 @@ Your ID of the buyer; filter invoices by it with `externalId`.
 
 > `optional` **name?**: `string`
 
-Defined in: [modules/payments/types.ts:36](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L36)
+Defined in: modules/payments/types.ts:36
 
 Name of the person or the company.
 
@@ -81,7 +81,7 @@ Name of the person or the company.
 
 > `optional` **postalCode?**: `string`
 
-Defined in: [modules/payments/types.ts:44](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L44)
+Defined in: modules/payments/types.ts:44
 
 Postal code.
 
@@ -91,7 +91,7 @@ Postal code.
 
 > `optional` **region?**: `string`
 
-Defined in: [modules/payments/types.ts:48](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L48)
+Defined in: modules/payments/types.ts:48
 
 Region or state.
 
@@ -101,7 +101,7 @@ Region or state.
 
 > `optional` **registrationNumber?**: `string`
 
-Defined in: [modules/payments/types.ts:52](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L52)
+Defined in: modules/payments/types.ts:52
 
 Company registration number.
 
@@ -111,6 +111,6 @@ Company registration number.
 
 > `optional` **taxId?**: `string`
 
-Defined in: [modules/payments/types.ts:54](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L54)
+Defined in: modules/payments/types.ts:54
 
 VAT or other tax ID; required for a reverse-charge invoice.

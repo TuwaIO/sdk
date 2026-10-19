@@ -2,7 +2,7 @@
 
 > **createRefundStore**(`options`): [`RefundStore`](/packages/quasar-sdk/checkout/type-aliases/RefundStore.md)
 
-Defined in: [checkout/refundStore.ts:101](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L101)
+Defined in: checkout/refundStore.ts:101
 
 Creates the headless refund of a payment from the merchant's connected wallet: ask for the refund, send its
 `instructions` with the wallet (Pulsar or the wallet itself; the store sends nothing on-chain), hand over the

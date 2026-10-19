@@ -2,7 +2,7 @@
 
 > **CheckoutPhase** = `"loading"` \| `"buyer"` \| `"selectMethod"` \| `"quoting"` \| `"awaitingPayment"` \| `"submitting"` \| `"confirming"` \| `"paid"` \| `"underpaid"` \| `"held"` \| `"refunded"` \| `"expired"` \| `"cancelled"` \| `"blocked"` \| `"error"`
 
-Defined in: [checkout/store.ts:29](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L29)
+Defined in: checkout/store.ts:29
 
 Where the payment stands:
 

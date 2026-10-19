@@ -1,8 +1,5 @@
 # @tuwaio/evm-sdk
 
-[![NPM Version](https://img.shields.io/npm/v/@tuwaio/evm-sdk.svg)](https://www.npmjs.com/package/@tuwaio/evm-sdk)
-[![License](https://img.shields.io/npm/l/@tuwaio/evm-sdk.svg)](https://github.com/TuwaIO/sdk/blob/main/packages/evm-sdk/LICENSE)
-
 `@tuwaio/evm-sdk` is the EVM add-on (Layer 9, L9) of [`@tuwaio/sdk`](https://sdk.docs.tuwa.io/packages/sdk). It re-exports the EVM packages of the TUWA projects under subpaths — Orbit Utils, Satellite Connect, Pulsar, SIWX and Nova Connect — built on [`viem`](https://viem.sh) and [`@wagmi/core`](https://wagmi.sh/core). An app with EVM wallets installs `@tuwaio/sdk` and this package; nothing of it is loaded in a Solana-only app.
 
 ---
@@ -21,7 +18,7 @@
 pnpm add @tuwaio/sdk @tuwaio/evm-sdk @wagmi/core viem react react-dom
 ```
 
-Peer dependencies: `@tuwaio/sdk` (>=0.5, the same release line), `@wagmi/core` (3.x), `viem` (2.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
+Peer dependencies: `@tuwaio/sdk` (>=0.6, the same release line), `@wagmi/core` (3.x), `viem` (2.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
 
 | Import path                    | Re-exports                                         | Reference                                                                                 |
 | ------------------------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------------- |

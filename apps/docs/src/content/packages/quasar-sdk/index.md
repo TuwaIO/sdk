@@ -1,8 +1,5 @@
 # @tuwaio/quasar-sdk
 
-[![NPM Version](https://img.shields.io/npm/v/@tuwaio/quasar-sdk.svg)](https://www.npmjs.com/package/@tuwaio/quasar-sdk)
-[![License](https://img.shields.io/npm/l/@tuwaio/quasar-sdk.svg)](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/LICENSE)
-
 `@tuwaio/quasar-sdk` is the Layer 5 (L5) package of the **TUWA SDK**: the client of the API of **Quasar**, the TUWA backend that tracks the transactions of your app on the server, keeps their history and, for a Payments app, issues invoices paid in crypto straight to your wallets. It works with Quasar Cloud (`https://api.tuwa.io`) and with a self-hosted Quasar server. It has four parts: the `Quasar` client for your server (with webhook verification), the headless checkout for the browser (`@tuwaio/quasar-sdk/checkout`), a check for the browser (`@tuwaio/quasar-sdk/react`), and the `quasar-sdk` CLI that relays webhooks to `localhost`.
 
 ---
@@ -59,6 +56,25 @@ export async function getHistory(walletAddress: string, page = 1) {
 ```
 
 Before calling Quasar for a user, check on the server that the user owns the wallet (for example with `getSiwxServerSession` and `isSessionMatchingTarget` from `@tuwaio/siwx-server`), so nobody can sync or read the transactions of another address. The complete flow — SIWX sessions, the Pulsar callbacks `onRemoteCreate` and `beforeTxProcess`, the history in Nova Transactions — is the **[Quasar transaction sync guide](https://docs.tuwa.io/guides/quasar-transaction-sync)**; Quasar itself (apps and keys, quotas, webhooks, self-hosting) is described in the **[Quasar docs](https://docs.tuwa.io/quasar)**.
+
+### EIP-5792 batches
+
+A batch of calls sent with `wallet_sendCalls` (`TransactionTracker.EIP5792`) is synced by its batch ID; Quasar tracks it on-chain once it gets the hash of the transaction that executed the batch, and marks it `Failed` an hour after the sync if the hash never arrives. Pulsar learns the hash in the browser, so watch the store there and send each hash through a Server Action:
+
+```ts
+'use server';
+
+export async function syncBatchHash(txKey: string, hash: `0x${string}`) {
+  await quasar.pulsar.syncHash(txKey, hash);
+}
+```
+
+```ts
+import { watchBatchHashes } from '@tuwaio/quasar-sdk';
+
+// In the browser, next to the Pulsar store
+const stop = watchBatchHashes(pulsarStore, (tx) => syncBatchHash(tx.txKey, tx.hash));
+```
 
 ### Payments
 

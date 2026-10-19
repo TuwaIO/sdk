@@ -329,6 +329,55 @@ registry.registerPath({
       description: 'Public key (read-only), disabled app, or IP address or origin not allowed by the app settings.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
+    422: {
+      description:
+        'The app has no provider to track this transaction, such as an RPC endpoint, an Alchemy key or a QuickNode key for its chain; nothing is stored. Quasar Cloud tracks transactions only through the providers of the app.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    429: {
+      description: 'Too many requests per second for the app.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: `${PULSAR_SYNC_ENDPOINT}/{txKey}/hash`,
+  summary: 'Send the hash of an EIP-5792 batch',
+  description:
+    'Sends the hash of the transaction that executed an EIP-5792 batch (`tracker: eip5792`), which was synced by its batch ID. Quasar then tracks the batch on-chain by the hash, like an Ethereum transaction; the record keeps the batch ID as `txKey`. A batch whose hash never arrives is marked `Failed` an hour after it was synced. Used by `quasar.pulsar.syncHash`; `watchBatchHashes` reads the hashes from a Pulsar store.',
+  tags: ['Pulsar'],
+  security: [{ [secretKeyAuth.name]: [] }],
+  request: {
+    params: z.object({ txKey: z.string().openapi({ description: 'The batch ID, the `txKey` of the transaction.' }) }),
+    body: { content: { 'application/json': { schema: BatchHashRequestSchema } }, required: true },
+  },
+  responses: {
+    200: {
+      description: 'The hash is recorded and on-chain tracking started, or Quasar already had it (`duplicate: true`).',
+      content: { 'application/json': { schema: BatchHashResponseSchema } },
+    },
+    400: {
+      description: 'The hash is malformed, or the transaction is not an EIP-5792 batch.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    401: {
+      description: 'Missing or invalid key.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    404: {
+      description: 'The app has no transaction with this `txKey`.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    403: {
+      description: 'Public key (read-only), disabled app, or IP address or origin not allowed by the app settings.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    409: {
+      description: 'The batch has another hash, or it is already final.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
     429: {
       description: 'Too many requests per second for the app.',
       content: { 'application/json': { schema: ErrorResponseSchema } },

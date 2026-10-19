@@ -1,8 +1,5 @@
 # @tuwaio/solana-sdk
 
-[![NPM Version](https://img.shields.io/npm/v/@tuwaio/solana-sdk.svg)](https://www.npmjs.com/package/@tuwaio/solana-sdk)
-[![License](https://img.shields.io/npm/l/@tuwaio/solana-sdk.svg)](https://github.com/TuwaIO/sdk/blob/main/packages/solana-sdk/LICENSE)
-
 `@tuwaio/solana-sdk` is the Solana add-on (Layer 9, L9) of [`@tuwaio/sdk`](https://sdk.docs.tuwa.io/packages/sdk). It re-exports the Solana packages of the TUWA projects under subpaths — Orbit Utils, Satellite Connect, Pulsar, SIWX and Nova Connect — built on [`@solana/kit`](https://github.com/anza-xyz/kit) and the [Wallet Standard](https://github.com/wallet-standard/wallet-standard), without `@solana/web3.js`. An app with Solana wallets installs `@tuwaio/sdk` and this package; nothing of it is loaded in an EVM-only app.
 
 ---
@@ -23,7 +20,7 @@ pnpm add @tuwaio/sdk @tuwaio/solana-sdk @solana/kit react react-dom
 
 pnpm (8 and later), npm (7 and later) and Bun also install the Wallet Standard peers of `@tuwaio/solana-sdk` (`@wallet-standard/app`, `base`, `features`, `react`, `ui` and `ui-registry`); with Yarn, add them to the command.
 
-Peer dependencies: `@tuwaio/sdk` (>=0.5, the same release line), `@solana/kit` (>=8.2), the Wallet Standard packages (1.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
+Peer dependencies: `@tuwaio/sdk` (>=0.6, the same release line), `@solana/kit` (>=8.2), the Wallet Standard packages (1.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
 
 | Import path                       | Re-exports                                            | Reference                                                                                    |
 | --------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |

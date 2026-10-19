@@ -1,6 +1,6 @@
 # InvoiceAml
 
-Defined in: [modules/payments/types.ts:202](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L202)
+Defined in: modules/payments/types.ts:202
 
 The payer's AML screening of an invoice.
 
@@ -10,7 +10,7 @@ The payer's AML screening of an invoice.
 
 > **coverage**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:208](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L208)
+Defined in: modules/payments/types.ts:208
 
 What screened the payer, when known.
 
@@ -20,7 +20,7 @@ What screened the payer, when known.
 
 > **reasons**: `string`[]
 
-Defined in: [modules/payments/types.ts:206](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L206)
+Defined in: modules/payments/types.ts:206
 
 Why.
 
@@ -30,6 +30,6 @@ Why.
 
 > **status**: `string`
 
-Defined in: [modules/payments/types.ts:204](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L204)
+Defined in: modules/payments/types.ts:204
 
 `passed`, `flagged`, `blocked` or `failed`.
