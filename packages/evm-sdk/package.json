@@ -100,7 +100,7 @@
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/satellite-core": "^0.10.0",
+    "@tuwaio/satellite-core": "^0.11.0",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.5",
     "tsup": "^9.0.0",
