@@ -1,6 +1,6 @@
 # PaymentMethod
 
-Defined in: modules/payments/types.ts:554
+Defined in: [modules/payments/types.ts:554](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L554)
 
 An active payment method of the app.
 
@@ -10,7 +10,7 @@ An active payment method of the app.
 
 > **assetId**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:566
+Defined in: [modules/payments/types.ts:566](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L566)
 
 CAIP-19 asset.
 
@@ -20,7 +20,7 @@ CAIP-19 asset.
 
 > **chainId**: `string`
 
-Defined in: modules/payments/types.ts:564
+Defined in: [modules/payments/types.ts:564](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L564)
 
 CAIP-2 chain.
 
@@ -30,7 +30,7 @@ CAIP-2 chain.
 
 > **decimals**: `number`
 
-Defined in: modules/payments/types.ts:568
+Defined in: [modules/payments/types.ts:568](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L568)
 
 Decimals of the token.
 
@@ -40,7 +40,7 @@ Decimals of the token.
 
 > **discount**: `string` \| `number` \| `null`
 
-Defined in: modules/payments/types.ts:578
+Defined in: [modules/payments/types.ts:578](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L578)
 
 Discount in percent.
 
@@ -50,7 +50,7 @@ Discount in percent.
 
 > **featured**: `boolean`
 
-Defined in: modules/payments/types.ts:584
+Defined in: [modules/payments/types.ts:584](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L584)
 
 Marked "Popular" in the checkout.
 
@@ -60,7 +60,7 @@ Marked "Popular" in the checkout.
 
 > **finality**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:580
+Defined in: [modules/payments/types.ts:580](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L580)
 
 `default` or `confirmed`.
 
@@ -70,7 +70,7 @@ Defined in: modules/payments/types.ts:580
 
 > **gasless**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:582
+Defined in: [modules/payments/types.ts:582](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L582)
 
 `off` or `auto`.
 
@@ -80,7 +80,7 @@ Defined in: modules/payments/types.ts:582
 
 > **id**: `string`
 
-Defined in: modules/payments/types.ts:556
+Defined in: [modules/payments/types.ts:556](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L556)
 
 Method ID.
 
@@ -90,7 +90,7 @@ Method ID.
 
 > **markup**: `string` \| `number` \| `null`
 
-Defined in: modules/payments/types.ts:576
+Defined in: [modules/payments/types.ts:576](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L576)
 
 Markup in percent.
 
@@ -100,7 +100,7 @@ Markup in percent.
 
 > **maxAmount**: `string` \| `number` \| `null`
 
-Defined in: modules/payments/types.ts:574
+Defined in: [modules/payments/types.ts:574](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L574)
 
 Largest invoice total it takes.
 
@@ -110,7 +110,7 @@ Largest invoice total it takes.
 
 > **minAmount**: `string` \| `number` \| `null`
 
-Defined in: modules/payments/types.ts:572
+Defined in: [modules/payments/types.ts:572](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L572)
 
 Smallest invoice total it takes.
 
@@ -120,7 +120,7 @@ Smallest invoice total it takes.
 
 > **name**: `string`
 
-Defined in: modules/payments/types.ts:560
+Defined in: [modules/payments/types.ts:560](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L560)
 
 Its name.
 
@@ -130,7 +130,7 @@ Its name.
 
 > **object**: `"payment_method"`
 
-Defined in: modules/payments/types.ts:558
+Defined in: [modules/payments/types.ts:558](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L558)
 
 Always `payment_method`.
 
@@ -140,7 +140,7 @@ Always `payment_method`.
 
 > **recipient**: `string`
 
-Defined in: modules/payments/types.ts:570
+Defined in: [modules/payments/types.ts:570](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L570)
 
 The wallet that receives payments.
 
@@ -150,6 +150,6 @@ The wallet that receives payments.
 
 > **symbol**: `string`
 
-Defined in: modules/payments/types.ts:562
+Defined in: [modules/payments/types.ts:562](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L562)
 
 Token symbol.

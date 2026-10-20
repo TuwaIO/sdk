@@ -1,6 +1,6 @@
 # VerifyWebhookParams
 
-Defined in: webhooks.ts:123
+Defined in: [webhooks.ts:123](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L123)
 
 What [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebhook.md) takes.
 
@@ -10,7 +10,7 @@ What [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebhook.md) tak
 
 > **body**: `string` \| `Uint8Array`\<`ArrayBufferLike`\>
 
-Defined in: webhooks.ts:125
+Defined in: [webhooks.ts:125](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L125)
 
 The request body exactly as received, before any parsing: a string or its bytes.
 
@@ -20,7 +20,7 @@ The request body exactly as received, before any parsing: a string or its bytes.
 
 > `optional` **now?**: `Date`
 
-Defined in: webhooks.ts:136
+Defined in: [webhooks.ts:136](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L136)
 
 The current time, for tests. Defaults to now.
 
@@ -30,7 +30,7 @@ The current time, for tests. Defaults to now.
 
 > **secret**: `string`
 
-Defined in: webhooks.ts:129
+Defined in: [webhooks.ts:129](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L129)
 
 The signing secret of the webhook endpoint.
 
@@ -40,7 +40,7 @@ The signing secret of the webhook endpoint.
 
 > **signature**: `string` \| `null` \| `undefined`
 
-Defined in: webhooks.ts:127
+Defined in: [webhooks.ts:127](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L127)
 
 The value of the `x-quasar-signature` header.
 
@@ -50,7 +50,7 @@ The value of the `x-quasar-signature` header.
 
 > `optional` **toleranceSeconds?**: `number` \| `false`
 
-Defined in: webhooks.ts:134
+Defined in: [webhooks.ts:134](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L134)
 
 How far `sentAt` of a payment event may be from now, in seconds; `false` turns the check off. Defaults to `300`.
 Transaction webhooks carry no send time and are not checked.

@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.2](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.1...evm-sdk-v0.6.2) (2026-10-20)
+
+
+### Bug Fixes
+
+* update dependencies (Nova 0.10.4, Satellite 0.11, orbit-solana 0.7.1, SIWX 0.7, siwx-server 0.8) ([99f9962](https://github.com/TuwaIO/sdk/commit/99f99629d1d42da899a50f7c2425a251182bfe8a))
+
+## [0.6.1](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.0...evm-sdk-v0.6.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* updated packages ([b41d71b](https://github.com/TuwaIO/sdk/commit/b41d71b2d75a8fc6797a4b41c5abcc71bfedee46))
+
 ## [0.6.0](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.5.0...evm-sdk-v0.6.0) (2026-10-15)
 
 

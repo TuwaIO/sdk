@@ -1,6 +1,6 @@
 {
   "name": "@tuwaio/evm-sdk",
-  "version": "0.6.0",
+  "version": "0.6.2",
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
@@ -16,6 +16,11 @@
       "types": "./dist/pulsar.d.ts",
       "import": "./dist/pulsar.js",
       "require": "./dist/pulsar.cjs"
+    },
+    "./pulsar-safe": {
+      "types": "./dist/pulsar-safe.d.ts",
+      "import": "./dist/pulsar-safe.js",
+      "require": "./dist/pulsar-safe.cjs"
     },
     "./satellite": {
       "types": "./dist/satellite.d.ts",
@@ -84,9 +89,9 @@
   ],
   "dependencies": {
     "@tuwaio/orbit-evm": "^0.4.0",
-    "@tuwaio/pulsar-evm": "^0.9.1",
+    "@tuwaio/pulsar-evm": "^0.10.0",
     "@tuwaio/satellite-evm": "^0.10.0",
-    "@tuwaio/siwx-evm": "^0.5.1"
+    "@tuwaio/siwx-evm": "^0.5.2"
   },
   "peerDependencies": {
     "@tuwaio/satellite-core": ">=0.7",
@@ -95,7 +100,7 @@
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/satellite-core": "^0.10.0",
+    "@tuwaio/satellite-core": "^0.11.0",
     "@tuwaio/sdk": "workspace:^",
     "@wagmi/core": "^3.6.5",
     "tsup": "^9.0.0",
