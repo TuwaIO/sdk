@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import * as novaConnect from '../nova-connect.js';
 import * as orbit from '../orbit.js';
 import * as pulsar from '../pulsar.js';
+import * as pulsarSafe from '../pulsar-safe.js';
 import * as satellite from '../satellite.js';
 import * as siwx from '../siwx.js';
 
@@ -21,6 +22,14 @@ describe('EVM SDK Re-Exports', () => {
     expect(typeof pulsar.evmTrackerForStore).toBe('function');
     expect(typeof pulsar.erc4337TrackerForStore).toBe('function');
     expect(typeof pulsar.selectEvmTxExplorerLink).toBe('function');
+  });
+
+  it('re-exports the Safe tracker of Pulsar alone, from the entry of @tuwaio/pulsar-evm without wagmi', () => {
+    expect(typeof pulsarSafe.createSafeFetcher).toBe('function');
+    expect(typeof pulsarSafe.safeTrackerForStore).toBe('function');
+    expect(typeof pulsarSafe.safePollingInterval).toBe('function');
+    expect(pulsarSafe.SafeTransactionServiceUrls).toBeDefined();
+    expect('pulsarEvmAdapter' in pulsarSafe).toBe(false);
   });
 
   it('re-exports Satellite EVM connection adapters and watchers', () => {

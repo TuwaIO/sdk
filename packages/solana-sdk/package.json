@@ -84,7 +84,7 @@
     "@tuwaio/orbit-solana": "^0.6.0",
     "@tuwaio/pulsar-solana": "^0.10.1",
     "@tuwaio/satellite-solana": "^0.10.0",
-    "@tuwaio/siwx-solana": "^0.6.1"
+    "@tuwaio/siwx-solana": "^0.6.2"
   },
   "peerDependencies": {
     "@tuwaio/sdk": ">=0.6",

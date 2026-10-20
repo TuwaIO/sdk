@@ -30,7 +30,7 @@ sdk/
 ├── packages/
 │   ├── sdk/                           # L8: one file per subpath in src/ (orbit.ts, pulsar.ts, satellite.ts, siwx*.ts, nova-*.ts)
 │   │   └── scripts/bundle-styles.js   # Copies dist/index.css of the Nova packages to dist/styles/
-│   ├── evm-sdk/                       # L9: src/{orbit,pulsar,satellite,siwx,nova-connect}.ts
+│   ├── evm-sdk/                       # L9: src/{orbit,pulsar,pulsar-safe,satellite,siwx,nova-connect}.ts
 │   ├── solana-sdk/                    # L9: same subpaths for Solana
 │   └── quasar-sdk/                    # L5
 │       └── src/
@@ -48,7 +48,7 @@ sdk/
 ### Module Breakdown
 
 - **`@tuwaio/sdk`**: `/orbit` (`orbit-core`), `/pulsar` (`pulsar-core` + `pulsar-react`), `/satellite` (`satellite-core` + `satellite-react`, whose `Connector` type is renamed `SatelliteReactConnector`), `/siwx` (`siwx-react`), `/siwx/core`, `/siwx/server`, `/siwx/server-next`, `/nova-core`, `/nova-connect` (+ `/components`, `/hooks`, `/i18n`, `/satellite`), `/nova-transactions` (+ `/providers`), `/styles/*.css`. `/nova-connect/evm` and `/nova-connect/solana` exist for the add-ons.
-- **`@tuwaio/evm-sdk` / `@tuwaio/solana-sdk`**: `/orbit`, `/satellite`, `/pulsar`, `/siwx` re-export the chain package; `/nova-connect` re-exports `@tuwaio/sdk/nova-connect/evm` (or `/solana`). Importing it registers the chain helpers of Nova Connect (a registry on `globalThis`) and augments `NovaConnectChainConfigTypes` of `@tuwaio/nova-connect` and `AllConnections`/`AllConnectors` of `@tuwaio/satellite-react`. Going through `@tuwaio/sdk` makes the augmentation apply to the same copy of those packages that `@tuwaio/sdk` re-exports; a direct `@tuwaio/nova-connect` dependency of the add-ons gives pnpm a second copy with other peers, and the types of `NovaConnectProvider` and `SatelliteConnectProvider` then miss the chain.
+- **`@tuwaio/evm-sdk` / `@tuwaio/solana-sdk`**: `/orbit`, `/satellite`, `/pulsar`, `/siwx` re-export the chain package; `@tuwaio/evm-sdk/pulsar-safe` re-exports `@tuwaio/pulsar-evm/safe`, the Safe tracker without the wagmi parts; `/nova-connect` re-exports `@tuwaio/sdk/nova-connect/evm` (or `/solana`). Importing it registers the chain helpers of Nova Connect (a registry on `globalThis`) and augments `NovaConnectChainConfigTypes` of `@tuwaio/nova-connect` and `AllConnections`/`AllConnectors` of `@tuwaio/satellite-react`. Going through `@tuwaio/sdk` makes the augmentation apply to the same copy of those packages that `@tuwaio/sdk` re-exports; a direct `@tuwaio/nova-connect` dependency of the add-ons gives pnpm a second copy with other peers, and the types of `NovaConnectProvider` and `SatelliteConnectProvider` then miss the chain.
 - **`@tuwaio/quasar-sdk`**: `Quasar` (`pulsar: PulsarModule`), `QuasarSDKError` (HTTP `status`, `originalError`), `BASE_API_URL`, `PULSAR_SYNC_ENDPOINT`, `PULSAR_HISTORY_ENDPOINT`, `QuasarConfig`, `HistoryQuery`, `PaginatedResult`, and the re-exported Pulsar `Transaction` types and enums. Requests send the secret key in `x-tuwa-secret-key` (and `x-internal-secret` when set; only the Quasar dashboard uses it). `/react`: `preFlightTxCheck` (SIWX session in `useSiwxSessionStore` + `GET /v1/engine/monitoring/health`). CLI: `quasar-sdk listen` streams the deliveries of webhook endpoints with a `localhost` URL from `/v1/engine/webhooks/listen` (signing secret in the `x-webhook-secret` header) and posts them to `--forward-to`.
 
 ### Documentation Model

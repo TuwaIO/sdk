@@ -17,6 +17,11 @@
       "import": "./dist/pulsar.js",
       "require": "./dist/pulsar.cjs"
     },
+    "./pulsar-safe": {
+      "types": "./dist/pulsar-safe.d.ts",
+      "import": "./dist/pulsar-safe.js",
+      "require": "./dist/pulsar-safe.cjs"
+    },
     "./satellite": {
       "types": "./dist/satellite.d.ts",
       "import": "./dist/satellite.js",
@@ -84,9 +89,9 @@
   ],
   "dependencies": {
     "@tuwaio/orbit-evm": "^0.4.0",
-    "@tuwaio/pulsar-evm": "^0.9.1",
+    "@tuwaio/pulsar-evm": "^0.10.0",
     "@tuwaio/satellite-evm": "^0.10.0",
-    "@tuwaio/siwx-evm": "^0.5.1"
+    "@tuwaio/siwx-evm": "^0.5.2"
   },
   "peerDependencies": {
     "@tuwaio/satellite-core": ">=0.7",
