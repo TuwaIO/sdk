@@ -32,6 +32,11 @@
       "import": "./dist/nova-connect.js",
       "require": "./dist/nova-connect.cjs"
     },
+    "./nova-payments": {
+      "types": "./dist/nova-payments.d.ts",
+      "import": "./dist/nova-payments.js",
+      "require": "./dist/nova-payments.cjs"
+    },
     "./siwx": {
       "types": "./dist/siwx.d.ts",
       "import": "./dist/siwx.js",

@@ -11,7 +11,7 @@
 
 - **One version to install:** the TUWA packages and the libraries they share (`zustand`, `immer`, `framer-motion`, Radix UI, `react-toastify`, `dayjs`) are dependencies of `@tuwaio/sdk`, so a release of the SDK pins a set of TUWA versions that work together. `react` and `react-dom` are peer dependencies: the app keeps one copy of React.
 - **Subpaths:** every subpath re-exports one entry point of a TUWA package, unchanged (see [Subpaths](#-subpaths)). Its reference is on the site of that package.
-- **Stylesheets:** `@tuwaio/sdk/styles/*.css` are copies of the compiled stylesheets of Nova Core, Nova Connect and Nova Transactions. The app does not need Tailwind CSS.
+- **Stylesheets:** `@tuwaio/sdk/styles/*.css` are copies of the compiled stylesheets of Nova Core, Nova Connect, Nova Transactions and Nova Payments. The app does not need Tailwind CSS.
 
 ---
 
@@ -41,7 +41,7 @@ Import the stylesheets once, for example in the global CSS file of the app:
 @import '@tuwaio/sdk/styles/all.css';
 ```
 
-`all.css` joins `nova-core.css` (the `--tuwa-*` theme variables), `nova-connect.css` and `nova-transactions.css`; import them one by one to leave one out.
+`all.css` joins `nova-core.css` (the `--tuwa-*` theme variables), `nova-connect.css`, `nova-transactions.css` and `nova-payments.css`; import them one by one to leave one out.
 
 ---
 
@@ -65,9 +65,12 @@ Import the stylesheets once, for example in the global CSS file of the app:
 | `@tuwaio/sdk/nova-connect/satellite`      | `@tuwaio/nova-connect/satellite`                                                                                                            | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-satellite-overview--docs)                                                            |
 | `@tuwaio/sdk/nova-transactions`           | `@tuwaio/nova-transactions`                                                                                                                 | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-transactions-transactions-overview--docs)                                                    |
 | `@tuwaio/sdk/nova-transactions/providers` | `@tuwaio/nova-transactions/providers`                                                                                                       | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-transactions-providers-overview--docs)                                                       |
-| `@tuwaio/sdk/styles/*.css`                | `dist/index.css` of the three Nova packages                                                                                                 | `all.css`, `nova-core.css`, `nova-connect.css`, `nova-transactions.css`                                                                                    |
+| `@tuwaio/sdk/nova-payments`               | `@tuwaio/nova-payments`                                                                                                                     | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-payments-payments-overview--docs)                                                            |
+| `@tuwaio/sdk/nova-payments/i18n`          | `@tuwaio/nova-payments/i18n`                                                                                                                | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-payments-i18n-overview--docs)                                                                |
+| `@tuwaio/sdk/quasar/checkout`             | `@tuwaio/quasar-sdk/checkout`: the checkout store of a Quasar Payments invoice, which `PaymentCheckout` runs on                             | [sdk.docs.tuwa.io](https://sdk.docs.tuwa.io/packages/quasar-sdk/checkout)                                                                                  |
+| `@tuwaio/sdk/styles/*.css`                | `dist/index.css` of the four Nova packages                                                                                                  | `all.css`, `nova-core.css`, `nova-connect.css`, `nova-transactions.css`, `nova-payments.css`                                                               |
 
-`@tuwaio/sdk/nova-connect/evm` and `@tuwaio/sdk/nova-connect/solana` re-export the chain entry points of Nova Connect for the add-ons; import them as `@tuwaio/evm-sdk/nova-connect` and `@tuwaio/solana-sdk/nova-connect`. They need the chain packages that the add-ons install, and going through `@tuwaio/sdk` makes their chain registration and types apply to the same copy of Nova Connect and Satellite React as the other subpaths.
+`@tuwaio/sdk/nova-connect/evm` and `@tuwaio/sdk/nova-connect/solana` re-export the chain entry points of Nova Connect for the add-ons; import them as `@tuwaio/evm-sdk/nova-connect` and `@tuwaio/solana-sdk/nova-connect`. They need the chain packages that the add-ons install, and going through `@tuwaio/sdk` makes their chain registration and types apply to the same copy of Nova Connect and Satellite React as the other subpaths. In the same way `@tuwaio/sdk/nova-payments/evm` and `@tuwaio/sdk/nova-payments/solana` re-export the chain adapters of Nova Payments for `@tuwaio/evm-sdk/nova-payments` and `@tuwaio/solana-sdk/nova-payments`.
 
 ---
 

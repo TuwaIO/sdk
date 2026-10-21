@@ -11,6 +11,7 @@ export default defineConfig([
       './src/pulsar-safe.ts',
       './src/satellite.ts',
       './src/nova-connect.ts',
+      './src/nova-payments.ts',
       './src/siwx.ts',
     ],
     sourcemap: false,

@@ -27,6 +27,11 @@
       "import": "./dist/nova-connect.js",
       "require": "./dist/nova-connect.cjs"
     },
+    "./nova-payments": {
+      "types": "./dist/nova-payments.d.ts",
+      "import": "./dist/nova-payments.js",
+      "require": "./dist/nova-payments.cjs"
+    },
     "./siwx": {
       "types": "./dist/siwx.d.ts",
       "import": "./dist/siwx.js",
@@ -95,9 +100,22 @@
     "@wallet-standard/react": "1.x.x",
     "@wallet-standard/ui": "1.x.x",
     "@wallet-standard/ui-registry": "1.x.x",
-    "@solana/kit": ">=8.2"
+    "@solana/kit": ">=8.2",
+    "@solana-program/system": ">=0.15",
+    "@solana-program/token": ">=0.17"
+  },
+  "peerDependenciesMeta": {
+    "@solana-program/system": {
+      "optional": true
+    },
+    "@solana-program/token": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@solana-program/system": "^0.15.0",
+    "@solana-program/token": "^0.17.0",
+    "@solana/kit": "^8.5.0",
     "@tuwaio/satellite-core": "^0.11.0",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
@@ -106,7 +124,6 @@
     "@wallet-standard/react": "^1.0.3",
     "@wallet-standard/ui": "^1.0.3",
     "@wallet-standard/ui-registry": "^1.1.1",
-    "@solana/kit": "^8.5.0",
     "tsup": "^9.0.0",
     "typescript": "6.0.3"
   }

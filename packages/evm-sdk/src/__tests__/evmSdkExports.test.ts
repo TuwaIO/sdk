@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs';
 
 import * as sdkNovaConnect from '@tuwaio/sdk/nova-connect/evm';
+import * as sdkNovaPayments from '@tuwaio/sdk/nova-payments/evm';
 import { describe, expect, it } from 'vitest';
 
 import * as novaConnect from '../nova-connect.js';
+import * as novaPayments from '../nova-payments.js';
 import * as orbit from '../orbit.js';
 import * as pulsar from '../pulsar.js';
 import * as pulsarSafe from '../pulsar-safe.js';
@@ -39,6 +41,11 @@ describe('EVM SDK Re-Exports', () => {
 
   it('re-exports the Nova Connect entry point of @tuwaio/sdk, so both share one copy of Nova Connect', () => {
     expect(novaConnect.EVMConnectorsWatcher).toBe(sdkNovaConnect.EVMConnectorsWatcher);
+  });
+
+  it('re-exports the EVM adapter of Nova Payments through @tuwaio/sdk', () => {
+    expect(typeof novaPayments.paymentsEVMAdapter).toBe('function');
+    expect(novaPayments.paymentsEVMAdapter).toBe(sdkNovaPayments.paymentsEVMAdapter);
   });
 
   it('registers the EVM chain helpers of Nova Connect when /nova-connect is imported', () => {

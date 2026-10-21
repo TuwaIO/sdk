@@ -11,6 +11,7 @@
 
 - **Chain packages in one install:** `@tuwaio/orbit-solana`, `@tuwaio/satellite-solana`, `@tuwaio/pulsar-solana` and `@tuwaio/siwx-solana` are dependencies, pinned to versions that work with the same release of `@tuwaio/sdk`.
 - **Nova Connect for Solana:** importing `@tuwaio/solana-sdk/nova-connect` registers the Solana chain helpers of `@tuwaio/orbit-solana` for the chain lists of Nova Connect, types `solanaRPCUrls` of `NovaConnectProvider` with the cluster monikers (`mainnet`, `devnet`, `testnet`) and adds the Solana connection types to Satellite Connect. It goes through `@tuwaio/sdk/nova-connect/solana`, so this applies to the `NovaConnectProvider` and `SatelliteConnectProvider` that `@tuwaio/sdk` exports.
+- **Nova Payments for Solana:** `@tuwaio/solana-sdk/nova-payments` exports `paymentsSolanaAdapter`, the adapter that `NovaPaymentsProvider` of `@tuwaio/sdk/nova-payments` pays from the connected Wallet Standard wallet with `@solana/kit`. It goes through `@tuwaio/sdk/nova-payments/solana`, so it pays with the same copy of Nova Payments.
 - **Subpaths:** every subpath re-exports one package, unchanged. Its reference is on the site of that package.
 
 ---
@@ -23,15 +24,16 @@ pnpm add @tuwaio/sdk @tuwaio/solana-sdk @solana/kit react react-dom
 
 pnpm (8 and later), npm (7 and later) and Bun also install the Wallet Standard peers of `@tuwaio/solana-sdk` (`@wallet-standard/app`, `base`, `features`, `react`, `ui` and `ui-registry`); with Yarn, add them to the command.
 
-Peer dependencies: `@tuwaio/sdk` (>=0.6, the same release line), `@solana/kit` (>=8.2), the Wallet Standard packages (1.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
+Peer dependencies: `@tuwaio/sdk` (>=0.6, the same release line), `@solana/kit` (>=8.2), the Wallet Standard packages (1.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`). `@tuwaio/solana-sdk/nova-payments` also needs `@solana-program/system` (>=0.15) and `@solana-program/token` (>=0.17): `pnpm add @solana-program/system @solana-program/token`.
 
-| Import path                       | Re-exports                                            | Reference                                                                                    |
-| --------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `@tuwaio/solana-sdk/orbit`        | `@tuwaio/orbit-solana`                                | [orbit.docs.tuwa.io](https://orbit.docs.tuwa.io/packages/orbit-solana)                       |
-| `@tuwaio/solana-sdk/satellite`    | `@tuwaio/satellite-solana`                            | [satellite.docs.tuwa.io](https://satellite.docs.tuwa.io/packages/satellite-solana)           |
-| `@tuwaio/solana-sdk/pulsar`       | `@tuwaio/pulsar-solana`                               | [pulsar.docs.tuwa.io](https://pulsar.docs.tuwa.io/packages/pulsar-solana)                    |
-| `@tuwaio/solana-sdk/siwx`         | `@tuwaio/siwx-solana`                                 | [siwx.docs.tuwa.io](https://siwx.docs.tuwa.io/packages/siwx-solana)                          |
-| `@tuwaio/solana-sdk/nova-connect` | `@tuwaio/nova-connect/solana` (through `@tuwaio/sdk`) | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-solana-overview--docs) |
+| Import path                        | Re-exports                                             | Reference                                                                                     |
+| ---------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `@tuwaio/solana-sdk/orbit`         | `@tuwaio/orbit-solana`                                 | [orbit.docs.tuwa.io](https://orbit.docs.tuwa.io/packages/orbit-solana)                        |
+| `@tuwaio/solana-sdk/satellite`     | `@tuwaio/satellite-solana`                             | [satellite.docs.tuwa.io](https://satellite.docs.tuwa.io/packages/satellite-solana)            |
+| `@tuwaio/solana-sdk/pulsar`        | `@tuwaio/pulsar-solana`                                | [pulsar.docs.tuwa.io](https://pulsar.docs.tuwa.io/packages/pulsar-solana)                     |
+| `@tuwaio/solana-sdk/siwx`          | `@tuwaio/siwx-solana`                                  | [siwx.docs.tuwa.io](https://siwx.docs.tuwa.io/packages/siwx-solana)                           |
+| `@tuwaio/solana-sdk/nova-connect`  | `@tuwaio/nova-connect/solana` (through `@tuwaio/sdk`)  | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-solana-overview--docs)  |
+| `@tuwaio/solana-sdk/nova-payments` | `@tuwaio/nova-payments/solana` (through `@tuwaio/sdk`) | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-payments-solana-overview--docs) |
 
 ---
 

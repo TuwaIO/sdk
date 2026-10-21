@@ -27,14 +27,17 @@ function resolvePackageCss(pkgName) {
 const coreCssPath = resolvePackageCss('@tuwaio/nova-core');
 const txCssPath = resolvePackageCss('@tuwaio/nova-transactions');
 const connectCssPath = resolvePackageCss('@tuwaio/nova-connect');
+const paymentsCssPath = resolvePackageCss('@tuwaio/nova-payments');
 
 const coreCss = coreCssPath ? fs.readFileSync(coreCssPath, 'utf8') : '';
 const txCss = txCssPath ? fs.readFileSync(txCssPath, 'utf8') : '';
 const connectCss = connectCssPath ? fs.readFileSync(connectCssPath, 'utf8') : '';
+const paymentsCss = paymentsCssPath ? fs.readFileSync(paymentsCssPath, 'utf8') : '';
 
 fs.writeFileSync(path.resolve(distStylesDir, 'nova-core.css'), coreCss);
 fs.writeFileSync(path.resolve(distStylesDir, 'nova-transactions.css'), txCss);
 fs.writeFileSync(path.resolve(distStylesDir, 'nova-connect.css'), connectCss);
+fs.writeFileSync(path.resolve(distStylesDir, 'nova-payments.css'), paymentsCss);
 
 const allCss = [
   '/* TUWA Nova Core Styles */',
@@ -43,6 +46,8 @@ const allCss = [
   txCss,
   '/* TUWA Nova Connect Styles */',
   connectCss,
+  '/* TUWA Nova Payments Styles */',
+  paymentsCss,
 ].join('\n\n');
 
 fs.writeFileSync(path.resolve(distStylesDir, 'all.css'), allCss);

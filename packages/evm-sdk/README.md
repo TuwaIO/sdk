@@ -11,6 +11,7 @@
 
 - **Chain packages in one install:** `@tuwaio/orbit-evm`, `@tuwaio/satellite-evm`, `@tuwaio/pulsar-evm` and `@tuwaio/siwx-evm` are dependencies, pinned to versions that work with the same release of `@tuwaio/sdk`.
 - **Nova Connect for EVM:** importing `@tuwaio/evm-sdk/nova-connect` registers the EVM chain helpers of `@tuwaio/orbit-evm` for the chain lists of Nova Connect, types `appChains` of `NovaConnectProvider` as your viem chains and adds the EVM connection types to Satellite Connect. It goes through `@tuwaio/sdk/nova-connect/evm`, so this applies to the `NovaConnectProvider` and `SatelliteConnectProvider` that `@tuwaio/sdk` exports.
+- **Nova Payments for EVM:** `@tuwaio/evm-sdk/nova-payments` exports `paymentsEVMAdapter`, the adapter that `NovaPaymentsProvider` of `@tuwaio/sdk/nova-payments` pays from the connected wallet through wagmi. It goes through `@tuwaio/sdk/nova-payments/evm`, so it pays with the same copy of Nova Payments.
 - **Subpaths:** every subpath re-exports one package, unchanged. Its reference is on the site of that package.
 
 ---
@@ -23,14 +24,15 @@ pnpm add @tuwaio/sdk @tuwaio/evm-sdk @wagmi/core viem react react-dom
 
 Peer dependencies: `@tuwaio/sdk` (>=0.6, the same release line), `@wagmi/core` (3.x), `viem` (2.x) and `@tuwaio/satellite-core` (>=0.7, a dependency of `@tuwaio/sdk`).
 
-| Import path                    | Re-exports                                                                | Reference                                                                                 |
-| ------------------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `@tuwaio/evm-sdk/orbit`        | `@tuwaio/orbit-evm`                                                       | [orbit.docs.tuwa.io](https://orbit.docs.tuwa.io/packages/orbit-evm)                       |
-| `@tuwaio/evm-sdk/satellite`    | `@tuwaio/satellite-evm`                                                   | [satellite.docs.tuwa.io](https://satellite.docs.tuwa.io/packages/satellite-evm)           |
-| `@tuwaio/evm-sdk/pulsar`       | `@tuwaio/pulsar-evm`                                                      | [pulsar.docs.tuwa.io](https://pulsar.docs.tuwa.io/packages/pulsar-evm)                    |
-| `@tuwaio/evm-sdk/pulsar-safe`  | `@tuwaio/pulsar-evm/safe` (the Safe tracker alone; does not import wagmi) | [pulsar.docs.tuwa.io](https://pulsar.docs.tuwa.io/packages/pulsar-evm)                    |
-| `@tuwaio/evm-sdk/siwx`         | `@tuwaio/siwx-evm`                                                        | [siwx.docs.tuwa.io](https://siwx.docs.tuwa.io/packages/siwx-evm)                          |
-| `@tuwaio/evm-sdk/nova-connect` | `@tuwaio/nova-connect/evm` (through `@tuwaio/sdk`)                        | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-evm-overview--docs) |
+| Import path                     | Re-exports                                                                | Reference                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `@tuwaio/evm-sdk/orbit`         | `@tuwaio/orbit-evm`                                                       | [orbit.docs.tuwa.io](https://orbit.docs.tuwa.io/packages/orbit-evm)                        |
+| `@tuwaio/evm-sdk/satellite`     | `@tuwaio/satellite-evm`                                                   | [satellite.docs.tuwa.io](https://satellite.docs.tuwa.io/packages/satellite-evm)            |
+| `@tuwaio/evm-sdk/pulsar`        | `@tuwaio/pulsar-evm`                                                      | [pulsar.docs.tuwa.io](https://pulsar.docs.tuwa.io/packages/pulsar-evm)                     |
+| `@tuwaio/evm-sdk/pulsar-safe`   | `@tuwaio/pulsar-evm/safe` (the Safe tracker alone; does not import wagmi) | [pulsar.docs.tuwa.io](https://pulsar.docs.tuwa.io/packages/pulsar-evm)                     |
+| `@tuwaio/evm-sdk/siwx`          | `@tuwaio/siwx-evm`                                                        | [siwx.docs.tuwa.io](https://siwx.docs.tuwa.io/packages/siwx-evm)                           |
+| `@tuwaio/evm-sdk/nova-connect`  | `@tuwaio/nova-connect/evm` (through `@tuwaio/sdk`)                        | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-evm-overview--docs)  |
+| `@tuwaio/evm-sdk/nova-payments` | `@tuwaio/nova-payments/evm` (through `@tuwaio/sdk`)                       | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-payments-evm-overview--docs) |
 
 ---
 

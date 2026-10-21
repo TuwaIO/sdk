@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs';
 
 import * as sdkNovaConnect from '@tuwaio/sdk/nova-connect/solana';
+import * as sdkNovaPayments from '@tuwaio/sdk/nova-payments/solana';
 import { describe, expect, it } from 'vitest';
 
 import * as novaConnect from '../nova-connect.js';
+import * as novaPayments from '../nova-payments.js';
 import * as orbit from '../orbit.js';
 import * as pulsar from '../pulsar.js';
 import * as satellite from '../satellite.js';
@@ -29,6 +31,11 @@ describe('Solana SDK Re-Exports', () => {
 
   it('re-exports the Nova Connect entry point of @tuwaio/sdk, so both share one copy of Nova Connect', () => {
     expect(novaConnect.SolanaConnectorsWatcher).toBe(sdkNovaConnect.SolanaConnectorsWatcher);
+  });
+
+  it('re-exports the Solana adapter of Nova Payments through @tuwaio/sdk', () => {
+    expect(typeof novaPayments.paymentsSolanaAdapter).toBe('function');
+    expect(novaPayments.paymentsSolanaAdapter).toBe(sdkNovaPayments.paymentsSolanaAdapter);
   });
 
   it('registers the Solana chain helpers of Nova Connect when /nova-connect is imported', () => {
