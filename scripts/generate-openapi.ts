@@ -266,6 +266,7 @@ registry.register('HealthResponse', HealthResponseSchema);
 
 const PaginatedHistoryResponseSchema = z
   .object({
+    success: z.boolean().openapi({ description: 'Always `true` in a 200 answer.' }),
     docs: z.array(TransactionSchema).openapi({ description: 'Array of transaction documents for the current page.' }),
     totalDocs: z.number().openapi({ description: 'Total matching documents across all pages.' }),
     totalPages: z.number().openapi({ description: 'Total number of pages.' }),
@@ -282,6 +283,11 @@ const ErrorResponseSchema = z
   .object({
     error: z.string().optional().openapi({ description: 'Error message.' }),
     message: z.string().optional().openapi({ description: 'Error message (NestJS errors).' }),
+    statusCode: z.number().int().optional().openapi({ description: 'The HTTP status (NestJS errors).' }),
+    code: z
+      .string()
+      .optional()
+      .openapi({ description: 'A stable code where a client acts on it, such as `data_processing_required`.' }),
   })
   .openapi('ErrorResponse');
 registry.register('ErrorResponse', ErrorResponseSchema);
@@ -326,7 +332,8 @@ registry.registerPath({
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
     403: {
-      description: 'Public key (read-only), disabled app, or IP address or origin not allowed by the app settings.',
+      description:
+        'Public key (read-only), disabled app, app being deleted, or IP address or origin not allowed by the app settings. In Quasar Cloud also an organization whose data processing is not set up (`code: data_processing_required`): transactions are accepted once an owner concludes the Data Processing Addendum, and the standard contractual clauses where they apply, in the dashboard.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
     422: {
@@ -371,7 +378,8 @@ registry.registerPath({
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
     403: {
-      description: 'Public key (read-only), disabled app, or IP address or origin not allowed by the app settings.',
+      description:
+        'Public key (read-only), disabled app, app being deleted, or IP address or origin not allowed by the app settings. In Quasar Cloud also an organization whose data processing is not set up (`code: data_processing_required`): transactions are accepted once an owner concludes the Data Processing Addendum, and the standard contractual clauses where they apply, in the dashboard.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
     409: {
@@ -380,42 +388,6 @@ registry.registerPath({
     },
     429: {
       description: 'Too many requests per second for the app.',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
-    },
-  },
-});
-
-registry.registerPath({
-  method: 'post',
-  path: `${PULSAR_SYNC_ENDPOINT}/{txKey}/hash`,
-  summary: 'Send the hash of an EIP-5792 batch',
-  description:
-    'Sends the hash of the transaction that executed an EIP-5792 batch (`tracker: eip5792`), which was synced by its batch ID. Quasar then tracks the batch on-chain by the hash, like an Ethereum transaction; the record keeps the batch ID as `txKey`. A batch whose hash never arrives is marked `Failed` an hour after it was synced. Used by `quasar.pulsar.syncHash`.',
-  tags: ['Pulsar'],
-  security: [{ [secretKeyAuth.name]: [] }],
-  request: {
-    params: z.object({ txKey: z.string().openapi({ description: 'The batch ID, the `txKey` of the transaction.' }) }),
-    body: { content: { 'application/json': { schema: BatchHashRequestSchema } }, required: true },
-  },
-  responses: {
-    200: {
-      description: 'The hash is recorded and on-chain tracking started, or Quasar already had it (`duplicate: true`).',
-      content: { 'application/json': { schema: BatchHashResponseSchema } },
-    },
-    400: {
-      description: 'The hash is malformed, or the transaction is not an EIP-5792 batch.',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
-    },
-    401: {
-      description: 'Missing or invalid key.',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
-    },
-    404: {
-      description: 'The app has no transaction with this `txKey`.',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
-    },
-    409: {
-      description: 'The batch has another hash, or it is already final.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
   },
@@ -468,6 +440,11 @@ registry.registerPath({
     },
     402: {
       description: 'The quota of the organization is used up.',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    403: {
+      description:
+        'A public key: the history is read with the secret key, from your server. Also a disabled app, an app being deleted, or an IP address or origin not allowed by the app settings.',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
     429: {

@@ -73,9 +73,10 @@ export class QuasarSDKError extends Error {
 
 /**
  * Wraps an `ofetch` error in a {@link QuasarSDKError}. Reads the error bodies of the API: `{ error: '…' }`, the
- * Payments API's `{ error: { code, message, issues?, … } }` (also from a download, whose body arrives as bytes) and
- * the engine's `{ statusCode, message }` (for example the rate limit, 429).
- * Side effect: logs a `console.error` on a 401 or 403 status without a Payments `code` (the key was refused).
+ * Payments API's `{ error: { code, message, issues?, … } }` (also from a download, whose body arrives as bytes), the
+ * engine's refusals of a key or an app `{ statusCode, error, message }` (by their `message`: `error` is only the
+ * status text) and a refusal with a `code` of its own, such as `data_processing_required`.
+ * Side effect: logs a `console.error` on a 401 or 403 status without a `code` (the key was refused).
  *
  * @param error - The error thrown by `ofetch`.
  * @returns The wrapped error.
@@ -90,7 +91,9 @@ export function toQuasarSDKError(error: unknown): QuasarSDKError {
   let message = fetchError.message ?? 'Unknown Error';
   let details: { code?: string; issues?: QuasarRequestIssue[]; details?: Record<string, unknown> } = {};
   if (typeof refusal === 'string') {
-    message = refusal;
+    // A NestJS refusal `{ statusCode, error: 'Forbidden', message }` says why in its message
+    message = typeof data?.statusCode === 'number' && typeof data.message === 'string' ? data.message : refusal;
+    if (typeof data?.code === 'string') details = { code: data.code };
   } else if (typeof refusal === 'object' && refusal !== null) {
     const { code, message: text, issues, ...rest } = refusal as Record<string, unknown>;
     if (typeof text === 'string') message = text;

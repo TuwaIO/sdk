@@ -78,6 +78,18 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     description,
     content: { 'application/json': { schema: PaymentsError } },
   });
+  // The engine checks the key and the app before the Payments API answers, and refuses in the NestJS shape
+  const KeyRefusal = z
+    .object({
+      statusCode: z.number().int(),
+      error: z.string(),
+      message: z.string(),
+    })
+    .openapi('KeyRefusal', {
+      description:
+        'A refusal of the key or the app before the Payments API answers: `401` for a missing or unknown key; `403` for a public key on a write, a disabled app, an app being deleted, or an IP address or origin the app does not allow.',
+    });
+  registry.register('KeyRefusal', KeyRefusal);
 
   const Buyer = z
     .object({
@@ -489,11 +501,18 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     }),
   });
   const json = <T extends z.ZodType>(schema: T) => ({ content: { 'application/json': { schema } } });
+  const forbidden = (codes: string) => ({
+    description: `${codes}; or a \`KeyRefusal\` of the key or the app.`,
+    content: { 'application/json': { schema: z.union([PaymentsError, KeyRefusal]) } },
+  });
   const common = {
-    401: { description: 'Missing or invalid key.' },
-    403: refused('`payments_disabled`: the app is not a Payments app or the node does not run Payments.'),
+    401: { description: 'Missing or invalid key.', ...json(KeyRefusal) },
+    403: forbidden(
+      '`secret_key_required` (a public key), `not_a_payments_app`, `payments_disabled` (the node does not run Payments for the organization)',
+    ),
     429: { description: 'The rate limit of the organization.' },
   };
+  const invalid = (codes = '') => refused(`\`invalid_request\` with \`issues\`${codes ? `, ${codes}` : ''}.`);
   const route = (
     method: 'get' | 'post',
     path: string,
@@ -562,26 +581,29 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
     },
   );
-  for (const [action, summary, description, body] of [
+  for (const [action, summary, description, body, conflict] of [
     [
       'cancel',
       'Cancel an invoice',
       'An open invoice stops being payable; its number stays taken.',
       z.object({ reason: z.string().optional() }),
+      '`invoice_not_cancellable`, `invoice_processing`: a payment is being confirmed.',
     ],
     [
       'release',
       'Release a held payment',
       'The invoice becomes paid and the buyer gets a receipt.',
       z.object({ reason: z.string() }),
+      '`invoice_not_held`.',
     ],
   ] as const) {
     route('post', `/invoices/{id}/${action}`, 'Invoices', summary, description, {
       request: { params: idParam('id', 'Invoice ID.'), body: json(body) },
       responses: {
         200: { description: 'The invoice.', ...json(Invoice) },
+        400: invalid(),
         404: refused('`invoice_not_found`.'),
-        409: refused('The invoice is not in a state for it.'),
+        409: refused(conflict),
         ...common,
       },
     });
@@ -602,8 +624,11 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           description: 'The new invoice (with its checkout while open) and the replaced one.',
           ...json(InvoiceCorrection),
         },
+        400: invalid(),
         404: refused('`invoice_not_found`.'),
-        409: refused('The invoice cannot be corrected.'),
+        409: refused(
+          '`invoice_not_correctable`, `invoice_replaced` (correct its replacement), `document_not_issued`, `invoice_processing`.',
+        ),
         ...common,
       },
     },
@@ -702,8 +727,11 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
       responses: {
         201: { description: 'The refund and what to send where.', ...json(RefundStart) },
+        400: invalid('`amount_exceeds_refundable`, `held_refund_must_be_whole`'),
         404: refused('`invoice_not_found`.'),
-        409: refused('Nothing to refund, or more than is left.'),
+        409: refused(
+          '`invoice_not_refundable`, `exact_refund_needs_whole_invoice`, `payment_unknown`: the payment to refund is not known.',
+        ),
         ...common,
       },
     },
@@ -722,6 +750,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       request: { params: idParam('id', 'Refund ID.'), body: json(z.object({ txHash: z.string(), from: z.string() })) },
       responses: {
         202: { description: 'The refund, `submitted`.', ...json(Refund) },
+        400: invalid('`invalid_transaction`, `invalid_sender`: the transaction must come from the app wallet'),
         404: refused('`refund_not_found`.'),
         409: refused('`refund_not_submittable`, `transaction_already_used`.'),
         ...common,
@@ -740,8 +769,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
       responses: {
         200: { description: 'The price.', ...json(PaymentQuote) },
+        400: invalid(),
         404: refused('`method_not_found`.'),
-        503: refused('No fresh price now.'),
+        409: refused('`method_not_priced`: the method has no price source.'),
+        503: refused('`price_unavailable`: no fresh price now.'),
         ...common,
       },
     },
@@ -779,8 +810,11 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       request: { headers: idempotencyHeader, body: { ...json(CreateSubscriptionRequest), required: true } },
       responses: {
         201: { description: 'The subscription and its first invoice.', ...json(SubscriptionStart) },
-        400: refused('`invalid_request`, `auto_charge_unavailable` (with `reason`).'),
+        400: invalid('`invalid_lines`, `method_not_found`, `auto_charge_unavailable` (with `reason`)'),
         ...common,
+        403: forbidden(
+          '`subscriptions_disabled` (the app turned subscriptions off), `secret_key_required`, `not_a_payments_app`, `payments_disabled`',
+        ),
       },
     },
   );
@@ -809,26 +843,35 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
     },
   );
-  for (const [action, summary, description, response] of [
+  for (const [action, summary, description, response, conflict] of [
     [
       'cancel',
       'Cancel a subscription',
       'Now (its open invoices are cancelled) or, with `atPeriodEnd`, when the running period ends.',
       Subscription,
+      '`subscription_not_active`.',
     ],
     [
       'cancel/undo',
       'Take back a scheduled cancellation',
       'The subscription renews again (`subscription.cancel_unscheduled`); a next-period invoice the cancellation cancelled is issued anew.',
       Subscription,
+      '`subscription_not_active`: no cancellation is scheduled.',
     ],
     [
       'pause',
       'Pause a subscription',
       'Its open invoices are cancelled and no period is billed until it resumes.',
       Subscription,
+      '`subscription_not_active`.',
     ],
-    ['resume', 'Resume a subscription', 'A new period starts now and is invoiced at once.', SubscriptionStart],
+    [
+      'resume',
+      'Resume a subscription',
+      'A new period starts now and is invoiced at once.',
+      SubscriptionStart,
+      '`subscription_not_paused`, `subscription_over`: its cycles or end date are past.',
+    ],
   ] as const) {
     route('post', `/subscriptions/{id}/${action}`, 'Subscriptions', summary, description, {
       request: {
@@ -839,8 +882,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
       responses: {
         200: { description: 'The subscription.', ...json(response) },
+        ...(action === 'cancel' && { 400: invalid() }),
         404: refused('`subscription_not_found`.'),
-        409: refused('Not possible in its state.'),
+        409: refused(conflict),
         ...common,
       },
     });
@@ -1109,10 +1153,13 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
       responses: {
         200: { description: 'The quote and its payment instructions.', ...json(CheckoutQuote) },
-        400: refused('`payer_required`, `payer_chain_mismatch`.'),
-        409: refused('`buyer_required`, `invoice_expired`, `invoice_processing`, `amount_out_of_range`…'),
-        503: refused('`screening_unavailable`.'),
+        400: invalid('`payer_required`, `payer_chain_mismatch`'),
+        409: refused(
+          '`buyer_required`, `invoice_expired`, `invoice_processing`, `invoice_not_payable`, `amount_out_of_range`, `method_not_priced`.',
+        ),
+        503: refused('`screening_unavailable` (AML in `block` mode while a source is down), `price_unavailable`.'),
         ...checkoutErrors,
+        404: refused('`checkout_not_found`, `method_not_found`.'),
         403: refused('`payer_blocked` (AML), `payer_not_expected`, `origin_not_allowed`.'),
       },
     },
@@ -1126,7 +1173,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       request: { body: json(z.object({ buyer: Buyer, company: z.boolean().optional() })) },
       responses: {
         200: { description: 'The checkout.', ...json(CheckoutView) },
-        400: refused('`buyer_incomplete`.'),
+        400: invalid('`buyer_incomplete`'),
         409: refused('`buyer_not_requested`, `invoice_not_payable`.'),
         ...checkoutErrors,
       },
@@ -1149,8 +1196,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
       responses: {
         202: { description: 'Taken.', ...json(z.object({ txKey: z.string(), status: z.string() })) },
-        400: refused('`invalid_transaction`, `sender_required`.'),
-        409: refused('`quote_required`, `invoice_not_payable`.'),
+        400: invalid('`invalid_transaction`, `sender_required`'),
+        409: refused(
+          '`quote_required`, `invoice_not_payable`, `too_many_pending`: the invoice already has 3 unconfirmed transactions; wait until one is confirmed or fails.',
+        ),
         ...checkoutErrors,
       },
     },
@@ -1175,9 +1224,13 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
             }),
           ),
         },
-        409: refused('`gasless_unavailable`, `already_relayed`.'),
+        400: invalid('`invalid_signature`'),
+        409: refused('`gasless_unavailable`, `already_relayed`, `quote_required`.'),
         502: refused('`relay_failed`: pay with a normal transfer or ask for a new quote.'),
         ...checkoutErrors,
+        429: refused(
+          '`sponsorship_limit` (the gas the merchant sponsors per invoice or day is used up: pay with a normal transfer), `rate_limited`.',
+        ),
       },
     },
   );
@@ -1194,6 +1247,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
       responses: {
         200: { description: 'The JSON-RPC answer.', ...json(z.record(z.string(), z.unknown())) },
+        400: invalid(),
         ...checkoutErrors,
       },
     },
@@ -1216,8 +1270,8 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
       responses: {
         200: { description: 'The permission.', ...json(z.object({ permission: Subscription.shape.permission })) },
-        400: refused('`payer_chain_mismatch`, a context that does not grant the requested terms.'),
-        409: refused('`subscription_not_active`.'),
+        400: invalid('`payer_chain_mismatch`, `permission_invalid`: the context does not grant the requested terms'),
+        409: refused('`subscription_not_active`, `auto_charge_unavailable`.'),
         ...checkoutErrors,
       },
     },
@@ -1267,7 +1321,11 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   );
   checkout('post', '/locale', 'Change the language', 'Of the page and the documents still to be issued.', {
     request: { body: json(z.object({ locale: Locale })) },
-    responses: { 200: { description: 'The language.', ...json(z.object({ locale: Locale })) }, ...checkoutErrors },
+    responses: {
+      200: { description: 'The language.', ...json(z.object({ locale: Locale })) },
+      400: invalid(),
+      ...checkoutErrors,
+    },
   });
 
   // -------------------------------------------------------------------------

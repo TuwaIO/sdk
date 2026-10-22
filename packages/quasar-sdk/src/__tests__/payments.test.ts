@@ -242,6 +242,30 @@ describe('quasar.payments', () => {
     expect(error).toMatchObject({ status: 429, message: '[Quasar SDK] Request Failed (429): Too Many Requests' });
   });
 
+  it('reads why the engine refused the key or the app, not the status text of its NestJS body', async () => {
+    fetchMock.mockResolvedValueOnce(
+      json({ statusCode: 403, error: 'Forbidden', message: 'App is being deleted' }, 403),
+    );
+    const deleting = await quasar.payments.listMethods().catch((e: unknown) => e);
+    expect(deleting).toMatchObject({ status: 403, message: '[Quasar SDK] Request Failed (403): App is being deleted' });
+    fetchMock.mockResolvedValueOnce(json({ statusCode: 401, error: 'Unauthorized', message: 'Invalid API Key' }, 401));
+    const unknown = await quasar.payments.listMethods().catch((e: unknown) => e);
+    expect(unknown).toMatchObject({ status: 401, message: '[Quasar SDK] Request Failed (401): Invalid API Key' });
+  });
+
+  it('keeps the code of a refusal the engine names at the top of its body, and blames no key for it', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const explanation = 'Data processing is not set up for this organization.';
+    fetchMock.mockResolvedValueOnce(
+      json({ error: `Forbidden: ${explanation}`, message: explanation, code: 'data_processing_required' }, 403),
+    );
+    const error = await quasar.payments.listMethods().catch((e: unknown) => e);
+    expect(error).toMatchObject({ status: 403, code: 'data_processing_required' });
+    expect((error as Error).message).toContain(explanation);
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
   it('reads the refusal of a document download too, and the details a refusal adds', async () => {
     fetchMock.mockResolvedValueOnce(
       json({ error: { code: 'document_not_found', message: 'There is no receipt document', retryAfter: 5 } }, 404),
