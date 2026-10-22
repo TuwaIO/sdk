@@ -197,7 +197,7 @@
     "@radix-ui/react-select": "^2.4.1",
     "@tuwaio/nova-connect": "1.0.0-feat-payments-alpha.15.9efca850",
     "@tuwaio/nova-core": "1.0.0-feat-payments-alpha.15.9efca850",
-    "@tuwaio/nova-payments": "1.0.0-feat-payments-alpha.15.9efca850",
+    "@tuwaio/nova-payments": "1.0.0-feat-payments-alpha.16.c8edb7e0",
     "@tuwaio/nova-transactions": "1.0.0-feat-payments-alpha.15.9efca850",
     "@tuwaio/orbit-core": "^0.6.0",
     "@tuwaio/pulsar-core": "^0.11.0",
