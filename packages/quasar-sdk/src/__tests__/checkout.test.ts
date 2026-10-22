@@ -74,6 +74,7 @@ const view = (overrides: Partial<CheckoutView> = {}): CheckoutView => ({
     subscription: null,
   },
   buyer: { collect: 'off', required: false, companyInvoice: false },
+  consent: null,
   methods: [
     {
       id: 'ap_1',
@@ -189,6 +190,50 @@ describe('createCheckoutStore', () => {
     expect(checkout.getState()).toMatchObject({ phase: 'awaitingPayment', quote: { methodId: 'ap_1' }, error: null });
     expect(checkout.getState().paymasterUrl).toBe(`${BASE}/v1/payments/checkout/tok_1/paymaster`);
     checkout.getState().destroy();
+  });
+
+  // The line the merchant asks the buyer to tick before paying (Quasar plan 12 §9.8)
+  it('asks for a required consent before the quote, and sends the consent with it', async () => {
+    const consent = { text: 'I ask Acme to start at once.', required: true };
+    fetchMock.mockResolvedValueOnce(json(view({ consent }))).mockResolvedValueOnce(json(QUOTE));
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().consentGiven).toBe(false);
+    checkout.getState().selectMethod('ap_1');
+    checkout.getState().setPayer(QUOTE.payer);
+
+    expect(await checkout.getState().requestQuote()).toBeNull();
+    expect(checkout.getState()).toMatchObject({ phase: 'selectMethod', error: { code: 'consent_required' } });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    checkout.getState().setConsentGiven(true);
+    expect(checkout.getState()).toMatchObject({ consentGiven: true, error: null });
+    await checkout.getState().requestQuote();
+    expect(await sent(1)).toMatchObject({ body: { methodId: 'ap_1', payer: QUOTE.payer, consentGiven: true } });
+    expect(checkout.getState().phase).toBe('awaitingPayment');
+    checkout.getState().destroy();
+  });
+
+  it('quotes without an optional consent, and sends no consent the merchant did not ask', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json(view({ consent: { text: 'Send me news.', required: false } })))
+      .mockResolvedValueOnce(json(QUOTE))
+      .mockResolvedValueOnce(json(view()))
+      .mockResolvedValueOnce(json(QUOTE));
+    const optional = store();
+    await optional.getState().load();
+    optional.getState().selectMethod('ap_1');
+    await optional.getState().requestQuote();
+    expect((await sent(1)).body).toEqual({ methodId: 'ap_1' });
+    optional.getState().destroy();
+
+    const none = store();
+    await none.getState().load();
+    none.getState().selectMethod('ap_1');
+    none.getState().setConsentGiven(true);
+    await none.getState().requestQuote();
+    expect((await sent(3)).body).toEqual({ methodId: 'ap_1' });
+    none.getState().destroy();
   });
 
   it('goes back to the methods from a locked price, but not once the payment is on its way', async () => {

@@ -123,6 +123,17 @@ export interface CheckoutMerchant {
   fundingUrl: string | null;
 }
 
+/**
+ * A line the merchant asks the buyer to tick before paying, such as a request to start a service at once. The quote
+ * records the tick in the invoice's ledger and the receipt email repeats the text.
+ */
+export interface CheckoutConsent {
+  /** The merchant's words, up to 500 characters, shown as they are. */
+  text: string;
+  /** Whether the buyer cannot pay without ticking it: Quasar refuses the quote with `consent_required`. */
+  required: boolean;
+}
+
 /** The look of the checkout the merchant chose. */
 export interface CheckoutTheme {
   /** `system` follows the buyer's device. */
@@ -314,6 +325,8 @@ export interface CheckoutView {
    * waits for them; `companyInvoice` when the page may offer an invoice for a company.
    */
   buyer: { collect: 'off' | 'email' | 'full'; required: boolean; companyInvoice: boolean };
+  /** The line the buyer ticks before paying; `null` when the merchant asks none. */
+  consent: CheckoutConsent | null;
   /** The methods that take this invoice. */
   methods: CheckoutMethod[];
   /** How long a quote holds once locked, in seconds (never past the invoice deadline). */
@@ -332,8 +345,8 @@ export interface CheckoutView {
 export interface CheckoutApi {
   /** Reads the checkout (`GET`). */
   view: () => Promise<CheckoutView>;
-  /** Locks a quote for a method and, when connected, the payer (`POST quote`). */
-  quote: (body: { methodId: string; payer?: string }) => Promise<CheckoutQuote>;
+  /** Locks a quote for a method and, when connected, the payer, with the buyer's consent when given (`POST quote`). */
+  quote: (body: { methodId: string; payer?: string; consentGiven?: boolean }) => Promise<CheckoutQuote>;
   /** Sends the buyer details (`POST buyer`) and answers with the checkout. */
   buyer: (body: { buyer: Buyer; company?: boolean }) => Promise<CheckoutView>;
   /** Sets the language of the page and the documents still to be issued (`POST locale`). */

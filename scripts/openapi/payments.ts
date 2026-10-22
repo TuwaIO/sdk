@@ -1058,6 +1058,16 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         required: z.boolean(),
         companyInvoice: z.boolean(),
       }),
+      consent: z
+        .object({
+          text: z.string().openapi({ description: "The merchant's words, up to 500 characters." }),
+          required: z.boolean().openapi({ description: 'The buyer cannot pay without ticking it.' }),
+        })
+        .nullable()
+        .openapi({
+          description:
+            'A line the buyer ticks before paying, such as a request to start a service at once; `null` when the merchant asks none. The quote records the tick in the ledger (`consent.given`) and the receipt email repeats the text.',
+        }),
       methods: z.array(
         z.object({
           id: z.string(),
@@ -1148,14 +1158,21 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     {
       request: {
         body: json(
-          z.object({ methodId: z.string(), payer: z.string().optional().openapi({ description: 'CAIP-10 account.' }) }),
+          z.object({
+            methodId: z.string(),
+            payer: z.string().optional().openapi({ description: 'CAIP-10 account.' }),
+            consentGiven: z
+              .boolean()
+              .optional()
+              .openapi({ description: 'The buyer ticked the checkout `consent`; a required one must be `true`.' }),
+          }),
         ),
       },
       responses: {
         200: { description: 'The quote and its payment instructions.', ...json(CheckoutQuote) },
         400: invalid('`payer_required`, `payer_chain_mismatch`'),
         409: refused(
-          '`buyer_required`, `invoice_expired`, `invoice_processing`, `invoice_not_payable`, `amount_out_of_range`, `method_not_priced`.',
+          '`buyer_required`, `consent_required` (a required consent without `consentGiven: true`), `invoice_expired`, `invoice_processing`, `invoice_not_payable`, `amount_out_of_range`, `method_not_priced`.',
         ),
         503: refused('`screening_unavailable` (AML in `block` mode while a source is down), `price_unavailable`.'),
         ...checkoutErrors,

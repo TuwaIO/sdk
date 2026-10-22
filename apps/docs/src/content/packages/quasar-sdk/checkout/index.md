@@ -8,6 +8,7 @@ merchant's wallet, whose calls run on the app's server. It needs `zustand` (5.x)
 ## Interfaces
 
 - [CheckoutApi](/packages/quasar-sdk/checkout/interfaces/CheckoutApi.md)
+- [CheckoutConsent](/packages/quasar-sdk/checkout/interfaces/CheckoutConsent.md)
 - [CheckoutError](/packages/quasar-sdk/checkout/interfaces/CheckoutError.md)
 - [CheckoutInvoice](/packages/quasar-sdk/checkout/interfaces/CheckoutInvoice.md)
 - [CheckoutLine](/packages/quasar-sdk/checkout/interfaces/CheckoutLine.md)

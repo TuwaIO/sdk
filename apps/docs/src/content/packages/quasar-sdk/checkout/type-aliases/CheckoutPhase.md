@@ -2,13 +2,14 @@
 
 > **CheckoutPhase** = `"loading"` \| `"buyer"` \| `"selectMethod"` \| `"quoting"` \| `"awaitingPayment"` \| `"submitting"` \| `"confirming"` \| `"paid"` \| `"underpaid"` \| `"held"` \| `"refunded"` \| `"expired"` \| `"cancelled"` \| `"blocked"` \| `"error"`
 
-Defined in: [checkout/store.ts:29](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L29)
+Defined in: [checkout/store.ts:30](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L30)
 
 Where the payment stands:
 
 - `loading`: reading the checkout.
 - `buyer`: the buyer details come first ([CheckoutState.setBuyer](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#setbuyer)).
-- `selectMethod`: choose a method and connect a wallet, then [CheckoutState.requestQuote](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#requestquote).
+- `selectMethod`: choose a method, connect a wallet and tick the merchant's consent when there is one, then
+  [CheckoutState.requestQuote](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#requestquote).
 - `quoting`: Quasar screens the payer and locks the price.
 - `awaitingPayment`: send `quote.instructions` from the wallet (or sign `quote.gasless`), then
   [CheckoutState.submit](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#submit) or [CheckoutState.relay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#relay).

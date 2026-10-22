@@ -35,7 +35,7 @@ export function checkoutApi(token: string, baseUrl: string = BASE_API_URL): Chec
   };
   return {
     view: () => call<CheckoutView>(''),
-    quote: (body: { methodId: string; payer?: string }) => call<CheckoutQuote>('quote', body),
+    quote: (body: { methodId: string; payer?: string; consentGiven?: boolean }) => call<CheckoutQuote>('quote', body),
     buyer: (body: { buyer: Buyer; company?: boolean }) => call<CheckoutView>('buyer', body),
     locale: (locale: InvoiceLocale) => call<{ locale: InvoiceLocale }>('locale', { locale }),
     submit: (body: { txKey: string; from?: string; connectorType?: string }) =>

@@ -15,7 +15,8 @@ import type { CheckoutApi, CheckoutQuote, CheckoutStatusEvent, CheckoutView, Gra
  *
  * - `loading`: reading the checkout.
  * - `buyer`: the buyer details come first ({@link CheckoutState.setBuyer}).
- * - `selectMethod`: choose a method and connect a wallet, then {@link CheckoutState.requestQuote}.
+ * - `selectMethod`: choose a method, connect a wallet and tick the merchant's consent when there is one, then
+ *   {@link CheckoutState.requestQuote}.
  * - `quoting`: Quasar screens the payer and locks the price.
  * - `awaitingPayment`: send `quote.instructions` from the wallet (or sign `quote.gasless`), then
  *   {@link CheckoutState.submit} or {@link CheckoutState.relay}.
@@ -45,8 +46,8 @@ export type CheckoutPhase =
 
 /**
  * Why the last action failed: the Payments `code` (`payer_blocked`, `quote_required`, `invoice_expired`…), or
- * `method_required` (no method chosen), `payment_failed` (the transaction failed on-chain; pay again) and
- * `request_failed` (no answer).
+ * `method_required` (no method chosen), `consent_required` (the merchant's consent is not ticked), `payment_failed`
+ * (the transaction failed on-chain; pay again) and `request_failed` (no answer).
  */
 export interface CheckoutError {
   /** Stable code. */
@@ -71,6 +72,8 @@ export interface CheckoutState {
   methodId: string | null;
   /** The connected wallet as a CAIP-10 account on the method's chain. */
   payer: string | null;
+  /** Whether the buyer ticked the merchant's consent (`checkout.consent`). */
+  consentGiven: boolean;
   /** The locked quote. */
   quote: CheckoutQuote | null;
   /** Language of the page and the documents still to be issued. */
@@ -108,6 +111,13 @@ export interface CheckoutState {
    */
   setPayer: (payer: string | null) => void;
   /**
+   * Ticks or clears the merchant's consent (`checkout.consent`): a required one must be ticked before
+   * {@link CheckoutState.requestQuote}, which sends it with the quote.
+   *
+   * @param given - Whether the buyer ticked it.
+   */
+  setConsentGiven: (given: boolean) => void;
+  /**
    * Forgets the locked quote and goes back to choosing a method ("Back to methods"), also for a Solana Pay QR quote
    * that no other action drops. Nothing changes once the payment is on its way (`submitting`, `confirming`) or done.
    * Quasar keeps the lock until it ends: a payment of the old quote that still arrives is credited.
@@ -117,7 +127,7 @@ export interface CheckoutState {
    * Screens the payer and locks the price (`POST quote`).
    *
    * @returns The quote, or `null` with `error` set (`phase` `blocked` when AML refuses the wallet, `buyer` when the
-   *   details come first).
+   *   details come first; `consent_required`, without a request, when a required consent is not ticked).
    */
   requestQuote: () => Promise<CheckoutQuote | null>;
   /**
@@ -380,6 +390,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       invoiceStatus: null,
       methodId: null,
       payer: null,
+      consentGiven: false,
       quote: null,
       locale: null,
       txKey: null,
@@ -427,20 +438,30 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         });
       },
 
+      setConsentGiven: (given) => update({ consentGiven: given, error: null }),
+
       releaseQuote: () => {
         if (get().phase !== 'awaitingPayment') return;
         update({ quote: null, error: null, phase: 'selectMethod' });
       },
 
       requestQuote: async () => {
-        const { methodId, payer, phase } = get();
+        const { methodId, payer, phase, checkout, consentGiven } = get();
         if (!methodId) {
           update({ error: { code: 'method_required', message: 'Choose a payment method first' } });
           return null;
         }
+        if (checkout?.consent?.required && !consentGiven) {
+          update({ error: { code: 'consent_required', message: 'Tick the consent of the checkout first' } });
+          return null;
+        }
         update({ phase: 'quoting', error: null });
         try {
-          const quote = await api.quote({ methodId, ...(payer ? { payer } : {}) });
+          const quote = await api.quote({
+            methodId,
+            ...(payer ? { payer } : {}),
+            ...(checkout?.consent && consentGiven ? { consentGiven: true } : {}),
+          });
           update({ quote, phase: 'awaitingPayment' });
           return quote;
         } catch (error) {
