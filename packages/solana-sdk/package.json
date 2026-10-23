@@ -82,7 +82,7 @@
   ],
   "dependencies": {
     "@tuwaio/orbit-solana": "^0.7.1",
-    "@tuwaio/pulsar-solana": "^0.10.3",
+    "@tuwaio/pulsar-solana": "^0.10.4",
     "@tuwaio/satellite-solana": "^0.11.0",
     "@tuwaio/siwx-solana": "^0.7.0"
   },
