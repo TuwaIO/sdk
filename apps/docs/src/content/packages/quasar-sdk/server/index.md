@@ -28,6 +28,7 @@ package; the browser helper for React apps is in `@tuwaio/quasar-sdk/react`.
 - [InvoiceLine](/packages/quasar-sdk/server/interfaces/InvoiceLine.md)
 - [InvoiceLineInput](/packages/quasar-sdk/server/interfaces/InvoiceLineInput.md)
 - [InvoiceQuote](/packages/quasar-sdk/server/interfaces/InvoiceQuote.md)
+- [InvoiceSeller](/packages/quasar-sdk/server/interfaces/InvoiceSeller.md)
 - [InvoiceSettlement](/packages/quasar-sdk/server/interfaces/InvoiceSettlement.md)
 - [InvoiceTermsInput](/packages/quasar-sdk/server/interfaces/InvoiceTermsInput.md)
 - [InvoiceWithCheckout](/packages/quasar-sdk/server/interfaces/InvoiceWithCheckout.md)

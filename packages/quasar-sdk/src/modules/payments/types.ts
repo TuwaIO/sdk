@@ -182,6 +182,8 @@ export interface InvoiceQuote {
 
 /** The payment that settled an invoice. */
 export interface InvoiceSettlement {
+  /** ID of the payment method paid with (see `listMethods`): its token and network read {@link InvoiceSettlement.amountPaid}. */
+  methodId: string | null;
   /** CAIP-2 chain ID of the payment. */
   chainId: string | null;
   /** Transaction hash or Solana signature. */
@@ -196,6 +198,37 @@ export interface InvoiceSettlement {
   paidAt: string | null;
   /** Base units received beyond what was due; a refund can return them. */
   overpaid: string;
+}
+
+/**
+ * The seller of an invoice as printed, copied from the app's payment settings when it was issued. Every field may be
+ * missing or `null`: invoices issued before the address had its parts carry only `address`.
+ */
+export interface InvoiceSeller {
+  /** Legal name. */
+  legalName?: string | null;
+  /** The name buyers know. */
+  tradingName?: string | null;
+  /** The postal address as one text, as the checkout shows it. */
+  address?: string | null;
+  /** First address line. */
+  addressLine1?: string | null;
+  /** Second address line. */
+  addressLine2?: string | null;
+  /** Postal code. */
+  postalCode?: string | null;
+  /** City. */
+  city?: string | null;
+  /** ISO 3166-1 alpha-2 country code. */
+  country?: string | null;
+  /** Company registration number. */
+  registrationNumber?: string | null;
+  /** VAT or other tax ID. */
+  taxId?: string | null;
+  /** Support email address. */
+  supportEmail?: string | null;
+  /** Website. */
+  website?: string | null;
 }
 
 /** The payer's AML screening of an invoice. */
@@ -231,7 +264,7 @@ export interface Invoice {
   /** When it stops being payable. */
   dueAt: string | null;
   /** The seller as printed, from the app's settings at issue. */
-  seller: Record<string, unknown> | null;
+  seller: InvoiceSeller | null;
   /** The buyer as printed. */
   buyer: (Buyer & { companyInvoice?: boolean }) | null;
   /** The CAIP-10 account you expected to pay. */

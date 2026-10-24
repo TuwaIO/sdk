@@ -12,6 +12,7 @@ import type {
   InvoiceCorrection,
   InvoiceDetails,
   InvoiceLedger,
+  InvoiceSeller,
   InvoiceWithCheckout,
   PaymentMethod,
   PaymentQuote,
@@ -161,6 +162,29 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     unitCode: z.string().optional(),
   });
 
+  const text = z.string().nullable().optional();
+  const InvoiceSeller = z
+    .object({
+      legalName: text,
+      tradingName: text,
+      address: text.openapi({ description: 'The postal address as one text, as the checkout shows it.' }),
+      addressLine1: text,
+      addressLine2: text,
+      postalCode: text,
+      city: text,
+      country: text.openapi({ description: 'ISO 3166-1 alpha-2.' }),
+      registrationNumber: text,
+      taxId: text,
+      supportEmail: text,
+      website: text,
+    })
+    .openapi('InvoiceSeller', {
+      description:
+        "The seller as printed, from the app's payment settings when the invoice was issued. Invoices issued before the address had its parts carry only `address`.",
+    });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkSeller: z.ZodType<InvoiceSeller> = InvoiceSeller;
+
   const Invoice = z
     .object({
       id: z.string(),
@@ -173,7 +197,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       issuedAt: dateTime('When it was issued.').nullable(),
       supplyDate: dateTime('Date of supply (BT-72).').nullable(),
       dueAt: dateTime('When it stops being payable.').nullable(),
-      seller: z.record(z.string(), z.unknown()).nullable().openapi({ description: 'The seller as printed.' }),
+      seller: InvoiceSeller.nullable(),
       buyer: Buyer.extend({ companyInvoice: z.boolean().optional() }).nullable(),
       expectedPayer: z.string().nullable(),
       buyerReference: z.string().nullable(),
@@ -215,6 +239,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         .openapi({ description: 'The locked quote, once a buyer chose how to pay. Token amounts in base units.' }),
       settlement: z
         .object({
+          methodId: z.string().nullable().openapi({
+            description: 'The payment method paid with (`GET /methods`): its token and network read `amountPaid`.',
+          }),
           chainId: z.string().nullable(),
           txHash: z.string(),
           blockRef: z.string().nullable(),
@@ -1300,19 +1327,26 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       404: refused('`receipt_not_issued`, `checkout_not_found`.'),
     },
   });
-  checkout('get', '/logo', "Get the merchant's logo", "The merchant's PNG or JPEG logo; any site may show it.", {
-    responses: {
-      200: {
-        description: 'The image, cacheable for five minutes.',
-        content: {
-          'image/png': { schema: z.string().openapi({ format: 'binary' }) },
-          'image/jpeg': { schema: z.string().openapi({ format: 'binary' }) },
+  checkout(
+    'get',
+    '/logo',
+    "Get the merchant's logo",
+    "The app's PNG or JPEG logo from its Business & documents settings, else the WebP logo of its organization; any site may show it.",
+    {
+      responses: {
+        200: {
+          description: 'The image, cacheable for five minutes.',
+          content: {
+            'image/png': { schema: z.string().openapi({ format: 'binary' }) },
+            'image/jpeg': { schema: z.string().openapi({ format: 'binary' }) },
+            'image/webp': { schema: z.string().openapi({ format: 'binary' }) },
+          },
         },
+        ...checkoutErrors,
+        404: refused('`logo_not_set`, `checkout_not_found`.'),
       },
-      ...checkoutErrors,
-      404: refused('`logo_not_set`, `checkout_not_found`.'),
     },
-  });
+  );
   const StatusEvent = z
     .object({
       status: InvoiceStatus,

@@ -1,6 +1,6 @@
 # InvoiceCorrection
 
-Defined in: [modules/payments/types.ts:333](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L333)
+Defined in: [modules/payments/types.ts:366](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L366)
 
 The answer of [PaymentsModule.correctInvoice](/packages/quasar-sdk/server/classes/PaymentsModule.md#correctinvoice): the corrected invoice and the one it replaces.
 
@@ -14,7 +14,7 @@ The answer of [PaymentsModule.correctInvoice](/packages/quasar-sdk/server/classe
 
 > **checkoutToken**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:327](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L327)
+Defined in: [modules/payments/types.ts:360](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L360)
 
 The checkout token, `null` when the invoice can no longer be paid.
 
@@ -28,7 +28,7 @@ The checkout token, `null` when the invoice can no longer be paid.
 
 > **invoice**: [`Invoice`](/packages/quasar-sdk/server/interfaces/Invoice.md)
 
-Defined in: [modules/payments/types.ts:325](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L325)
+Defined in: [modules/payments/types.ts:358](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L358)
 
 The invoice.
 
@@ -42,7 +42,7 @@ The invoice.
 
 > **payUrl**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:329](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L329)
+Defined in: [modules/payments/types.ts:362](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L362)
 
 The payment page, `null` without a token or when the node has no dashboard URL.
 
@@ -56,6 +56,6 @@ The payment page, `null` without a token or when the node has no dashboard URL.
 
 > **replaced**: [`Invoice`](/packages/quasar-sdk/server/interfaces/Invoice.md)
 
-Defined in: [modules/payments/types.ts:335](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L335)
+Defined in: [modules/payments/types.ts:368](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L368)
 
 The invoice it replaces, now credited.
