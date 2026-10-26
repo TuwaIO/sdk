@@ -6,6 +6,7 @@ import * as novaConnectHooks from '../nova-connect-hooks.js';
 import * as novaCore from '../nova-core.js';
 import * as novaCoreUtils from '../nova-core-utils.js';
 import * as novaTransactions from '../nova-transactions.js';
+import * as novaTransactionsI18n from '../nova-transactions-i18n.js';
 import * as novaTransactionsProviders from '../nova-transactions-providers.js';
 import * as orbit from '../orbit.js';
 import * as pulsar from '../pulsar.js';
@@ -76,6 +77,12 @@ describe('Unified SDK Re-Exports', () => {
     expect(typeof novaConnect.NovaConnectProvider).toBe('function');
     expect(typeof novaConnectHooks.useNovaSiwx).toBe('function');
     expect(novaConnectComponents.ConnectButton).toBeDefined();
+  });
+
+  it('exports transaction i18n labels from nova-transactions-i18n', () => {
+    expect(novaTransactionsI18n.defaultLabels).toBeDefined();
+    expect(novaTransactionsI18n.chineseLabels).toBeDefined();
+    expect(novaTransactionsI18n.ukrainianLabels).toBeDefined();
   });
 
   it('exports only the helpers of nova-core from nova-core-utils, without components and icons', async () => {

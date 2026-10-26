@@ -62,6 +62,11 @@
       "import": "./dist/nova-transactions-providers.js",
       "require": "./dist/nova-transactions-providers.cjs"
     },
+    "./nova-transactions/i18n": {
+      "types": "./dist/nova-transactions-i18n.d.ts",
+      "import": "./dist/nova-transactions-i18n.js",
+      "require": "./dist/nova-transactions-i18n.cjs"
+    },
     "./nova-core": {
       "types": "./dist/nova-core.d.ts",
       "import": "./dist/nova-core.js",

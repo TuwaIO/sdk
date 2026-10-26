@@ -21,6 +21,7 @@ export default defineConfig([
       './src/nova-connect-solana.ts',
       './src/nova-transactions.ts',
       './src/nova-transactions-providers.ts',
+      './src/nova-transactions-i18n.ts',
       './src/nova-core.ts',
       './src/nova-core-utils.ts',
       './src/orbit.ts',
