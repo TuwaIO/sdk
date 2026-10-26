@@ -4,7 +4,7 @@
   "private": true,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@12.11.2",
+  "packageManager": "pnpm@12.15.0",
   "description": "Monorepo for the TUWA SDK: @tuwaio/sdk (L8) and its EVM and Solana add-ons (L9), which re-export the TUWA projects for React apps, and @tuwaio/quasar-sdk (L5), the client of the Quasar API.",
   "scripts": {
     "build": "pnpm --filter \"./packages/**\" build",
@@ -54,9 +54,9 @@
     "semantic-release": "^25.0.9",
     "tsx": "^4.23.15",
     "typedoc": "^0.28.20",
-    "typedoc-plugin-markdown": "^4.14.0",
+    "typedoc-plugin-markdown": "^4.14.1",
     "typescript": "6.0.3",
-    "typescript-eslint": "^8.71.2",
+    "typescript-eslint": "^8.72.0",
     "vitest": "^5.0.5",
     "yaml": "^2.9.1",
     "zod": "^4.6.7"

@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-const LOGO_URL = 'https://cdn.jsdelivr.net/gh/TuwaIO/workflows@main/preview/logo_v2.svg';
+const LOGO_URL = 'https://tuwa.io/brand/logo_v2.svg';
 const logo = (
   <RemoteLogo url={LOGO_URL} width={126} height={40} className="tuwadocs:transition-opacity tuwadocs:duration-300" />
 );
