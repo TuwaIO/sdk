@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.6](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.5...sdk-v0.6.6) (2026-10-26)
+
+
+### Bug Fixes
+
+* updated nova core for fonts ([74aac32](https://github.com/TuwaIO/sdk/commit/74aac32c3cc1980db1955ca710321de58bc1f884))
+
 ## [0.6.5](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.4...sdk-v0.6.5) (2026-10-26)
 
 
