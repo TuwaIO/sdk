@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.5](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.4...sdk-v0.6.5) (2026-10-26)
+
+
+### Bug Fixes
+
+* added nova transactions i18n exports ([ea85649](https://github.com/TuwaIO/sdk/commit/ea85649cf9ffbf8d456c78a5ad1b53dad3c14f32))
+
 ## [0.6.4](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.3...sdk-v0.6.4) (2026-10-26)
 
 
