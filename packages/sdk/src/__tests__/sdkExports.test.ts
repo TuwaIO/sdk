@@ -8,6 +8,7 @@ import * as novaCoreUtils from '../nova-core-utils.js';
 import * as novaPayments from '../nova-payments.js';
 import * as novaPaymentsI18n from '../nova-payments-i18n.js';
 import * as novaTransactions from '../nova-transactions.js';
+import * as novaTransactionsI18n from '../nova-transactions-i18n.js';
 import * as novaTransactionsProviders from '../nova-transactions-providers.js';
 import * as orbit from '../orbit.js';
 import * as pulsar from '../pulsar.js';
@@ -99,6 +100,12 @@ describe('Unified SDK Re-Exports', () => {
   it('exports the chain adapters of Nova Payments from their own subpaths, for the add-ons', async () => {
     expect(typeof (await import('../nova-payments-evm.js')).paymentsEVMAdapter).toBe('function');
     expect(typeof (await import('../nova-payments-solana.js')).paymentsSolanaAdapter).toBe('function');
+  });
+
+  it('exports transaction i18n labels from nova-transactions-i18n', () => {
+    expect(novaTransactionsI18n.defaultLabels).toBeDefined();
+    expect(novaTransactionsI18n.chineseLabels).toBeDefined();
+    expect(novaTransactionsI18n.ukrainianLabels).toBeDefined();
   });
 
   it('exports only the helpers of nova-core from nova-core-utils, without components and icons', async () => {

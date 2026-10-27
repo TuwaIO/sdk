@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.6.6](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.5...sdk-v0.6.6) (2026-10-26)
+
+
+### Bug Fixes
+
+* updated nova core for fonts ([74aac32](https://github.com/TuwaIO/sdk/commit/74aac32c3cc1980db1955ca710321de58bc1f884))
+
+## [0.6.5](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.4...sdk-v0.6.5) (2026-10-26)
+
+
+### Bug Fixes
+
+* added nova transactions i18n exports ([ea85649](https://github.com/TuwaIO/sdk/commit/ea85649cf9ffbf8d456c78a5ad1b53dad3c14f32))
+
+## [0.6.4](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.3...sdk-v0.6.4) (2026-10-26)
+
+
+### Bug Fixes
+
+* updated packages ([37a145f](https://github.com/TuwaIO/sdk/commit/37a145f6b9677837771145ca5ceb2ee58538ebbc))
+
 ## [0.6.3](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.2...sdk-v0.6.3) (2026-10-20)
 
 

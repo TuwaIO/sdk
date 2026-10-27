@@ -26,6 +26,7 @@ export default defineConfig([
       './src/nova-payments-evm.ts',
       './src/nova-payments-solana.ts',
       './src/quasar-checkout.ts',
+      './src/nova-transactions-i18n.ts',
       './src/nova-core.ts',
       './src/nova-core-utils.ts',
       './src/orbit.ts',
