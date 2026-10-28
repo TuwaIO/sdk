@@ -92,7 +92,9 @@ export interface CheckoutState {
   logoUrl: string | null;
   /**
    * Reads the checkout (`GET`) and, while the invoice can change, follows it (server-sent events, else a read every
-   * `pollMs`). Sets `phase` `error` when the link is wrong or retired.
+   * `pollMs`). An event that brings an outcome (underpaid, held, paid, refunded, expired, cancelled) updates
+   * `checkout.invoice.amountPaid` at once and reads the checkout again for the rest (`review`, the refund, the invoice
+   * that replaced it, `autoCharge`). Sets `phase` `error` when the link is wrong or retired.
    *
    * @returns Resolves when the checkout is read.
    */
@@ -214,6 +216,12 @@ export type CheckoutStore = StoreApi<CheckoutState>;
 /** Invoice states after which the page has nothing to follow. */
 const FINAL: ReadonlySet<string> = new Set(['paid', 'held', 'expired', 'cancelled', 'refunded', 'partially_refunded']);
 
+/**
+ * The outcomes whose details an event does not carry: why a payment waits (`review`), the refund, the invoice that
+ * replaced a cancelled one, the automatic payments offer after a paid period. The checkout is read again for them.
+ */
+const OUTCOMES: ReadonlySet<string> = new Set([...FINAL, 'underpaid']);
+
 /** The phase an invoice state stands for, once a payment is under way or over. */
 function phaseOfStatus(status: InvoiceStatus): CheckoutPhase {
   switch (status) {
@@ -267,7 +275,8 @@ function errorOf(error: unknown): CheckoutError {
  *
  * Side effects: requests to `<baseUrl>/v1/payments/checkout/<token>` (the page's origin must be one of the app's
  * domains, when it lists any); after `load`, an `EventSource` on its `events` route (or a `GET` every `pollMs`) until
- * the invoice reaches a final state or `destroy` is called. Nothing is stored in the browser.
+ * the invoice reaches a final state or `destroy` is called, and a `GET` of the checkout when an event brings an
+ * outcome. Nothing is stored in the browser.
  *
  * @param options - The checkout token and optional overrides.
  * @returns The store; call `load()` first.
@@ -321,10 +330,30 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       poll = null;
     };
 
-    const onStatus = (event: CheckoutStatusEvent) => {
+    /** Reads the checkout again for the details of an outcome; a failed read leaves the state the event set. */
+    const refreshView = () =>
+      api
+        .view()
+        .then((view) => {
+          // The details only: the phase follows the events, and the buyer's quote stays as the actions left it
+          if (!destroyed) update({ checkout: view });
+        })
+        .catch(() => {
+          // The outcome stands; its details come with the next load
+        });
+
+    /**
+     * Applies a state of the invoice: from the event stream, or from `view`, a read of the checkout that already has
+     * the details.
+     */
+    const onStatus = (event: CheckoutStatusEvent, view?: CheckoutView) => {
       if (destroyed) return;
-      const { invoiceStatus: previous, phase, quote } = get();
+      const { invoiceStatus: previous, phase, quote, checkout } = get();
       const partial: Partial<CheckoutState> = { invoiceStatus: event.status, txHash: event.txHash ?? get().txHash };
+      // What arrived is in the event: the underpaid and expired outcomes show it at once
+      if (!view && checkout && event.amountPaid !== undefined && event.amountPaid !== checkout.invoice.amountPaid) {
+        partial.checkout = { ...checkout, invoice: { ...checkout.invoice, amountPaid: event.amountPaid } };
+      }
       if (event.status === 'open') {
         // Back to open after processing: the transaction failed or was rejected, the buyer may pay again
         if (previous === 'processing') {
@@ -338,6 +367,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       }
       update(partial);
       if (FINAL.has(event.status)) stopWatching();
+      if (!view && event.status !== previous && OUTCOMES.has(event.status)) void refreshView();
     };
 
     const startPolling = () => {
@@ -348,13 +378,16 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           .then((view) => {
             if (destroyed) return;
             update({ checkout: view, quote: view.quote ?? get().quote });
-            onStatus({
-              status: view.invoice.status,
-              ledgerSeq: 0,
-              txHash: null,
-              amountPaid: null,
-              quoteExpiresAt: view.quote?.expiresAt ?? null,
-            });
+            onStatus(
+              {
+                status: view.invoice.status,
+                ledgerSeq: 0,
+                txHash: null,
+                amountPaid: view.invoice.amountPaid,
+                quoteExpiresAt: view.quote?.expiresAt ?? null,
+              },
+              view,
+            );
           })
           .catch(() => {
             // A missed read is retried on the next tick

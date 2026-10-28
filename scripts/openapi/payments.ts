@@ -252,7 +252,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         })
         .nullable()
         .openapi({ description: 'The payment, once there is one.' }),
-      reviewReason: z.string().nullable(),
+      reviewReason: z.string().nullable().openapi({
+        description:
+          'Why the payment waits for you: `overpaid` when the app flags overpayments, `quote_expired` when it arrived after its locked quote expired.',
+      }),
       aml: z.object({ status: z.string(), reasons: z.array(z.string()), coverage: z.string().nullable() }).nullable(),
       receiptNumber: z.string().nullable(),
       eInvoiceSkipped: z.array(z.string()).nullable().openapi({
@@ -1055,7 +1058,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         cancelUrl: z.string().nullable(),
         amountPaid: z.string().nullable().openapi({ description: 'Base units of the quoted asset received so far.' }),
         review: z
-          .object({ reason: z.enum(['screening', 'late', 'overpaid']) })
+          .object({ reason: z.enum(['screening', 'late', 'overpaid', 'quote_expired']) })
           .nullable()
           .openapi({ description: 'Why a payment waits for, or was flagged to, the seller.' }),
         refundedTotalMinor: z.string().nullable().openapi({ description: 'Refunded, in minor units (cents).' }),
@@ -1095,6 +1098,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           description:
             'A line the buyer ticks before paying, such as a request to start a service at once; `null` when the merchant asks none. The quote records the tick in the ledger (`consent.given`) and the receipt email repeats the text.',
         }),
+      amlScreening: z.boolean().openapi({
+        description:
+          '`true` when the merchant checks paying wallets before payment (its AML mode is `block` or `flag`); the checkout says so to the buyer only then.',
+      }),
       methods: z.array(
         z.object({
           id: z.string(),

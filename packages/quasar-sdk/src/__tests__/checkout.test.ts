@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { type CheckoutApi, createCheckoutStore } from '../checkout';
-import type { CheckoutView } from '../checkout/types';
+import type { CheckoutInvoice, CheckoutView } from '../checkout/types';
 
 const BASE = 'https://quasar.example';
 const fetchMock = vi.fn();
@@ -75,6 +75,7 @@ const view = (overrides: Partial<CheckoutView> = {}): CheckoutView => ({
   },
   buyer: { collect: 'off', required: false, companyInvoice: false },
   consent: null,
+  amlScreening: true,
   methods: [
     {
       id: 'ap_1',
@@ -167,6 +168,23 @@ describe('createCheckoutStore', () => {
       expect(other.getState().phase).toBe(phase);
       other.getState().destroy();
     }
+  });
+
+  it('keeps whether the merchant screens paying wallets, and why a held payment waits', async () => {
+    const held = { ...view().invoice, status: 'held', amountPaid: '49000000', review: { reason: 'quote_expired' } };
+    fetchMock.mockResolvedValueOnce(json(view({ amlScreening: false, invoice: held as CheckoutView['invoice'] })));
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+
+    expect(checkout.getState()).toMatchObject({
+      phase: 'held',
+      checkout: { amlScreening: false, invoice: { review: { reason: 'quote_expired' } } },
+    });
+    expectTypeOf<CheckoutView['amlScreening']>().toEqualTypeOf<boolean>();
+    expectTypeOf<NonNullable<CheckoutInvoice['review']>['reason']>().toEqualTypeOf<
+      'screening' | 'late' | 'overpaid' | 'quote_expired'
+    >();
+    checkout.getState().destroy();
   });
 
   it('locks a quote for the chosen method and the connected wallet', async () => {
@@ -333,6 +351,86 @@ describe('createCheckoutStore', () => {
     expect(checkout.getState().receiptUrl).toBe(`${BASE}/v1/payments/checkout/tok_1/receipt`);
     // A final state ends the stream
     expect(events.closed).toBe(true);
+  });
+
+  it('brings the details of an outcome the event stream announces: what arrived and why a payment waits', async () => {
+    const invoice = view().invoice;
+    const underpaid = { ...invoice, status: 'underpaid' as const, amountPaid: '40000000' };
+    fetchMock
+      .mockResolvedValueOnce(json(view({ quote: QUOTE as never })))
+      .mockResolvedValueOnce(json(view({ quote: QUOTE as never, invoice: underpaid })))
+      .mockResolvedValueOnce(json(view({ quote: QUOTE as never, invoice: { ...underpaid, status: 'expired' } })));
+    const checkout = store();
+    await checkout.getState().load();
+    const events = FakeEventSource.instances[0];
+
+    // The event carries what arrived: the underpaid and expired outcomes show it at once
+    events.emit('status', {
+      status: 'underpaid',
+      ledgerSeq: 5,
+      txHash: '0xfeed',
+      amountPaid: '40000000',
+      quoteExpiresAt: null,
+    });
+    expect(checkout.getState()).toMatchObject({
+      phase: 'underpaid',
+      checkout: { invoice: { amountPaid: '40000000' } },
+    });
+    await vi.waitFor(() => expect(checkout.getState().checkout?.invoice.status).toBe('underpaid'));
+    events.emit('status', {
+      status: 'expired',
+      ledgerSeq: 6,
+      txHash: '0xfeed',
+      amountPaid: '40000000',
+      quoteExpiresAt: null,
+    });
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', checkout: { invoice: { amountPaid: '40000000' } } });
+    expect(events.closed).toBe(true);
+    // The rest of an outcome (why it waits, the refund, the new invoice, the automatic payments offer) is read again
+    await vi.waitFor(() => expect(checkout.getState().checkout?.invoice.status).toBe('expired'));
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(checkout.getState().quote).toMatchObject({ methodId: 'ap_1' });
+
+    // A payment held after its price lock ran out says why
+    fetchMock.mockResolvedValueOnce(json(view({ quote: QUOTE as never }))).mockResolvedValueOnce(
+      json(
+        view({
+          quote: QUOTE as never,
+          invoice: { ...invoice, status: 'held', amountPaid: '49000000', review: { reason: 'quote_expired' } },
+        }),
+      ),
+    );
+    const held = store();
+    await held.getState().load();
+    FakeEventSource.instances[1].emit('status', {
+      status: 'held',
+      ledgerSeq: 5,
+      txHash: '0xfeed',
+      amountPaid: '49000000',
+      quoteExpiresAt: null,
+    });
+    expect(held.getState().phase).toBe('held');
+    await vi.waitFor(() => expect(held.getState().checkout?.invoice.review).toEqual({ reason: 'quote_expired' }));
+    held.getState().destroy();
+    expect(fetchMock).toHaveBeenCalledTimes(5);
+  });
+
+  it('keeps what arrived when it reads the invoice instead of following events', async () => {
+    vi.useFakeTimers();
+    const underpaid = { ...view().invoice, status: 'underpaid' as const, amountPaid: '40000000' };
+    fetchMock
+      .mockResolvedValueOnce(json(view({ quote: QUOTE as never })))
+      .mockResolvedValueOnce(json(view({ quote: QUOTE as never, invoice: underpaid })));
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(checkout.getState()).toMatchObject({
+      phase: 'underpaid',
+      checkout: { invoice: { amountPaid: '40000000' } },
+    });
+    // The read brought the details: no second read for them
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    checkout.getState().destroy();
   });
 
   it('returns to the payment when the transaction fails, so the buyer may pay again', async () => {

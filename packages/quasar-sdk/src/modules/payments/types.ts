@@ -310,7 +310,10 @@ export interface Invoice {
   quote: InvoiceQuote | null;
   /** The payment, once there is one. */
   settlement: InvoiceSettlement | null;
-  /** Why a paid invoice waits for you: `overpaid` when the app flags overpayments. */
+  /**
+   * Why the payment waits for you: `overpaid` when the app flags overpayments, `quote_expired` when it arrived after
+   * its locked quote expired.
+   */
   reviewReason: string | null;
   /** The payer's AML screening, once there was one. */
   aml: InvoiceAml | null;

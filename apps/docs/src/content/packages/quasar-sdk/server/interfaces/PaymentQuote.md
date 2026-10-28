@@ -1,6 +1,6 @@
 # PaymentQuote
 
-Defined in: [modules/payments/types.ts:555](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L555)
+Defined in: [modules/payments/types.ts:558](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L558)
 
 The price of an amount in a payment method now; nothing is locked.
 
@@ -10,7 +10,7 @@ The price of an amount in a payment method now; nothing is locked.
 
 > **amount**: `string`
 
-Defined in: [modules/payments/types.ts:565](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L565)
+Defined in: [modules/payments/types.ts:568](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L568)
 
 The fiat amount.
 
@@ -20,7 +20,7 @@ The fiat amount.
 
 > **amountToSend**: `string`
 
-Defined in: [modules/payments/types.ts:571](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L571)
+Defined in: [modules/payments/types.ts:574](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L574)
 
 Token amount the buyer sends (grossed up for a transfer fee), in base units.
 
@@ -30,7 +30,7 @@ Token amount the buyer sends (grossed up for a transfer fee), in base units.
 
 > **chainId**: `string`
 
-Defined in: [modules/payments/types.ts:563](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L563)
+Defined in: [modules/payments/types.ts:566](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L566)
 
 CAIP-2 chain.
 
@@ -40,7 +40,7 @@ CAIP-2 chain.
 
 > **cryptoAmount**: `string`
 
-Defined in: [modules/payments/types.ts:569](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L569)
+Defined in: [modules/payments/types.ts:572](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L572)
 
 Token amount the merchant receives, in base units.
 
@@ -50,7 +50,7 @@ Token amount the merchant receives, in base units.
 
 > **currency**: [`PaymentsCurrency`](/packages/quasar-sdk/server/type-aliases/PaymentsCurrency.md)
 
-Defined in: [modules/payments/types.ts:567](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L567)
+Defined in: [modules/payments/types.ts:570](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L570)
 
 Its currency.
 
@@ -60,7 +60,7 @@ Its currency.
 
 > **decimals**: `number`
 
-Defined in: [modules/payments/types.ts:575](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L575)
+Defined in: [modules/payments/types.ts:578](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L578)
 
 Decimals of the token.
 
@@ -70,7 +70,7 @@ Decimals of the token.
 
 > **discountBps**: `number`
 
-Defined in: [modules/payments/types.ts:579](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L579)
+Defined in: [modules/payments/types.ts:582](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L582)
 
 Discount of the method in basis points.
 
@@ -80,7 +80,7 @@ Discount of the method in basis points.
 
 > **markupBps**: `number`
 
-Defined in: [modules/payments/types.ts:577](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L577)
+Defined in: [modules/payments/types.ts:580](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L580)
 
 Markup of the method in basis points.
 
@@ -90,7 +90,7 @@ Markup of the method in basis points.
 
 > **methodId**: `string`
 
-Defined in: [modules/payments/types.ts:559](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L559)
+Defined in: [modules/payments/types.ts:562](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L562)
 
 The payment method.
 
@@ -100,7 +100,7 @@ The payment method.
 
 > **object**: `"quote"`
 
-Defined in: [modules/payments/types.ts:557](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L557)
+Defined in: [modules/payments/types.ts:560](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L560)
 
 Always `quote`.
 
@@ -110,7 +110,7 @@ Always `quote`.
 
 > **quotedAt**: `string`
 
-Defined in: [modules/payments/types.ts:583](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L583)
+Defined in: [modules/payments/types.ts:586](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L586)
 
 When it was priced.
 
@@ -120,7 +120,7 @@ When it was priced.
 
 > **rates**: `unknown`
 
-Defined in: [modules/payments/types.ts:581](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L581)
+Defined in: [modules/payments/types.ts:584](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L584)
 
 Price rounds used, as evidence.
 
@@ -130,7 +130,7 @@ Price rounds used, as evidence.
 
 > **symbol**: `string`
 
-Defined in: [modules/payments/types.ts:561](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L561)
+Defined in: [modules/payments/types.ts:564](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L564)
 
 Token symbol.
 
@@ -140,6 +140,6 @@ Token symbol.
 
 > **transferFee**: \{ `bps`: `number`; `maxFee`: `string` \| `null`; `source`: `"method"` \| `"contract"`; \} \| `null`
 
-Defined in: [modules/payments/types.ts:573](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L573)
+Defined in: [modules/payments/types.ts:576](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L576)
 
 The token's transfer fee, when it takes one.

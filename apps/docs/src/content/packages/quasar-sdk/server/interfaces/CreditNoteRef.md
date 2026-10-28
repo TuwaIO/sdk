@@ -1,6 +1,6 @@
 # CreditNoteRef
 
-Defined in: [modules/payments/types.ts:338](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L338)
+Defined in: [modules/payments/types.ts:341](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L341)
 
 A credit note of an invoice.
 
@@ -10,7 +10,7 @@ A credit note of an invoice.
 
 > **issuedAt**: `string`
 
-Defined in: [modules/payments/types.ts:344](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L344)
+Defined in: [modules/payments/types.ts:347](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L347)
 
 When it was issued.
 
@@ -20,7 +20,7 @@ When it was issued.
 
 > **number**: `string`
 
-Defined in: [modules/payments/types.ts:340](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L340)
+Defined in: [modules/payments/types.ts:343](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L343)
 
 Its number.
 
@@ -30,6 +30,6 @@ Its number.
 
 > **refundId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:342](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L342)
+Defined in: [modules/payments/types.ts:345](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L345)
 
 The refund it credits; `null` for the credit note of a correction.

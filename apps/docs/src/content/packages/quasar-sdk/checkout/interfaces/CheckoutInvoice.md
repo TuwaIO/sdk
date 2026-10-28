@@ -100,7 +100,7 @@ Series number; `null` while its document waits for the buyer details.
 
 > **refundedTotalMinor**: `string` \| `null`
 
-Defined in: [checkout/types.ts:69](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L69)
+Defined in: [checkout/types.ts:70](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L70)
 
 What was refunded, in minor units (cents) of the invoice currency.
 
@@ -110,7 +110,7 @@ What was refunded, in minor units (cents) of the invoice currency.
 
 > **replacedBy**: \{ `checkoutToken`: `string` \| `null`; `number`: `string` \| `null`; \} \| `null`
 
-Defined in: [checkout/types.ts:74](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L74)
+Defined in: [checkout/types.ts:75](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L75)
 
 The invoice that replaced this one after the seller corrected it: its number and, while it can be paid, its
 checkout token.
@@ -119,12 +119,13 @@ checkout token.
 
 ### review
 
-> **review**: \{ `reason`: `"screening"` \| `"late"` \| `"overpaid"`; \} \| `null`
+> **review**: \{ `reason`: `"screening"` \| `"late"` \| `"overpaid"` \| `"quote_expired"`; \} \| `null`
 
-Defined in: [checkout/types.ts:67](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L67)
+Defined in: [checkout/types.ts:68](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L68)
 
 Why a payment waits for, or was flagged to, the seller: `screening` (the sender did not pass the check after
-paying; no details reach the buyer), `late` (it arrived after the invoice expired or was cancelled), `overpaid`.
+paying; no details reach the buyer), `late` (it arrived after the invoice expired or was cancelled), `overpaid`,
+`quote_expired` (it arrived after its locked quote expired).
 
 ***
 
@@ -142,7 +143,7 @@ State of the invoice.
 
 > **subscription**: [`CheckoutSubscription`](/packages/quasar-sdk/checkout/interfaces/CheckoutSubscription.md) \| `null`
 
-Defined in: [checkout/types.ts:76](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L76)
+Defined in: [checkout/types.ts:77](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L77)
 
 The subscription period this invoice bills; `null` for a one-off invoice.
 

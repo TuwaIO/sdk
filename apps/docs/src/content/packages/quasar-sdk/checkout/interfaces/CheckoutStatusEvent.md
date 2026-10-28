@@ -1,6 +1,6 @@
 # CheckoutStatusEvent
 
-Defined in: [checkout/types.ts:381](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L381)
+Defined in: [checkout/types.ts:387](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L387)
 
 One `status` event of the checkout's event stream.
 
@@ -10,7 +10,7 @@ One `status` event of the checkout's event stream.
 
 > **amountPaid**: `string` \| `null`
 
-Defined in: [checkout/types.ts:389](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L389)
+Defined in: [checkout/types.ts:395](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L395)
 
 Amount received, in base units.
 
@@ -20,7 +20,7 @@ Amount received, in base units.
 
 > **ledgerSeq**: `number`
 
-Defined in: [checkout/types.ts:385](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L385)
+Defined in: [checkout/types.ts:391](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L391)
 
 Number of ledger steps so far.
 
@@ -30,7 +30,7 @@ Number of ledger steps so far.
 
 > **quoteExpiresAt**: `string` \| `null`
 
-Defined in: [checkout/types.ts:391](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L391)
+Defined in: [checkout/types.ts:397](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L397)
 
 When the locked quote expires.
 
@@ -40,7 +40,7 @@ When the locked quote expires.
 
 > **status**: [`InvoiceStatus`](/packages/quasar-sdk/server/type-aliases/InvoiceStatus.md)
 
-Defined in: [checkout/types.ts:383](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L383)
+Defined in: [checkout/types.ts:389](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L389)
 
 State of the invoice.
 
@@ -50,6 +50,6 @@ State of the invoice.
 
 > **txHash**: `string` \| `null`
 
-Defined in: [checkout/types.ts:387](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L387)
+Defined in: [checkout/types.ts:393](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L393)
 
 The payment transaction, once there is one.

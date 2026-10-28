@@ -1,6 +1,6 @@
 # QuoteParams
 
-Defined in: [modules/payments/types.ts:545](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L545)
+Defined in: [modules/payments/types.ts:548](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L548)
 
 What [PaymentsModule.quote](/packages/quasar-sdk/server/classes/PaymentsModule.md#quote) takes.
 
@@ -10,7 +10,7 @@ What [PaymentsModule.quote](/packages/quasar-sdk/server/classes/PaymentsModule.m
 
 > **amount**: `string`
 
-Defined in: [modules/payments/types.ts:547](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L547)
+Defined in: [modules/payments/types.ts:550](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L550)
 
 Amount with up to two decimals (`'49.00'`).
 
@@ -20,7 +20,7 @@ Amount with up to two decimals (`'49.00'`).
 
 > `optional` **currency?**: [`PaymentsCurrency`](/packages/quasar-sdk/server/type-aliases/PaymentsCurrency.md)
 
-Defined in: [modules/payments/types.ts:549](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L549)
+Defined in: [modules/payments/types.ts:552](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L552)
 
 Currency. Defaults to `USD`.
 
@@ -30,6 +30,6 @@ Currency. Defaults to `USD`.
 
 > **methodId**: `string`
 
-Defined in: [modules/payments/types.ts:551](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L551)
+Defined in: [modules/payments/types.ts:554](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L554)
 
 The payment method.

@@ -2,7 +2,7 @@
 
 > **createCheckoutStore**(`options`): [`CheckoutStore`](/packages/quasar-sdk/checkout/type-aliases/CheckoutStore.md)
 
-Defined in: [checkout/store.ts:288](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L288)
+Defined in: [checkout/store.ts:297](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L297)
 
 Creates the headless checkout of one invoice for the buyer's browser: a vanilla Zustand store with the invoice,
 its methods, the locked quote and where the payment stands, and the actions that move it on. The wallet is the
@@ -12,7 +12,8 @@ invoice only. `@tuwaio/nova-payments` renders it.
 
 Side effects: requests to `<baseUrl>/v1/payments/checkout/<token>` (the page's origin must be one of the app's
 domains, when it lists any); after `load`, an `EventSource` on its `events` route (or a `GET` every `pollMs`) until
-the invoice reaches a final state or `destroy` is called. Nothing is stored in the browser.
+the invoice reaches a final state or `destroy` is called, and a `GET` of the checkout when an event brings an
+outcome. Nothing is stored in the browser.
 
 ## Parameters
 

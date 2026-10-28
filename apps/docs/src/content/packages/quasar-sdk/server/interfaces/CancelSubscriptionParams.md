@@ -1,6 +1,6 @@
 # CancelSubscriptionParams
 
-Defined in: [modules/payments/types.ts:800](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L800)
+Defined in: [modules/payments/types.ts:803](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L803)
 
 What [PaymentsModule.cancelSubscription](/packages/quasar-sdk/server/classes/PaymentsModule.md#cancelsubscription) takes.
 
@@ -10,7 +10,7 @@ What [PaymentsModule.cancelSubscription](/packages/quasar-sdk/server/classes/Pay
 
 > `optional` **atPeriodEnd?**: `boolean`
 
-Defined in: [modules/payments/types.ts:802](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L802)
+Defined in: [modules/payments/types.ts:805](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L805)
 
 Cancel when the running period ends instead of now.
 
@@ -20,6 +20,6 @@ Cancel when the running period ends instead of now.
 
 > `optional` **reason?**: `string`
 
-Defined in: [modules/payments/types.ts:804](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L804)
+Defined in: [modules/payments/types.ts:807](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L807)
 
 Why.

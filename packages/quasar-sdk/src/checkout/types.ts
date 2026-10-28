@@ -62,9 +62,10 @@ export interface CheckoutInvoice {
   amountPaid: string | null;
   /**
    * Why a payment waits for, or was flagged to, the seller: `screening` (the sender did not pass the check after
-   * paying; no details reach the buyer), `late` (it arrived after the invoice expired or was cancelled), `overpaid`.
+   * paying; no details reach the buyer), `late` (it arrived after the invoice expired or was cancelled), `overpaid`,
+   * `quote_expired` (it arrived after its locked quote expired).
    */
-  review: { reason: 'screening' | 'late' | 'overpaid' } | null;
+  review: { reason: 'screening' | 'late' | 'overpaid' | 'quote_expired' } | null;
   /** What was refunded, in minor units (cents) of the invoice currency. */
   refundedTotalMinor: string | null;
   /**
@@ -327,6 +328,11 @@ export interface CheckoutView {
   buyer: { collect: 'off' | 'email' | 'full'; required: boolean; companyInvoice: boolean };
   /** The line the buyer ticks before paying; `null` when the merchant asks none. */
   consent: CheckoutConsent | null;
+  /**
+   * `true` when the merchant checks paying wallets before payment (its AML mode is `block` or `flag`); the checkout
+   * says so to the buyer only then.
+   */
+  amlScreening: boolean;
   /** The methods that take this invoice. */
   methods: CheckoutMethod[];
   /** How long a quote holds once locked, in seconds (never past the invoice deadline). */

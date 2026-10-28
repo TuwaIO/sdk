@@ -2,7 +2,7 @@
 
 > **CreateSubscriptionParams** = [`InvoiceLinesInput`](/packages/quasar-sdk/server/type-aliases/InvoiceLinesInput.md) & [`InvoiceTermsInput`](/packages/quasar-sdk/server/interfaces/InvoiceTermsInput.md) & `object`
 
-Defined in: [modules/payments/types.ts:630](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L630)
+Defined in: [modules/payments/types.ts:633](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L633)
 
 What [PaymentsModule.createSubscription](/packages/quasar-sdk/server/classes/PaymentsModule.md#createsubscription) takes: a plan, billed every period as one invoice.
 

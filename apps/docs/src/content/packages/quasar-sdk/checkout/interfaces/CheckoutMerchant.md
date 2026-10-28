@@ -1,6 +1,6 @@
 # CheckoutMerchant
 
-Defined in: [checkout/types.ts:102](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L102)
+Defined in: [checkout/types.ts:103](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L103)
 
 Who is paid and on what terms, as the checkout shows it.
 
@@ -10,7 +10,7 @@ Who is paid and on what terms, as the checkout shows it.
 
 > **fundingUrl**: `string` \| `null`
 
-Defined in: [checkout/types.ts:123](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L123)
+Defined in: [checkout/types.ts:124](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L124)
 
 A page where buyers get the token to pay, shown when the wallet has too little.
 
@@ -20,7 +20,7 @@ A page where buyers get the token to pay, shown when the wallet has too little.
 
 > **links**: `object`
 
-Defined in: [checkout/types.ts:121](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L121)
+Defined in: [checkout/types.ts:122](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L122)
 
 The merchant's terms, refund policy and privacy notice (http(s) links only).
 
@@ -42,7 +42,7 @@ The merchant's terms, refund policy and privacy notice (http(s) links only).
 
 > **logo**: `boolean`
 
-Defined in: [checkout/types.ts:110](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L110)
+Defined in: [checkout/types.ts:111](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L111)
 
 Whether the merchant has a logo: read it from the `logo` route ([CheckoutState.logoUrl](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#logourl)).
 
@@ -52,7 +52,7 @@ Whether the merchant has a logo: read it from the `logo` route ([CheckoutState.l
 
 > **name**: `string`
 
-Defined in: [checkout/types.ts:104](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L104)
+Defined in: [checkout/types.ts:105](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L105)
 
 The name buyers know.
 
@@ -62,7 +62,7 @@ The name buyers know.
 
 > **seller**: \{ `address`: `string` \| `null`; `country`: `string` \| `null`; `legalName`: `string` \| `null`; `registrationNumber`: `string` \| `null`; `taxId`: `string` \| `null`; `tradingName`: `string` \| `null`; \} \| `null`
 
-Defined in: [checkout/types.ts:112](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L112)
+Defined in: [checkout/types.ts:113](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L113)
 
 The seller as the invoice document names them.
 
@@ -72,7 +72,7 @@ The seller as the invoice document names them.
 
 > **supportEmail**: `string` \| `null`
 
-Defined in: [checkout/types.ts:108](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L108)
+Defined in: [checkout/types.ts:109](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L109)
 
 Where buyers ask for help.
 
@@ -82,6 +82,6 @@ Where buyers ask for help.
 
 > **website**: `string` \| `null`
 
-Defined in: [checkout/types.ts:106](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L106)
+Defined in: [checkout/types.ts:107](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L107)
 
 Website, as an http(s) link.
