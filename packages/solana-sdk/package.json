@@ -81,10 +81,10 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-solana": "^0.7.1",
-    "@tuwaio/pulsar-solana": "^0.10.4",
-    "@tuwaio/satellite-solana": "^0.11.1",
-    "@tuwaio/siwx-solana": "^0.7.0"
+    "@tuwaio/orbit-solana": "^0.7.2",
+    "@tuwaio/pulsar-solana": "^0.10.5",
+    "@tuwaio/satellite-solana": "^0.11.2",
+    "@tuwaio/siwx-solana": "^0.7.1"
   },
   "peerDependencies": {
     "@tuwaio/sdk": ">=0.6",
@@ -98,7 +98,7 @@
     "@solana/kit": ">=8.2"
   },
   "devDependencies": {
-    "@tuwaio/satellite-core": "^0.11.1",
+    "@tuwaio/satellite-core": "^0.11.2",
     "@tuwaio/sdk": "workspace:^",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",
