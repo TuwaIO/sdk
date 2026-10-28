@@ -123,8 +123,11 @@ export interface CheckoutRejectedPayment {
   /**
    * Why: `reverted`, `cancelled`, `expired` (a Solana blockhash), `no_matching_transfer` (a wrong amount, asset or
    * recipient), `tx_already_used`, `reference_missing`, `too_early`, `not_found` (the network never returned the
-   * transaction), `timeout` (no receipt in time), `replaced`, `payer_mismatch`, `native_from_contract_unverifiable`,
-   * `invoice_not_payable`, a relay's reason, or `transaction_failed` when Quasar does not know.
+   * transaction), `timeout` (no receipt in time), `replaced`, `payer_mismatch` (a transfer from another wallet to an
+   * invoice paid or held already; one to a payable invoice is held for the merchant instead),
+   * `native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded already),
+   * `unresolved_after_24h` (no result seen on chain within 24 hours), a relay's reason (`user_operation_lost`…), or
+   * `transaction_failed` when Quasar does not know.
    */
   reason: string;
   /**
@@ -145,6 +148,15 @@ export interface CheckoutRejectedPayment {
    * 29, 2026 leave it out.
    */
   movedMoney?: true;
+  /**
+   * `true` while Quasar still reads the transaction again: a rejection for `not_found`, `timeout` or `replaced` of a
+   * payment Quasar learned of within the last 24 hours that nothing has resolved since. Only then may the page promise
+   * that Quasar checks the payment again; a payment still unresolved after the 24 hours is closed with the final reason
+   * `unresolved_after_24h`. Any other reason that is not `final` (a relay operation lost, `transaction_failed`, a
+   * transfer from another wallet…) is never read again: if money left the wallet, the buyer contacts the merchant with
+   * the transaction hash. Quasar versions before October 29, 2026 leave it out.
+   */
+  rechecked?: true;
 }
 
 /** The subscription period an invoice bills, as the checkout shows it. */

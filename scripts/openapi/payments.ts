@@ -966,7 +966,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       }),
       reason: z.string().openapi({
         description:
-          'Why: `reverted`, `cancelled`, `expired`, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `not_found`, `timeout`, `replaced`, `payer_mismatch`, `native_from_contract_unverifiable`, `invoice_not_payable`, a relay reason, or `transaction_failed`.',
+          'Why: `reverted`, `cancelled`, `expired`, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `not_found`, `timeout`, `replaced`, `payer_mismatch` (a transfer from another wallet to an invoice paid or held already: one to a payable invoice is held for the merchant instead), `native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded already), `unresolved_after_24h` (no result seen on chain within 24 hours: final), a relay reason (`user_operation_lost`…), or `transaction_failed`.',
       }),
       final: z.boolean().openapi({
         description:
@@ -979,7 +979,11 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         .openapi({ description: 'The transaction the checkout handed over, when this one replaced it (sped up).' }),
       movedMoney: z.literal(true).optional().openapi({
         description:
-          'Set when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`, `invoice_not_payable`): it may have moved money. Never tell the buyer that it did not go through or that nothing was charged: say that this transaction does not pay the invoice, and to contact the merchant if money left the wallet.',
+          'Set when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`, `invoice_not_payable`): it may have moved money, final or not. Never tell the buyer that it did not go through, that nothing was charged or that Quasar checks it again, and offer no plain second payment: say that this transaction does not pay the invoice, and to contact the merchant if money left the wallet.',
+      }),
+      rechecked: z.literal(true).optional().openapi({
+        description:
+          'Set while Quasar still reads the transaction again: a rejection for `not_found`, `timeout` or `replaced` of a payment Quasar learned of within the last 24 hours that nothing has resolved since. Only then may the page promise that Quasar checks the payment again; still unresolved after the 24 hours, it is closed with the final reason `unresolved_after_24h`. Any other rejection that is not `final` (a relay operation lost, `transaction_failed`, a transfer from another wallet…) is never read again: ask the buyer to contact the merchant with the transaction hash if money left the wallet.',
       }),
     })
     .openapi('CheckoutRejectedPayment');
@@ -1101,7 +1105,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           .nullable()
           .openapi({
             description:
-              'Why a payment waits for, or was flagged to, the seller. A late payment from a wallet the screening blocks shows `screening`.',
+              'Why a payment waits for, or was flagged to, the seller. A late payment from a wallet the screening blocks shows `screening`, and so does a transfer in time from another wallet than the quoted payer (held for the seller to check who paid; `late` when it was late too).',
           }),
         refundedTotalMinor: z.string().nullable().openapi({ description: 'Refunded, in minor units (cents).' }),
         pendingPayments: z.number().optional().openapi({
@@ -1114,7 +1118,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         }),
         rejectedPayments: z.array(RejectedPayment).optional().openapi({
           description:
-            'The payments that failed, latest first (at most 10). `final`: the transaction can never pay the invoice (`reverted`, `cancelled`, `expired` Solana blockhash, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `chain_mismatch`, `no_quote`, `no_payment_method`, a relay the bundler refused or never sent), so the buyer may pay again; otherwise (`not_found`, `timeout`, `replaced`, `payer_mismatch`…) the money may still be on its way or with the merchant: ask the buyer to check the wallet before paying again. `movedMoney`: the transaction went through without paying the invoice and may have moved money. Quasar reads a transaction rejected with `not_found`, `timeout` or `replaced` again for 24 hours (`unresolvedPayments`): if it arrives, it is recorded (paid within the grace, else held as late). A transaction sped up in the wallet is followed under its new hash and not rejected; `original` is the hash the checkout handed over.',
+            'The payments that failed, latest first (at most 10). `final`: the transaction can never pay the invoice (`reverted`, `cancelled`, `expired` Solana blockhash, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `chain_mismatch`, `no_quote`, `no_payment_method`, a relay the bundler refused or never sent, `unresolved_after_24h`), so the buyer may pay again; otherwise (`not_found`, `timeout`, `replaced`, `payer_mismatch`…) the money may still be on its way or with the merchant: ask the buyer to check the wallet before paying again. `movedMoney`: the transaction went through without paying the invoice and may have moved money. `rechecked`: Quasar still reads the transaction again (a `not_found`, `timeout` or `replaced` rejection, for 24 hours after Quasar learned of the payment, while `unresolvedPayments` counts it): if it arrives, it is recorded (paid within the grace, else held as late); once Quasar reports `unresolvedPayments` 0, such a rejection was resolved. A transaction sped up in the wallet is followed under its new hash and not rejected; `original` is the hash the checkout handed over.',
         }),
         paymentCountsUntil: z.string().nullable().optional().openapi({
           description:
@@ -1122,7 +1126,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         }),
         unresolvedPayments: z.number().optional().openapi({
           description:
-            'Payments of the invoice that may still arrive, with no time limit: tracked transactions neither verified nor rejected for good (also one stuck past the 25 minutes `pendingPayments` counts, and one rejected with `not_found`, `timeout` or `replaced`, which Quasar reads again for 24 hours), and gasless relays still sending. While it is above 0, do not offer a plain second payment and never tell the buyer that nothing was charged.',
+            'Payments of the invoice that may still arrive: tracked transactions neither verified nor rejected for good (also one stuck past the 25 minutes `pendingPayments` counts, and one rejected with `not_found`, `timeout` or `replaced`), which Quasar reads again for 24 hours after it learned of them and then closes (`unresolved_after_24h`), and gasless relays still sending. While it is above 0, do not offer a plain second payment and never tell the buyer that nothing was charged.',
         }),
         onTimeTxKeys: z.array(z.string()).optional().openapi({
           description:
@@ -1300,7 +1304,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     'post',
     '/submit',
     'Submit the payment transaction',
-    'Quasar tracks it; the invoice is settled when it is final. For an EIP-5792 batch, send the hash of its transaction. An `expired` invoice takes it too: the payment is held for the merchant as late (`review.reason` `late`), who credits or returns it. One handed over before `dueAt` keeps the invoice payable for up to 30 minutes past it while it confirms; one handed over after `dueAt` is held as late, even while another payment keeps the invoice payable. The same `txKey` is taken once: a page that got no answer (network, 5xx) hands it over again, since the wallet has sent it already.',
+    'Quasar tracks it; the invoice is settled when it is final. For an EIP-5792 batch, send the hash of its transaction. An invoice in any state takes it, since the money reaches the merchant whatever the invoice says: an `expired` or `cancelled` invoice holds the payment for the merchant as late (`review.reason` `late`), who credits or returns it; an invoice `paid`, `held` or `refunded` already records it with its amount as a payment that pays nothing (`rejectedPayments`, `invoice_not_payable` or `payer_mismatch`, `movedMoney`). One handed over before `dueAt` keeps the invoice payable for up to 30 minutes past it while it confirms; one handed over after `dueAt` is held as late, even while another payment keeps the invoice payable. The same `txKey` is taken once, and a `txKey` Quasar has already is answered as taken before anything else is checked: a page that got no answer (network, 5xx) hands it over again, also after a reload (`@tuwaio/quasar-sdk` keeps the hand-over in the tab until it is taken), since the wallet has sent it already.',
     {
       request: {
         body: json(
@@ -1312,10 +1316,13 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         ),
       },
       responses: {
-        202: { description: 'Taken.', ...json(z.object({ txKey: z.string(), status: z.string() })) },
+        202: {
+          description: 'Taken, also when Quasar has the `txKey` already. `status` is the state of the invoice.',
+          ...json(z.object({ txKey: z.string(), status: z.string() })),
+        },
         400: invalid('`invalid_transaction`, `sender_required`'),
         409: refused(
-          '`quote_required`, `invoice_not_payable`, `too_many_pending`: the invoice already has 3 unconfirmed transactions; wait until one is confirmed or fails.',
+          '`quote_required`, `too_many_pending`: the invoice already has 3 unconfirmed transactions; wait until one is confirmed or fails.',
         ),
         ...checkoutErrors,
       },
@@ -1457,7 +1464,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     'get',
     '/events',
     'Follow the invoice',
-    'Server-sent events: one `status` event at once and on every change (data: `CheckoutStatusEvent`), a `ping` every 15 seconds; the stream ends on a final state (an `expired` invoice only once no payment of it is on its way) or after 10 minutes.',
+    'Server-sent events: one `status` event at once and on every change (data: `CheckoutStatusEvent`), a `ping` every 15 seconds; the stream ends on a final state, once no payment of the invoice is on its way (a payment sent before the expiry or the cancellation, or a second payment of a paid invoice, is followed to its record), or after 10 minutes.',
     {
       responses: {
         200: { description: 'The event stream.', content: { 'text/event-stream': { schema: StatusEvent } } },

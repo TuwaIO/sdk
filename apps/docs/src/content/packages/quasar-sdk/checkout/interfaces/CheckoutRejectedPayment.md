@@ -10,7 +10,7 @@ A payment of the invoice that failed, as the checkout lists it ([CheckoutInvoice
 
 > **final**: `boolean`
 
-Defined in: [checkout/types.ts:135](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L135)
+Defined in: [checkout/types.ts:138](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L138)
 
 Whether the transaction can never pay the invoice, so the buyer may pay again. When `false` (`not_found`,
 `timeout`, `replaced`…) the money may still be on its way or already with the merchant: the buyer checks the wallet
@@ -22,7 +22,7 @@ before paying again. A final rejection may still have moved money: read `movedMo
 
 > `optional` **movedMoney?**: `true`
 
-Defined in: [checkout/types.ts:147](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L147)
+Defined in: [checkout/types.ts:150](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L150)
 
 `true` when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`,
 `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`,
@@ -36,7 +36,7 @@ say that it does not pay the invoice, and whom to contact if money left the wall
 
 > `optional` **original?**: `string`
 
-Defined in: [checkout/types.ts:139](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L139)
+Defined in: [checkout/types.ts:142](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L142)
 
 The transaction the checkout handed over, when this one replaced it (a payment sped up in the wallet).
 
@@ -46,12 +46,30 @@ The transaction the checkout handed over, when this one replaced it (a payment s
 
 > **reason**: `string`
 
-Defined in: [checkout/types.ts:129](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L129)
+Defined in: [checkout/types.ts:132](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L132)
 
 Why: `reverted`, `cancelled`, `expired` (a Solana blockhash), `no_matching_transfer` (a wrong amount, asset or
 recipient), `tx_already_used`, `reference_missing`, `too_early`, `not_found` (the network never returned the
-transaction), `timeout` (no receipt in time), `replaced`, `payer_mismatch`, `native_from_contract_unverifiable`,
-`invoice_not_payable`, a relay's reason, or `transaction_failed` when Quasar does not know.
+transaction), `timeout` (no receipt in time), `replaced`, `payer_mismatch` (a transfer from another wallet to an
+invoice paid or held already; one to a payable invoice is held for the merchant instead),
+`native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded already),
+`unresolved_after_24h` (no result seen on chain within 24 hours), a relay's reason (`user_operation_lost`…), or
+`transaction_failed` when Quasar does not know.
+
+***
+
+### rechecked?
+
+> `optional` **rechecked?**: `true`
+
+Defined in: [checkout/types.ts:159](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L159)
+
+`true` while Quasar still reads the transaction again: a rejection for `not_found`, `timeout` or `replaced` of a
+payment Quasar learned of within the last 24 hours that nothing has resolved since. Only then may the page promise
+that Quasar checks the payment again; a payment still unresolved after the 24 hours is closed with the final reason
+`unresolved_after_24h`. Any other reason that is not `final` (a relay operation lost, `transaction_failed`, a
+transfer from another wallet…) is never read again: if money left the wallet, the buyer contacts the merchant with
+the transaction hash. Quasar versions before October 29, 2026 leave it out.
 
 ***
 
@@ -69,6 +87,6 @@ The transaction's `txKey`, or the `userOpHash` of a gasless relay that failed be
 
 > `optional` **userOpHash?**: `string`
 
-Defined in: [checkout/types.ts:137](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L137)
+Defined in: [checkout/types.ts:140](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L140)
 
 The relay operation the transaction came from, which the page knows when the relay answered `sending`.

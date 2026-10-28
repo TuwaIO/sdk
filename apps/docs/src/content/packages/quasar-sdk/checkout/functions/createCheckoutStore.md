@@ -2,7 +2,7 @@
 
 > **createCheckoutStore**(`options`): [`CheckoutStore`](/packages/quasar-sdk/checkout/type-aliases/CheckoutStore.md)
 
-Defined in: [checkout/store.ts:528](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L528)
+Defined in: [checkout/store.ts:660](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L660)
 
 Creates the headless checkout of one invoice for the buyer's browser: a vanilla Zustand store with the invoice,
 its methods, the locked quote and where the payment stands, and the actions that move it on. The wallet is the
@@ -14,7 +14,9 @@ Side effects: requests to `<baseUrl>/v1/payments/checkout/<token>` (the page's o
 domains, when it lists any); after `load`, an `EventSource` on its `events` route (or a `GET` every `pollMs`) until
 the invoice reaches a final state or `destroy` is called (an invoice that expired while a payment of this store
 confirms is followed on, until that payment ends it as `paid` or `held`), and a `GET` of the checkout when an event
-brings an outcome. Nothing is stored in the browser.
+brings an outcome. A hand-over Quasar has not taken yet is kept in the tab's `sessionStorage` under
+`quasar-sdk:checkoutHandOvers:<token>` ([CheckoutStoreOptions.handOverStorage](/packages/quasar-sdk/checkout/interfaces/CheckoutStoreOptions.md#handoverstorage)) until Quasar takes or refuses
+it; nothing else is stored in the browser.
 
 ## Parameters
 

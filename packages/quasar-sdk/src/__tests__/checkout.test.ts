@@ -1543,3 +1543,375 @@ describe('createCheckoutStore: reloads, late hand-overs and transfers that do no
     checkout.getState().destroy();
   });
 });
+
+describe('createCheckoutStore: honest re-check states, moved money, hand-overs kept across a reload', () => {
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal('fetch', fetchMock);
+    FakeEventSource.instances = [];
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  /** The `sessionStorage` of a browser tab, in memory. */
+  class MemoryStorage {
+    items = new Map<string, string>();
+    getItem(key: string) {
+      return this.items.get(key) ?? null;
+    }
+    setItem(key: string, value: string) {
+      this.items.set(key, value);
+    }
+    removeItem(key: string) {
+      this.items.delete(key);
+    }
+  }
+
+  const KEY = 'quasar-sdk:checkoutHandOvers:tok_1';
+
+  /** Answers reads of the checkout with `invoice` (and the quote), and `/submit` with `submit` when given. */
+  const answer = (
+    invoice: Partial<CheckoutInvoice> = {},
+    options: { quote?: unknown; submit?: () => Promise<Response> } = {},
+  ) =>
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      if (path.endsWith('/submit'))
+        return options.submit ? options.submit() : json({ txKey: '0xfeed', status: 'open' }, 202);
+      return json(view({ quote: (options.quote ?? QUOTE) as never, invoice: { ...view().invoice, ...invoice } }));
+    });
+
+  /** The paths of the requests made so far. */
+  const paths = () =>
+    fetchMock.mock.calls.map(([input]) => new URL(input instanceof Request ? input.url : (input as string)).pathname);
+
+  const storeWith = (handOverStorage: MemoryStorage | null, EventSource: unknown = FakeEventSource) =>
+    createCheckoutStore({
+      token: 'tok_1',
+      baseUrl: BASE,
+      pollMs: 1_000,
+      EventSource: EventSource as never,
+      handOverStorage,
+    });
+
+  // N1: the page may promise that Quasar checks the payment again only when Quasar does
+  it('says that Quasar checks a payment again only for one Quasar still reads again', async () => {
+    answer({
+      pendingPayments: 0,
+      unresolvedPayments: 1,
+      rejectedPayments: [rejection('0xfeed', 'timeout', false, { rechecked: true })],
+    });
+    const rechecked = store();
+    await rechecked.getState().load();
+    expect(rechecked.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      error: { code: 'payment_unconfirmed', reason: 'timeout', rechecked: true },
+    });
+    rechecked.getState().destroy();
+
+    // Reasons Quasar never reads again: the wallet check, without the promise
+    for (const reason of ['user_operation_lost', 'pimlico_key_required', 'transaction_failed']) {
+      answer({ pendingPayments: 0, unresolvedPayments: 0, rejectedPayments: [rejection('0xfeed', reason, false)] });
+      const lost = store();
+      await lost.getState().load();
+      expect(lost.getState()).toMatchObject({ phase: 'unconfirmed', error: { code: 'payment_unconfirmed', reason } });
+      expect(lost.getState().error?.rechecked).toBeUndefined();
+      expect(lost.getState().error?.message).toMatch(/contact the merchant/);
+      lost.getState().destroy();
+    }
+
+    // No rejection, but a payment Quasar still counts as unresolved: it reads it again
+    answer({ pendingPayments: 0, unresolvedPayments: 1, rejectedPayments: [] });
+    const stuck = store();
+    await stuck.getState().load();
+    expect(stuck.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      error: { code: 'payment_unconfirmed', rechecked: true },
+    });
+    stuck.getState().destroy();
+  });
+
+  it('says whether Quasar reads again a followed payment it could not confirm', async () => {
+    answer({ pendingPayments: 0, rejectedPayments: [] });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    FakeEventSource.instances[0].emit(
+      'status',
+      signal('open', 5, {
+        pendingPayments: 0,
+        unresolvedPayments: 1,
+        rejectedPayments: [rejection('0xfeed', 'not_found', false, { rechecked: true })],
+      }),
+    );
+    expect(checkout.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      error: { code: 'payment_unconfirmed', reason: 'not_found', rechecked: true },
+    });
+    checkout.getState().destroy();
+
+    const relayLost = store();
+    await relayLost.getState().load();
+    await relayLost.getState().submit({ txKey: '0xfeed' });
+    FakeEventSource.instances[1].emit(
+      'status',
+      signal('open', 5, {
+        pendingPayments: 0,
+        unresolvedPayments: 0,
+        rejectedPayments: [rejection('0xfeed', 'user_operation_lost', false)],
+      }),
+    );
+    expect(relayLost.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      error: { code: 'payment_unconfirmed', reason: 'user_operation_lost' },
+    });
+    expect(relayLost.getState().error?.rechecked).toBeUndefined();
+    relayLost.getState().destroy();
+  });
+
+  // N1: a transfer that moved money without paying the invoice is never a plain "pay again", final or not
+  it('names a transfer that moved money as a mismatch whatever Quasar says of it, with no plain second payment', async () => {
+    answer({ pendingPayments: 0, rejectedPayments: [] });
+    const followed = store();
+    await followed.getState().load();
+    await followed.getState().submit({ txKey: '0xfeed' });
+    FakeEventSource.instances[0].emit(
+      'status',
+      signal('open', 5, {
+        pendingPayments: 0,
+        unresolvedPayments: 0,
+        rejectedPayments: [rejection('0xfeed', 'native_from_contract_unverifiable', false, { movedMoney: true })],
+      }),
+    );
+    expect(followed.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      paymentOnTheWay: false,
+      error: { code: 'payment_mismatch', reason: 'native_from_contract_unverifiable' },
+    });
+    expect(followed.getState().error?.rechecked).toBeUndefined();
+    // Only once the buyer confirmed that nothing left the wallet
+    followed.getState().payAgain();
+    expect(followed.getState()).toMatchObject({ phase: 'awaitingPayment', error: null });
+    followed.getState().destroy();
+
+    // A reload finds it: the same, never the 24-hour promise
+    answer({
+      pendingPayments: 0,
+      unresolvedPayments: 0,
+      rejectedPayments: [rejection('0xfeed', 'payer_mismatch', false, { movedMoney: true })],
+    });
+    const reloaded = store();
+    await reloaded.getState().load();
+    expect(reloaded.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      error: { code: 'payment_mismatch', reason: 'payer_mismatch' },
+    });
+    reloaded.getState().destroy();
+  });
+
+  // N6: a rejection Quasar reads again stops counting once Quasar reports nothing unresolved
+  it('opens on the payment when Quasar resolved the payment it could not confirm', async () => {
+    answer({
+      pendingPayments: 0,
+      unresolvedPayments: 0,
+      rejectedPayments: [rejection('0xfeed', 'timeout', false)],
+    });
+    const resolved = store();
+    await resolved.getState().load();
+    expect(resolved.getState()).toMatchObject({ phase: 'awaitingPayment', error: null });
+    resolved.getState().destroy();
+
+    // Settled as an underpayment by the re-read: the rest is asked for, without a wallet check
+    answer({
+      status: 'underpaid',
+      amountPaid: '20000000',
+      pendingPayments: 0,
+      unresolvedPayments: 0,
+      rejectedPayments: [rejection('0xfeed', 'not_found', false)],
+    });
+    const underpaid = store();
+    await underpaid.getState().load();
+    expect(underpaid.getState()).toMatchObject({ phase: 'underpaid', error: null });
+    underpaid.getState().destroy();
+  });
+
+  // N7a: an hour of hand-overs without an answer: the page stops promising that it keeps trying
+  it('says that Quasar never received the payment once the hand-overs give up', async () => {
+    vi.useFakeTimers();
+    answer({ pendingPayments: 0, rejectedPayments: [] }, { submit: () => Promise.reject(new TypeError('Failed')) });
+    const checkout = storeWith(null);
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    await vi.advanceTimersByTimeAsync(59 * 60_000);
+    expect(checkout.getState().error).toMatchObject({ code: 'payment_unconfirmed', reason: 'submit_retrying' });
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(checkout.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      txKey: '0xfeed',
+      error: { code: 'payment_unconfirmed', reason: 'submit_failed' },
+    });
+    expect(checkout.getState().error?.message).toMatch(/contact the merchant/);
+    const calls = paths().length;
+    await vi.advanceTimersByTimeAsync(10 * 60_000);
+    expect(paths()).toHaveLength(calls);
+    checkout.getState().destroy();
+  });
+
+  // N8: the page may close between the broadcast and the hand-over: the next load hands it over
+  it('keeps a hand-over Quasar has not taken in the tab and hands it over again on the next load', async () => {
+    vi.useFakeTimers({ now: Date.parse('2026-10-28T12:00:00.000Z') });
+    const storage = new MemoryStorage();
+    let down = true;
+    answer(
+      { pendingPayments: 0, rejectedPayments: [] },
+      {
+        submit: () =>
+          down ? Promise.reject(new TypeError('Failed')) : Promise.resolve(json({ txKey: '0xfeed', status: 'open' })),
+      },
+    );
+    const first = storeWith(storage);
+    await first.getState().load();
+    const sending = first.getState().submit({ txKey: '0xfeed', from: '0x1111', connectorType: 'evm:metamask' });
+    // Kept before the request leaves
+    expect(JSON.parse(storage.getItem(KEY) ?? 'null')).toEqual([
+      { txKey: '0xfeed', from: '0x1111', connectorType: 'evm:metamask', at: Date.parse('2026-10-28T12:00:00.000Z') },
+    ]);
+    expect(await sending).toBe(false);
+    // The page closes while the hand-over is retried
+    first.getState().destroy();
+    expect(storage.getItem(KEY)).not.toBeNull();
+
+    // Reopened in the same tab: handed over again before the page offers to pay
+    down = false;
+    fetchMock.mockClear();
+    const second = storeWith(storage);
+    await second.getState().load();
+    expect(second.getState().phase).not.toBe('awaitingPayment');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(await sent(1)).toMatchObject({
+      path: '/v1/payments/checkout/tok_1/submit',
+      body: { txKey: '0xfeed', from: '0x1111', connectorType: 'evm:metamask' },
+    });
+    expect(second.getState()).toMatchObject({ phase: 'confirming', paymentOnTheWay: true, txKey: '0xfeed' });
+    // Taken: forgotten
+    expect(storage.getItem(KEY)).toBeNull();
+    second.getState().destroy();
+
+    // Nothing kept: the next load hands nothing over
+    fetchMock.mockClear();
+    const third = storeWith(storage);
+    await third.getState().load();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(paths().filter((path) => path.endsWith('/submit'))).toHaveLength(0);
+    third.getState().destroy();
+  });
+
+  it('forgets a hand-over Quasar refuses or already lists, and keeps the hand-overs of other checkouts', async () => {
+    vi.useFakeTimers();
+    const storage = new MemoryStorage();
+    storage.setItem('quasar-sdk:checkoutHandOvers:tok_2', JSON.stringify([{ txKey: '0xother', at: 1 }]));
+    answer(
+      { pendingPayments: 0, rejectedPayments: [] },
+      { submit: async () => json({ error: { code: 'invalid_transaction', message: 'Not a transaction hash' } }, 400) },
+    );
+    const refused = storeWith(storage);
+    await refused.getState().load();
+    expect(await refused.getState().submit({ txKey: '0xfeed' })).toBe(false);
+    expect(storage.getItem(KEY)).toBeNull();
+    expect(storage.getItem('quasar-sdk:checkoutHandOvers:tok_2')).not.toBeNull();
+    refused.getState().destroy();
+
+    // Quasar lists the transaction already (it got the first hand-over, the answer was lost): not sent again
+    storage.setItem(KEY, JSON.stringify([{ txKey: '0xFEED', at: 1 }]));
+    fetchMock.mockReset();
+    answer({
+      pendingPayments: 0,
+      rejectedTxKeys: ['0xfeed'],
+      rejectedPayments: [rejection('0xfeed', 'reverted', true)],
+    });
+    const listed = storeWith(storage);
+    await listed.getState().load();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(paths().filter((path) => path.endsWith('/submit'))).toHaveLength(0);
+    expect(storage.getItem(KEY)).toBeNull();
+    listed.getState().destroy();
+
+    // Malformed or unreadable storage never breaks the checkout
+    storage.setItem(KEY, '{not json');
+    const malformed = storeWith(storage);
+    await malformed.getState().load();
+    expect(malformed.getState().phase).toBe('awaitingPayment');
+    malformed.getState().destroy();
+    const broken = {
+      getItem: () => {
+        throw new Error('SecurityError');
+      },
+      setItem: () => {
+        throw new Error('QuotaExceededError');
+      },
+      removeItem: () => {
+        throw new Error('SecurityError');
+      },
+    };
+    fetchMock.mockReset();
+    answer({ pendingPayments: 0, rejectedPayments: [] });
+    const blocked = storeWith(broken as unknown as MemoryStorage);
+    await blocked.getState().load();
+    expect(await blocked.getState().submit({ txKey: '0xfeed' })).toBe(true);
+    blocked.getState().destroy();
+  });
+
+  it("uses the tab's sessionStorage by default, and none with the app's own calls", async () => {
+    const storage = new MemoryStorage();
+    vi.stubGlobal('sessionStorage', storage);
+    answer({ pendingPayments: 0, rejectedPayments: [] }, { submit: () => Promise.reject(new TypeError('Failed')) });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    expect(storage.getItem(KEY)).not.toBeNull();
+    checkout.getState().destroy();
+
+    const simulated = new MemoryStorage();
+    vi.stubGlobal('sessionStorage', simulated);
+    const api: CheckoutApi = {
+      view: async () => view({ quote: QUOTE as never }),
+      quote: async () => QUOTE as never,
+      buyer: async () => view(),
+      locale: async (locale) => ({ locale }),
+      submit: () => Promise.reject(new TypeError('Failed')),
+      relay: async () => ({ status: 'submitted', txHash: '0xfeed' }),
+      permission: async () => ({ permission: null }),
+      url: (route) => `sim://${route}`,
+    };
+    const playground = createCheckoutStore({ token: 'tok_1', api, EventSource: null });
+    await playground.getState().load();
+    await playground.getState().submit({ txKey: '0xfeed' });
+    expect(simulated.items.size).toBe(0);
+    playground.getState().destroy();
+  });
+
+  it('never turns a settled invoice back into a confirming payment when a late hand-over is taken', async () => {
+    vi.useFakeTimers();
+    let fail = true;
+    answer(
+      { pendingPayments: 0, rejectedPayments: [] },
+      {
+        submit: async () =>
+          fail
+            ? json({ error: { code: 'internal_error', message: 'Try again' } }, 502)
+            : json({ txKey: '0xfeed', status: 'paid' }, 200),
+      },
+    );
+    const checkout = storeWith(new MemoryStorage());
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    // Paid meanwhile (by this transaction, which Quasar found, or another one)
+    FakeEventSource.instances[0].emit('status', signal('paid', 6, { pendingPayments: 0 }));
+    fail = false;
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(checkout.getState()).toMatchObject({ phase: 'paid', paymentOnTheWay: false, error: null });
+    checkout.getState().destroy();
+  });
+});
