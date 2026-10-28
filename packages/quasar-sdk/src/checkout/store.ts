@@ -24,10 +24,9 @@ import type { CheckoutApi, CheckoutQuote, CheckoutStatusEvent, CheckoutView, Gra
  * - `confirming`: Quasar follows the transaction until it is final.
  * - `paid`, `underpaid` (the buyer may top it up), `held` (the merchant looks at the payment), `refunded`, `expired`,
  *   `cancelled`: the invoice's outcome. An invoice that expires while a payment this store handed over (`submit`,
- *   `relay`) still confirms is not over: the payment may still arrive, and the invoice then becomes `paid` (Quasar
- *   lets a payment it learned of before `dueAt` confirm) or `held` (a late payment the merchant accepts or returns).
- *   The store keeps following it; `txKey` (for a relayed payment, once Quasar returns its hash) tells the page that a
- *   payment is on its way.
+ *   `relay`) is on its way is not over: the payment may still arrive, and the invoice then becomes `paid` (Quasar
+ *   lets a payment it learned of before `dueAt` confirm for up to 30 minutes) or `held` (a late payment the merchant
+ *   accepts or returns). The store keeps following it while {@link CheckoutState.paymentOnTheWay} is `true`.
  * - `blocked`: AML screening refused the payer's wallet.
  * - `error`: the checkout could not be read (a wrong or retired link, the network).
  */
@@ -82,8 +81,24 @@ export interface CheckoutState {
   quote: CheckoutQuote | null;
   /** Language of the page and the documents still to be issued. */
   locale: InvoiceLocale | null;
-  /** The transaction handed to Quasar. */
+  /**
+   * The transaction handed to Quasar: the hash or signature passed to {@link CheckoutState.submit}, or the hash of a
+   * relayed transfer when Quasar returns it. A relay Quasar answers with `sending` has none yet: read
+   * {@link CheckoutState.paymentOnTheWay} to know that a payment is on its way.
+   */
   txKey: string | null;
+  /**
+   * Whether a payment this store handed to Quasar ({@link CheckoutState.submit}, {@link CheckoutState.relay}, also a
+   * relay still `sending`, without a `txKey`) is on its way: `true` from the hand-over until the payment settles
+   * (the invoice becomes `paid`, `underpaid`, `held`, `refunded` or `cancelled`) or fails. It fails when Quasar lists
+   * it among the rejected payments (`rejectedTxKeys` of the status events: reverted, dropped, a wrong amount…), then
+   * `error` is `payment_failed`, on an `open` invoice too, or when the invoice goes back to `open` after `processing`.
+   * On an `expired` invoice it tells the page that the buyer's payment may still arrive: `false` again once Quasar
+   * reports no payment of the invoice on its way, or 35 minutes past the later of `dueAt` and the hand-over (an hour
+   * after the invoice expired when it has no `dueAt`), when the store stops following the invoice. Read-only: the
+   * store sets it.
+   */
+  readonly paymentOnTheWay: boolean;
   /** The payment's transaction, once Quasar has one. */
   txHash: string | null;
   /** Why the last action failed; cleared by the next one. */
@@ -98,10 +113,13 @@ export interface CheckoutState {
    * Reads the checkout (`GET`) and, while the invoice can change, follows it (server-sent events, else a read every
    * `pollMs`). An event that brings an outcome (underpaid, held, paid, refunded, expired, cancelled) updates
    * `checkout.invoice.amountPaid` at once and reads the checkout again for the rest (`review`, the refund, the invoice
-   * that replaced it, `autoCharge`). It stops at a final state, except `expired` while a payment of this store
-   * confirms: it then follows the invoice until another outcome arrives (`paid`, `held`) or `destroy` is called. It
-   * never expires the invoice by the clock: past `dueAt`, a confirming payment stays `confirming` until Quasar reports
-   * the outcome. Sets `phase` `error` when the link is wrong or retired.
+   * that replaced it, `autoCharge`). It stops at a final state, except `expired` while
+   * {@link CheckoutState.paymentOnTheWay}: it keeps the event stream while Quasar keeps it open for that payment, and
+   * otherwise closes it and reads the checkout every 20 seconds (or every `pollMs`, when longer), until the payment
+   * ends the invoice (`paid`, `held`), fails, Quasar reports no payment on its way, 35 minutes past the later of
+   * `dueAt` and the hand-over (an hour after the expiry without `dueAt`), or `destroy` is called. It never expires the
+   * invoice by the clock: past `dueAt`, a confirming payment stays `confirming` until Quasar reports the outcome. Sets
+   * `phase` `error` when the link is wrong or retired.
    *
    * @returns Resolves when the checkout is read.
    */
@@ -160,7 +178,8 @@ export interface CheckoutState {
    *
    * @param params - `txKey`: transaction hash or Solana signature; `from`: the sender, for a Solana Pay quote without
    *   a payer; `connectorType`: the wallet connector, for the record.
-   * @returns Whether Quasar took it; `phase` is then `confirming`.
+   * @returns Whether Quasar took it; `phase` is then `confirming` (`expired` when the invoice expired meanwhile: Quasar
+   *   still takes the transaction, and holds it as a late payment) and {@link CheckoutState.paymentOnTheWay} `true`.
    */
   submit: (params: { txKey: string; from?: string; connectorType?: string }) => Promise<boolean>;
   /**
@@ -168,7 +187,8 @@ export interface CheckoutState {
    * merchant pays the gas.
    *
    * @param signature - The 65-byte EIP-712 signature.
-   * @returns Whether it was relayed; `phase` is then `confirming`.
+   * @returns Whether it was relayed; `phase` is then `confirming` and {@link CheckoutState.paymentOnTheWay} `true`.
+   *   `txKey` is the transfer's hash when Quasar returns it, `null` while the relay is still `sending`.
    */
   relay: (signature: string) => Promise<boolean>;
   /**
@@ -222,6 +242,24 @@ export type CheckoutStore = StoreApi<CheckoutState>;
 
 /** Invoice states after which the page has nothing to follow. */
 const FINAL: ReadonlySet<string> = new Set(['paid', 'held', 'expired', 'cancelled', 'refunded', 'partially_refunded']);
+
+/** Invoice states in which a payment has settled: it is no longer on its way. */
+const SETTLED: ReadonlySet<string> = new Set(['paid', 'held', 'cancelled', 'refunded', 'partially_refunded']);
+
+/** Invoice states in which a payment on its way may still fail. */
+const UNSETTLED: ReadonlySet<string> = new Set(['open', 'processing', 'underpaid', 'expired']);
+
+/** How long Quasar waits past `dueAt` for a payment it learned of before it, plus a margin for the last reads. */
+const LATE_FOLLOW_MS = 35 * 60_000;
+
+/** How long the store follows an expired invoice without a `dueAt` for a payment on its way. */
+const LATE_FOLLOW_WITHOUT_DUE_MS = 60 * 60_000;
+
+/** How often the store reads an expired invoice whose payment is on its way, at least. */
+const LATE_POLL_MS = 20_000;
+
+/** A payment key as Quasar lists it: EVM hashes in lower case, Solana signatures as they are. */
+const keyOf = (key: string) => (key.startsWith('0x') || key.startsWith('0X') ? key.toLowerCase() : key);
 
 /**
  * The outcomes whose details an event does not carry: why a payment waits (`review`), the refund, the invoice that
@@ -312,13 +350,21 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
 
   let source: EventSourceLike | null = null;
   let poll: ReturnType<typeof setInterval> | null = null;
+  let pollEvery = pollMs;
   let destroyed = false;
-  /**
-   * A payment this page handed to Quasar (`submit`, `relay`) that has not ended yet: an invoice that expires while it
-   * confirms may still be paid (the engine lets a payment it learned of before `dueAt` confirm) or hold it (a late
-   * payment), so the store keeps following it.
-   */
-  let paymentOnTheWay = false;
+  /** The keys of the payment this page handed over: its `txKey`, a relay's `userOpHash` and hash. */
+  let ownKeys: string[] = [];
+  /** The failed payments Quasar listed last, and the ones it had listed when this page handed its payment over. */
+  let knownRejected: string[] = [];
+  let rejectedAtHandOver: ReadonlySet<string> = new Set();
+  /** When the payment was handed over, and how many hand-overs so far (a read started before the last one is stale). */
+  let handedOverAt = 0;
+  let handOvers = 0;
+  /** Following an expired invoice for a payment on its way: until when, and the timer that stops it then. */
+  let lateUntil: number | null = null;
+  let lateTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Whether the last `expired` event said a payment is on its way: Quasar then keeps the stream open. */
+  let streamFollows = false;
 
   const store = createStore<CheckoutState>()((set, get) => {
     /** Sets fields and the URLs that follow from them. */
@@ -337,11 +383,37 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       update({ error: refusal, phase: PHASE_OF_REFUSAL[refusal.code] ?? fallback });
     };
 
+    const stopLate = () => {
+      if (lateTimer) clearTimeout(lateTimer);
+      lateTimer = null;
+      lateUntil = null;
+      streamFollows = false;
+    };
+
     const stopWatching = () => {
       source?.close();
       source = null;
       if (poll) clearInterval(poll);
       poll = null;
+      stopLate();
+    };
+
+    /** The payment this page handed over ended (settled or failed): the fields that say so. */
+    const paymentEnded = (): Partial<CheckoutState> => {
+      ownKeys = [];
+      return { paymentOnTheWay: false };
+    };
+
+    /**
+     * Whether Quasar reports that this page's payment failed: it lists one of its keys among the rejected payments, or,
+     * when the store does not know the key (a relay answered `sending`, then rejected by its transfer's hash), it has no
+     * payment on its way and lists a rejection it had not listed at the hand-over.
+     */
+    const rejectedNow = (event: CheckoutStatusEvent): boolean => {
+      if (!event.rejectedTxKeys) return false;
+      const listed = event.rejectedTxKeys.map(keyOf);
+      if (ownKeys.some((key) => listed.includes(key))) return true;
+      return event.pendingPayments === 0 && listed.some((key) => !rejectedAtHandOver.has(key));
     };
 
     /** Reads the checkout again for the details of an outcome; a failed read leaves the state the event set. */
@@ -356,42 +428,19 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           // The outcome stands; its details come with the next load
         });
 
-    /**
-     * Applies a state of the invoice: from the event stream, or from `view`, a read of the checkout that already has
-     * the details.
-     */
-    const onStatus = (event: CheckoutStatusEvent, view?: CheckoutView) => {
-      if (destroyed) return;
-      const { invoiceStatus: previous, phase, quote, checkout } = get();
-      const partial: Partial<CheckoutState> = { invoiceStatus: event.status, txHash: event.txHash ?? get().txHash };
-      // What arrived is in the event: the underpaid and expired outcomes show it at once
-      if (!view && checkout && event.amountPaid !== undefined && event.amountPaid !== checkout.invoice.amountPaid) {
-        partial.checkout = { ...checkout, invoice: { ...checkout.invoice, amountPaid: event.amountPaid } };
-      }
-      if (event.status === 'open') {
-        // Back to open after processing: the transaction failed or was rejected, the buyer may pay again
-        if (previous === 'processing') {
-          paymentOnTheWay = false;
-          partial.phase = quote ? 'awaitingPayment' : 'selectMethod';
-          partial.error = { code: 'payment_failed', message: 'The payment did not go through. Try again.' };
-        } else if (phase === 'loading') {
-          partial.phase = 'selectMethod';
-        }
-      } else {
-        partial.phase = phaseOfStatus(event.status);
-      }
-      update(partial);
-      // Expired while this page's payment confirms: the payment still ends it (paid, or held as a late payment)
-      if (FINAL.has(event.status) && !(event.status === 'expired' && paymentOnTheWay)) {
-        paymentOnTheWay = false;
-        stopWatching();
-      }
-      if (!view && event.status !== previous && OUTCOMES.has(event.status)) void refreshView();
+    /** Whether the store follows the invoice: not after a final state, except an expired one with a payment on its way. */
+    const following = () => {
+      const { invoiceStatus, paymentOnTheWay } = get();
+      return !FINAL.has(invoiceStatus ?? '') || (invoiceStatus === 'expired' && paymentOnTheWay);
     };
 
     const startPolling = () => {
       if (poll || destroyed) return;
+      // An expired invoice whose payment is on its way changes once at most: read it calmly
+      pollEvery = lateUntil === null ? pollMs : Math.max(pollMs, LATE_POLL_MS);
       poll = setInterval(() => {
+        // A read that started before the last hand-over may not count the payment yet
+        const startedAt = handOvers;
         void api
           .view()
           .then((view) => {
@@ -404,18 +453,111 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
                 txHash: null,
                 amountPaid: view.invoice.amountPaid,
                 quoteExpiresAt: view.quote?.expiresAt ?? null,
+                pendingPayments: view.invoice.pendingPayments,
+                rejectedTxKeys: view.invoice.rejectedTxKeys,
               },
               view,
+              startedAt === handOvers,
             );
           })
           .catch(() => {
             // A missed read is retried on the next tick
           });
-      }, pollMs);
+      }, pollEvery);
+    };
+
+    /**
+     * Follows an expired invoice for this page's payment, for a while: the reads slow down, and the store stops
+     * following it 35 minutes past the later of `dueAt` and the hand-over (Quasar waits 30 minutes at most for a
+     * payment it learned of before `dueAt`; a later one settles in minutes), or an hour after the expiry without
+     * `dueAt`.
+     */
+    const followLate = () => {
+      if (lateUntil === null) {
+        const dueAt = Date.parse(get().checkout?.invoice.dueAt ?? '');
+        lateUntil = Number.isFinite(dueAt)
+          ? Math.max(dueAt, handedOverAt) + LATE_FOLLOW_MS
+          : Date.now() + LATE_FOLLOW_WITHOUT_DUE_MS;
+        lateTimer = setTimeout(
+          () => {
+            lateTimer = null;
+            if (destroyed) return;
+            update(paymentEnded());
+            stopWatching();
+          },
+          Math.max(0, lateUntil - Date.now()),
+        );
+      }
+      if (poll && pollEvery < LATE_POLL_MS) {
+        clearInterval(poll);
+        poll = null;
+        startPolling();
+      }
+    };
+
+    /**
+     * Applies a state of the invoice: from the event stream, or from `view`, a read of the checkout that already has
+     * the details. `current` is `false` for a read that started before the last hand-over.
+     */
+    const onStatus = (event: CheckoutStatusEvent, view?: CheckoutView, current = true) => {
+      if (destroyed) return;
+      const { invoiceStatus: previous, phase, quote, checkout, paymentOnTheWay } = get();
+      if (event.rejectedTxKeys) knownRejected = event.rejectedTxKeys;
+      const partial: Partial<CheckoutState> = { invoiceStatus: event.status, txHash: event.txHash ?? get().txHash };
+      // What arrived is in the event: the underpaid and expired outcomes show it at once
+      if (!view && checkout && event.amountPaid !== undefined && event.amountPaid !== checkout.invoice.amountPaid) {
+        partial.checkout = { ...checkout, invoice: { ...checkout.invoice, amountPaid: event.amountPaid } };
+      }
+      const failed =
+        (paymentOnTheWay && current && UNSETTLED.has(event.status) && rejectedNow(event)) ||
+        // Back to open after processing: the transaction failed or was rejected
+        (event.status === 'open' && previous === 'processing');
+      if (failed) {
+        // The buyer may pay again while the invoice is payable
+        Object.assign(partial, paymentEnded(), {
+          error: { code: 'payment_failed', message: 'The payment did not go through. Try again.' },
+          phase:
+            event.status === 'open' || event.status === 'processing'
+              ? quote
+                ? 'awaitingPayment'
+                : 'selectMethod'
+              : phaseOfStatus(event.status),
+        });
+      } else if (event.status === 'open') {
+        if (phase === 'loading') partial.phase = 'selectMethod';
+      } else {
+        partial.phase = phaseOfStatus(event.status);
+      }
+      if (paymentOnTheWay && !failed) {
+        const nothingOnItsWay = current && event.pendingPayments === 0;
+        const settled =
+          SETTLED.has(event.status) ||
+          // It made the invoice underpaid, or topped up an underpaid one that stays short
+          (event.status === 'underpaid' && (previous !== 'underpaid' || nothingOnItsWay)) ||
+          // A read of the expired invoice: Quasar has no payment of it on its way any longer
+          (event.status === 'expired' && view !== undefined && nothingOnItsWay);
+        if (settled) Object.assign(partial, paymentEnded());
+      }
+      update(partial);
+
+      if (!following()) {
+        stopWatching();
+      } else if (event.status === 'expired') {
+        // Expired while this page's payment is on its way: it may still end it (paid, or held as a late payment)
+        streamFollows = (event.pendingPayments ?? 0) > 0;
+        followLate();
+        if (source && event.pendingPayments === 0) {
+          // Quasar ends this stream: read the invoice instead, until a read confirms that nothing is on its way
+          source.close();
+          source = null;
+          startPolling();
+        }
+      }
+      if (!view && event.status !== previous && OUTCOMES.has(event.status)) void refreshView();
     };
 
     const watch = () => {
-      if (destroyed || source || poll || FINAL.has(get().invoiceStatus ?? '')) return;
+      if (destroyed || source || poll || !following()) return;
       if (!EventSourceClass) return startPolling();
       const events = new EventSourceClass(api.url('events'));
       source = events;
@@ -427,13 +569,28 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         }
       });
       events.onerror = () => {
-        // Closed for good (the browser gave up reconnecting): read the invoice instead
-        if (events.readyState === 2 && source === events) {
+        if (source !== events) return;
+        // Closed for good (the browser gave up reconnecting), or ended on an expired invoice that Quasar does not
+        // follow (the browser would reconnect every few seconds to a stream that ends at once): read the invoice
+        const { invoiceStatus, paymentOnTheWay } = get();
+        if (events.readyState === 2 || (invoiceStatus === 'expired' && paymentOnTheWay && !streamFollows)) {
           events.close();
           source = null;
           startPolling();
         }
       };
+    };
+
+    /** Takes a payment this page handed over: it is on its way until it settles or fails. */
+    const handOver = (keys: (string | null | undefined)[], txKey: string | null) => {
+      handOvers += 1;
+      handedOverAt = Date.now();
+      ownKeys = keys.filter((key): key is string => Boolean(key)).map(keyOf);
+      rejectedAtHandOver = new Set(knownRejected.map(keyOf));
+      const expired = get().invoiceStatus === 'expired';
+      update({ txKey, paymentOnTheWay: true, phase: expired ? 'expired' : 'confirming' });
+      if (expired) followLate();
+      watch();
     };
 
     return {
@@ -446,6 +603,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       quote: null,
       locale: null,
       txKey: null,
+      paymentOnTheWay: false,
       txHash: null,
       error: null,
       receiptUrl: null,
@@ -456,6 +614,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         update({ phase: 'loading', error: null });
         try {
           const view = await api.view();
+          if (view.invoice.rejectedTxKeys) knownRejected = view.invoice.rejectedTxKeys;
           update({
             checkout: view,
             invoiceStatus: view.invoice.status,
@@ -552,9 +711,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         update({ phase: 'submitting', error: null });
         try {
           await api.submit(params);
-          paymentOnTheWay = true;
-          update({ txKey: params.txKey, phase: 'confirming' });
-          watch();
+          handOver([params.txKey], params.txKey);
           return true;
         } catch (error) {
           fail(error, phase === 'submitting' ? 'awaitingPayment' : phase);
@@ -567,9 +724,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         update({ phase: 'submitting', error: null });
         try {
           const relayed = await api.relay(signature);
-          paymentOnTheWay = true;
-          update({ txKey: relayed.txHash ?? null, phase: 'confirming' });
-          watch();
+          handOver([relayed.userOpHash, relayed.txHash], relayed.txHash ?? null);
           return true;
         } catch (error) {
           fail(error, phase === 'submitting' ? 'awaitingPayment' : phase);

@@ -145,7 +145,9 @@ checkout.subscribe(({ phase }) => console.log(phase)); // confirming, then paid
 
 The page's origin must be one of the domains of your Quasar app, when the app lists any.
 
-The deadline is Quasar's: the store never ends a confirming payment by the clock. When the invoice expires while a payment the store handed over still confirms, `phase` becomes `expired` and the store keeps following the invoice: the payment may still make it `paid` (Quasar lets a payment it learned of before `dueAt` confirm) or `held` (a late payment the merchant accepts or returns). When `txKey` is set (a relayed payment has it once Quasar returns its hash), tell the buyer their payment may still arrive rather than that nothing was charged.
+`paymentOnTheWay` is `true` from a successful `submit` or `relay` until the payment settles or fails: use it, not `txKey`, to tell the buyer a payment is on its way (a relay Quasar answers with `sending` has no `txKey` yet). When Quasar rejects that payment (reverted, dropped, a wrong amount), the store sets `error` to `payment_failed` and leaves the confirm step, even though the invoice stays `open`.
+
+The deadline is Quasar's: the store never ends a confirming payment by the clock. When the invoice expires while `paymentOnTheWay`, `phase` becomes `expired` and the store keeps following the invoice: the payment may still make it `paid` (Quasar waits up to 30 minutes for a payment it learned of before `dueAt`) or `held` (a late payment the merchant accepts or returns), so tell the buyer their payment may still arrive rather than that nothing was charged. It keeps the event stream while Quasar keeps it open for that payment, and otherwise reads the invoice every 20 seconds; it stops 35 minutes past the later of `dueAt` and the hand-over, or once Quasar reports no payment on its way, and `paymentOnTheWay` is then `false`.
 
 ### Webhook relay
 

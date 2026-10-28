@@ -1,6 +1,6 @@
 # EventSourceLike
 
-Defined in: [checkout/store.ts:186](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L186)
+Defined in: [checkout/store.ts:206](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L206)
 
 The part of the browser's `EventSource` the store uses.
 
@@ -10,7 +10,7 @@ The part of the browser's `EventSource` the store uses.
 
 > **addEventListener**: (`type`, `listener`) => `void`
 
-Defined in: [checkout/store.ts:192](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L192)
+Defined in: [checkout/store.ts:212](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L212)
 
 Listens to named events.
 
@@ -34,7 +34,7 @@ Listens to named events.
 
 > **close**: () => `void`
 
-Defined in: [checkout/store.ts:194](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L194)
+Defined in: [checkout/store.ts:214](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L214)
 
 Closes the stream.
 
@@ -48,7 +48,7 @@ Closes the stream.
 
 > **onerror**: ((`event`) => `void`) \| `null`
 
-Defined in: [checkout/store.ts:190](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L190)
+Defined in: [checkout/store.ts:210](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L210)
 
 Called on a failure; the browser reconnects unless `readyState` is `2`.
 
@@ -58,6 +58,6 @@ Called on a failure; the browser reconnects unless `readyState` is `2`.
 
 > **readyState**: `number`
 
-Defined in: [checkout/store.ts:188](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L188)
+Defined in: [checkout/store.ts:208](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L208)
 
 `2` once closed for good.

@@ -36,6 +36,11 @@ class FakeEventSource {
     this.readyState = 2;
     this.onerror?.({});
   }
+  /** The server ends the stream: the browser fires `error` and reconnects (`readyState` 0, CONNECTING). */
+  end() {
+    this.readyState = 0;
+    this.onerror?.({});
+  }
   close() {
     this.closed = true;
     this.readyState = 2;
@@ -130,6 +135,13 @@ const store = (options: { EventSource?: unknown } = { EventSource: FakeEventSour
     pollMs: 1_000,
     EventSource: options.EventSource as never,
   });
+
+/** A `status` event of the stream; `signals` are what Quasar adds about the payments on their way. */
+const signal = (
+  status: string,
+  ledgerSeq: number,
+  signals: { pendingPayments?: number; rejectedTxKeys?: string[] } = {},
+) => ({ status, ledgerSeq, txHash: null, amountPaid: null, quoteExpiresAt: null, ...signals });
 
 describe('createCheckoutStore', () => {
   beforeEach(() => {
@@ -543,10 +555,13 @@ describe('createCheckoutStore', () => {
     expect(checkout.getState().phase).toBe('confirming');
     await vi.advanceTimersByTimeAsync(1_000);
     expect(checkout.getState().phase).toBe('expired');
+    // Expired: the reads slow down to one every 20 seconds
+    await vi.advanceTimersByTimeAsync(19_000);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
     await vi.advanceTimersByTimeAsync(1_000);
     expect(checkout.getState().phase).toBe('held');
     // Held: no more reads
-    await vi.advanceTimersByTimeAsync(5_000);
+    await vi.advanceTimersByTimeAsync(60_000);
     expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
@@ -564,6 +579,192 @@ describe('createCheckoutStore', () => {
     expect(checkout.getState()).toMatchObject({ phase: 'confirming', error: null });
     expect(FakeEventSource.instances[0].closed).toBe(false);
     checkout.getState().destroy();
+  });
+
+  it('tells the page that its payment is on the way until it settles, also a relayed one without a hash', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json(view({ quote: QUOTE as never })))
+      .mockResolvedValueOnce(json({ status: 'sending', userOpHash: '0xop' }));
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().paymentOnTheWay).toBe(false);
+    expect(await checkout.getState().relay(`0x${'1'.repeat(130)}`)).toBe(true);
+    // The relay is still sending: no hash yet, but the payment is on its way
+    expect(checkout.getState()).toMatchObject({ phase: 'confirming', txKey: null, paymentOnTheWay: true });
+    const events = FakeEventSource.instances[0];
+    events.emit('status', signal('open', 4, { pendingPayments: 1, rejectedTxKeys: [] }));
+    expect(checkout.getState().paymentOnTheWay).toBe(true);
+    events.emit('status', signal('paid', 6, { pendingPayments: 0, rejectedTxKeys: [] }));
+    expect(checkout.getState()).toMatchObject({ phase: 'paid', paymentOnTheWay: false });
+  });
+
+  it("ends the confirm step when Quasar rejects this page's payment, while the invoice stays open", async () => {
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      if (path.endsWith('/submit')) return json({ txKey: '0xFEED', status: 'open' }, 202);
+      if (path.endsWith('/relay')) return json({ status: 'sending', userOpHash: '0xop' });
+      return json(view({ quote: QUOTE as never, invoice: { ...view().invoice, rejectedTxKeys: ['0xold'] } }));
+    });
+
+    // A transaction it handed over, rejected by its hash
+    const submitted = store();
+    await submitted.getState().load();
+    await submitted.getState().submit({ txKey: '0xFEED' });
+    const submittedEvents = FakeEventSource.instances[0];
+    submittedEvents.emit('status', signal('open', 4, { pendingPayments: 1, rejectedTxKeys: ['0xother', '0xold'] }));
+    // Another payment failed: this one is still on its way
+    expect(submitted.getState()).toMatchObject({ phase: 'confirming', paymentOnTheWay: true, error: null });
+    submittedEvents.emit('status', signal('open', 5, { pendingPayments: 0, rejectedTxKeys: ['0xfeed', '0xold'] }));
+    expect(submitted.getState()).toMatchObject({
+      phase: 'awaitingPayment',
+      paymentOnTheWay: false,
+      error: { code: 'payment_failed' },
+    });
+    // The invoice is still open: the store keeps following it
+    expect(submittedEvents.closed).toBe(false);
+    submitted.getState().destroy();
+
+    // A relay that failed after answering `sending`, by its user operation hash
+    const relayed = store();
+    await relayed.getState().load();
+    await relayed.getState().relay(`0x${'1'.repeat(130)}`);
+    FakeEventSource.instances[1].emit('status', signal('open', 5, { pendingPayments: 0, rejectedTxKeys: ['0xop'] }));
+    expect(relayed.getState()).toMatchObject({ paymentOnTheWay: false, error: { code: 'payment_failed' } });
+    relayed.getState().destroy();
+
+    // A relayed transfer rejected by the hash the store never learned: nothing else is on its way
+    const unseen = store();
+    await unseen.getState().load();
+    await unseen.getState().relay(`0x${'1'.repeat(130)}`);
+    const unseenEvents = FakeEventSource.instances[2];
+    unseenEvents.emit('status', signal('open', 5, { pendingPayments: 1, rejectedTxKeys: ['0xold'] }));
+    expect(unseen.getState().paymentOnTheWay).toBe(true);
+    unseenEvents.emit('status', signal('open', 6, { pendingPayments: 0, rejectedTxKeys: ['0xbeef', '0xold'] }));
+    expect(unseen.getState()).toMatchObject({ paymentOnTheWay: false, error: { code: 'payment_failed' } });
+    unseen.getState().destroy();
+  });
+
+  it('ends an expired invoice whose payment Quasar rejected', async () => {
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      return path.endsWith('/submit') ? json({ txKey: '0xfeed', status: 'open' }, 202) : json(view());
+    });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    const events = FakeEventSource.instances[0];
+    events.emit('status', signal('expired', 5, { pendingPayments: 1, rejectedTxKeys: [] }));
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', paymentOnTheWay: true });
+    expect(events.closed).toBe(false);
+    events.emit('status', signal('expired', 6, { pendingPayments: 0, rejectedTxKeys: ['0xfeed'] }));
+    expect(checkout.getState()).toMatchObject({
+      phase: 'expired',
+      paymentOnTheWay: false,
+      error: { code: 'payment_failed' },
+    });
+    expect(events.closed).toBe(true);
+  });
+
+  it('keeps the stream Quasar keeps open for an expired invoice with a payment on the way', async () => {
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      return path.endsWith('/submit') ? json({ txKey: '0xfeed', status: 'open' }, 202) : json(view());
+    });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    const events = FakeEventSource.instances[0];
+    events.emit('status', signal('expired', 5, { pendingPayments: 1, rejectedTxKeys: [] }));
+    // The stream reached its time limit: the browser reconnects to a stream that follows the payment
+    events.end();
+    expect(events.closed).toBe(false);
+    events.emit('status', signal('held', 6, { pendingPayments: 0, rejectedTxKeys: [] }));
+    expect(checkout.getState()).toMatchObject({ phase: 'held', paymentOnTheWay: false });
+    expect(events.closed).toBe(true);
+  });
+
+  it('reads an expired invoice slowly and briefly when the stream ends on it, instead of reconnecting', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-28T12:00:00.000Z'));
+    const invoice = { ...view().invoice, dueAt: '2026-10-28T12:01:00.000Z' };
+    let reads = 0;
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      if (path.endsWith('/submit')) return json({ txKey: '0xfeed', status: 'open' }, 202);
+      reads += 1;
+      return json(view({ invoice: { ...invoice, status: reads === 1 ? 'open' : 'expired' } }));
+    });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    await vi.advanceTimersByTimeAsync(2 * 60_000);
+    const events = FakeEventSource.instances[0];
+    // A Quasar that ends the stream on `expired` (it says nothing of the payments on their way)
+    events.emit('status', signal('expired', 5));
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', paymentOnTheWay: true });
+    events.end();
+    expect(events.closed).toBe(true);
+    expect(FakeEventSource.instances).toHaveLength(1);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3)); // the outcome's details
+    const calls = fetchMock.mock.calls.length;
+
+    // One read every 20 seconds, not the page's 1-second reads
+    await vi.advanceTimersByTimeAsync(19_000);
+    expect(fetchMock).toHaveBeenCalledTimes(calls);
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(fetchMock).toHaveBeenCalledTimes(calls + 1);
+    expect(checkout.getState().paymentOnTheWay).toBe(true);
+
+    // Until 35 minutes past the deadline (Quasar waits 30 at most), then it stops
+    await vi.advanceTimersByTimeAsync(40 * 60_000);
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', paymentOnTheWay: false });
+    const atCap = fetchMock.mock.calls.length;
+    expect(atCap).toBeLessThanOrEqual(calls + 1 + (34 * 60) / 20);
+    await vi.advanceTimersByTimeAsync(60 * 60_000);
+    expect(fetchMock).toHaveBeenCalledTimes(atCap);
+  });
+
+  it('stops reading an expired invoice once Quasar has no payment of it on the way', async () => {
+    vi.useFakeTimers();
+    const invoice = view().invoice;
+    const expired = (pendingPayments: number) =>
+      json(view({ invoice: { ...invoice, status: 'expired', pendingPayments, rejectedTxKeys: [] } }));
+    fetchMock
+      .mockResolvedValueOnce(json(view({ quote: QUOTE as never })))
+      .mockResolvedValueOnce(json({ txKey: '0xfeed', status: 'open' }, 202))
+      .mockResolvedValueOnce(expired(1))
+      .mockResolvedValueOnce(expired(0));
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', paymentOnTheWay: true });
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', paymentOnTheWay: false });
+    await vi.advanceTimersByTimeAsync(10 * 60_000);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
+
+  it('follows a payment handed over after the invoice expired', async () => {
+    let answer: (response: Response) => void = () => undefined;
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      if (path.endsWith('/submit')) return new Promise<Response>((resolve) => (answer = resolve));
+      return json(view({ quote: QUOTE as never }));
+    });
+    const checkout = store();
+    await checkout.getState().load();
+    const submitting = checkout.getState().submit({ txKey: '0xfeed' });
+    // The invoice expired while the page handed the transaction over
+    FakeEventSource.instances[0].emit('status', signal('expired', 5, { pendingPayments: 0, rejectedTxKeys: [] }));
+    expect(FakeEventSource.instances[0].closed).toBe(true);
+    answer(json({ txKey: '0xfeed', status: 'expired' }, 202));
+    expect(await submitting).toBe(true);
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', paymentOnTheWay: true, txKey: '0xfeed' });
+    const events = FakeEventSource.instances[1];
+    expect(events.closed).toBe(false);
+    events.emit('status', signal('held', 6, { pendingPayments: 0, rejectedTxKeys: [] }));
+    expect(checkout.getState()).toMatchObject({ phase: 'held', paymentOnTheWay: false });
   });
 
   it('reads the invoice every few seconds where there is no event stream', async () => {

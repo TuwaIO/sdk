@@ -1062,6 +1062,14 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           .nullable()
           .openapi({ description: 'Why a payment waits for, or was flagged to, the seller.' }),
         refundedTotalMinor: z.string().nullable().openapi({ description: 'Refunded, in minor units (cents).' }),
+        pendingPayments: z.number().optional().openapi({
+          description:
+            'Payments handed over and still on their way: tracked transactions not yet verified or rejected, gasless relays still sending.',
+        }),
+        rejectedTxKeys: z.array(z.string()).optional().openapi({
+          description:
+            'The payments that failed, latest first (at most 10): the `txKey` of a rejected transaction, or the `userOpHash` of a gasless relay that failed after answering `sending`.',
+        }),
         replacedBy: z
           .object({ number: z.string().nullable(), checkoutToken: z.string().nullable() })
           .nullable()
@@ -1361,6 +1369,11 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       txHash: z.string().nullable(),
       amountPaid: z.string().nullable(),
       quoteExpiresAt: z.string().nullable(),
+      pendingPayments: z.number().optional().openapi({ description: 'Payments handed over and still on their way.' }),
+      rejectedTxKeys: z
+        .array(z.string())
+        .optional()
+        .openapi({ description: 'The payments that failed, latest first (at most 10).' }),
     })
     .openapi('CheckoutStatusEvent');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1369,7 +1382,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     'get',
     '/events',
     'Follow the invoice',
-    'Server-sent events: one `status` event at once and on every change (data: `CheckoutStatusEvent`), a `ping` every 15 seconds; the stream ends on a final state or after 10 minutes.',
+    'Server-sent events: one `status` event at once and on every change (data: `CheckoutStatusEvent`), a `ping` every 15 seconds; the stream ends on a final state (an `expired` invoice only once no payment of it is on its way) or after 10 minutes.',
     {
       responses: {
         200: { description: 'The event stream.', content: { 'text/event-stream': { schema: StatusEvent } } },

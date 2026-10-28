@@ -96,6 +96,17 @@ Series number; `null` while its document waits for the buyer details.
 
 ***
 
+### pendingPayments?
+
+> `optional` **pendingPayments?**: `number`
+
+Defined in: [checkout/types.ts:75](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L75)
+
+Payments handed over and still on their way: tracked transactions settlement has not verified or rejected yet,
+and gasless relays still sending. Quasar versions before the payment grace (October 2026) leave it out.
+
+***
+
 ### refundedTotalMinor
 
 > **refundedTotalMinor**: `string` \| `null`
@@ -106,11 +117,23 @@ What was refunded, in minor units (cents) of the invoice currency.
 
 ***
 
+### rejectedTxKeys?
+
+> `optional` **rejectedTxKeys?**: `string`[]
+
+Defined in: [checkout/types.ts:81](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L81)
+
+The payments that failed, latest first (at most 10): the `txKey` of a transaction settlement rejected (reverted,
+dropped, replaced, a wrong amount or recipient), or the `userOpHash` of a gasless relay that failed after Quasar
+answered `sending`. Left out like `pendingPayments`.
+
+***
+
 ### replacedBy
 
 > **replacedBy**: \{ `checkoutToken`: `string` \| `null`; `number`: `string` \| `null`; \} \| `null`
 
-Defined in: [checkout/types.ts:75](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L75)
+Defined in: [checkout/types.ts:86](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L86)
 
 The invoice that replaced this one after the seller corrected it: its number and, while it can be paid, its
 checkout token.
@@ -143,7 +166,7 @@ State of the invoice.
 
 > **subscription**: [`CheckoutSubscription`](/packages/quasar-sdk/checkout/interfaces/CheckoutSubscription.md) \| `null`
 
-Defined in: [checkout/types.ts:77](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L77)
+Defined in: [checkout/types.ts:88](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L88)
 
 The subscription period this invoice bills; `null` for a one-off invoice.
 

@@ -1,6 +1,6 @@
 # CheckoutError
 
-Defined in: [checkout/store.ts:56](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L56)
+Defined in: [checkout/store.ts:55](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L55)
 
 Why the last action failed: the Payments `code` (`payer_blocked`, `quote_required`, `invoice_expired`…), or
 `method_required` (no method chosen), `consent_required` (the merchant's consent is not ticked), `payment_failed`
@@ -12,7 +12,7 @@ Why the last action failed: the Payments `code` (`payer_blocked`, `quote_require
 
 > **code**: `string`
 
-Defined in: [checkout/store.ts:58](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L58)
+Defined in: [checkout/store.ts:57](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L57)
 
 Stable code.
 
@@ -22,7 +22,7 @@ Stable code.
 
 > `optional` **issues?**: [`QuasarRequestIssue`](/packages/quasar-sdk/server/interfaces/QuasarRequestIssue.md)[]
 
-Defined in: [checkout/store.ts:64](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L64)
+Defined in: [checkout/store.ts:63](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L63)
 
 The fields at fault of an invalid request.
 
@@ -32,7 +32,7 @@ The fields at fault of an invalid request.
 
 > **message**: `string`
 
-Defined in: [checkout/store.ts:60](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L60)
+Defined in: [checkout/store.ts:59](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L59)
 
 What to show or log.
 
@@ -42,6 +42,6 @@ What to show or log.
 
 > `optional` **status?**: `number`
 
-Defined in: [checkout/store.ts:62](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L62)
+Defined in: [checkout/store.ts:61](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L61)
 
 HTTP status, when the API answered.

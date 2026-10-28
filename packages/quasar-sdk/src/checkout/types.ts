@@ -69,6 +69,17 @@ export interface CheckoutInvoice {
   /** What was refunded, in minor units (cents) of the invoice currency. */
   refundedTotalMinor: string | null;
   /**
+   * Payments handed over and still on their way: tracked transactions settlement has not verified or rejected yet,
+   * and gasless relays still sending. Quasar versions before the payment grace (October 2026) leave it out.
+   */
+  pendingPayments?: number;
+  /**
+   * The payments that failed, latest first (at most 10): the `txKey` of a transaction settlement rejected (reverted,
+   * dropped, replaced, a wrong amount or recipient), or the `userOpHash` of a gasless relay that failed after Quasar
+   * answered `sending`. Left out like `pendingPayments`.
+   */
+  rejectedTxKeys?: string[];
+  /**
    * The invoice that replaced this one after the seller corrected it: its number and, while it can be paid, its
    * checkout token.
    */
@@ -395,4 +406,11 @@ export interface CheckoutStatusEvent {
   amountPaid: string | null;
   /** When the locked quote expires. */
   quoteExpiresAt: string | null;
+  /**
+   * Payments handed over and still on their way, as {@link CheckoutInvoice.pendingPayments}. Quasar keeps the stream of an
+   * `expired` invoice open while it is above `0`.
+   */
+  pendingPayments?: number;
+  /** The payments that failed, latest first, as {@link CheckoutInvoice.rejectedTxKeys}. */
+  rejectedTxKeys?: string[];
 }
