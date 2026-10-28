@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.4](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.3...solana-sdk-v0.6.4) (2026-10-28)
+
+
+### Bug Fixes
+
+* **deps:** Satellite Connect core 0.11.1, evm 0.10.1, solana 0.11.1, react 0.10.1 and Nova Connect 0.10.6 ([63b2bc3](https://github.com/TuwaIO/sdk/commit/63b2bc3a449caa8d1bed4be0bcf4fdf4d428fc1f))
+
 ## [0.6.3](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.2...solana-sdk-v0.6.3) (2026-10-23)
 
 
