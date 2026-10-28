@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.5](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.4...solana-sdk-v0.6.5) (2026-10-28)
+
+
+### Bug Fixes
+
+* **deps:** Nova 0.10.7, Satellite Connect 0.11.2, SIWX, Pulsar 0.11.1 and Orbit 0.7.2 — wallet lists update live ([ed3e152](https://github.com/TuwaIO/sdk/commit/ed3e152bb4e468e36a3321052b2490f1f461380a))
+
 ## [0.6.4](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.3...solana-sdk-v0.6.4) (2026-10-28)
 
 

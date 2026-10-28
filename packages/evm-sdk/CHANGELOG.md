@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.4](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.3...evm-sdk-v0.6.4) (2026-10-28)
+
+
+### Bug Fixes
+
+* **deps:** Nova 0.10.7, Satellite Connect 0.11.2, SIWX, Pulsar 0.11.1 and Orbit 0.7.2 — wallet lists update live ([ed3e152](https://github.com/TuwaIO/sdk/commit/ed3e152bb4e468e36a3321052b2490f1f461380a))
+* **deps:** update dependencies except TypeScript ([1c0e08a](https://github.com/TuwaIO/sdk/commit/1c0e08a4cb83713e16ede2e2a15137408be83ae7))
+
 ## [0.6.3](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.2...evm-sdk-v0.6.3) (2026-10-28)
 
 
