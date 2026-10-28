@@ -93,6 +93,21 @@ export interface CheckoutInvoice {
    */
   paymentCountsUntil?: string | null;
   /**
+   * Payments of the invoice that may still arrive, with no time limit: tracked transactions neither confirmed nor
+   * rejected for good (also one stuck past the 25 minutes `pendingPayments` counts, and one whose tracker lost sight of
+   * it, `not_found`, `timeout` or `replaced`, which Quasar reads again for 24 hours), and gasless relays still sending.
+   * While it is above `0` the page offers no plain second payment and never says that nothing was charged. Quasar
+   * versions before October 29, 2026 leave it out.
+   */
+  unresolvedPayments?: number;
+  /**
+   * Every key (`txKey`, hash, the hash a sped-up transaction replaced, a relay's `userOpHash`) of the payments that
+   * count as sent in time: Quasar learned of them before `dueAt` (all of them when the invoice has none); at most the
+   * latest 20 transactions and 10 relays. Match the page's own keys against it instead of the browser clock. Left out
+   * like `unresolvedPayments`.
+   */
+  onTimeTxKeys?: string[];
+  /**
    * The invoice that replaced this one after the seller corrected it: its number and, while it can be paid, its
    * checkout token.
    */
@@ -108,20 +123,28 @@ export interface CheckoutRejectedPayment {
   /**
    * Why: `reverted`, `cancelled`, `expired` (a Solana blockhash), `no_matching_transfer` (a wrong amount, asset or
    * recipient), `tx_already_used`, `reference_missing`, `too_early`, `not_found` (the network never returned the
-   * transaction), `timeout` (no receipt in time), `replaced`, `payer_mismatch`, a relay's reason, or
-   * `transaction_failed` when Quasar does not know.
+   * transaction), `timeout` (no receipt in time), `replaced`, `payer_mismatch`, `native_from_contract_unverifiable`,
+   * `invoice_not_payable`, a relay's reason, or `transaction_failed` when Quasar does not know.
    */
   reason: string;
   /**
    * Whether the transaction can never pay the invoice, so the buyer may pay again. When `false` (`not_found`,
    * `timeout`, `replaced`…) the money may still be on its way or already with the merchant: the buyer checks the wallet
-   * before paying again.
+   * before paying again. A final rejection may still have moved money: read `movedMoney`.
    */
   final: boolean;
   /** The relay operation the transaction came from, which the page knows when the relay answered `sending`. */
   userOpHash?: string;
   /** The transaction the checkout handed over, when this one replaced it (a payment sped up in the wallet). */
   original?: string;
+  /**
+   * `true` when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`,
+   * `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`,
+   * `invoice_not_payable`): it may have moved money. Never say that it did not go through or that nothing was charged:
+   * say that it does not pay the invoice, and whom to contact if money left the wallet. Quasar versions before October
+   * 29, 2026 leave it out.
+   */
+  movedMoney?: true;
 }
 
 /** The subscription period an invoice bills, as the checkout shows it. */
@@ -453,4 +476,8 @@ export interface CheckoutStatusEvent {
   rejectedPayments?: CheckoutRejectedPayment[];
   /** Until when a payment sent before the due date counts, as {@link CheckoutInvoice.paymentCountsUntil}. */
   paymentCountsUntil?: string | null;
+  /** Payments that may still arrive, with no time limit, as {@link CheckoutInvoice.unresolvedPayments}. */
+  unresolvedPayments?: number;
+  /** The keys of the payments that count as sent in time, as {@link CheckoutInvoice.onTimeTxKeys}. */
+  onTimeTxKeys?: string[];
 }

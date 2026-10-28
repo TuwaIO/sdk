@@ -1,6 +1,6 @@
 # CheckoutStoreOptions
 
-Defined in: [checkout/store.ts:266](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L266)
+Defined in: [checkout/store.ts:302](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L302)
 
 Options of [createCheckoutStore](/packages/quasar-sdk/checkout/functions/createCheckoutStore.md).
 
@@ -10,7 +10,7 @@ Options of [createCheckoutStore](/packages/quasar-sdk/checkout/functions/createC
 
 > `optional` **api?**: [`CheckoutApi`](/packages/quasar-sdk/checkout/interfaces/CheckoutApi.md)
 
-Defined in: [checkout/store.ts:282](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L282)
+Defined in: [checkout/store.ts:318](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L318)
 
 The calls to make instead of the HTTP ones of `token` and `baseUrl`, for tests and simulations (the TUWA docs
 Playground). With your own calls, pass `EventSource: null` too, or the store opens `api.url('events')`.
@@ -21,7 +21,7 @@ Playground). With your own calls, pass `EventSource: null` too, or the store ope
 
 > `optional` **baseUrl?**: `string`
 
-Defined in: [checkout/store.ts:270](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L270)
+Defined in: [checkout/store.ts:306](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L306)
 
 The Quasar API. Defaults to [BASE\_API\_URL](/packages/quasar-sdk/server/variables/BASE_API_URL.md).
 
@@ -31,7 +31,7 @@ The Quasar API. Defaults to [BASE\_API\_URL](/packages/quasar-sdk/server/variabl
 
 > `optional` **EventSource?**: [`EventSourceConstructor`](/packages/quasar-sdk/checkout/type-aliases/EventSourceConstructor.md) \| `null`
 
-Defined in: [checkout/store.ts:277](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L277)
+Defined in: [checkout/store.ts:313](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L313)
 
 The `EventSource` to follow the invoice with. Defaults to the global one; `null` reads the invoice every `pollMs`
 instead.
@@ -42,7 +42,7 @@ instead.
 
 > `optional` **pollMs?**: `number`
 
-Defined in: [checkout/store.ts:272](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L272)
+Defined in: [checkout/store.ts:308](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L308)
 
 How often to read the invoice when there is no event stream, in milliseconds. Defaults to `5000`.
 
@@ -52,6 +52,6 @@ How often to read the invoice when there is no event stream, in milliseconds. De
 
 > **token**: `string`
 
-Defined in: [checkout/store.ts:268](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L268)
+Defined in: [checkout/store.ts:304](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L304)
 
 The checkout token of the invoice (from its `checkoutToken` or the end of its `payUrl`).

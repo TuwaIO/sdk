@@ -57,7 +57,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     .enum(['open', 'processing', 'paid', 'underpaid', 'held', 'partially_refunded', 'refunded', 'expired', 'cancelled'])
     .openapi('InvoiceStatus', {
       description:
-        '`open` until paid; `processing` while a payment is confirmed; `paid`, `underpaid` (the buyer may top it up), `held` (released or refunded by the merchant), `partially_refunded`, `refunded`; `expired` or `cancelled` without a payment (`expired` up to 30 minutes after `dueAt` while a payment sent before it confirms).',
+        '`open` until paid; `processing` while a payment is confirmed; `paid`, `underpaid` (the buyer may top it up), `held` (released or refunded by the merchant), `partially_refunded`, `refunded`; `expired` or `cancelled` without a payment (`expired` up to 30 minutes after `dueAt` while a payment sent before it confirms; a payment that still arrives later makes it `held`, `late`).',
     });
   const Environment = z.enum(['live', 'test']).openapi('PaymentsEnvironment', {
     description: 'Live or test: the key that issued it decides. Test invoices are paid on test networks.',
@@ -202,7 +202,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       issuedAt: dateTime('When it was issued.').nullable(),
       supplyDate: dateTime('Date of supply (BT-72).').nullable(),
       dueAt: dateTime(
-        'When it stops being payable. A payment Quasar learned of before it (handed over to `/submit` or `/relay`, or a Solana Pay transfer in a block before it) may still confirm for up to 30 minutes after it: the invoice stays payable meanwhile, so `expired` and the `invoice.expired` webhook can come up to 30 minutes after `dueAt`. Confirmed in time, it pays the invoice as usual, except in an asset not pegged to the invoice currency when its block is more than 60 seconds past the end of the locked quote (`held`, `quote_expired`). A payment handed over after `dueAt` is held as late.',
+        'When it stops being payable. A payment Quasar learned of before it (handed over to `/submit` or `/relay`, or a Solana Pay transfer in a block before it: an invoice quoted in a Solana method stays open until Quasar has read its Solana Pay reference at least 30 seconds past `dueAt`) may still confirm for up to 30 minutes after it: the invoice stays payable meanwhile, so `expired` and the `invoice.expired` webhook can come up to 30 minutes after `dueAt`. Confirmed in time, it pays the invoice as usual, except in an asset not pegged to the invoice currency when its block is more than 60 seconds past the end of the locked quote (`held`, `quote_expired`). A payment handed over after `dueAt`, or one that confirms after the invoice expired (Quasar reads a payment whose tracker lost sight of it again for 24 hours), is held as late, with its AML screening.',
       ).nullable(),
       seller: InvoiceSeller.nullable(),
       buyer: Buyer.extend({ companyInvoice: z.boolean().optional() }).nullable(),
@@ -261,7 +261,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         .openapi({ description: 'The payment, once there is one.' }),
       reviewReason: z.string().nullable().openapi({
         description:
-          'Why the payment waits for you: `overpaid` when the app flags overpayments, `quote_expired` when it arrived after its locked quote expired (in an asset not pegged to the invoice currency, a block more than 60 seconds past the end of the quote), `late` when it was handed over after `dueAt` or arrived after the invoice expired or was cancelled.',
+          'Why the payment waits for you: `overpaid` when the app flags overpayments, `quote_expired` when it arrived after its locked quote expired (in an asset not pegged to the invoice currency, a block more than 60 seconds past the end of the quote), `late` when it was handed over after `dueAt` or arrived after the invoice expired or was cancelled (screened like any payment: a sender the screening blocks waits as an AML hold, with `late` in the ledger).',
       }),
       aml: z.object({ status: z.string(), reasons: z.array(z.string()), coverage: z.string().nullable() }).nullable(),
       receiptNumber: z.string().nullable(),
@@ -966,16 +966,21 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       }),
       reason: z.string().openapi({
         description:
-          'Why: `reverted`, `cancelled`, `expired`, `no_matching_transfer`, `tx_already_used`, `not_found`, `timeout`, `replaced`, `payer_mismatch`, a relay reason, or `transaction_failed`.',
+          'Why: `reverted`, `cancelled`, `expired`, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `not_found`, `timeout`, `replaced`, `payer_mismatch`, `native_from_contract_unverifiable`, `invoice_not_payable`, a relay reason, or `transaction_failed`.',
       }),
-      final: z
-        .boolean()
-        .openapi({ description: 'Whether the transaction can never pay the invoice: the buyer may pay again.' }),
+      final: z.boolean().openapi({
+        description:
+          'Whether the transaction can never pay the invoice: the buyer may pay again. A final one may still have moved money: read `movedMoney`.',
+      }),
       userOpHash: z.string().optional().openapi({ description: 'The relay operation the transaction came from.' }),
       original: z
         .string()
         .optional()
         .openapi({ description: 'The transaction the checkout handed over, when this one replaced it (sped up).' }),
+      movedMoney: z.literal(true).optional().openapi({
+        description:
+          'Set when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`, `invoice_not_payable`): it may have moved money. Never tell the buyer that it did not go through or that nothing was charged: say that this transaction does not pay the invoice, and to contact the merchant if money left the wallet.',
+      }),
     })
     .openapi('CheckoutRejectedPayment');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1086,7 +1091,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         locale: Locale.nullable(),
         dueAt: z.string().nullable().openapi({
           description:
-            'When it stops being payable. A payment Quasar learned of before it (handed over to `/submit` or `/relay`, or a Solana Pay transfer in a block before it) may still confirm for up to 30 minutes after it: the invoice stays payable meanwhile, so `expired` and the `invoice.expired` webhook can come up to 30 minutes after `dueAt`. Confirmed in time, it pays the invoice as usual, except in an asset not pegged to the invoice currency when its block is more than 60 seconds past the end of the locked quote (`held`, `quote_expired`). A payment handed over after `dueAt` is held as late.',
+            'When it stops being payable. A payment Quasar learned of before it (handed over to `/submit` or `/relay`, or a Solana Pay transfer in a block before it: an invoice quoted in a Solana method stays open until Quasar has read its Solana Pay reference at least 30 seconds past `dueAt`) may still confirm for up to 30 minutes after it: the invoice stays payable meanwhile, so `expired` and the `invoice.expired` webhook can come up to 30 minutes after `dueAt`. Confirmed in time, it pays the invoice as usual, except in an asset not pegged to the invoice currency when its block is more than 60 seconds past the end of the locked quote (`held`, `quote_expired`). A payment handed over after `dueAt`, or one that confirms after the invoice expired (Quasar reads a payment whose tracker lost sight of it again for 24 hours), is held as late, with its AML screening.',
         }),
         successUrl: z.string().nullable(),
         cancelUrl: z.string().nullable(),
@@ -1094,7 +1099,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         review: z
           .object({ reason: z.enum(['screening', 'late', 'overpaid', 'quote_expired']) })
           .nullable()
-          .openapi({ description: 'Why a payment waits for, or was flagged to, the seller.' }),
+          .openapi({
+            description:
+              'Why a payment waits for, or was flagged to, the seller. A late payment from a wallet the screening blocks shows `screening`.',
+          }),
         refundedTotalMinor: z.string().nullable().openapi({ description: 'Refunded, in minor units (cents).' }),
         pendingPayments: z.number().optional().openapi({
           description:
@@ -1106,11 +1114,19 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         }),
         rejectedPayments: z.array(RejectedPayment).optional().openapi({
           description:
-            'The payments that failed, latest first (at most 10). `final`: the transaction can never pay the invoice (`reverted`, `cancelled`, `expired` Solana blockhash, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `chain_mismatch`, `no_quote`, `no_payment_method`, a relay the bundler refused or never sent), so the buyer may pay again; otherwise (`not_found`, `timeout`, `replaced`, `payer_mismatch`…) the money may still be on its way or with the merchant: ask the buyer to check the wallet before paying again. A transaction sped up in the wallet is followed under its new hash and not rejected; `original` is the hash the checkout handed over.',
+            'The payments that failed, latest first (at most 10). `final`: the transaction can never pay the invoice (`reverted`, `cancelled`, `expired` Solana blockhash, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `chain_mismatch`, `no_quote`, `no_payment_method`, a relay the bundler refused or never sent), so the buyer may pay again; otherwise (`not_found`, `timeout`, `replaced`, `payer_mismatch`…) the money may still be on its way or with the merchant: ask the buyer to check the wallet before paying again. `movedMoney`: the transaction went through without paying the invoice and may have moved money. Quasar reads a transaction rejected with `not_found`, `timeout` or `replaced` again for 24 hours (`unresolvedPayments`): if it arrives, it is recorded (paid within the grace, else held as late). A transaction sped up in the wallet is followed under its new hash and not rejected; `original` is the hash the checkout handed over.',
         }),
         paymentCountsUntil: z.string().nullable().optional().openapi({
           description:
             'While the invoice is payable and a payment Quasar learned of before `dueAt` is on its way: until when the invoice waits for it (`dueAt` plus 30 minutes); `null` otherwise. Say from it, not from the browser clock, that the payment was sent in time.',
+        }),
+        unresolvedPayments: z.number().optional().openapi({
+          description:
+            'Payments of the invoice that may still arrive, with no time limit: tracked transactions neither verified nor rejected for good (also one stuck past the 25 minutes `pendingPayments` counts, and one rejected with `not_found`, `timeout` or `replaced`, which Quasar reads again for 24 hours), and gasless relays still sending. While it is above 0, do not offer a plain second payment and never tell the buyer that nothing was charged.',
+        }),
+        onTimeTxKeys: z.array(z.string()).optional().openapi({
+          description:
+            "Every key (`txKey`, hash, the hash a sped-up transaction replaced, the relay `userOpHash`) of the payments that count as sent in time: Quasar learned of them before `dueAt` (all of them without a `dueAt`); at most the latest 20 transactions and 10 relays. Match the page's own keys against it, not the browser clock.",
         }),
         replacedBy: z
           .object({ number: z.string().nullable(), checkoutToken: z.string().nullable() })
@@ -1284,7 +1300,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     'post',
     '/submit',
     'Submit the payment transaction',
-    'Quasar tracks it; the invoice is settled when it is final. For an EIP-5792 batch, send the hash of its transaction. An `expired` invoice takes it too: the payment is held for the merchant as late (`review.reason` `late`), who credits or returns it. One handed over before `dueAt` keeps the invoice payable for up to 30 minutes past it while it confirms; one handed over after `dueAt` is held as late, even while another payment keeps the invoice payable.',
+    'Quasar tracks it; the invoice is settled when it is final. For an EIP-5792 batch, send the hash of its transaction. An `expired` invoice takes it too: the payment is held for the merchant as late (`review.reason` `late`), who credits or returns it. One handed over before `dueAt` keeps the invoice payable for up to 30 minutes past it while it confirms; one handed over after `dueAt` is held as late, even while another payment keeps the invoice payable. The same `txKey` is taken once: a page that got no answer (network, 5xx) hands it over again, since the wallet has sent it already.',
     {
       request: {
         body: json(
@@ -1425,6 +1441,14 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         .nullable()
         .optional()
         .openapi({ description: 'Until when a payment sent before `dueAt` counts; `null` without one on its way.' }),
+      unresolvedPayments: z
+        .number()
+        .optional()
+        .openapi({ description: 'Payments that may still arrive, with no time limit (see `CheckoutInvoice`).' }),
+      onTimeTxKeys: z
+        .array(z.string())
+        .optional()
+        .openapi({ description: 'The keys of the payments that count as sent in time (see `CheckoutInvoice`).' }),
     })
     .openapi('CheckoutStatusEvent');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

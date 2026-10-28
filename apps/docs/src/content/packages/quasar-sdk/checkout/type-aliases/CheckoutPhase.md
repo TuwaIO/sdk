@@ -2,7 +2,7 @@
 
 > **CheckoutPhase** = `"loading"` \| `"buyer"` \| `"selectMethod"` \| `"quoting"` \| `"awaitingPayment"` \| `"submitting"` \| `"confirming"` \| `"unconfirmed"` \| `"paid"` \| `"underpaid"` \| `"held"` \| `"refunded"` \| `"expired"` \| `"cancelled"` \| `"blocked"` \| `"error"`
 
-Defined in: [checkout/store.ts:46](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L46)
+Defined in: [checkout/store.ts:48](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L48)
 
 Where the payment stands:
 
@@ -20,7 +20,9 @@ Where the payment stands:
 - `unconfirmed`: Quasar could not confirm the payment (the network never returned the transaction, no receipt in
   time…), but it may still have gone through: the page asks the buyer to check the wallet before paying again, and
   offers no payment; [CheckoutState.payAgain](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#payagain) goes back to it once the buyer did. `error` says why
-  (`payment_unconfirmed`, with the `reason`).
+  (`payment_unconfirmed`, with the `reason`). Also where a reopened page finds the latest payment of the invoice
+  unconfirmed or still unresolved ([CheckoutState.invoicePaymentUnresolved](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#invoicepaymentunresolved)), and while the store retries
+  handing over a transaction the wallet sent (`reason` `submit_retrying`, [CheckoutState.submit](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#submit)).
 - `paid`, `underpaid` (the buyer may top it up), `held` (the merchant looks at the payment), `refunded`, `expired`,
   `cancelled`: the invoice's outcome. An invoice that expires while a payment this store handed over (`submit`,
   `relay`) is on its way is not over: the payment may still arrive, and the invoice then becomes `paid` (Quasar

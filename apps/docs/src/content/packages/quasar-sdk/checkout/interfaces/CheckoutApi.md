@@ -1,6 +1,6 @@
 # CheckoutApi
 
-Defined in: [checkout/types.ts:398](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L398)
+Defined in: [checkout/types.ts:421](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L421)
 
 The calls a checkout store makes, one per checkout route. [createCheckoutStore](/packages/quasar-sdk/checkout/functions/createCheckoutStore.md) makes them over HTTP; pass
 your own as `api` to drive the store without a network, as tests and the TUWA docs Playground do. A call rejects with
@@ -12,7 +12,7 @@ a `QuasarSDKError` that carries the Payments `code` when Quasar refuses it.
 
 > **buyer**: (`body`) => `Promise`\<[`CheckoutView`](/packages/quasar-sdk/checkout/interfaces/CheckoutView.md)\>
 
-Defined in: [checkout/types.ts:404](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L404)
+Defined in: [checkout/types.ts:427](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L427)
 
 Sends the buyer details (`POST buyer`) and answers with the checkout.
 
@@ -38,7 +38,7 @@ Sends the buyer details (`POST buyer`) and answers with the checkout.
 
 > **locale**: (`locale`) => `Promise`\<\{ `locale`: [`InvoiceLocale`](/packages/quasar-sdk/server/type-aliases/InvoiceLocale.md); \}\>
 
-Defined in: [checkout/types.ts:406](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L406)
+Defined in: [checkout/types.ts:429](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L429)
 
 Sets the language of the page and the documents still to be issued (`POST locale`).
 
@@ -58,7 +58,7 @@ Sets the language of the page and the documents still to be issued (`POST locale
 
 > **permission**: (`body`) => `Promise`\<\{ `permission`: `unknown`; \}\>
 
-Defined in: [checkout/types.ts:416](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L416)
+Defined in: [checkout/types.ts:439](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L439)
 
 Sends the ERC-7715 permission the wallet granted (`POST permission`).
 
@@ -78,7 +78,7 @@ Sends the ERC-7715 permission the wallet granted (`POST permission`).
 
 > **quote**: (`body`) => `Promise`\<[`CheckoutQuote`](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md)\>
 
-Defined in: [checkout/types.ts:402](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L402)
+Defined in: [checkout/types.ts:425](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L425)
 
 Locks a quote for a method and, when connected, the payer, with the buyer's consent when given (`POST quote`).
 
@@ -108,7 +108,7 @@ Locks a quote for a method and, when connected, the payer, with the buyer's cons
 
 > **relay**: (`signature`) => `Promise`\<\{ `status`: `"submitted"` \| `"sending"`; `txHash?`: `string`; `userOpHash?`: `string`; \}\>
 
-Defined in: [checkout/types.ts:414](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L414)
+Defined in: [checkout/types.ts:437](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L437)
 
 Relays the signed EIP-3009 authorization (`POST relay`).
 
@@ -128,7 +128,7 @@ Relays the signed EIP-3009 authorization (`POST relay`).
 
 > **submit**: (`body`) => `Promise`\<\{ `status`: `string`; `txKey`: `string`; \}\>
 
-Defined in: [checkout/types.ts:408](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L408)
+Defined in: [checkout/types.ts:431](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L431)
 
 Hands over the transaction the wallet sent (`POST submit`).
 
@@ -158,7 +158,7 @@ Hands over the transaction the wallet sent (`POST submit`).
 
 > **url**: (`route`) => `string`
 
-Defined in: [checkout/types.ts:418](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L418)
+Defined in: [checkout/types.ts:441](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L441)
 
 The URL of a route that is read without the store: `receipt`, `logo`, `paymaster`, `events`.
 
@@ -178,7 +178,7 @@ The URL of a route that is read without the store: `receipt`, `logo`, `paymaster
 
 > **view**: () => `Promise`\<[`CheckoutView`](/packages/quasar-sdk/checkout/interfaces/CheckoutView.md)\>
 
-Defined in: [checkout/types.ts:400](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L400)
+Defined in: [checkout/types.ts:423](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L423)
 
 Reads the checkout (`GET`).
 
