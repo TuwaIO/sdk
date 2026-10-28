@@ -1,0 +1,75 @@
+# 简介
+
+<p align="center">
+  <img
+    src="https://tuwa.io/brand/sdk.png"
+    alt="TUWA SDK"
+    width="450"
+    style={{ borderRadius: '12px', margin: '24px auto', display: 'block' }}
+  />
+</p>
+
+**TUWA SDK** 是在 React 应用中使用 TUWA 的最短路径。`@tuwaio/sdk` 通过子路径重导出 Orbit Utils、Pulsar、Satellite Connect、SIWX 与 Nova UI Kit 的客户端包，其扩展包 `@tuwaio/evm-sdk` 与 `@tuwaio/solana-sdk` 则添加应用所用的链。本仓库还包含 `@tuwaio/quasar-sdk`，即供服务端使用的 Quasar API 客户端。
+
+---
+
+## 🏛️ SDK 在 TUWA 中的位置 [#️-where-the-sdk-fits-in-tuwa]
+
+TUWA 按阶段构建，每个阶段都建立在之前的阶段之上：
+
+| 阶段                       | 项目                                                                                                  | 作用                                      |
+| -------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| **1 — 核心认证与底层原语** | [SIWX](https://siwx.docs.tuwa.io/)、[Orbit Utils](https://orbit.docs.tuwa.io/)                        | CAIP-122 身份认证与多链原语               |
+| **2 — 状态机与连接层**     | [Satellite Connect](https://satellite.docs.tuwa.io/)、[Pulsar](https://pulsar.docs.tuwa.io/)          | 钱包连接状态与交易追踪                    |
+| **3 — 服务端与状态同步**   | [Quasar](https://docs.tuwa.io/quasar)（Cloud 或自部署的 Community 版），配合 **`@tuwaio/quasar-sdk`** | 服务端交易追踪、历史记录与 Webhook        |
+| **4 — 用户界面组件**       | [Nova UI Kit](https://stories.tuwa.io/)                                                               | React 设计系统与组件                      |
+| **5 — SDK 统一集成层**     | **`@tuwaio/sdk`**、**`@tuwaio/evm-sdk`**、**`@tuwaio/solana-sdk`**                                    | 一次安装即可获得第 1、2、4 阶段的客户端包 |
+
+第 5 阶段的包不包含自己的逻辑：每个子路径都是某个 TUWA 包的一个入口，其参考文档位于对应项目的站点上。SDK 决定哪些版本的 TUWA 包可以协同工作，并为每个包提供唯一的导入路径。
+
+---
+
+## 🧭 设计原则 [#-principles]
+
+1. **一次安装，版本经过测试：** TUWA 包是 `@tuwaio/sdk` 及其扩展包的依赖，因此 SDK 的每个版本都会锁定可以协同工作的包版本。React、`viem`、`@wagmi/core`、`@solana/kit` 与 Wallet Standard 包仍为对等依赖，因此应用中每个库只保留一份。
+2. **只引入所用的链：** `@tuwaio/sdk` 不加载任何 EVM 或 Solana 代码。EVM 应用添加 `@tuwaio/evm-sdk`，Solana 应用添加 `@tuwaio/solana-sdk`，同时使用两者的应用则两者都添加。
+3. **相同的包，相同的文档：** 子路径原样重导出 TUWA 包，因此 Orbit、Pulsar、Satellite Connect、SIWX 与 Nova UI Kit 站点上的所有内容照常适用；只有导入路径不同。
+4. **密钥留在服务端：** `@tuwaio/quasar-sdk` 使用 Quasar 应用的密钥 (secret key) 进行认证。其根入口不含 React 代码，可在 Node.js 与 Edge 运行时中运行；浏览器端检查是一个单独的入口。
+
+---
+
+## 🧩 软件包 [#-packages]
+
+| 软件包                                       | 层级 | 提供的功能                                                                        | 对等依赖                                                                            |
+| -------------------------------------------- | ---- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| [`@tuwaio/sdk`](/packages/sdk)               | L8   | 通过子路径提供 Orbit、Pulsar、Satellite Connect、SIWX 与 Nova UI Kit；Nova 样式表 | `react`, `react-dom` (>=19.2.3)                                                     |
+| [`@tuwaio/evm-sdk`](/packages/evm-sdk)       | L9   | Orbit、Satellite Connect、Pulsar、SIWX 与 Nova Connect 的 EVM 包                  | `@tuwaio/sdk` ≥ 0.4, `@wagmi/core` 3.x, `viem` 2.x                                  |
+| [`@tuwaio/solana-sdk`](/packages/solana-sdk) | L9   | Orbit、Satellite Connect、Pulsar、SIWX 与 Nova Connect 的 Solana 包               | `@tuwaio/sdk` ≥ 0.4, `@solana/kit` ≥ 8.2, Wallet Standard 包                        |
+| [`@tuwaio/quasar-sdk`](/packages/quasar-sdk) | L5   | Quasar API 客户端、浏览器端预检与 Webhook 转发 CLI                                | `@tuwaio/pulsar-core` ≥ 0.9；`@tuwaio/quasar-sdk/react` 还需要 `@tuwaio/siwx-react` |
+
+`@tuwaio/sdk`、`@tuwaio/evm-sdk` 与 `@tuwaio/solana-sdk` 的页面列出各自的子路径，并附有指向每个被重导出包参考文档的链接。`@tuwaio/quasar-sdk` 的页面之后是根据 TypeScript 源码生成的全部导出的参考文档。
+
+---
+
+## 💾 安装 [#-installation]
+
+```bash
+# React app: the SDK and the chains it uses
+pnpm add @tuwaio/sdk react react-dom
+pnpm add @tuwaio/evm-sdk @wagmi/core viem
+pnpm add @tuwaio/solana-sdk @solana/kit
+
+# Server that syncs transactions to Quasar
+pnpm add @tuwaio/quasar-sdk @tuwaio/pulsar-core
+```
+
+pnpm（8 及以上）、npm（7 及以上）与 Bun 还会安装 `@tuwaio/solana-sdk` 的 Wallet Standard 对等依赖（`@wallet-standard/app`、`base`、`features`、`react`、`ui` 与 `ui-registry`）；使用 Yarn 时，请将它们加入安装命令。
+
+---
+
+## 📚 后续步骤 [#-next-steps]
+
+- 使用 **[全栈 React 应用指南](https://docs.tuwa.io/guides/full-stack-react)** 构建完整应用：钱包连接、交易追踪、SIWX 登录与 Quasar 同步，支持 EVM 与 Solana。
+- 使用 **[启动模板](https://docs.tuwa.io/guides/starter-templates)** 从现成的应用开始。
+- 使用 **[将交易同步至 Quasar 指南](https://docs.tuwa.io/guides/quasar-transaction-sync)** 将交易同步到 Quasar，并在 **[Quasar 文档](https://docs.tuwa.io/quasar)** 中了解应用、密钥、配额与 Webhook。
+- 在 **[Nova UI Kit Storybook](https://stories.tuwa.io/)** 中浏览组件，并在 **[GitHub](https://github.com/TuwaIO/sdk)** 阅读源代码。

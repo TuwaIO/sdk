@@ -14,7 +14,7 @@
     "format": "prettier --write .",
     "test": "pnpm --filter \"./packages/**\" test",
     "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && find . -name dist -type d -prune -exec rm -rf '{}' + && rm -rf .turbo",
-    "docs:gen": "rm -rf apps/docs/src/content/packages && typedoc && node apps/docs/typedoc/packagePages.mjs && cp -R apps/docs/typedoc/meta/. apps/docs/src/content/packages/",
+    "docs:gen": "rm -rf apps/docs/src/content/packages && typedoc && node apps/docs/typedoc/packagePages.mjs && cp -R apps/docs/typedoc/meta/. apps/docs/src/content/packages/ && pnpm --filter @tuwaio/sdk-docs i18n:check",
     "openapi:gen": "tsx scripts/generate-openapi.ts",
     "prepare": "husky"
   },

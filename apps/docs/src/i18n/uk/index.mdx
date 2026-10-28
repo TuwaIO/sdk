@@ -1,0 +1,75 @@
+# Вступ
+
+<p align="center">
+  <img
+    src="https://tuwa.io/brand/sdk.png"
+    alt="TUWA SDK"
+    width="450"
+    style={{ borderRadius: '12px', margin: '24px auto', display: 'block' }}
+  />
+</p>
+
+**TUWA SDK** — найкоротший шлях до TUWA в React-застосунку. `@tuwaio/sdk` реекспортує клієнтські пакети Orbit Utils, Pulsar, Satellite Connect, SIWX і Nova UI Kit через підшляхи, а його доповнення `@tuwaio/evm-sdk` і `@tuwaio/solana-sdk` додають мережі, які використовує ваш застосунок. У репозиторії також є `@tuwaio/quasar-sdk` — клієнт API Quasar для вашого сервера.
+
+---
+
+## 🏛️ Місце SDK у TUWA [#️-where-the-sdk-fits-in-tuwa]
+
+TUWA побудовано етапами. Кожен етап спирається на попередні:
+
+| Етап                                       | Проєкти                                                                                                     | Роль                                                    |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| **1 — Базова автентифікація та примітиви** | [SIWX](https://siwx.docs.tuwa.io/), [Orbit Utils](https://orbit.docs.tuwa.io/)                              | Автентифікація CAIP-122 і мультичейн-примітиви          |
+| **2 — Стан та підключення**                | [Satellite Connect](https://satellite.docs.tuwa.io/), [Pulsar](https://pulsar.docs.tuwa.io/)                | Стан підключення гаманців і відстеження транзакцій      |
+| **3 — Бекенд та синхронізація**            | [Quasar](https://docs.tuwa.io/quasar) (Cloud або Community на власному сервері), з **`@tuwaio/quasar-sdk`** | Відстеження транзакцій на сервері, історія та вебхуки   |
+| **4 — Інтерфейс користувача**              | [Nova UI Kit](https://stories.tuwa.io/)                                                                     | Дизайн-система та компоненти React                      |
+| **5 — Рівень інтеграції SDK**              | **`@tuwaio/sdk`**, **`@tuwaio/evm-sdk`**, **`@tuwaio/solana-sdk`**                                          | Клієнтські пакети етапів 1, 2 і 4 в одному встановленні |
+
+Пакети Етапу 5 не додають власної логіки: кожен підшлях — це одна точка входу пакета TUWA, а його довідник розміщено на сайті відповідного проєкту. SDK визначає, які версії пакетів TUWA працюють разом, і дає кожному з них один шлях імпорту.
+
+---
+
+## 🧭 Принципи [#-principles]
+
+1. **Одне встановлення, перевірені версії:** пакети TUWA — це залежності `@tuwaio/sdk` та його доповнень, тож кожен реліз SDK фіксує версії, які працюють разом. React, `viem`, `@wagmi/core`, `@solana/kit` і пакети Wallet Standard залишаються peer-залежностями, тож ваш застосунок тримає лише одну копію кожного з них.
+2. **Лише ті мережі, які ви використовуєте:** `@tuwaio/sdk` не завантажує коду EVM чи Solana. EVM-застосунок додає `@tuwaio/evm-sdk`, Solana-застосунок — `@tuwaio/solana-sdk`, а застосунок з обома мережами — обидва пакети.
+3. **Ті самі пакети, та сама документація:** підшляхи реекспортують пакети TUWA без змін, тож усе, що написано на сайтах Orbit, Pulsar, Satellite Connect, SIWX і Nova UI Kit, діє так, як написано; змінюється лише шлях імпорту.
+4. **Секрети залишаються на сервері:** `@tuwaio/quasar-sdk` автентифікується секретним ключем застосунку Quasar. Його коренева точка входу не містить коду React і працює в середовищах виконання Node.js та Edge; перевірка в браузері — окрема точка входу.
+
+---
+
+## 🧩 Пакети [#-packages]
+
+| Пакет                                        | Рівень | Що надає                                                                                 | Peer-залежності                                                                  |
+| -------------------------------------------- | ------ | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [`@tuwaio/sdk`](/packages/sdk)               | L8     | Orbit, Pulsar, Satellite Connect, SIWX і Nova UI Kit через підшляхи; таблиці стилів Nova | `react`, `react-dom` (>=19.2.3)                                                  |
+| [`@tuwaio/evm-sdk`](/packages/evm-sdk)       | L9     | EVM-пакети Orbit, Satellite Connect, Pulsar, SIWX і Nova Connect                         | `@tuwaio/sdk` ≥ 0.4, `@wagmi/core` 3.x, `viem` 2.x                               |
+| [`@tuwaio/solana-sdk`](/packages/solana-sdk) | L9     | Solana-пакети Orbit, Satellite Connect, Pulsar, SIWX і Nova Connect                      | `@tuwaio/sdk` ≥ 0.4, `@solana/kit` ≥ 8.2, пакети Wallet Standard                 |
+| [`@tuwaio/quasar-sdk`](/packages/quasar-sdk) | L5     | Клієнт API Quasar, попередня перевірка в браузері та CLI для пересилання вебхуків        | `@tuwaio/pulsar-core` ≥ 0.9; `@tuwaio/siwx-react` для `@tuwaio/quasar-sdk/react` |
+
+Сторінки `@tuwaio/sdk`, `@tuwaio/evm-sdk` і `@tuwaio/solana-sdk` перелічують їхні підшляхи з посиланням на довідник кожного реекспортованого пакета. За сторінкою `@tuwaio/quasar-sdk` іде довідник усіх експортів, згенерований із вихідного коду TypeScript.
+
+---
+
+## 💾 Встановлення [#-installation]
+
+```bash
+# React app: the SDK and the chains it uses
+pnpm add @tuwaio/sdk react react-dom
+pnpm add @tuwaio/evm-sdk @wagmi/core viem
+pnpm add @tuwaio/solana-sdk @solana/kit
+
+# Server that syncs transactions to Quasar
+pnpm add @tuwaio/quasar-sdk @tuwaio/pulsar-core
+```
+
+pnpm (від версії 8), npm (від версії 7) і Bun також встановлюють peer-залежності Wallet Standard пакета `@tuwaio/solana-sdk` (`@wallet-standard/app`, `base`, `features`, `react`, `ui` і `ui-registry`); з Yarn додайте їх до команди.
+
+---
+
+## 📚 Що далі [#-next-steps]
+
+- Створіть повний застосунок — підключення гаманців, відстеження транзакцій, вхід через SIWX і синхронізацію з Quasar для EVM і Solana — за **[посібником «Full-Stack React застосунок»](https://docs.tuwa.io/guides/full-stack-react)**.
+- Почніть із готового застосунку: **[стартові шаблони](https://docs.tuwa.io/guides/starter-templates)**.
+- Синхронізуйте транзакції з Quasar за **[посібником «Синхронізація транзакцій із Quasar»](https://docs.tuwa.io/guides/quasar-transaction-sync)**, а про застосунки, ключі, квоти та вебхуки читайте в **[документації Quasar](https://docs.tuwa.io/quasar)**.
+- Перегляньте компоненти в **[Storybook Nova UI Kit](https://stories.tuwa.io/)**, а вихідний код — на **[GitHub](https://github.com/TuwaIO/sdk)**.
