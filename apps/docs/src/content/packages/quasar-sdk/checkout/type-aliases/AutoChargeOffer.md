@@ -2,7 +2,7 @@
 
 > **AutoChargeOffer** = \{ `methodId`: `string`; `request`: [`PermissionRequest`](/packages/quasar-sdk/checkout/interfaces/PermissionRequest.md); `status`: `"available"`; \} \| \{ `permission`: [`SubscriptionPermission`](/packages/quasar-sdk/server/interfaces/SubscriptionPermission.md) \| `null`; `status`: `"active"`; \} \| \{ `reason`: `string`; `status`: `"unavailable"`; \}
 
-Defined in: [checkout/types.ts:303](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L303)
+Defined in: [checkout/types.ts:339](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L339)
 
 For a subscription with automatic charges: whether the page should ask the wallet for the permission.
 

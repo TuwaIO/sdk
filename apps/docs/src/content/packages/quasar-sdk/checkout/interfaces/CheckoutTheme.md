@@ -1,6 +1,6 @@
 # CheckoutTheme
 
-Defined in: [checkout/types.ts:150](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L150)
+Defined in: [checkout/types.ts:186](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L186)
 
 The look of the checkout the merchant chose.
 
@@ -10,7 +10,7 @@ The look of the checkout the merchant chose.
 
 > **accentColor**: `string` \| `null`
 
-Defined in: [checkout/types.ts:154](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L154)
+Defined in: [checkout/types.ts:190](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L190)
 
 Main button and selection color (`#rrggbb`); `null` for the default.
 
@@ -20,6 +20,6 @@ Main button and selection color (`#rrggbb`); `null` for the default.
 
 > **mode**: `"system"` \| `"light"` \| `"dark"`
 
-Defined in: [checkout/types.ts:152](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L152)
+Defined in: [checkout/types.ts:188](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L188)
 
 `system` follows the buyer's device.

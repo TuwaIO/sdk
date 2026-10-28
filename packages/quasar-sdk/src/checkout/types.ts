@@ -69,16 +69,29 @@ export interface CheckoutInvoice {
   /** What was refunded, in minor units (cents) of the invoice currency. */
   refundedTotalMinor: string | null;
   /**
-   * Payments handed over and still on their way: tracked transactions settlement has not verified or rejected yet,
-   * and gasless relays still sending. Quasar versions before the payment grace (October 2026) leave it out.
+   * Payments of the invoice handed over and still on their way, whoever handed them over: tracked transactions
+   * settlement has not verified or rejected yet (recorded within the last 25 minutes: Quasar stops counting a stuck
+   * one), and gasless relays still sending (within 35 minutes). Quasar versions before the payment grace (October 2026)
+   * leave it out.
    */
   pendingPayments?: number;
   /**
-   * The payments that failed, latest first (at most 10): the `txKey` of a transaction settlement rejected (reverted,
-   * dropped, replaced, a wrong amount or recipient), or the `userOpHash` of a gasless relay that failed after Quasar
-   * answered `sending`. Left out like `pendingPayments`.
+   * Every key the page may know a failed payment by, latest first: the `txKey` of a rejected transaction, the hash the
+   * checkout handed over when a sped-up transaction replaced it, and the `userOpHash` of a gasless relay. Left out like
+   * `pendingPayments`; read {@link CheckoutInvoice.rejectedPayments} for why they failed.
    */
   rejectedTxKeys?: string[];
+  /**
+   * The payments that failed, latest first (at most 10), with the reason and whether the buyer may pay again. Quasar
+   * versions before October 28, 2026 leave it out.
+   */
+  rejectedPayments?: CheckoutRejectedPayment[];
+  /**
+   * While the invoice is payable and a payment Quasar learned of before `dueAt` is on its way: until when the invoice
+   * waits for it (`dueAt` plus 30 minutes), so the page can say that the payment was sent in time. `null` otherwise;
+   * left out like `rejectedPayments`.
+   */
+  paymentCountsUntil?: string | null;
   /**
    * The invoice that replaced this one after the seller corrected it: its number and, while it can be paid, its
    * checkout token.
@@ -86,6 +99,29 @@ export interface CheckoutInvoice {
   replacedBy: { number: string | null; checkoutToken: string | null } | null;
   /** The subscription period this invoice bills; `null` for a one-off invoice. */
   subscription: CheckoutSubscription | null;
+}
+
+/** A payment of the invoice that failed, as the checkout lists it ({@link CheckoutInvoice.rejectedPayments}). */
+export interface CheckoutRejectedPayment {
+  /** The transaction's `txKey`, or the `userOpHash` of a gasless relay that failed before it had a transaction. */
+  txKey: string;
+  /**
+   * Why: `reverted`, `cancelled`, `expired` (a Solana blockhash), `no_matching_transfer` (a wrong amount, asset or
+   * recipient), `tx_already_used`, `reference_missing`, `too_early`, `not_found` (the network never returned the
+   * transaction), `timeout` (no receipt in time), `replaced`, `payer_mismatch`, a relay's reason, or
+   * `transaction_failed` when Quasar does not know.
+   */
+  reason: string;
+  /**
+   * Whether the transaction can never pay the invoice, so the buyer may pay again. When `false` (`not_found`,
+   * `timeout`, `replaced`…) the money may still be on its way or already with the merchant: the buyer checks the wallet
+   * before paying again.
+   */
+  final: boolean;
+  /** The relay operation the transaction came from, which the page knows when the relay answered `sending`. */
+  userOpHash?: string;
+  /** The transaction the checkout handed over, when this one replaced it (a payment sped up in the wallet). */
+  original?: string;
 }
 
 /** The subscription period an invoice bills, as the checkout shows it. */
@@ -411,6 +447,10 @@ export interface CheckoutStatusEvent {
    * `expired` invoice open while it is above `0`.
    */
   pendingPayments?: number;
-  /** The payments that failed, latest first, as {@link CheckoutInvoice.rejectedTxKeys}. */
+  /** The keys of the payments that failed, latest first, as {@link CheckoutInvoice.rejectedTxKeys}. */
   rejectedTxKeys?: string[];
+  /** The payments that failed and why, latest first, as {@link CheckoutInvoice.rejectedPayments}. */
+  rejectedPayments?: CheckoutRejectedPayment[];
+  /** Until when a payment sent before the due date counts, as {@link CheckoutInvoice.paymentCountsUntil}. */
+  paymentCountsUntil?: string | null;
 }

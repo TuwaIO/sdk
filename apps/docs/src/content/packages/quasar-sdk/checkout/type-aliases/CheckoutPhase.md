@@ -1,8 +1,8 @@
 # CheckoutPhase
 
-> **CheckoutPhase** = `"loading"` \| `"buyer"` \| `"selectMethod"` \| `"quoting"` \| `"awaitingPayment"` \| `"submitting"` \| `"confirming"` \| `"paid"` \| `"underpaid"` \| `"held"` \| `"refunded"` \| `"expired"` \| `"cancelled"` \| `"blocked"` \| `"error"`
+> **CheckoutPhase** = `"loading"` \| `"buyer"` \| `"selectMethod"` \| `"quoting"` \| `"awaitingPayment"` \| `"submitting"` \| `"confirming"` \| `"unconfirmed"` \| `"paid"` \| `"underpaid"` \| `"held"` \| `"refunded"` \| `"expired"` \| `"cancelled"` \| `"blocked"` \| `"error"`
 
-Defined in: [checkout/store.ts:33](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L33)
+Defined in: [checkout/store.ts:46](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L46)
 
 Where the payment stands:
 
@@ -14,7 +14,13 @@ Where the payment stands:
 - `awaitingPayment`: send `quote.instructions` from the wallet (or sign `quote.gasless`), then
   [CheckoutState.submit](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#submit) or [CheckoutState.relay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#relay).
 - `submitting`: handing the transaction to Quasar.
-- `confirming`: Quasar follows the transaction until it is final.
+- `confirming`: Quasar follows the transaction until it is final. Also while Quasar reports a payment of the
+  invoice on its way that this store did not hand over ([CheckoutState.invoicePaymentOnTheWay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#invoicepaymentontheway): the page was
+  reopened, or Quasar found a Solana Pay transfer): the page does not offer to pay meanwhile.
+- `unconfirmed`: Quasar could not confirm the payment (the network never returned the transaction, no receipt in
+  time…), but it may still have gone through: the page asks the buyer to check the wallet before paying again, and
+  offers no payment; [CheckoutState.payAgain](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#payagain) goes back to it once the buyer did. `error` says why
+  (`payment_unconfirmed`, with the `reason`).
 - `paid`, `underpaid` (the buyer may top it up), `held` (the merchant looks at the payment), `refunded`, `expired`,
   `cancelled`: the invoice's outcome. An invoice that expires while a payment this store handed over (`submit`,
   `relay`) is on its way is not over: the payment may still arrive, and the invoice then becomes `paid` (Quasar

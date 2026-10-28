@@ -24,7 +24,12 @@ import type {
   SubscriptionDetails,
   SubscriptionStart,
 } from '../../packages/quasar-sdk/src';
-import type { CheckoutQuote, CheckoutStatusEvent, CheckoutView } from '../../packages/quasar-sdk/src/checkout';
+import type {
+  CheckoutQuote,
+  CheckoutRejectedPayment,
+  CheckoutStatusEvent,
+  CheckoutView,
+} from '../../packages/quasar-sdk/src/checkout';
 
 const P = '/v1/payments';
 const dateTime = (description: string) => z.string().openapi({ format: 'date-time', description });
@@ -52,7 +57,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     .enum(['open', 'processing', 'paid', 'underpaid', 'held', 'partially_refunded', 'refunded', 'expired', 'cancelled'])
     .openapi('InvoiceStatus', {
       description:
-        '`open` until paid; `processing` while a payment is confirmed; `paid`, `underpaid` (the buyer may top it up), `held` (released or refunded by the merchant), `partially_refunded`, `refunded`; `expired` or `cancelled` without a payment.',
+        '`open` until paid; `processing` while a payment is confirmed; `paid`, `underpaid` (the buyer may top it up), `held` (released or refunded by the merchant), `partially_refunded`, `refunded`; `expired` or `cancelled` without a payment (`expired` up to 30 minutes after `dueAt` while a payment sent before it confirms).',
     });
   const Environment = z.enum(['live', 'test']).openapi('PaymentsEnvironment', {
     description: 'Live or test: the key that issued it decides. Test invoices are paid on test networks.',
@@ -196,7 +201,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       locale: Locale.nullable(),
       issuedAt: dateTime('When it was issued.').nullable(),
       supplyDate: dateTime('Date of supply (BT-72).').nullable(),
-      dueAt: dateTime('When it stops being payable.').nullable(),
+      dueAt: dateTime(
+        'When it stops being payable. A payment Quasar learned of before it (handed over to `/submit` or `/relay`, or a Solana Pay transfer in a block before it) may still confirm for up to 30 minutes after it: the invoice stays payable meanwhile, so `expired` and the `invoice.expired` webhook can come up to 30 minutes after `dueAt`. Confirmed in time, it pays the invoice as usual, except in an asset not pegged to the invoice currency when its block is more than 60 seconds past the end of the locked quote (`held`, `quote_expired`). A payment handed over after `dueAt` is held as late.',
+      ).nullable(),
       seller: InvoiceSeller.nullable(),
       buyer: Buyer.extend({ companyInvoice: z.boolean().optional() }).nullable(),
       expectedPayer: z.string().nullable(),
@@ -254,7 +261,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         .openapi({ description: 'The payment, once there is one.' }),
       reviewReason: z.string().nullable().openapi({
         description:
-          'Why the payment waits for you: `overpaid` when the app flags overpayments, `quote_expired` when it arrived after its locked quote expired.',
+          'Why the payment waits for you: `overpaid` when the app flags overpayments, `quote_expired` when it arrived after its locked quote expired (in an asset not pegged to the invoice currency, a block more than 60 seconds past the end of the quote), `late` when it was handed over after `dueAt` or arrived after the invoice expired or was cancelled.',
       }),
       aml: z.object({ status: z.string(), reasons: z.array(z.string()), coverage: z.string().nullable() }).nullable(),
       receiptNumber: z.string().nullable(),
@@ -555,7 +562,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   const CreateInvoiceRequest = z
     .object({
       ...terms,
-      dueAt: dateTime('When it stops being payable; or give `expiresInMinutes`.').optional(),
+      dueAt: dateTime(
+        'When it stops being payable; or give `expiresInMinutes`. A payment sent before it may still confirm for up to 30 minutes after it.',
+      ).optional(),
       expiresInMinutes: z.number().int().optional().openapi({ description: 'From 5 minutes to 90 days.' }),
       supplyDate: dateTime('Date of supply. Defaults to the issue date.').optional(),
     })
@@ -949,6 +958,28 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     .openapi('PaymentInstructions', {
       description: 'What the wallet sends: the exact amount in base units to `to`; Solana transfers carry `reference`.',
     });
+  const RejectedPayment = z
+    .object({
+      txKey: z.string().openapi({
+        description:
+          "The transaction's `txKey`, or the `userOpHash` of a gasless relay that failed before it had a transaction.",
+      }),
+      reason: z.string().openapi({
+        description:
+          'Why: `reverted`, `cancelled`, `expired`, `no_matching_transfer`, `tx_already_used`, `not_found`, `timeout`, `replaced`, `payer_mismatch`, a relay reason, or `transaction_failed`.',
+      }),
+      final: z
+        .boolean()
+        .openapi({ description: 'Whether the transaction can never pay the invoice: the buyer may pay again.' }),
+      userOpHash: z.string().optional().openapi({ description: 'The relay operation the transaction came from.' }),
+      original: z
+        .string()
+        .optional()
+        .openapi({ description: 'The transaction the checkout handed over, when this one replaced it (sped up).' }),
+    })
+    .openapi('CheckoutRejectedPayment');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkRejectedPayment: z.ZodType<CheckoutRejectedPayment> = RejectedPayment;
   const CheckoutQuote = z
     .object({
       object: z.literal('checkout_quote'),
@@ -1053,7 +1084,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           }),
         ),
         locale: Locale.nullable(),
-        dueAt: z.string().nullable(),
+        dueAt: z.string().nullable().openapi({
+          description:
+            'When it stops being payable. A payment Quasar learned of before it (handed over to `/submit` or `/relay`, or a Solana Pay transfer in a block before it) may still confirm for up to 30 minutes after it: the invoice stays payable meanwhile, so `expired` and the `invoice.expired` webhook can come up to 30 minutes after `dueAt`. Confirmed in time, it pays the invoice as usual, except in an asset not pegged to the invoice currency when its block is more than 60 seconds past the end of the locked quote (`held`, `quote_expired`). A payment handed over after `dueAt` is held as late.',
+        }),
         successUrl: z.string().nullable(),
         cancelUrl: z.string().nullable(),
         amountPaid: z.string().nullable().openapi({ description: 'Base units of the quoted asset received so far.' }),
@@ -1064,11 +1098,19 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         refundedTotalMinor: z.string().nullable().openapi({ description: 'Refunded, in minor units (cents).' }),
         pendingPayments: z.number().optional().openapi({
           description:
-            'Payments handed over and still on their way: tracked transactions not yet verified or rejected, gasless relays still sending.',
+            'Payments of the invoice handed over and still on their way, whoever handed them over: tracked transactions not yet verified or rejected (recorded within the last 25 minutes), gasless relays still sending (within 35 minutes). A page that finds one on its way should not offer to pay.',
         }),
         rejectedTxKeys: z.array(z.string()).optional().openapi({
           description:
-            'The payments that failed, latest first (at most 10): the `txKey` of a rejected transaction, or the `userOpHash` of a gasless relay that failed after answering `sending`.',
+            'Every key a failed payment may be known by, latest first: the `txKey` of a rejected transaction, the hash the checkout handed over when a sped-up transaction replaced it, the `userOpHash` of a gasless relay. Read `rejectedPayments` for why.',
+        }),
+        rejectedPayments: z.array(RejectedPayment).optional().openapi({
+          description:
+            'The payments that failed, latest first (at most 10). `final`: the transaction can never pay the invoice (`reverted`, `cancelled`, `expired` Solana blockhash, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `chain_mismatch`, `no_quote`, `no_payment_method`, a relay the bundler refused or never sent), so the buyer may pay again; otherwise (`not_found`, `timeout`, `replaced`, `payer_mismatch`…) the money may still be on its way or with the merchant: ask the buyer to check the wallet before paying again. A transaction sped up in the wallet is followed under its new hash and not rejected; `original` is the hash the checkout handed over.',
+        }),
+        paymentCountsUntil: z.string().nullable().optional().openapi({
+          description:
+            'While the invoice is payable and a payment Quasar learned of before `dueAt` is on its way: until when the invoice waits for it (`dueAt` plus 30 minutes); `null` otherwise. Say from it, not from the browser clock, that the payment was sent in time.',
         }),
         replacedBy: z
           .object({ number: z.string().nullable(), checkoutToken: z.string().nullable() })
@@ -1242,7 +1284,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     'post',
     '/submit',
     'Submit the payment transaction',
-    'Quasar tracks it; the invoice is settled when it is final. For an EIP-5792 batch, send the hash of its transaction.',
+    'Quasar tracks it; the invoice is settled when it is final. For an EIP-5792 batch, send the hash of its transaction. An `expired` invoice takes it too: the payment is held for the merchant as late (`review.reason` `late`), who credits or returns it. One handed over before `dueAt` keeps the invoice payable for up to 30 minutes past it while it confirms; one handed over after `dueAt` is held as late, even while another payment keeps the invoice payable.',
     {
       request: {
         body: json(
@@ -1373,7 +1415,16 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       rejectedTxKeys: z
         .array(z.string())
         .optional()
-        .openapi({ description: 'The payments that failed, latest first (at most 10).' }),
+        .openapi({ description: 'Every key of the payments that failed, latest first.' }),
+      rejectedPayments: z
+        .array(RejectedPayment)
+        .optional()
+        .openapi({ description: 'The payments that failed and why, latest first (at most 10).' }),
+      paymentCountsUntil: z
+        .string()
+        .nullable()
+        .optional()
+        .openapi({ description: 'Until when a payment sent before `dueAt` counts; `null` without one on its way.' }),
     })
     .openapi('CheckoutStatusEvent');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

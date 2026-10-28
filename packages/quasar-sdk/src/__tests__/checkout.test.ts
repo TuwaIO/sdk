@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { type CheckoutApi, createCheckoutStore } from '../checkout';
-import type { CheckoutInvoice, CheckoutView } from '../checkout/types';
+import type { CheckoutInvoice, CheckoutRejectedPayment, CheckoutStatusEvent, CheckoutView } from '../checkout/types';
 
 const BASE = 'https://quasar.example';
 const fetchMock = vi.fn();
@@ -140,8 +140,19 @@ const store = (options: { EventSource?: unknown } = { EventSource: FakeEventSour
 const signal = (
   status: string,
   ledgerSeq: number,
-  signals: { pendingPayments?: number; rejectedTxKeys?: string[] } = {},
+  signals: Pick<
+    CheckoutStatusEvent,
+    'pendingPayments' | 'rejectedTxKeys' | 'rejectedPayments' | 'paymentCountsUntil'
+  > = {},
 ) => ({ status, ledgerSeq, txHash: null, amountPaid: null, quoteExpiresAt: null, ...signals });
+
+/** A payment Quasar rejected, with its reason and whether the buyer may pay again. */
+const rejection = (txKey: string, reason: string, final: boolean, extra: Partial<CheckoutRejectedPayment> = {}) => ({
+  txKey,
+  reason,
+  final,
+  ...extra,
+});
 
 describe('createCheckoutStore', () => {
   beforeEach(() => {
@@ -865,5 +876,275 @@ describe('createCheckoutStore', () => {
     expect(checkout.getState().paymasterUrl).toBe('sim://checkout/paymaster');
     expect(fetchMock).not.toHaveBeenCalled();
     checkout.getState().destroy();
+  });
+});
+
+describe('createCheckoutStore: payments on their way and why they failed', () => {
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal('fetch', fetchMock);
+    FakeEventSource.instances = [];
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  /** Answers the submit and relay calls, and reads of the checkout with `invoice` (and the quote). */
+  const answer = (invoice: Partial<CheckoutInvoice> = {}, quote: unknown = QUOTE) =>
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      if (path.endsWith('/submit')) return json({ txKey: '0xfeed', status: 'open' }, 202);
+      if (path.endsWith('/relay')) return json({ status: 'sending', userOpHash: '0xop' });
+      return json(view({ quote: quote as never, invoice: { ...view().invoice, ...invoice } }));
+    });
+
+  it('asks the buyer to check the wallet, without offering to pay, when the payment may still have gone through', async () => {
+    answer({ rejectedTxKeys: [], rejectedPayments: [] });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xFEED' });
+    const events = FakeEventSource.instances[0];
+    // The node never returned the transaction: it may still be mined, or have been sent again from the wallet
+    events.emit(
+      'status',
+      signal('open', 5, {
+        pendingPayments: 0,
+        rejectedTxKeys: ['0xfeed'],
+        rejectedPayments: [rejection('0xfeed', 'not_found', false)],
+      }),
+    );
+    expect(checkout.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      paymentOnTheWay: false,
+      error: { code: 'payment_unconfirmed', reason: 'not_found' },
+    });
+    // The invoice is still open: the store keeps following it, and a payment that arrives still ends it
+    expect(events.closed).toBe(false);
+    events.emit('status', signal('paid', 6, { pendingPayments: 0, rejectedTxKeys: ['0xfeed'] }));
+    expect(checkout.getState()).toMatchObject({ phase: 'paid' });
+  });
+
+  it('goes back to the payment once the buyer checked the wallet', async () => {
+    answer({ rejectedTxKeys: [], rejectedPayments: [] });
+    const checkout = store();
+    await checkout.getState().load();
+    // Nothing to do outside the check
+    checkout.getState().payAgain();
+    expect(checkout.getState().phase).toBe('awaitingPayment');
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    checkout.getState().payAgain();
+    expect(checkout.getState().phase).toBe('confirming');
+    FakeEventSource.instances[0].emit(
+      'status',
+      signal('open', 5, { pendingPayments: 0, rejectedPayments: [rejection('0xfeed', 'timeout', false)] }),
+    );
+    expect(checkout.getState().phase).toBe('unconfirmed');
+    checkout.getState().payAgain();
+    expect(checkout.getState()).toMatchObject({ phase: 'awaitingPayment', error: null, quote: { methodId: 'ap_1' } });
+    checkout.getState().destroy();
+  });
+
+  it('offers to pay again only after a final rejection, and says why', async () => {
+    answer({ rejectedTxKeys: [], rejectedPayments: [] });
+
+    // Reverted on-chain
+    const reverted = store();
+    await reverted.getState().load();
+    await reverted.getState().submit({ txKey: '0xfeed' });
+    FakeEventSource.instances[0].emit(
+      'status',
+      signal('open', 5, { pendingPayments: 0, rejectedPayments: [rejection('0xfeed', 'reverted', true)] }),
+    );
+    expect(reverted.getState()).toMatchObject({
+      phase: 'awaitingPayment',
+      error: { code: 'payment_failed', reason: 'reverted' },
+    });
+    reverted.getState().destroy();
+
+    // The sped-up transaction that replaced this page's one carried a wrong amount: rejected by the original hash
+    const spedUp = store();
+    await spedUp.getState().load();
+    await spedUp.getState().submit({ txKey: '0xfeed' });
+    FakeEventSource.instances[1].emit(
+      'status',
+      signal('open', 5, {
+        pendingPayments: 1,
+        rejectedPayments: [rejection('0xfaster', 'no_matching_transfer', true, { original: '0xfeed' })],
+      }),
+    );
+    expect(spedUp.getState()).toMatchObject({ paymentOnTheWay: false, error: { code: 'payment_failed' } });
+    spedUp.getState().destroy();
+  });
+
+  it('asks to check the wallet when the invoice goes back to open without a final rejection', async () => {
+    answer({ rejectedTxKeys: [], rejectedPayments: [] });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    const events = FakeEventSource.instances[0];
+    events.emit('status', signal('processing', 4, { pendingPayments: 1, rejectedPayments: [] }));
+    events.emit(
+      'status',
+      signal('open', 5, { pendingPayments: 0, rejectedPayments: [rejection('0xfeed', 'timeout', false)] }),
+    );
+    expect(checkout.getState()).toMatchObject({ phase: 'unconfirmed', error: { code: 'payment_unconfirmed' } });
+    checkout.getState().destroy();
+  });
+
+  it('never says that nothing arrived on an expired invoice whose payment may still have gone through', async () => {
+    answer({ rejectedTxKeys: [], rejectedPayments: [] });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    const events = FakeEventSource.instances[0];
+    events.emit('status', signal('expired', 5, { pendingPayments: 1, rejectedPayments: [] }));
+    events.emit(
+      'status',
+      signal('expired', 6, { pendingPayments: 0, rejectedPayments: [rejection('0xfeed', 'not_found', false)] }),
+    );
+    expect(checkout.getState()).toMatchObject({
+      phase: 'expired',
+      paymentOnTheWay: false,
+      error: { code: 'payment_unconfirmed', reason: 'not_found' },
+    });
+    expect(events.closed).toBe(true);
+  });
+
+  it('recognises a relay answered `sending` and rejected later by its user operation hash', async () => {
+    answer({ rejectedTxKeys: [], rejectedPayments: [] });
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().relay(`0x${'1'.repeat(130)}`);
+    // Another payment of the invoice is still on its way: only the user operation hash tells this one failed
+    FakeEventSource.instances[0].emit(
+      'status',
+      signal('open', 5, {
+        pendingPayments: 1,
+        rejectedTxKeys: ['0xtransfer', '0xop'],
+        rejectedPayments: [rejection('0xtransfer', 'reverted', true, { userOpHash: '0xop' })],
+      }),
+    );
+    expect(checkout.getState()).toMatchObject({ paymentOnTheWay: false, error: { code: 'payment_failed' } });
+    checkout.getState().destroy();
+  });
+
+  it('chooses the method again when the locked price expired before the payment failed', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-28T12:00:00.000Z'));
+    answer({ rejectedTxKeys: [], rejectedPayments: [] }, { ...QUOTE, expiresAt: '2026-10-28T12:05:00.000Z' });
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().phase).toBe('awaitingPayment');
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    vi.setSystemTime(new Date('2026-10-28T12:10:00.000Z'));
+    FakeEventSource.instances[0].emit(
+      'status',
+      signal('open', 5, { pendingPayments: 0, rejectedPayments: [rejection('0xfeed', 'reverted', true)] }),
+    );
+    expect(checkout.getState()).toMatchObject({
+      phase: 'selectMethod',
+      quote: null,
+      error: { code: 'payment_failed' },
+    });
+    checkout.getState().destroy();
+  });
+
+  it('tells the page until when a payment sent before the deadline counts, as Quasar reports it', async () => {
+    answer({ pendingPayments: 0, rejectedPayments: [], paymentCountsUntil: null });
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().paymentCountsUntil).toBeNull();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    const events = FakeEventSource.instances[0];
+    events.emit('status', signal('open', 5, { pendingPayments: 1, paymentCountsUntil: '2026-10-28T12:30:00.000Z' }));
+    expect(checkout.getState().paymentCountsUntil).toBe('2026-10-28T12:30:00.000Z');
+    events.emit('status', signal('paid', 6, { pendingPayments: 0, paymentCountsUntil: null }));
+    expect(checkout.getState().paymentCountsUntil).toBeNull();
+  });
+
+  it('shows a payment of the invoice on its way on a reopened page instead of the payment', async () => {
+    answer({
+      pendingPayments: 1,
+      rejectedTxKeys: ['0xold'],
+      rejectedPayments: [rejection('0xold', 'reverted', true)],
+      paymentCountsUntil: '2026-10-28T12:30:00.000Z',
+    });
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState()).toMatchObject({
+      phase: 'confirming',
+      invoicePaymentOnTheWay: true,
+      paymentOnTheWay: false,
+      paymentCountsUntil: '2026-10-28T12:30:00.000Z',
+    });
+    const events = FakeEventSource.instances[0];
+    events.emit(
+      'status',
+      signal('paid', 6, { pendingPayments: 0, rejectedPayments: [rejection('0xold', 'reverted', true)] }),
+    );
+    expect(checkout.getState()).toMatchObject({ phase: 'paid', invoicePaymentOnTheWay: false });
+    expect(events.closed).toBe(true);
+  });
+
+  it('goes back to the payment of a reopened page once that payment failed for good, or asks to check the wallet', async () => {
+    const rejected = [rejection('0xold', 'reverted', true)];
+    answer({ pendingPayments: 1, rejectedTxKeys: ['0xold'], rejectedPayments: rejected });
+
+    const failed = store();
+    await failed.getState().load();
+    FakeEventSource.instances[0].emit(
+      'status',
+      signal('open', 5, { pendingPayments: 0, rejectedPayments: [rejection('0xnew', 'reverted', true), ...rejected] }),
+    );
+    expect(failed.getState()).toMatchObject({
+      phase: 'awaitingPayment',
+      invoicePaymentOnTheWay: false,
+      error: { code: 'payment_failed' },
+    });
+    failed.getState().destroy();
+
+    // No longer on its way and not rejected either (Quasar stopped counting a stuck one): the buyer checks the wallet
+    const stuck = store();
+    await stuck.getState().load();
+    FakeEventSource.instances[1].emit('status', signal('open', 5, { pendingPayments: 0, rejectedPayments: rejected }));
+    expect(stuck.getState()).toMatchObject({ phase: 'unconfirmed', error: { code: 'payment_unconfirmed' } });
+    stuck.getState().destroy();
+  });
+
+  it('stops offering to pay when Quasar finds a payment of the invoice, such as a scanned QR code', async () => {
+    answer({ pendingPayments: 0, rejectedPayments: [] });
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().phase).toBe('awaitingPayment');
+    FakeEventSource.instances[0].emit('status', signal('open', 5, { pendingPayments: 1, rejectedPayments: [] }));
+    expect(checkout.getState()).toMatchObject({ phase: 'confirming', invoicePaymentOnTheWay: true });
+    checkout.getState().destroy();
+  });
+
+  it('follows an expired invoice whose payment is on its way on a reopened page, also when the stream ends', async () => {
+    vi.useFakeTimers();
+    let pending = 1;
+    fetchMock.mockImplementation(async () =>
+      json(view({ invoice: { ...view().invoice, status: 'expired', pendingPayments: pending, rejectedPayments: [] } })),
+    );
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', invoicePaymentOnTheWay: true });
+    const events = FakeEventSource.instances[0];
+    expect(events.closed).toBe(false);
+    events.emit('status', signal('expired', 5, { pendingPayments: 1, rejectedPayments: [] }));
+    // Quasar keeps this stream open while the payment is on its way: the browser reconnects when it ends
+    events.end();
+    expect(events.closed).toBe(false);
+    // No payment on its way any longer: Quasar ends the stream, the store reads the invoice instead
+    pending = 0;
+    events.emit('status', signal('expired', 6, { pendingPayments: 0, rejectedPayments: [] }));
+    expect(events.closed).toBe(true);
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', invoicePaymentOnTheWay: false });
+    const reads = fetchMock.mock.calls.length;
+    await vi.advanceTimersByTimeAsync(10 * 60_000);
+    expect(fetchMock).toHaveBeenCalledTimes(reads);
   });
 });
