@@ -102,9 +102,9 @@
   "devDependencies": {
     "@tuwaio/satellite-core": "^0.11.1",
     "@tuwaio/sdk": "workspace:^",
-    "@wagmi/core": "^3.6.5",
+    "@wagmi/core": "^3.6.7",
     "tsup": "^9.0.0",
     "typescript": "6.0.3",
-    "viem": "^2.57.7"
+    "viem": "^2.57.12"
   }
 }
