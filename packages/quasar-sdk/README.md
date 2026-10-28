@@ -145,6 +145,8 @@ checkout.subscribe(({ phase }) => console.log(phase)); // confirming, then paid
 
 The page's origin must be one of the domains of your Quasar app, when the app lists any.
 
+The deadline is Quasar's: the store never ends a confirming payment by the clock. When the invoice expires while a payment the store handed over still confirms, `phase` becomes `expired` and the store keeps following the invoice: the payment may still make it `paid` (Quasar lets a payment it learned of before `dueAt` confirm) or `held` (a late payment the merchant accepts or returns). When `txKey` is set (a relayed payment has it once Quasar returns its hash), tell the buyer their payment may still arrive rather than that nothing was charged.
+
 ### Webhook relay
 
 Add a webhook endpoint with a `localhost` URL in the Quasar dashboard, put its signing secret in `.env.local` and start the relay next to your dev server:

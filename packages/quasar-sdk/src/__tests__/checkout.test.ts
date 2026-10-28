@@ -447,6 +447,125 @@ describe('createCheckoutStore', () => {
     checkout.getState().destroy();
   });
 
+  it('keeps following an invoice that expired while its payment was on the way, until the payment ends it', async () => {
+    const status = (value: string, ledgerSeq: number) => ({
+      status: value,
+      ledgerSeq,
+      txHash: '0xfeed',
+      amountPaid: null,
+      quoteExpiresAt: null,
+    });
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      return path.endsWith('/submit') ? json({ txKey: '0xfeed', status: 'processing' }, 202) : json(view());
+    });
+
+    // The engine held the payment that arrived after the invoice closed
+    const late = store();
+    await late.getState().load();
+    late.getState().selectMethod('ap_1');
+    await late.getState().submit({ txKey: '0xfeed' });
+    const lateEvents = FakeEventSource.instances[0];
+    lateEvents.emit('status', status('processing', 4));
+    lateEvents.emit('status', status('expired', 5));
+    expect(late.getState()).toMatchObject({ phase: 'expired', invoiceStatus: 'expired', txKey: '0xfeed' });
+    expect(lateEvents.closed).toBe(false);
+    lateEvents.emit('status', status('held', 6));
+    expect(late.getState()).toMatchObject({ phase: 'held', invoiceStatus: 'held' });
+    expect(lateEvents.closed).toBe(true);
+
+    // The engine took the payment it learned of before the deadline
+    const grace = store();
+    await grace.getState().load();
+    await grace.getState().submit({ txKey: '0xfeed' });
+    const graceEvents = FakeEventSource.instances[1];
+    graceEvents.emit('status', status('expired', 5));
+    expect(graceEvents.closed).toBe(false);
+    graceEvents.emit('status', status('paid', 6));
+    expect(grace.getState()).toMatchObject({ phase: 'paid', invoiceStatus: 'paid' });
+    expect(graceEvents.closed).toBe(true);
+
+    // Leaving the page still ends it
+    const left = store();
+    await left.getState().load();
+    await left.getState().submit({ txKey: '0xfeed' });
+    const leftEvents = FakeEventSource.instances[2];
+    leftEvents.emit('status', status('expired', 5));
+    left.getState().destroy();
+    expect(leftEvents.closed).toBe(true);
+  });
+
+  it('stops at an expired invoice when no payment of this page is on the way', async () => {
+    const status = (value: string, ledgerSeq: number) => ({
+      status: value,
+      ledgerSeq,
+      txHash: null,
+      amountPaid: null,
+      quoteExpiresAt: null,
+    });
+    fetchMock.mockImplementation(async (input: string | Request) => {
+      const path = new URL(input instanceof Request ? input.url : input).pathname;
+      return path.endsWith('/submit') ? json({ txKey: '0xfeed', status: 'processing' }, 202) : json(view());
+    });
+
+    // The payment failed and the buyer let the invoice run out
+    const failed = store();
+    await failed.getState().load();
+    await failed.getState().submit({ txKey: '0xfeed' });
+    const failedEvents = FakeEventSource.instances[0];
+    failedEvents.emit('status', status('processing', 4));
+    failedEvents.emit('status', status('open', 5));
+    failedEvents.emit('status', status('expired', 6));
+    expect(failed.getState().phase).toBe('expired');
+    expect(failedEvents.closed).toBe(true);
+
+    // Nothing was sent from this page
+    const idle = store();
+    await idle.getState().load();
+    const idleEvents = FakeEventSource.instances[1];
+    idleEvents.emit('status', status('expired', 3));
+    expect(idleEvents.closed).toBe(true);
+  });
+
+  it('keeps reading an invoice that expired while its payment was on the way, without an event stream', async () => {
+    vi.useFakeTimers();
+    const invoice = view().invoice;
+    fetchMock
+      .mockResolvedValueOnce(json(view({ quote: QUOTE as never })))
+      .mockResolvedValueOnce(json({ txKey: '0xfeed', status: 'processing' }, 202))
+      .mockResolvedValueOnce(json(view({ invoice: { ...invoice, status: 'processing' } })))
+      .mockResolvedValueOnce(json(view({ invoice: { ...invoice, status: 'expired' } })))
+      .mockResolvedValueOnce(json(view({ invoice: { ...invoice, status: 'held', amountPaid: '49000000' } })));
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(checkout.getState().phase).toBe('confirming');
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(checkout.getState().phase).toBe('expired');
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(checkout.getState().phase).toBe('held');
+    // Held: no more reads
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
+  });
+
+  it("never expires a confirming payment by the clock: the deadline is the engine's", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-28T12:00:00.000Z'));
+    const invoice = { ...view().invoice, dueAt: '2026-10-28T12:00:30.000Z' };
+    fetchMock
+      .mockResolvedValueOnce(json(view({ invoice, quote: QUOTE as never })))
+      .mockResolvedValueOnce(json({ txKey: '0xfeed', status: 'processing' }, 202));
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    await vi.advanceTimersByTimeAsync(10 * 60_000);
+    expect(checkout.getState()).toMatchObject({ phase: 'confirming', error: null });
+    expect(FakeEventSource.instances[0].closed).toBe(false);
+    checkout.getState().destroy();
+  });
+
   it('reads the invoice every few seconds where there is no event stream', async () => {
     vi.useFakeTimers();
     fetchMock

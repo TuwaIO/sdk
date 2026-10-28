@@ -2,7 +2,7 @@
 
 > **CheckoutPhase** = `"loading"` \| `"buyer"` \| `"selectMethod"` \| `"quoting"` \| `"awaitingPayment"` \| `"submitting"` \| `"confirming"` \| `"paid"` \| `"underpaid"` \| `"held"` \| `"refunded"` \| `"expired"` \| `"cancelled"` \| `"blocked"` \| `"error"`
 
-Defined in: [checkout/store.ts:30](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L30)
+Defined in: [checkout/store.ts:34](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L34)
 
 Where the payment stands:
 
@@ -16,6 +16,10 @@ Where the payment stands:
 - `submitting`: handing the transaction to Quasar.
 - `confirming`: Quasar follows the transaction until it is final.
 - `paid`, `underpaid` (the buyer may top it up), `held` (the merchant looks at the payment), `refunded`, `expired`,
-  `cancelled`: the invoice's outcome.
+  `cancelled`: the invoice's outcome. An invoice that expires while a payment this store handed over (`submit`,
+  `relay`) still confirms is not over: the payment may still arrive, and the invoice then becomes `paid` (Quasar
+  lets a payment it learned of before `dueAt` confirm) or `held` (a late payment the merchant accepts or returns).
+  The store keeps following it; `txKey` (for a relayed payment, once Quasar returns its hash) tells the page that a
+  payment is on its way.
 - `blocked`: AML screening refused the payer's wallet.
 - `error`: the checkout could not be read (a wrong or retired link, the network).

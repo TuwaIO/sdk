@@ -23,7 +23,11 @@ import type { CheckoutApi, CheckoutQuote, CheckoutStatusEvent, CheckoutView, Gra
  * - `submitting`: handing the transaction to Quasar.
  * - `confirming`: Quasar follows the transaction until it is final.
  * - `paid`, `underpaid` (the buyer may top it up), `held` (the merchant looks at the payment), `refunded`, `expired`,
- *   `cancelled`: the invoice's outcome.
+ *   `cancelled`: the invoice's outcome. An invoice that expires while a payment this store handed over (`submit`,
+ *   `relay`) still confirms is not over: the payment may still arrive, and the invoice then becomes `paid` (Quasar
+ *   lets a payment it learned of before `dueAt` confirm) or `held` (a late payment the merchant accepts or returns).
+ *   The store keeps following it; `txKey` (for a relayed payment, once Quasar returns its hash) tells the page that a
+ *   payment is on its way.
  * - `blocked`: AML screening refused the payer's wallet.
  * - `error`: the checkout could not be read (a wrong or retired link, the network).
  */
@@ -94,7 +98,10 @@ export interface CheckoutState {
    * Reads the checkout (`GET`) and, while the invoice can change, follows it (server-sent events, else a read every
    * `pollMs`). An event that brings an outcome (underpaid, held, paid, refunded, expired, cancelled) updates
    * `checkout.invoice.amountPaid` at once and reads the checkout again for the rest (`review`, the refund, the invoice
-   * that replaced it, `autoCharge`). Sets `phase` `error` when the link is wrong or retired.
+   * that replaced it, `autoCharge`). It stops at a final state, except `expired` while a payment of this store
+   * confirms: it then follows the invoice until another outcome arrives (`paid`, `held`) or `destroy` is called. It
+   * never expires the invoice by the clock: past `dueAt`, a confirming payment stays `confirming` until Quasar reports
+   * the outcome. Sets `phase` `error` when the link is wrong or retired.
    *
    * @returns Resolves when the checkout is read.
    */
@@ -275,8 +282,9 @@ function errorOf(error: unknown): CheckoutError {
  *
  * Side effects: requests to `<baseUrl>/v1/payments/checkout/<token>` (the page's origin must be one of the app's
  * domains, when it lists any); after `load`, an `EventSource` on its `events` route (or a `GET` every `pollMs`) until
- * the invoice reaches a final state or `destroy` is called, and a `GET` of the checkout when an event brings an
- * outcome. Nothing is stored in the browser.
+ * the invoice reaches a final state or `destroy` is called (an invoice that expired while a payment of this store
+ * confirms is followed on, until that payment ends it as `paid` or `held`), and a `GET` of the checkout when an event
+ * brings an outcome. Nothing is stored in the browser.
  *
  * @param options - The checkout token and optional overrides.
  * @returns The store; call `load()` first.
@@ -305,6 +313,12 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
   let source: EventSourceLike | null = null;
   let poll: ReturnType<typeof setInterval> | null = null;
   let destroyed = false;
+  /**
+   * A payment this page handed to Quasar (`submit`, `relay`) that has not ended yet: an invoice that expires while it
+   * confirms may still be paid (the engine lets a payment it learned of before `dueAt` confirm) or hold it (a late
+   * payment), so the store keeps following it.
+   */
+  let paymentOnTheWay = false;
 
   const store = createStore<CheckoutState>()((set, get) => {
     /** Sets fields and the URLs that follow from them. */
@@ -357,6 +371,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       if (event.status === 'open') {
         // Back to open after processing: the transaction failed or was rejected, the buyer may pay again
         if (previous === 'processing') {
+          paymentOnTheWay = false;
           partial.phase = quote ? 'awaitingPayment' : 'selectMethod';
           partial.error = { code: 'payment_failed', message: 'The payment did not go through. Try again.' };
         } else if (phase === 'loading') {
@@ -366,7 +381,11 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         partial.phase = phaseOfStatus(event.status);
       }
       update(partial);
-      if (FINAL.has(event.status)) stopWatching();
+      // Expired while this page's payment confirms: the payment still ends it (paid, or held as a late payment)
+      if (FINAL.has(event.status) && !(event.status === 'expired' && paymentOnTheWay)) {
+        paymentOnTheWay = false;
+        stopWatching();
+      }
       if (!view && event.status !== previous && OUTCOMES.has(event.status)) void refreshView();
     };
 
@@ -533,6 +552,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         update({ phase: 'submitting', error: null });
         try {
           await api.submit(params);
+          paymentOnTheWay = true;
           update({ txKey: params.txKey, phase: 'confirming' });
           watch();
           return true;
@@ -547,6 +567,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         update({ phase: 'submitting', error: null });
         try {
           const relayed = await api.relay(signature);
+          paymentOnTheWay = true;
           update({ txKey: relayed.txHash ?? null, phase: 'confirming' });
           watch();
           return true;
