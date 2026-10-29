@@ -69,7 +69,14 @@ export type RefundStore = StoreApi<RefundState>;
 
 function errorOf(error: unknown): CheckoutError {
   if (error instanceof QuasarSDKError) {
-    return { code: error.code ?? 'request_failed', message: error.message, status: error.status, issues: error.issues };
+    const other = error.details?.invoice;
+    return {
+      code: error.code ?? 'request_failed',
+      message: error.message,
+      status: error.status,
+      issues: error.issues,
+      ...(typeof other === 'string' ? { otherInvoice: other } : {}),
+    };
   }
   return { code: 'request_failed', message: error instanceof Error ? error.message : String(error) };
 }

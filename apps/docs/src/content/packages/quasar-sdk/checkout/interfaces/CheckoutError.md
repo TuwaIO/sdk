@@ -32,6 +32,18 @@ Stable code.
 
 ***
 
+### held?
+
+> `optional` **held?**: `true`
+
+Defined in: [checkout/store.ts:140](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L140)
+
+Set on a `payment_mismatch` with the reason `tx_already_used` when another invoice holds the transfer for a refund
+only ([CheckoutRejectedPayment.held](/packages/quasar-sdk/checkout/interfaces/CheckoutRejectedPayment.md#held)): say that the transaction is tied to another invoice, never that it pays
+one.
+
+***
+
 ### issues?
 
 > `optional` **issues?**: [`QuasarRequestIssue`](/packages/quasar-sdk/server/interfaces/QuasarRequestIssue.md)[]
@@ -49,6 +61,28 @@ The fields at fault of an invalid request.
 Defined in: [checkout/store.ts:97](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L97)
 
 What to show or log.
+
+***
+
+### originWallet?
+
+> `optional` **originWallet?**: `string`
+
+Defined in: [checkout/store.ts:150](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L150)
+
+The wallet that paid the invoice first, on `payer_mismatch` (`409`) of [CheckoutState.requestQuote](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#requestquote): Quasar
+prices the rest of an underpaid invoice only for that wallet, so the buyer pays the rest from it.
+
+***
+
+### otherInvoice?
+
+> `optional` **otherInvoice?**: `string`
+
+Defined in: [checkout/store.ts:145](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L145)
+
+The other invoice Quasar names: the one a rejected transaction is credited to or held on, or the one whose hold
+the merchant refunds instead (`payment_held_elsewhere` of a refund, its `details.invoice`).
 
 ***
 

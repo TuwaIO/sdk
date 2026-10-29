@@ -1,6 +1,6 @@
 # PayerProofConfirmation
 
-Defined in: [checkout/types.ts:347](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L347)
+Defined in: [checkout/types.ts:356](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L356)
 
 What `POST payer-proof` answers: the wallet's confirmation of the invoice, as Quasar recorded it.
 
@@ -10,7 +10,7 @@ What `POST payer-proof` answers: the wallet's confirmation of the invoice, as Qu
 
 > **chainId**: `string`
 
-Defined in: [checkout/types.ts:357](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L357)
+Defined in: [checkout/types.ts:366](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L366)
 
 The CAIP-2 network it confirmed on.
 
@@ -20,7 +20,7 @@ The CAIP-2 network it confirmed on.
 
 > **confirmedAt**: `string`
 
-Defined in: [checkout/types.ts:359](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L359)
+Defined in: [checkout/types.ts:368](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L368)
 
 When.
 
@@ -30,7 +30,7 @@ When.
 
 > **kind**: [`PayerProofKind`](/packages/quasar-sdk/checkout/type-aliases/PayerProofKind.md)
 
-Defined in: [checkout/types.ts:355](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L355)
+Defined in: [checkout/types.ts:364](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L364)
 
 How it confirmed.
 
@@ -40,7 +40,7 @@ How it confirmed.
 
 > **object**: `"payer_proof"`
 
-Defined in: [checkout/types.ts:349](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L349)
+Defined in: [checkout/types.ts:358](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L358)
 
 Always `payer_proof`.
 
@@ -50,7 +50,7 @@ Always `payer_proof`.
 
 > **payer**: `string`
 
-Defined in: [checkout/types.ts:351](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L351)
+Defined in: [checkout/types.ts:360](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L360)
 
 The wallet, as a CAIP-10 account.
 
@@ -60,6 +60,6 @@ The wallet, as a CAIP-10 account.
 
 > **proven**: `true`
 
-Defined in: [checkout/types.ts:353](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L353)
+Defined in: [checkout/types.ts:362](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L362)
 
 Always `true`.

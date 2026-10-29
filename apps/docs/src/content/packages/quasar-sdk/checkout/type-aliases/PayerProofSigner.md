@@ -2,7 +2,7 @@
 
 > **PayerProofSigner** = (`message`, `request`) => `Promise`\<`string`\>
 
-Defined in: [checkout/store.ts:167](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L167)
+Defined in: [checkout/store.ts:184](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L184)
 
 Signs the message of a payer proof with the connected wallet: `personal_sign` (EIP-191) of `message` exactly as it
 is, from `request.payer` (a smart wallet signs it through its own flow, ERC-1271 or ERC-6492). Rejects when the buyer

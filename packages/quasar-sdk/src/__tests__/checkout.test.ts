@@ -2631,6 +2631,106 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     checkout.getState().destroy();
   });
 
+  // UX review 8, item 1: a cancelled signature on a method the relay may pay never blocks a new price
+  it('quotes an expired price after a cancelled signature on a relayed method', async () => {
+    answer();
+    const checkout = store();
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_gasless');
+    checkout.getState().setPayer(PAYER);
+    expect(await checkout.getState().requestQuote()).not.toBeNull();
+
+    // "Confirm to pay", then Cancel: the wallet never answers
+    const sign = vi.fn(() => new Promise<string>(() => undefined));
+    void checkout.getState().confirmPayer(sign);
+    await vi.waitFor(() => expect(sign).toHaveBeenCalled());
+    expect(checkout.getState().payerProof).toBe('unless_relayed');
+
+    // The price expires: "New price" locks a new one, and the relay still confirms the wallet
+    checkout.getState().releaseQuote();
+    expect(await checkout.getState().requestQuote()).not.toBeNull();
+    expect(checkout.getState()).toMatchObject({ phase: 'awaitingPayment', error: null, payerProof: 'unless_relayed' });
+    checkout.getState().destroy();
+  });
+
+  // UX review 8, item 2: the wallet confirmed through an earlier prompt; declining the later one is no error
+  it('sets no error when the buyer declines a later prompt of a wallet already confirmed', async () => {
+    answer();
+    const checkout = store();
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_evm');
+    checkout.getState().setPayer(PAYER);
+    let answerFirst: (signature: string) => void = () => undefined;
+    const first = checkout.getState().confirmPayer(
+      () =>
+        new Promise<string>((resolve) => {
+          answerFirst = resolve;
+        }),
+    );
+    let declineSecond: (reason: Error) => void = () => undefined;
+    const secondSign = vi.fn(
+      () =>
+        new Promise<string>((_, reject) => {
+          declineSecond = reject;
+        }),
+    );
+    const second = checkout.getState().confirmPayer(secondSign);
+    await vi.waitFor(() => expect(secondSign).toHaveBeenCalled());
+    answerFirst('0xsig');
+    expect(await first).toBe(true);
+    expect(checkout.getState().payerProof).toBe('confirmed');
+    expect(await checkout.getState().requestQuote()).not.toBeNull();
+
+    declineSecond(new Error('User rejected'));
+    await second;
+    expect(checkout.getState()).toMatchObject({ payerProof: 'confirmed', error: null, phase: 'awaitingPayment' });
+    checkout.getState().destroy();
+  });
+
+  // Owner, 2026-10-29: a transfer held on another invoice for a refund only pays nothing
+  it('names a transfer held on another invoice as tied to it, never as paying it', async () => {
+    const held = rejection('0xfeed', 'tx_already_used', true, { movedMoney: true, held: true, otherInvoice: 'inv_2' });
+    answer({ invoice: { ...view().invoice, pendingPayments: 0, rejectedPayments: [held] } });
+    const reopened = store({ EventSource: null });
+    await reopened.getState().load();
+    expect(reopened.getState().error).toMatchObject({
+      code: 'payment_mismatch',
+      reason: 'tx_already_used',
+      held: true,
+      otherInvoice: 'inv_2',
+    });
+    expect(reopened.getState().error?.message).toMatch(/tied to another invoice/);
+    expect(reopened.getState().error?.message).not.toMatch(/pays/);
+    reopened.getState().destroy();
+  });
+
+  // Owner, 2026-10-29: the rest of an underpaid invoice comes from the wallet that paid first
+  it('names the wallet that paid first when Quasar refuses a price for the rest from another one', async () => {
+    answer(
+      { invoice: { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'] },
+      {
+        quote: () =>
+          json(
+            {
+              error: {
+                code: 'payer_mismatch',
+                message: 'Pay the rest from the wallet that paid first',
+                originWallet: OTHER,
+              },
+            },
+            409,
+          ),
+      },
+    );
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_gasless');
+    checkout.getState().setPayer(PAYER);
+    expect(await checkout.getState().requestQuote()).toBeNull();
+    expect(checkout.getState().error).toMatchObject({ code: 'payer_mismatch', status: 409, originWallet: OTHER });
+    checkout.getState().destroy();
+  });
+
   // UX review 3: Quasar's word wins over a checkout read before the merchant changed the method
   it('asks for the confirmation when Quasar demands one for a method the checkout announced without it', async () => {
     answer(

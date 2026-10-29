@@ -148,7 +148,8 @@ export interface CheckoutRejectedPayment {
   /**
    * Why: `reverted`, `cancelled`, `expired` (a Solana blockhash), `no_matching_transfer` (a wrong amount, asset or
    * recipient), `tx_already_used` (the transaction pays another invoice of the merchant: the one the wallet that sent
-   * it confirmed, or whose mark it carries, also when this invoice's page handed it over first or claimed it),
+   * it confirmed, or whose mark it carries, also when this invoice's page handed it over first or claimed it; with
+   * `held`, another invoice holds it for a refund only and it pays none),
    * `reference_missing`, `too_early`, `not_found` (the network never returned the transaction), `timeout` (no receipt
    * in time), `replaced`, `payer_mismatch` (a transfer from another wallet to an invoice paid or held already; one to a
    * payable invoice is held for a refund only: {@link CheckoutReview}), `payer_unconfirmed` (the same from a wallet that
@@ -192,6 +193,14 @@ export interface CheckoutRejectedPayment {
    * before October 29, 2026 leave it out.
    */
   rechecked?: true;
+  /**
+   * `true` on a `tx_already_used` rejection whose transfer another invoice of the merchant holds for a refund only
+   * (`otherInvoice`): it pays neither invoice and the merchant returns it to the wallet that sent it, once. Say that it
+   * is tied to another invoice, never that it pays one. Quasar versions before October 29, 2026 leave it out.
+   */
+  held?: true;
+  /** The invoice of the merchant the transaction is credited to or held on, when Quasar names it. */
+  otherInvoice?: string;
 }
 
 /** The subscription period an invoice bills, as the checkout shows it. */

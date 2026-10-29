@@ -132,6 +132,22 @@ export interface CheckoutError {
    * merchant with the transaction hash if money left the wallet.
    */
   rechecked?: true;
+  /**
+   * Set on a `payment_mismatch` with the reason `tx_already_used` when another invoice holds the transfer for a refund
+   * only ({@link CheckoutRejectedPayment.held}): say that the transaction is tied to another invoice, never that it pays
+   * one.
+   */
+  held?: true;
+  /**
+   * The other invoice Quasar names: the one a rejected transaction is credited to or held on, or the one whose hold
+   * the merchant refunds instead (`payment_held_elsewhere` of a refund, its `details.invoice`).
+   */
+  otherInvoice?: string;
+  /**
+   * The wallet that paid the invoice first, on `payer_mismatch` (`409`) of {@link CheckoutState.requestQuote}: Quasar
+   * prices the rest of an underpaid invoice only for that wallet, so the buyer pays the rest from it.
+   */
+  originWallet?: string;
 }
 
 /**
@@ -148,7 +164,8 @@ export interface CheckoutError {
  *   transfer from the wallet or a paymaster payment (`quote.gasless.paymaster`) needs
  *   {@link CheckoutState.confirmPayer} before the wallet sends it: Quasar credits a transfer of an unconfirmed wallet to
  *   no invoice and the merchant returns it.
- * - `confirming`: {@link CheckoutState.confirmPayer} is under way.
+ * - `confirming`: {@link CheckoutState.confirmPayer} is under way for a wallet that confirms before the price. A
+ *   wallet the relay may confirm stays `unless_relayed` meanwhile, so a prompt that never answers blocks no new price.
  * - `confirmed`: the wallet confirmed the invoice: on any EVM network for an ordinary wallet (or through the relay's
  *   authorization), on the method's network for a smart wallet. One confirmation per invoice and wallet: a new quote,
  *   another token or network needs none, also on a reopened page (`checkout.payerProofs`).
@@ -321,7 +338,8 @@ export interface CheckoutState {
    * @returns The quote, or `null` with `error` set (`phase` `blocked` when AML refuses the wallet, `buyer` when the
    *   details come first; `consent_required`, without a request, when a required consent is not ticked;
    *   `payer_proof_required`, without a request while {@link CheckoutState.payerProof} is `required`, and from Quasar
-   *   for a wallet it wants confirmed first, `phase` back at `selectMethod`).
+   *   for a wallet it wants confirmed first, `phase` back at `selectMethod`; `payer_mismatch` (`409`) with
+   *   {@link CheckoutError.originWallet} on an underpaid invoice: the rest is paid from the wallet that paid first).
    */
   requestQuote: () => Promise<CheckoutQuote | null>;
   /**
@@ -333,7 +351,7 @@ export interface CheckoutState {
    * `unless_relayed`. A wallet confirms an invoice once: a wallet Quasar or this page already knows as confirmed asks
    * for no signature (also one Quasar answers `proven` for, confirmed from another tab), and a method that needs none
    * (`not_needed`) answers `true` at once. The page stays in its phase meanwhile ({@link CheckoutState.payerProof} is
-   * `confirming` for the wallet being asked, never for another one). A new call replaces a confirmation under way, so a
+   * `confirming` for the wallet being asked before the price, never for another one or an `unless_relayed` one). A new call replaces a confirmation under way, so a
    * prompt the buyer closed that never answers blocks nothing: call it again to try again. The replaced attempt's late
    * answer only records the wallet's proof (no `error`, no phase change). Side effect: a wallet prompt through `sign`.
    *
@@ -643,18 +661,32 @@ interface Rejection {
   final: boolean;
   movedMoney?: boolean;
   rechecked?: boolean;
+  held?: boolean;
+  otherInvoice?: string;
 }
 
 /** The failed payments a status lists; `null` when Quasar does not report them. */
 function rejectionsOf(signals: Pick<CheckoutStatusEvent, 'rejectedTxKeys' | 'rejectedPayments'>): Rejection[] | null {
   if (signals.rejectedPayments) {
     return signals.rejectedPayments.map(
-      ({ txKey, original, userOpHash, reason, final, movedMoney, rechecked }: CheckoutRejectedPayment) => ({
+      ({
+        txKey,
+        original,
+        userOpHash,
+        reason,
+        final,
+        movedMoney,
+        rechecked,
+        held,
+        otherInvoice,
+      }: CheckoutRejectedPayment) => ({
         keys: [txKey, original, userOpHash].filter((key): key is string => Boolean(key)).map(keyOf),
         reason,
         final,
         movedMoney: movedMoney === true || MOVED_MONEY_REASONS.has(reason),
         rechecked: rechecked === true,
+        held: held === true,
+        ...(typeof otherInvoice === 'string' ? { otherInvoice } : {}),
       }),
     );
   }
@@ -710,7 +742,14 @@ const PHASE_OF_REFUSAL: Record<string, CheckoutPhase> = {
 };
 
 /** How a payment the store follows, or the latest one of a reopened page, ended without paying the invoice. */
-type Ending = { final: boolean; reason?: string; movedMoney?: boolean; rechecked?: boolean };
+type Ending = {
+  final: boolean;
+  reason?: string;
+  movedMoney?: boolean;
+  rechecked?: boolean;
+  held?: boolean;
+  otherInvoice?: string;
+};
 
 /**
  * The error of a payment that ended without paying the invoice, by how it ended: a transfer that may have moved money
@@ -729,8 +768,21 @@ function endedError(ended: Ending): CheckoutError {
       ...reason,
     };
   }
+  const other = ended.otherInvoice ? { otherInvoice: ended.otherInvoice } : {};
+  if (ended.held) {
+    // Held on another invoice for a refund only: it pays neither invoice (owner, 2026-10-29)
+    return {
+      code: 'payment_mismatch',
+      message:
+        'This transaction is tied to another invoice, which holds it for a refund to the wallet that sent it. It does not count for this invoice. If it was your payment for this invoice, contact the merchant.',
+      ...reason,
+      held: true,
+      ...other,
+    };
+  }
   if (ended.movedMoney) {
     return {
+      ...other,
       code: 'payment_mismatch',
       message: 'This transaction does not pay the invoice. If money left your wallet, contact the merchant.',
       ...reason,
@@ -853,13 +905,14 @@ const statusOfView = (view: CheckoutView): CheckoutStatusEvent => ({
 
 function errorOf(error: unknown): CheckoutError {
   if (error instanceof QuasarSDKError) {
-    const reason = error.details?.reason;
+    const { reason, originWallet } = error.details ?? {};
     return {
       code: error.code ?? 'request_failed',
       message: error.message,
       status: error.status,
       issues: error.issues,
       ...(typeof reason === 'string' ? { reason } : {}),
+      ...(typeof originWallet === 'string' ? { originWallet } : {}),
     };
   }
   return { code: 'request_failed', message: error instanceof Error ? error.message : String(error) };
@@ -1021,7 +1074,8 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       return 'confirmed';
     }
     // Only the wallet the latest attempt asks to sign waits for it: another one confirms on its own
-    if (payer !== null && payer === signingPayer) return 'confirming';
+    // `unless_relayed` stays: the relay confirms the wallet, so a prompt that never answers blocks no new price
+    if (payer !== null && payer === signingPayer && need === 'before_quote') return 'confirming';
     return need === 'before_quote' ? 'required' : 'unless_relayed';
   };
 
@@ -1678,7 +1732,8 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           if (latest) signingPayer = null;
           if (destroyed) return;
           // A replaced attempt's late answer only records the proof: the page belongs to the latest one
-          if (failure === undefined || !latest) update({});
+          // So does a failure of a wallet confirmed meanwhile (an earlier prompt's late signature): nothing is wrong
+          if (failure === undefined || !latest || payerProofOf(get()) === 'confirmed') update({});
           else if (failure instanceof Error && failure.name === 'PayerProofDeclined') {
             update({
               error: {

@@ -232,7 +232,8 @@ export class PaymentsModule {
    * @returns The refund and what to send where.
    * @throws {QuasarSDKError} `invalid_request` (400), `invoice_not_found` (404), an invoice that cannot be refunded,
    *   an amount above what is left, or `payment_credited_elsewhere` (a refund-only hold whose transfer paid another
-   *   invoice since: nothing to refund) (409), a timeout or a network error.
+   *   invoice since: nothing to refund) or `payment_held_elsewhere` (`details.invoice`: another invoice holds the same
+   *   transfer for a refund; refund it there, once) (409), a timeout or a network error.
    */
   async refund(invoiceId: string, params: RefundParams = {}): Promise<RefundStart> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/refunds`, {

@@ -1,6 +1,6 @@
 # GrantPermissionParams
 
-Defined in: [checkout/types.ts:586](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L586)
+Defined in: [checkout/types.ts:595](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L595)
 
 The answer of the wallet to `wallet_grantPermissions`, as [CheckoutState.grantPermission](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#grantpermission) takes it.
 
@@ -10,7 +10,7 @@ The answer of the wallet to `wallet_grantPermissions`, as [CheckoutState.grantPe
 
 > **context**: `string`
 
-Defined in: [checkout/types.ts:590](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L590)
+Defined in: [checkout/types.ts:599](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L599)
 
 The permission context the wallet returned.
 
@@ -20,7 +20,7 @@ The permission context the wallet returned.
 
 > **delegationManager**: `string`
 
-Defined in: [checkout/types.ts:592](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L592)
+Defined in: [checkout/types.ts:601](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L601)
 
 The delegation manager it names.
 
@@ -30,7 +30,7 @@ The delegation manager it names.
 
 > `optional` **dependencies?**: `object`[]
 
-Defined in: [checkout/types.ts:594](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L594)
+Defined in: [checkout/types.ts:603](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L603)
 
 Account deployments the delegator needs first (ERC-7715 `dependencies`).
 
@@ -48,6 +48,6 @@ Account deployments the delegator needs first (ERC-7715 `dependencies`).
 
 > **payer**: `string`
 
-Defined in: [checkout/types.ts:588](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L588)
+Defined in: [checkout/types.ts:597](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L597)
 
 CAIP-10 account that granted it, on the method's chain.
