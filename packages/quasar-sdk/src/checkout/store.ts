@@ -10,11 +10,13 @@ import type { Buyer, InvoiceLocale, InvoiceStatus } from '../modules/payments/ty
 import { checkoutApi } from './api';
 import type {
   CheckoutApi,
+  CheckoutPayerProof,
   CheckoutQuote,
   CheckoutRejectedPayment,
   CheckoutStatusEvent,
   CheckoutView,
   GrantPermissionParams,
+  PayerProofMessage,
 } from './types';
 
 /**
@@ -22,8 +24,9 @@ import type {
  *
  * - `loading`: reading the checkout.
  * - `buyer`: the buyer details come first ({@link CheckoutState.setBuyer}).
- * - `selectMethod`: choose a method, connect a wallet and tick the merchant's consent when there is one, then
- *   {@link CheckoutState.requestQuote}.
+ * - `selectMethod`: choose a method, connect a wallet, confirm it with {@link CheckoutState.confirmPayer} when
+ *   {@link CheckoutState.payerProof} is `required` (an EVM payment the buyer's wallet sends), tick the merchant's consent
+ *   when there is one, then {@link CheckoutState.requestQuote}.
  * - `quoting`: Quasar screens the payer and locks the price.
  * - `awaitingPayment`: send `quote.instructions` from the wallet (or sign `quote.gasless`), then
  *   {@link CheckoutState.submit} or {@link CheckoutState.relay}.
@@ -70,7 +73,13 @@ export type CheckoutPhase =
 
 /**
  * Why the last action failed: the Payments `code` (`payer_blocked`, `quote_required`, `invoice_expired`…), or
- * `method_required` (no method chosen), `consent_required` (the merchant's consent is not ticked), `payment_failed`
+ * `method_required` (no method chosen), `consent_required` (the merchant's consent is not ticked),
+ * `payer_proof_required` (the wallet has not confirmed the invoice yet: {@link CheckoutState.confirmPayer}; also Quasar's
+ * `409` to a quote), `payer_required` (no wallet to confirm), `payer_proof_declined` (the wallet did not sign the
+ * confirmation; nothing was sent), the refusals of a confirmation (`payer_proof_invalid` with `reason`
+ * `message_mismatch` or `signature_invalid`, `payer_proof_unavailable` with `reason` `rpc_failed` when the network of a
+ * smart wallet cannot be asked now, `payer_chain_mismatch`, `origin_required`, `rate_limited`, `too_many_payers`),
+ * `payment_failed`
  * (the transaction did not go through: it reverted, was cancelled, its Solana blockhash expired…; pay again),
  * `payment_mismatch` (the transaction succeeded on chain but does not pay the invoice: a wrong amount, asset or
  * recipient, no Solana Pay reference, sent before the quote, already used; it may have moved money, so never say that
@@ -91,30 +100,71 @@ export interface CheckoutError {
   /** The fields at fault of an invalid request. */
   issues?: QuasarRequestIssue[];
   /**
-   * Why Quasar rejected the payment, for `payment_failed`, `payment_mismatch` and `payment_unconfirmed`: a reason of
+   * Why Quasar refused an action, when it says (`details.reason` of the refusal: `signature_invalid` of
+   * `payer_proof_invalid`, `feed_unavailable` of `price_unavailable`…). Why Quasar rejected the payment, for
+   * `payment_failed`, `payment_mismatch` and `payment_unconfirmed`: a reason of
    * {@link CheckoutRejectedPayment} (`reverted`, `no_matching_transfer`, `not_found`, `timeout`…), `submit_retrying`
    * while the store retries handing over a transaction Quasar has not received yet ({@link CheckoutState.submit}), or
    * `submit_failed` once it gave up after an hour; left out when Quasar did not say. Two reasons of
    * `payment_unconfirmed` are about a payment that left the wallet, and the page offers no payment for them:
    * - `tx_already_used` (with `status` `409`): Quasar tracks the transaction for another invoice whose page handed it
    *   over first (anyone who saw the hash may have done so). Quasar recorded this invoice's claim on it and credits it
-   *   to the invoice whose quoted wallet sent it: when it pays this invoice, the invoice becomes `processing` or `paid`
-   *   and the error clears; when it does not, Quasar rejects it here with `tx_already_used` (`payment_mismatch`).
-   * - `settlement_failed`: the network confirmed the transaction, but Quasar has not recorded it yet and settles it
-   *   again daily (for 30 days). The money reached the merchant's address: the buyer contacts the merchant with the
-   *   transaction hash and does not pay again; never say that it does not pay the invoice or that nothing was charged.
+   *   to the invoice the wallet that sent it confirmed ({@link CheckoutState.confirmPayer}): when that is this invoice,
+   *   it becomes `processing` or `paid` and the error clears; when it is not, Quasar rejects it here with
+   *   `tx_already_used` (`payment_mismatch`).
+   * - `settlement_failed`: the network confirmed the transaction, but Quasar has not recorded it yet. The money reached
+   *   the merchant's address: the buyer contacts the merchant with the transaction hash and does not pay again; never
+   *   say that it does not pay the invoice or that nothing was charged. Quasar settles it again daily for 30 days after
+   *   it learned of it, while `rechecked` is set; only then may the page say so.
+   *
+   * `payment_mismatch` with `payer_mismatch` or `payer_unconfirmed`: the transfer came from another wallet than the
+   * quoted one, or from one that never confirmed the invoice; it pays no invoice and the merchant returns it to the
+   * wallet that sent it.
    */
   reason?: string;
   /**
    * Set on `payment_unconfirmed` while Quasar still reads the payment again (for up to 24 hours after it learned of
-   * it): the rejection is `rechecked` ({@link CheckoutRejectedPayment.rechecked}), or there is no rejection and Quasar
-   * reports a payment that may still arrive (`unresolvedPayments` above `0`). Only then may the page promise that
-   * Quasar checks the payment again. Left out otherwise (`user_operation_lost`, `transaction_failed`, `submit_failed`, a
-   * Quasar that does not say): Quasar never reads that payment again, so the page asks the buyer to contact the
+   * it; a `settlement_failed` one daily for 30 days): the rejection is `rechecked`
+   * ({@link CheckoutRejectedPayment.rechecked}), or there is no rejection and Quasar reports a payment that may still
+   * arrive (`unresolvedPayments` above `0`). Only then may the page promise that Quasar checks the payment again. Left
+   * out otherwise (`user_operation_lost`, `transaction_failed`, `submit_failed`, a `settlement_failed` past its 30 days,
+   * a Quasar that does not say): Quasar never reads that payment again, so the page asks the buyer to contact the
    * merchant with the transaction hash if money left the wallet.
    */
   rechecked?: true;
 }
+
+/**
+ * Whether the connected wallet must confirm the invoice before it pays (owner rule of October 29, 2026: a transfer is
+ * credited only to an invoice it is tied to by proof):
+ *
+ * - `not_needed`: no method chosen, a Solana method (the quote's reference ties the transfer), or a Quasar before payer
+ *   proofs.
+ * - `required`: an EVM payment the buyer's wallet sends (paying the gas, or a smart wallet with or without the
+ *   merchant's paymaster): {@link CheckoutState.confirmPayer} before {@link CheckoutState.requestQuote}, which refuses
+ *   with `payer_proof_required` until then. Also when Quasar refused a quote with `409 payer_proof_required`.
+ * - `unless_relayed`: an EVM method the gasless relay may pay. The quote comes first; paying with
+ *   {@link CheckoutState.relay} needs nothing more (the signed EIP-3009 authorization confirms the wallet), while a
+ *   transfer from the wallet or a paymaster payment (`quote.gasless.paymaster`) needs
+ *   {@link CheckoutState.confirmPayer} before the wallet sends it: Quasar credits a transfer of an unconfirmed wallet to
+ *   no invoice and the merchant returns it.
+ * - `confirming`: {@link CheckoutState.confirmPayer} is under way.
+ * - `confirmed`: the wallet confirmed the invoice: on any EVM network for an ordinary wallet (or through the relay's
+ *   authorization), on the method's network for a smart wallet. One confirmation per invoice and wallet: a new quote,
+ *   another token or network needs none, also on a reopened page (`checkout.payerProofs`).
+ */
+export type PayerProofStatus = 'not_needed' | 'required' | 'unless_relayed' | 'confirming' | 'confirmed';
+
+/**
+ * Signs the message of a payer proof with the connected wallet: `personal_sign` (EIP-191) of `message` exactly as it
+ * is, from `request.payer` (a smart wallet signs it through its own flow, ERC-1271 or ERC-6492). Rejects when the buyer
+ * refuses or the wallet cannot sign.
+ *
+ * @param message - The EIP-4361 message to sign.
+ * @param request - What Quasar answered: the message with its site, network, nonce and dates.
+ * @returns The signature, as hex.
+ */
+export type PayerProofSigner = (message: string, request: PayerProofMessage) => Promise<string>;
 
 /** The state and actions of {@link createCheckoutStore}. */
 export interface CheckoutState {
@@ -130,6 +180,11 @@ export interface CheckoutState {
   payer: string | null;
   /** Whether the buyer ticked the merchant's consent (`checkout.consent`). */
   consentGiven: boolean;
+  /**
+   * Whether the connected wallet must confirm the invoice before it pays, for the chosen method ({@link PayerProofStatus}).
+   * Read-only: the store sets it from the method, the wallet and the confirmations Quasar and this page know of.
+   */
+  readonly payerProof: PayerProofStatus;
   /** The locked quote. */
   quote: CheckoutQuote | null;
   /** Language of the page and the documents still to be issued. */
@@ -150,12 +205,10 @@ export interface CheckoutState {
    * again; otherwise (not found, no receipt in time…) `error` is
    * `payment_unconfirmed` and `phase` `unconfirmed`. The same when the invoice goes back to `open` after `processing`.
    * On an `expired` or `cancelled` invoice it tells the page that the buyer's payment may still arrive: `false` again
-   * once Quasar reports no payment of the invoice on its way, or 35 minutes past the later of `dueAt` and the hand-over
-   * (an hour after the invoice expired when it has no `dueAt`; 35 minutes after the store found the invoice
-   * cancelled), when the store stops following the invoice (`error` `payment_unconfirmed` then, or on a read without a
-   * payment on its way, while {@link CheckoutState.invoicePaymentUnresolved} is `true`). Also `true` while Quasar
-   * decides about a transaction another invoice handed over first (`error.reason` `tx_already_used`). Read-only: the
-   * store sets it.
+   * once Quasar reports no payment of the invoice on its way, or at {@link CheckoutState.followingUntil}, when the store
+   * stops following the invoice (`error` `payment_unconfirmed` then, or on a read without a payment on its way, while
+   * {@link CheckoutState.invoicePaymentUnresolved} is `true`). Also `true` while Quasar decides about a transaction
+   * another invoice handed over first (`error.reason` `tx_already_used`). Read-only: the store sets it.
    */
   readonly paymentOnTheWay: boolean;
   /**
@@ -189,6 +242,18 @@ export interface CheckoutState {
    * Read-only: the store sets it.
    */
   readonly paymentSentInTime: boolean | null;
+  /**
+   * Until when this page follows an `expired` or `cancelled` invoice for a payment on its way (ISO 8601), `null` when it
+   * does not (an invoice that can still be paid is followed with no limit). An expired invoice is followed until 35
+   * minutes past the later of `dueAt` and the latest hand-over of this page (Quasar waits 30 minutes past `dueAt` at
+   * most for a payment it learned of before it, and settles a later one in minutes); when the page found the payment on
+   * its way instead (a reload, another tab), the time it found it counts as the hand-over; an hour after the store found
+   * the invoice expired when it has no `dueAt`. A cancelled invoice is followed until 35 minutes after the later of when
+   * the store found it cancelled and the latest hand-over. A later hand-over moves it on. Past it the page shows nothing
+   * more without a reload, so say "this page follows the payment until {time}", never that it shows the outcome
+   * whenever it comes; a reloaded page reads the outcome. Read-only: the store sets it.
+   */
+  readonly followingUntil: string | null;
   /** The payment's transaction, once Quasar has one. */
   txHash: string | null;
   /** Why the last action failed; cleared by the next one. */
@@ -215,9 +280,8 @@ export interface CheckoutState {
    * state, except `expired` and `cancelled` while {@link CheckoutState.paymentOnTheWay} or
    * {@link CheckoutState.invoicePaymentOnTheWay}: it keeps the event stream while Quasar keeps it open for that payment, and
    * otherwise closes it and reads the checkout every 20 seconds (or every `pollMs`, when longer), until the payment
-   * ends the invoice (`paid`, `held`), fails, Quasar reports no payment on its way, 35 minutes past the later of
-   * `dueAt` and the hand-over for an expired invoice (an hour after the expiry without `dueAt`), 35 minutes after the
-   * store found the invoice cancelled, or `destroy` is called. A cancelled invoice with a payment that may still arrive
+   * ends the invoice (`paid`, `held`), fails, Quasar reports no payment on its way, {@link CheckoutState.followingUntil}
+   * comes, or `destroy` is called. A cancelled invoice with a payment that may still arrive
    * and none on its way opens with `error` `payment_unconfirmed`, like an expired one. It never expires the invoice by
    * the clock: past `dueAt`, a confirming payment stays `confirming` until Quasar reports the outcome. Sets `phase`
    * `error` when the link is wrong or retired.
@@ -255,9 +319,31 @@ export interface CheckoutState {
    * Screens the payer and locks the price (`POST quote`).
    *
    * @returns The quote, or `null` with `error` set (`phase` `blocked` when AML refuses the wallet, `buyer` when the
-   *   details come first; `consent_required`, without a request, when a required consent is not ticked).
+   *   details come first; `consent_required`, without a request, when a required consent is not ticked;
+   *   `payer_proof_required`, without a request while {@link CheckoutState.payerProof} is `required`, and from Quasar
+   *   for a wallet it wants confirmed first, `phase` back at `selectMethod`).
    */
   requestQuote: () => Promise<CheckoutQuote | null>;
+  /**
+   * Confirms that the connected wallet pays this invoice: asks Quasar for the exact message
+   * (`POST payer-proof/message`), has `sign` sign it with the wallet (a free signature that moves no funds), and sends
+   * the signature (`POST payer-proof`), which Quasar checks (an ordinary wallet's by recovery, a smart wallet's through
+   * its contract) and records for the invoice. Call it right after the wallet and the method are chosen, while
+   * {@link CheckoutState.payerProof} is `required`, and before a transfer or a paymaster payment while it is
+   * `unless_relayed`. A wallet confirms an invoice once: a wallet Quasar or this page already knows as confirmed asks
+   * for no signature (also one Quasar answers `proven` for, confirmed from another tab), and a method that needs none
+   * (`not_needed`) answers `true` at once. The page stays in its phase meanwhile ({@link CheckoutState.payerProof} is
+   * `confirming`). Side effect: a wallet prompt through `sign`.
+   *
+   * @param sign - Signs the message with the wallet ({@link PayerProofSigner}).
+   * @returns Whether the wallet confirmed the invoice; {@link CheckoutState.payerProof} is then `confirmed`. `false`
+   *   while another confirmation is under way (nothing changes), and with `error` set: `payer_required` (no wallet),
+   *   `request_failed` (an `api` without the payer proof calls), `payer_proof_declined` (`sign` rejected: the buyer
+   *   refused, or the wallet cannot sign messages), or Quasar's refusal (`payer_proof_invalid`, `payer_proof_unavailable`,
+   *   `payer_chain_mismatch`, `origin_required`, `rate_limited`, `too_many_payers`, `invoice_not_payable`;
+   *   `payer_not_expected` sets `phase` `blocked`, `invoice_expired` `expired`).
+   */
+  confirmPayer: (sign: PayerProofSigner) => Promise<boolean>;
   /**
    * Sends the buyer details the checkout collects (`POST buyer`); the invoice document is issued with them.
    *
@@ -451,6 +537,7 @@ const MOVED_MONEY_REASONS: ReadonlySet<string> = new Set([
   'too_early',
   'tx_already_used',
   'payer_mismatch',
+  'payer_unconfirmed',
   'native_from_contract_unverifiable',
   'invoice_not_payable',
   'settlement_failed',
@@ -458,14 +545,15 @@ const MOVED_MONEY_REASONS: ReadonlySet<string> = new Set([
 
 /**
  * The rejection of a payment the network confirmed whose settlement keeps failing: the money is on the merchant's
- * address, Quasar settles it again daily (for 30 days). Not "does not pay the invoice", and never a second payment.
+ * address, Quasar settles it again daily (for 30 days, while it marks the rejection `rechecked`). Not "does not pay the
+ * invoice", and never a second payment.
  */
 const SETTLEMENT_FAILED = 'settlement_failed';
 
 /**
  * The refusal of `/submit` for a transaction Quasar tracks for another invoice of the app (its hash was handed over
  * there first), and the `reason` of the store's error then: Quasar records this invoice's claim and credits the
- * transaction to the invoice whose quoted wallet sent it.
+ * transaction to the invoice the wallet that sent it confirmed.
  */
 const TAKEN_ELSEWHERE = 'tx_already_used';
 
@@ -484,6 +572,40 @@ interface KeptHandOver {
   from?: string;
   connectorType?: string;
   at: number;
+}
+
+/** Rejection reasons of a transfer Quasar could tie to no invoice: the merchant returns it to the wallet that sent it. */
+const REFUND_ONLY_REASONS: ReadonlySet<string> = new Set(['payer_mismatch', 'payer_unconfirmed']);
+
+/** Kinds of payer proof that count on every EVM network: the key behind the address signs for it everywhere. */
+const ANY_NETWORK_PROOFS: ReadonlySet<string> = new Set(['eoa', 'authorization']);
+
+/** A wallet's confirmation as the store matches it: Quasar's, or one this page got (`kind` unknown: its network only). */
+type KnownProof = Pick<CheckoutPayerProof, 'payer' | 'chainId'> & { kind?: CheckoutPayerProof['kind'] };
+
+/** A CAIP-10 account's network and address (an EVM address in lower case); `null` when it is none. */
+function accountOf(account: string): { namespace: string; chainId: string; address: string } | null {
+  const [namespace, reference, address, ...rest] = account.split(':');
+  if (!namespace || !reference || !address || rest.length > 0) return null;
+  return {
+    namespace,
+    chainId: `${namespace}:${reference}`,
+    address: namespace === 'eip155' ? address.toLowerCase() : address,
+  };
+}
+
+/**
+ * Whether `payer` confirmed the invoice for a payment from its network: an ordinary wallet's confirmation (or a relay's
+ * authorization) counts on every EVM network, a smart wallet's (or one of unknown kind) only on its own.
+ */
+function confirmedBy(proofs: readonly KnownProof[], payer: string): boolean {
+  const wallet = accountOf(payer);
+  if (!wallet) return false;
+  return proofs.some((proof) => {
+    const known = accountOf(proof.payer);
+    if (!known || known.namespace !== wallet.namespace || known.address !== wallet.address) return false;
+    return (proof.kind && ANY_NETWORK_PROOFS.has(proof.kind)) || proof.chainId === wallet.chainId;
+  });
 }
 
 /** Pauses between the hand-overs of a transaction Quasar has not received yet, in milliseconds; the last repeats. */
@@ -591,8 +713,17 @@ type Ending = { final: boolean; reason?: string; movedMoney?: boolean; rechecked
  */
 function endedError(ended: Ending): CheckoutError {
   const reason = ended.reason ? { reason: ended.reason } : {};
-  // Confirmed on chain, not recorded yet: Quasar retries it, the merchant has the money
-  if (ended.reason === SETTLEMENT_FAILED) return settlementFailedError();
+  // Confirmed on chain, not recorded yet: the merchant has the money, Quasar may still retry it
+  if (ended.reason === SETTLEMENT_FAILED) return settlementFailedError(ended.rechecked);
+  if (ended.reason && REFUND_ONLY_REASONS.has(ended.reason)) {
+    // Tied to no invoice: only the wallet that sent it gets it back
+    return {
+      code: 'payment_mismatch',
+      message:
+        'This transaction came from a wallet that did not confirm this invoice, so it pays no invoice. The merchant returns it to the wallet that sent it.',
+      ...reason,
+    };
+  }
   if (ended.movedMoney) {
     return {
       code: 'payment_mismatch',
@@ -638,19 +769,24 @@ const submitFailedError = (): CheckoutError => ({
   reason: 'submit_failed',
 });
 
-/** The error of a payment the network confirmed that Quasar could not record yet (`settlement_failed`). */
-const settlementFailedError = (): CheckoutError => ({
+/**
+ * The error of a payment the network confirmed that Quasar could not record yet (`settlement_failed`): the daily retry
+ * only while Quasar says it retries (`rechecked`, for 30 days).
+ */
+const settlementFailedError = (rechecked = false): CheckoutError => ({
   code: 'payment_unconfirmed',
-  message:
-    'The payment reached the network, but Quasar has not recorded it yet and tries again daily. Do not pay again; contact the merchant with the transaction hash.',
+  message: rechecked
+    ? 'The payment reached the network, but Quasar has not recorded it yet; it tries again daily for up to 30 days. Do not pay again; contact the merchant with the transaction hash.'
+    : 'The payment reached the network, but Quasar could not record it. Do not pay again; contact the merchant with the transaction hash.',
   reason: SETTLEMENT_FAILED,
+  ...(rechecked ? { rechecked: true as const } : {}),
 });
 
 /** The error of a transaction another invoice handed over first ({@link CheckoutState.submit}). */
 const takenElsewhereError = (): CheckoutError => ({
   code: 'payment_unconfirmed',
   message:
-    'This transaction was handed over for another invoice first. Quasar credits it to the invoice whose quoted wallet sent it, and this page shows the result. Do not pay again meanwhile.',
+    'This transaction was handed over for another invoice first. Quasar credits it to the invoice that the wallet which sent it confirmed, and this page shows the result. Do not pay again meanwhile.',
   status: 409,
   reason: TAKEN_ELSEWHERE,
 });
@@ -712,7 +848,14 @@ const statusOfView = (view: CheckoutView): CheckoutStatusEvent => ({
 
 function errorOf(error: unknown): CheckoutError {
   if (error instanceof QuasarSDKError) {
-    return { code: error.code ?? 'request_failed', message: error.message, status: error.status, issues: error.issues };
+    const reason = error.details?.reason;
+    return {
+      code: error.code ?? 'request_failed',
+      message: error.message,
+      status: error.status,
+      issues: error.issues,
+      ...(typeof reason === 'string' ? { reason } : {}),
+    };
   }
   return { code: 'request_failed', message: error instanceof Error ? error.message : String(error) };
 }
@@ -725,7 +868,8 @@ function errorOf(error: unknown): CheckoutError {
  * invoice only. `@tuwaio/nova-payments` renders it.
  *
  * Side effects: requests to `<baseUrl>/v1/payments/checkout/<token>` (the page's origin must be one of the app's
- * domains, when it lists any); after `load`, an `EventSource` on its `events` route (or a `GET` every `pollMs`) until
+ * domains, when it lists any; its `Origin` is the site the payer proof message names); a wallet prompt to sign a
+ * message through the `sign` passed to {@link CheckoutState.confirmPayer}, never by itself; after `load`, an `EventSource` on its `events` route (or a `GET` every `pollMs`) until
  * the invoice reaches a final state or `destroy` is called (an invoice that expired or was cancelled while a payment
  * confirms is followed on, for a limited time, until that payment ends it as `paid` or `held`), and a `GET` of the
  * checkout when an event brings an outcome. A hand-over Quasar has not taken yet is kept in the tab's `sessionStorage` under
@@ -743,6 +887,10 @@ function errorOf(error: unknown): CheckoutError {
  * await checkout.getState().load();
  * checkout.getState().selectMethod(checkout.getState().checkout!.methods[0].id);
  * checkout.getState().setPayer(`eip155:8453:${address}`);
+ * // An EVM payment the wallet sends: the wallet confirms the invoice first, with a free signature
+ * if (checkout.getState().payerProof === 'required') {
+ *   await checkout.getState().confirmPayer((message) => walletClient.signMessage({ account: address, message }));
+ * }
  * const quote = await checkout.getState().requestQuote();
  * // Send quote.instructions with the wallet, then:
  * await checkout.getState().submit({ txKey: hash });
@@ -785,6 +933,12 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
   const submitRetries = new Map<string, ReturnType<typeof setTimeout>>();
   /** Whether Quasar last reported a payment of the invoice that it reads again (`unresolvedPayments` above `0`). */
   let quasarRechecks = false;
+  /** Whether {@link CheckoutState.confirmPayer} is under way. */
+  let confirming = false;
+  /** The confirmations this page got ({@link CheckoutState.confirmPayer}), on top of Quasar's `payerProofs`. */
+  const confirmedHere: KnownProof[] = [];
+  /** The wallets Quasar refused a quote for until they confirm the invoice (`409 payer_proof_required`). */
+  const proofDemanded = new Set<string>();
   const handOverStorage =
     options.handOverStorage !== undefined ? options.handOverStorage : options.api ? null : browserSessionStorage();
   const handOversKey = `${HAND_OVERS_KEY}${options.token}`;
@@ -834,8 +988,33 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
     if (kept.some(({ txKey }) => txKey === key)) keepHandOvers(kept.filter(({ txKey }) => txKey !== key));
   };
 
+  /** Whether the connected wallet must confirm the invoice for the chosen method ({@link PayerProofStatus}). */
+  const payerProofOf = (state: CheckoutState): PayerProofStatus => {
+    const { payer, quote } = state;
+    const method = state.checkout?.methods.find(({ id }) => id === state.methodId);
+    const demanded = payer !== null && proofDemanded.has(payer);
+    const need = method?.payerProof ?? (demanded ? 'before_quote' : 'none');
+    if (need === 'none' || !method) return 'not_needed';
+    if (confirming) return 'confirming';
+    // The quote says whether its wallet confirmed the invoice (the relay's authorization, too)
+    const quoted: KnownProof[] =
+      quote?.payerProof?.proven === true && quote.payer !== null
+        ? [
+            {
+              payer: quote.payer,
+              chainId: accountOf(quote.payer)?.chainId ?? '',
+              kind: quote.payerProof.kind ?? undefined,
+            },
+          ]
+        : [];
+    if (payer && confirmedBy([...(state.checkout?.payerProofs ?? []), ...confirmedHere, ...quoted], payer)) {
+      return 'confirmed';
+    }
+    return demanded || need === 'before_quote' ? 'required' : 'unless_relayed';
+  };
+
   const store = createStore<CheckoutState>()((set, get) => {
-    /** Sets fields and the URLs that follow from them. */
+    /** Sets fields and the ones that follow from them: the URLs and whether the wallet must confirm the invoice. */
     const update = (partial: Partial<CheckoutState>) => {
       const next = { ...get(), ...partial };
       set({
@@ -843,6 +1022,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         receiptUrl: next.phase === 'paid' || next.phase === 'refunded' ? api.url('receipt') : null,
         paymasterUrl: next.quote?.gasless?.paymaster ? api.url('paymaster') : null,
         logoUrl: next.checkout?.merchant.logo ? api.url('logo') : null,
+        payerProof: payerProofOf(next),
       });
     };
 
@@ -856,6 +1036,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       lateTimer = null;
       lateUntil = null;
       streamFollows = false;
+      if (get().followingUntil !== null) update({ followingUntil: null });
     };
 
     const stopWatching = () => {
@@ -945,21 +1126,25 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
     };
 
     /**
-     * Follows an expired or cancelled invoice for the payment on its way, for a while: the reads slow down, and the
-     * store stops following an expired one 35 minutes past the later of `dueAt` and the hand-over (or when the store
-     * found the payment on its way): Quasar waits 30 minutes at most for a payment it learned of before `dueAt`, a later
-     * one settles in minutes. An hour after the expiry without `dueAt`; a cancelled one 35 minutes after the store found
-     * it cancelled.
+     * Follows an expired or cancelled invoice for the payment on its way, for a while
+     * ({@link CheckoutState.followingUntil}): the reads slow down, and the store stops following an expired one 35
+     * minutes past the later of `dueAt` and the latest hand-over (or when the store found the payment on its way):
+     * Quasar waits 30 minutes at most for a payment it learned of before `dueAt`, a later one settles in minutes. An
+     * hour after the expiry without `dueAt`; a cancelled one 35 minutes after the later of when the store found it
+     * cancelled and the latest hand-over. `handedOver`: a hand-over of this page just now, which moves the end on.
      */
-    const followLate = (status: string) => {
-      if (lateUntil === null) {
-        const dueAt = Date.parse(get().checkout?.invoice.dueAt ?? '');
-        lateUntil =
-          status === 'cancelled'
-            ? Math.max(Date.now(), handedOverAt) + CANCELLED_FOLLOW_MS
-            : Number.isFinite(dueAt)
-              ? Math.max(dueAt, handedOverAt) + LATE_FOLLOW_MS
-              : Date.now() + LATE_FOLLOW_WITHOUT_DUE_MS;
+    const followLate = (status: string, handedOver = false) => {
+      const dueAt = Date.parse(get().checkout?.invoice.dueAt ?? '');
+      const until =
+        status === 'cancelled'
+          ? Math.max(Date.now(), handedOverAt) + CANCELLED_FOLLOW_MS
+          : Number.isFinite(dueAt)
+            ? Math.max(dueAt, handedOverAt) + LATE_FOLLOW_MS
+            : Date.now() + LATE_FOLLOW_WITHOUT_DUE_MS;
+      // Set once; a hand-over of this page moves it on, never back
+      if (lateUntil === null || (handedOver && until > lateUntil)) {
+        lateUntil = until;
+        if (lateTimer) clearTimeout(lateTimer);
         lateTimer = setTimeout(
           () => {
             lateTimer = null;
@@ -976,6 +1161,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           },
           Math.max(0, lateUntil - Date.now()),
         );
+        update({ followingUntil: new Date(lateUntil).toISOString() });
       }
       if (poll && pollEvery < LATE_POLL_MS) {
         clearInterval(poll);
@@ -1187,7 +1373,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         error: elsewhere ? takenElsewhereError() : null,
         phase: closed ? phaseOfStatus(closed) : elsewhere ? 'unconfirmed' : 'confirming',
       });
-      if (closed) followLate(closed);
+      if (closed) followLate(closed, true);
       watch();
     };
 
@@ -1313,6 +1499,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       methodId: null,
       payer: null,
       consentGiven: false,
+      payerProof: 'not_needed',
       quote: null,
       locale: null,
       txKey: null,
@@ -1321,6 +1508,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       paymentCountsUntil: null,
       invoicePaymentUnresolved: false,
       paymentSentInTime: null,
+      followingUntil: null,
       txHash: null,
       error: null,
       receiptUrl: null,
@@ -1418,6 +1606,16 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           update({ error: { code: 'consent_required', message: 'Tick the consent of the checkout first' } });
           return null;
         }
+        if (get().payerProof === 'required' || get().payerProof === 'confirming') {
+          // The wallet confirms the invoice before the price (owner, 2026-10-29): Quasar would refuse the quote
+          update({
+            error: {
+              code: 'payer_proof_required',
+              message: 'Confirm the paying wallet with a free signature first',
+            },
+          });
+          return null;
+        }
         update({ phase: 'quoting', error: null });
         try {
           const quote = await api.quote({
@@ -1428,8 +1626,75 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           update({ quote, phase: 'awaitingPayment' });
           return quote;
         } catch (error) {
+          // A wallet Quasar wants confirmed first, although the checkout did not say so (read before the method changed)
+          if (error instanceof QuasarSDKError && error.code === 'payer_proof_required' && payer) {
+            proofDemanded.add(payer);
+          }
           fail(error, phase === 'quoting' ? 'selectMethod' : phase);
           return null;
+        }
+      },
+
+      confirmPayer: async (sign) => {
+        const { payer } = get();
+        if (!payer) {
+          update({ error: { code: 'payer_required', message: 'Connect the paying wallet first' } });
+          return false;
+        }
+        if (get().payerProof === 'confirmed' || get().payerProof === 'not_needed') {
+          update({ error: null });
+          return true;
+        }
+        if (confirming) return false;
+        const { payerProofMessage, payerProof } = api;
+        if (!payerProofMessage || !payerProof) {
+          update({
+            error: {
+              code: 'request_failed',
+              message: 'The checkout calls cannot confirm a wallet (payerProofMessage)',
+            },
+          });
+          return false;
+        }
+        confirming = true;
+        update({ error: null });
+        /** Ends the confirmation: `known` is what Quasar recorded, `failure` why it did not. */
+        const end = (known: KnownProof | null, failure?: unknown) => {
+          confirming = false;
+          if (known) confirmedHere.push(known);
+          if (destroyed) return;
+          if (failure === undefined) update({});
+          else if (failure instanceof Error && failure.name === 'PayerProofDeclined') {
+            update({
+              error: {
+                code: 'payer_proof_declined',
+                message:
+                  'The wallet did not sign the confirmation. It is free and moves no funds: sign it to pay from this wallet, or choose another wallet or method.',
+              },
+            });
+          } else fail(failure, get().phase);
+        };
+        try {
+          const request = await payerProofMessage({ payer });
+          // Confirmed already (another tab): on its network at least
+          if (request.proven) {
+            end({ payer: request.payer, chainId: request.chainId });
+            return true;
+          }
+          let signature: string;
+          try {
+            signature = await sign(request.message, request);
+          } catch (refusal) {
+            const declined = new Error(refusal instanceof Error ? refusal.message : String(refusal));
+            declined.name = 'PayerProofDeclined';
+            throw declined;
+          }
+          const proof = await payerProof({ payer, message: request.message, signature });
+          end(proof);
+          return true;
+        } catch (error) {
+          end(null, error);
+          return false;
         }
       },
 

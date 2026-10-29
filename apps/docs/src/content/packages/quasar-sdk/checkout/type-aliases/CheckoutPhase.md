@@ -2,14 +2,15 @@
 
 > **CheckoutPhase** = `"loading"` \| `"buyer"` \| `"selectMethod"` \| `"quoting"` \| `"awaitingPayment"` \| `"submitting"` \| `"confirming"` \| `"unconfirmed"` \| `"paid"` \| `"underpaid"` \| `"held"` \| `"refunded"` \| `"expired"` \| `"cancelled"` \| `"blocked"` \| `"error"`
 
-Defined in: [checkout/store.ts:53](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L53)
+Defined in: [checkout/store.ts:56](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L56)
 
 Where the payment stands:
 
 - `loading`: reading the checkout.
 - `buyer`: the buyer details come first ([CheckoutState.setBuyer](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#setbuyer)).
-- `selectMethod`: choose a method, connect a wallet and tick the merchant's consent when there is one, then
-  [CheckoutState.requestQuote](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#requestquote).
+- `selectMethod`: choose a method, connect a wallet, confirm it with [CheckoutState.confirmPayer](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#confirmpayer) when
+  [CheckoutState.payerProof](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#payerproof) is `required` (an EVM payment the buyer's wallet sends), tick the merchant's consent
+  when there is one, then [CheckoutState.requestQuote](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#requestquote).
 - `quoting`: Quasar screens the payer and locks the price.
 - `awaitingPayment`: send `quote.instructions` from the wallet (or sign `quote.gasless`), then
   [CheckoutState.submit](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#submit) or [CheckoutState.relay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#relay).

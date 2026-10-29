@@ -1,6 +1,6 @@
 # CheckoutConsent
 
-Defined in: [checkout/types.ts:221](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L221)
+Defined in: [checkout/types.ts:248](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L248)
 
 A line the merchant asks the buyer to tick before paying, such as a request to start a service at once. The quote
 records the tick in the invoice's ledger and the receipt email repeats the text.
@@ -11,7 +11,7 @@ records the tick in the invoice's ledger and the receipt email repeats the text.
 
 > **required**: `boolean`
 
-Defined in: [checkout/types.ts:225](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L225)
+Defined in: [checkout/types.ts:252](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L252)
 
 Whether the buyer cannot pay without ticking it: Quasar refuses the quote with `consent_required`.
 
@@ -21,6 +21,6 @@ Whether the buyer cannot pay without ticking it: Quasar refuses the quote with `
 
 > **text**: `string`
 
-Defined in: [checkout/types.ts:223](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L223)
+Defined in: [checkout/types.ts:250](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L250)
 
 The merchant's words, up to 500 characters, shown as they are.

@@ -209,8 +209,9 @@ describe('createCheckoutStore', () => {
       checkout: { amlScreening: false, invoice: { review: { reason: 'quote_expired' } } },
     });
     expectTypeOf<CheckoutView['amlScreening']>().toEqualTypeOf<boolean>();
-    expectTypeOf<NonNullable<CheckoutInvoice['review']>['reason']>().toEqualTypeOf<
-      'screening' | 'late' | 'overpaid' | 'quote_expired'
+    // The reasons of a refund-only hold came with the payer proof (Quasar, October 29, 2026)
+    expectTypeOf<NonNullable<CheckoutInvoice['review']>['reason']>().toExtend<
+      'screening' | 'late' | 'overpaid' | 'quote_expired' | 'payer_mismatch' | 'payer_unconfirmed'
     >();
     checkout.getState().destroy();
   });
@@ -2212,5 +2213,444 @@ describe('createCheckoutStore: a hash taken by another invoice, settlement failu
       error: { code: 'payment_unconfirmed', rechecked: true },
     });
     unresolved.getState().destroy();
+  });
+});
+
+describe('createCheckoutStore: the paying wallet confirms the invoice, refund-only holds, honest follow windows', () => {
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal('fetch', fetchMock);
+    FakeEventSource.instances = [];
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  const PAYER = QUOTE.payer;
+  const OTHER = 'eip155:8453:0x2222222222222222222222222222222222222222';
+  const MESSAGE =
+    'shop.example wants you to sign in with your Ethereum account:\n0x1111111111111111111111111111111111111111\n\nPay invoice INV-2026-7 of Acme (49.00 USD) from this wallet.';
+  const base = view().methods[0];
+  const METHODS = [
+    { ...base, id: 'ap_evm', gasless: 'off', payerProof: 'before_quote' as const },
+    { ...base, id: 'ap_eth', chainId: 'eip155:1', gasless: 'off', payerProof: 'before_quote' as const },
+    { ...base, id: 'ap_gasless', payerProof: 'unless_relayed' as const },
+    {
+      ...base,
+      id: 'ap_sol',
+      chainId: 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+      gasless: 'off',
+      payerProof: 'none' as const,
+    },
+  ];
+  const messageOf = (payer: string, proven = false) => ({
+    object: 'payer_proof_message',
+    payer,
+    proven,
+    message: MESSAGE,
+    domain: 'shop.example',
+    chainId: payer.split(':').slice(0, 2).join(':'),
+    nonce: '0123456789abcdef0123456789abcdef',
+    issuedAt: '2026-10-29T10:00:00.000Z',
+    expiresAt: null,
+  });
+  const proofOf = (payer: string, kind = 'eoa') => ({
+    object: 'payer_proof',
+    payer,
+    proven: true,
+    kind,
+    chainId: payer.split(':').slice(0, 2).join(':'),
+    confirmedAt: '2026-10-29T10:01:00.000Z',
+  });
+
+  /** Answers every checkout route; `routes` replaces the answer of one (by the end of its path). */
+  const answer = (
+    overrides: Partial<CheckoutView> = {},
+    routes: Record<string, (body: Record<string, unknown>) => Response | Promise<Response>> = {},
+  ) =>
+    fetchMock.mockImplementation(async (input: string | Request, init?: RequestInit) => {
+      const request = input instanceof Request ? input : new Request(input, init);
+      const path = new URL(request.url).pathname;
+      const text = await request.clone().text();
+      const body = (text ? JSON.parse(text) : {}) as Record<string, unknown>;
+      for (const [route, reply] of Object.entries(routes)) if (path.endsWith(`/${route}`)) return reply(body);
+      if (path.endsWith('/payer-proof/message')) return json(messageOf(body.payer as string));
+      if (path.endsWith('/payer-proof')) return json(proofOf(body.payer as string));
+      if (path.endsWith('/quote')) return json({ ...QUOTE, methodId: body.methodId, payer: body.payer });
+      if (path.endsWith('/submit')) return json({ txKey: '0xfeed', status: 'open' }, 202);
+      return json(view({ methods: METHODS, payerProofs: [], ...overrides }));
+    });
+
+  const paths = () =>
+    fetchMock.mock.calls.map(([input]) => new URL(input instanceof Request ? input.url : (input as string)).pathname);
+
+  // Owner, 2026-10-29: one free signature before an EVM payment the buyer's wallet sends, after the wallet and the
+  // method are chosen and before the price; one per invoice and wallet
+  it('asks the wallet to confirm the invoice before the price of an EVM payment, once per invoice and wallet', async () => {
+    answer();
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().payerProof).toBe('not_needed');
+    checkout.getState().selectMethod('ap_evm');
+    checkout.getState().setPayer(PAYER);
+    expect(checkout.getState().payerProof).toBe('required');
+
+    // No price before the confirmation, and no request for one
+    expect(await checkout.getState().requestQuote()).toBeNull();
+    expect(checkout.getState()).toMatchObject({ phase: 'selectMethod', error: { code: 'payer_proof_required' } });
+    expect(paths()).toEqual(['/v1/payments/checkout/tok_1']);
+
+    const states: string[] = [];
+    checkout.subscribe((state) => states.push(state.payerProof));
+    const sign = vi.fn().mockResolvedValue('0xsig');
+    expect(await checkout.getState().confirmPayer(sign)).toBe(true);
+    expect(await sent(1)).toEqual({
+      method: 'POST',
+      path: '/v1/payments/checkout/tok_1/payer-proof/message',
+      body: { payer: PAYER },
+    });
+    // The wallet signs exactly the message Quasar built
+    expect(sign).toHaveBeenCalledWith(MESSAGE, expect.objectContaining({ domain: 'shop.example', proven: false }));
+    expect(await sent(2)).toEqual({
+      method: 'POST',
+      path: '/v1/payments/checkout/tok_1/payer-proof',
+      body: { payer: PAYER, message: MESSAGE, signature: '0xsig' },
+    });
+    expect(states).toContain('confirming');
+    expect(checkout.getState()).toMatchObject({ payerProof: 'confirmed', error: null, phase: 'selectMethod' });
+
+    await checkout.getState().requestQuote();
+    expect(checkout.getState()).toMatchObject({ phase: 'awaitingPayment', quote: { methodId: 'ap_evm' } });
+
+    // A new quote, another token or network of the same wallet needs no new signature (an EOA signs for every network)
+    checkout.getState().releaseQuote();
+    checkout.getState().selectMethod('ap_eth');
+    checkout.getState().setPayer('eip155:1:0x1111111111111111111111111111111111111111');
+    expect(checkout.getState().payerProof).toBe('confirmed');
+    expect(await checkout.getState().confirmPayer(sign)).toBe(true);
+    expect(sign).toHaveBeenCalledTimes(1);
+    expect(paths().filter((path) => path.includes('payer-proof'))).toHaveLength(2);
+
+    // Another wallet confirms on its own
+    checkout.getState().setPayer('eip155:1:0x2222222222222222222222222222222222222222');
+    expect(checkout.getState().payerProof).toBe('required');
+    checkout.getState().destroy();
+  });
+
+  it('remembers the wallets that confirmed the invoice from the checkout, a smart wallet only on its network', async () => {
+    const smart = 'eip155:8453:0xAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAa';
+    answer({
+      payerProofs: [
+        { payer: smart, kind: 'eip1271', chainId: 'eip155:8453', confirmedAt: '2026-10-29T10:01:00.000Z' },
+        { payer: OTHER, kind: 'eoa', chainId: 'eip155:8453', confirmedAt: '2026-10-29T10:02:00.000Z' },
+      ],
+    });
+    const checkout = store();
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_evm');
+    checkout.getState().setPayer(smart.toLowerCase());
+    expect(checkout.getState().payerProof).toBe('confirmed');
+    // Its contract accepted the signature on Base only
+    checkout.getState().selectMethod('ap_eth');
+    checkout.getState().setPayer('eip155:1:0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+    expect(checkout.getState().payerProof).toBe('required');
+    checkout.getState().setPayer('eip155:1:0x2222222222222222222222222222222222222222');
+    expect(checkout.getState().payerProof).toBe('confirmed');
+    await checkout.getState().requestQuote();
+    expect(await sent(1)).toMatchObject({ path: '/v1/payments/checkout/tok_1/quote' });
+    checkout.getState().destroy();
+  });
+
+  it('needs no confirmation on Solana, nor before a quote the gasless relay may pay, nor with an older Quasar', async () => {
+    answer();
+    const checkout = store();
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_sol');
+    checkout
+      .getState()
+      .setPayer('solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp:9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM');
+    expect(checkout.getState().payerProof).toBe('not_needed');
+    await checkout.getState().requestQuote();
+    expect(checkout.getState().phase).toBe('awaitingPayment');
+
+    // The relay's authorization confirms the wallet: the price comes first, a transfer or a paymaster payment waits
+    checkout.getState().releaseQuote();
+    checkout.getState().selectMethod('ap_gasless');
+    checkout.getState().setPayer(PAYER);
+    expect(checkout.getState().payerProof).toBe('unless_relayed');
+    await checkout.getState().requestQuote();
+    expect(checkout.getState().phase).toBe('awaitingPayment');
+    expect(await checkout.getState().confirmPayer(async () => '0xsig')).toBe(true);
+    expect(checkout.getState()).toMatchObject({ payerProof: 'confirmed', phase: 'awaitingPayment' });
+    checkout.getState().destroy();
+
+    // A Quasar before payer proofs announces none
+    answer({ methods: [view().methods[0]] });
+    const older = store();
+    await older.getState().load();
+    older.getState().selectMethod('ap_1');
+    older.getState().setPayer(PAYER);
+    expect(older.getState().payerProof).toBe('not_needed');
+    older.getState().destroy();
+  });
+
+  it('asks for the confirmation when Quasar refuses a price for an unconfirmed wallet the checkout did not announce', async () => {
+    answer(
+      { methods: [view().methods[0]] },
+      {
+        quote: () =>
+          json(
+            {
+              error: {
+                code: 'payer_proof_required',
+                message: 'Confirm the paying wallet with a free signature first (POST payer-proof)',
+                payer: PAYER,
+              },
+            },
+            409,
+          ),
+      },
+    );
+    const checkout = store();
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_1');
+    checkout.getState().setPayer(PAYER);
+    expect(await checkout.getState().requestQuote()).toBeNull();
+    expect(checkout.getState()).toMatchObject({
+      phase: 'selectMethod',
+      payerProof: 'required',
+      error: { code: 'payer_proof_required', status: 409 },
+    });
+    expect(await checkout.getState().confirmPayer(async () => '0xsig')).toBe(true);
+    expect(checkout.getState().payerProof).toBe('confirmed');
+    checkout.getState().destroy();
+  });
+
+  it('says why a confirmation failed and lets the buyer try again', async () => {
+    let proofAnswer: () => Response = () => json(proofOf(PAYER));
+    answer({}, { 'payer-proof': () => proofAnswer() });
+    const checkout = store();
+    await checkout.getState().load();
+
+    // No wallet yet
+    expect(await checkout.getState().confirmPayer(async () => '0xsig')).toBe(false);
+    expect(checkout.getState().error).toMatchObject({ code: 'payer_required' });
+    checkout.getState().selectMethod('ap_evm');
+    checkout.getState().setPayer(PAYER);
+
+    // The buyer refuses to sign in the wallet: nothing is sent
+    const calls = fetchMock.mock.calls.length;
+    expect(await checkout.getState().confirmPayer(async () => Promise.reject(new Error('User rejected')))).toBe(false);
+    expect(checkout.getState()).toMatchObject({
+      payerProof: 'required',
+      phase: 'selectMethod',
+      error: { code: 'payer_proof_declined' },
+    });
+    expect(paths().slice(calls)).toEqual(['/v1/payments/checkout/tok_1/payer-proof/message']);
+
+    // Quasar refuses the signature, with why
+    proofAnswer = () =>
+      json(
+        {
+          error: {
+            code: 'payer_proof_invalid',
+            message: 'The signature is not the wallet’s',
+            reason: 'signature_invalid',
+          },
+        },
+        400,
+      );
+    expect(await checkout.getState().confirmPayer(async () => '0xbad')).toBe(false);
+    expect(checkout.getState()).toMatchObject({
+      payerProof: 'required',
+      error: { code: 'payer_proof_invalid', reason: 'signature_invalid', status: 400 },
+    });
+
+    // The network of a smart wallet cannot be asked now
+    proofAnswer = () =>
+      json(
+        {
+          error: {
+            code: 'payer_proof_unavailable',
+            message: 'The network of the wallet cannot be asked now; try again in a moment',
+            reason: 'rpc_failed',
+          },
+        },
+        503,
+      );
+    expect(await checkout.getState().confirmPayer(async () => '0xsig')).toBe(false);
+    expect(checkout.getState().error).toMatchObject({ code: 'payer_proof_unavailable', reason: 'rpc_failed' });
+
+    // A wallet the merchant does not expect
+    proofAnswer = () =>
+      json({ error: { code: 'payer_not_expected', message: 'This invoice is to be paid from another wallet' } }, 403);
+    expect(await checkout.getState().confirmPayer(async () => '0xsig')).toBe(false);
+    expect(checkout.getState()).toMatchObject({ phase: 'blocked', error: { code: 'payer_not_expected' } });
+    checkout.getState().destroy();
+
+    // A wallet that confirmed the invoice before (another tab): no signature
+    answer({}, { 'payer-proof/message': (body) => json(messageOf(body.payer as string, true)) });
+    const before = fetchMock.mock.calls.length;
+    const again = store();
+    await again.getState().load();
+    again.getState().selectMethod('ap_evm');
+    again.getState().setPayer(PAYER);
+    const sign = vi.fn();
+    expect(await again.getState().confirmPayer(sign)).toBe(true);
+    expect(sign).not.toHaveBeenCalled();
+    expect(again.getState().payerProof).toBe('confirmed');
+    expect(
+      paths()
+        .slice(before)
+        .filter((path) => path.endsWith('/payer-proof')),
+    ).toHaveLength(0);
+    again.getState().destroy();
+  });
+
+  it('confirms the wallet through calls the app supplies, and refuses when they lack the confirmation', async () => {
+    const api: CheckoutApi = {
+      view: vi.fn().mockResolvedValue(view({ methods: METHODS, payerProofs: [] })),
+      quote: vi.fn().mockResolvedValue(QUOTE),
+      buyer: vi.fn(),
+      locale: vi.fn(),
+      submit: vi.fn(),
+      relay: vi.fn(),
+      permission: vi.fn(),
+      payerProofMessage: vi.fn().mockResolvedValue(messageOf(PAYER)),
+      payerProof: vi.fn().mockResolvedValue(proofOf(PAYER)),
+      url: (route: string) => `sim://checkout/${route}`,
+    };
+    const checkout = createCheckoutStore({ token: 'tok_1', api, EventSource: null });
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_evm');
+    checkout.getState().setPayer(PAYER);
+    expect(await checkout.getState().confirmPayer(async () => '0xsig')).toBe(true);
+    expect(api.payerProof).toHaveBeenCalledWith({ payer: PAYER, message: MESSAGE, signature: '0xsig' });
+    checkout.getState().destroy();
+
+    // A simulation written before payer proofs
+    const { payerProofMessage, payerProof, ...older } = api;
+    void payerProofMessage;
+    void payerProof;
+    const simulated = createCheckoutStore({ token: 'tok_1', api: older, EventSource: null });
+    await simulated.getState().load();
+    simulated.getState().selectMethod('ap_evm');
+    simulated.getState().setPayer(OTHER);
+    expect(await simulated.getState().confirmPayer(async () => '0xsig')).toBe(false);
+    expect(simulated.getState().error).toMatchObject({ code: 'request_failed' });
+    simulated.getState().destroy();
+  });
+
+  // N2: a transfer credited to no invoice is held only to be refunded to the wallet that sent it
+  it('tells a refund-only hold apart from a payment the merchant may release', async () => {
+    const held = {
+      ...view().invoice,
+      status: 'held',
+      amountPaid: '49000000',
+      review: { reason: 'payer_mismatch', refundOnly: true },
+    };
+    answer({ invoice: held as CheckoutView['invoice'] });
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    expect(checkout.getState()).toMatchObject({
+      phase: 'held',
+      checkout: { invoice: { review: { reason: 'payer_mismatch', refundOnly: true } } },
+    });
+    expectTypeOf<NonNullable<CheckoutInvoice['review']>['reason']>().toEqualTypeOf<
+      'screening' | 'late' | 'overpaid' | 'quote_expired' | 'payer_mismatch' | 'payer_unconfirmed'
+    >();
+    checkout.getState().destroy();
+  });
+
+  it('names a transfer from a wallet that never confirmed the invoice: it pays no invoice and goes back to its wallet', async () => {
+    const unconfirmed = rejection('0xfeed', 'payer_unconfirmed', true);
+    answer({ invoice: { ...view().invoice, pendingPayments: 0, rejectedPayments: [unconfirmed] } });
+    const reopened = store({ EventSource: null });
+    await reopened.getState().load();
+    expect(reopened.getState()).toMatchObject({
+      phase: 'selectMethod',
+      error: { code: 'payment_mismatch', reason: 'payer_unconfirmed' },
+    });
+    expect(reopened.getState().error?.message).toMatch(/wallet that sent it/);
+    expect(reopened.getState().error?.message).not.toMatch(/did not go through|nothing/i);
+    reopened.getState().destroy();
+  });
+
+  it('promises the daily retry of a payment Quasar has not recorded only while Quasar retries it', async () => {
+    const retried = rejection('0xfeed', 'settlement_failed', false, { movedMoney: true, rechecked: true });
+    answer({ invoice: { ...view().invoice, pendingPayments: 0, unresolvedPayments: 0, rejectedPayments: [retried] } });
+    const retrying = store({ EventSource: null });
+    await retrying.getState().load();
+    expect(retrying.getState()).toMatchObject({
+      phase: 'unconfirmed',
+      error: { code: 'payment_unconfirmed', reason: 'settlement_failed', rechecked: true },
+    });
+    expect(retrying.getState().error?.message).toMatch(/30 days/);
+    retrying.getState().destroy();
+
+    // Past the 30 days Quasar no longer retries: no promise, the merchant has the money
+    const given = rejection('0xfeed', 'settlement_failed', false, { movedMoney: true });
+    answer({ invoice: { ...view().invoice, pendingPayments: 0, unresolvedPayments: 0, rejectedPayments: [given] } });
+    const over = store({ EventSource: null });
+    await over.getState().load();
+    expect(over.getState().error).toMatchObject({ code: 'payment_unconfirmed', reason: 'settlement_failed' });
+    expect(over.getState().error?.rechecked).toBeUndefined();
+    expect(over.getState().error?.message).not.toMatch(/tries again|daily/);
+    expect(over.getState().error?.message).toMatch(/contact the merchant/);
+    over.getState().destroy();
+  });
+
+  it('says that a transaction handed over for another invoice counts for the invoice its wallet confirmed', async () => {
+    answer(
+      {},
+      {
+        submit: () =>
+          json(
+            {
+              error: {
+                code: 'tx_already_used',
+                message:
+                  'The transaction was handed over for another invoice; it counts for the invoice the wallet that sent it confirmed',
+              },
+            },
+            409,
+          ),
+      },
+    );
+    const checkout = store();
+    await checkout.getState().load();
+    await checkout.getState().submit({ txKey: '0xfeed' });
+    expect(checkout.getState().error).toMatchObject({ code: 'payment_unconfirmed', reason: 'tx_already_used' });
+    expect(checkout.getState().error?.message).toMatch(/confirmed/);
+    expect(checkout.getState().error?.message).not.toMatch(/quoted wallet/);
+    checkout.getState().destroy();
+  });
+
+  // The store's follow of an expired invoice counts from the latest hand-over, and says until when it follows
+  it('follows an expired invoice 35 minutes past the latest hand-over, and tells the page until when', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-29T12:00:00.000Z'));
+    const invoice = { ...view().invoice, dueAt: '2026-10-29T12:01:00.000Z', pendingPayments: 1, rejectedPayments: [] };
+    answer({ invoice }, { submit: () => json({ txKey: '0xbeef', status: 'expired' }, 202) });
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().followingUntil).toBeNull();
+    // A payment of the invoice found on its way
+    const events = FakeEventSource.instances[0];
+    await vi.advanceTimersByTimeAsync(2 * 60_000);
+    events.emit('status', signal('expired', 5, { pendingPayments: 1, rejectedPayments: [] }));
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', invoicePaymentOnTheWay: true });
+    expect(checkout.getState().followingUntil).toBe('2026-10-29T12:36:00.000Z');
+
+    // Twenty minutes later the page hands over another transaction the wallet sent: it is followed for 35 minutes too
+    await vi.advanceTimersByTimeAsync(20 * 60_000);
+    expect(await checkout.getState().submit({ txKey: '0xbeef' })).toBe(true);
+    expect(checkout.getState().followingUntil).toBe('2026-10-29T12:57:00.000Z');
+    await vi.advanceTimersByTimeAsync(20 * 60_000);
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', paymentOnTheWay: true });
+    await vi.advanceTimersByTimeAsync(16 * 60_000);
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', paymentOnTheWay: false, followingUntil: null });
+    checkout.getState().destroy();
   });
 });

@@ -155,15 +155,15 @@ export class PaymentsModule {
 
   /**
    * Accepts a held payment (`POST /v1/payments/invoices/:id/release`): the invoice becomes paid and the buyer gets a
-   * receipt. A payment from another wallet than the quoted payer is never released: anyone may hand over for their own
+   * receipt. A payment Quasar could tie to no invoice (from another wallet than the quoted payer, or from one that
+   * never confirmed the invoice: `reviewReason` `payer_mismatch`) is never released: anyone may hand over for their own
    * invoice a transaction hash they saw on the network, so refund it to the wallet that sent it instead.
    *
    * @param invoiceId - The invoice.
    * @param params - `reason`, required, recorded in the ledger.
    * @returns The invoice.
    * @throws {QuasarSDKError} `invoice_not_found` (404); `invoice_not_held`, `invoice_partly_refunded` (refund the rest)
-   *   or `payer_mismatch_refund_only` (a payment from another wallet than the quoted payer: refund it) (409); a timeout
-   *   or a network error.
+   *   or `payer_mismatch_refund_only` (a payment tied to no invoice: refund it) (409); a timeout or a network error.
    */
   async releaseInvoice(invoiceId: string, params: { reason: string }): Promise<Invoice> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/release`, {
@@ -230,8 +230,9 @@ export class PaymentsModule {
    * @param invoiceId - The invoice.
    * @param params - Amount (everything left when omitted), mode and reason.
    * @returns The refund and what to send where.
-   * @throws {QuasarSDKError} `invalid_request` (400), `invoice_not_found` (404), an invoice that cannot be refunded
-   *   or an amount above what is left (409), a timeout or a network error.
+   * @throws {QuasarSDKError} `invalid_request` (400), `invoice_not_found` (404), an invoice that cannot be refunded,
+   *   an amount above what is left, or `payment_credited_elsewhere` (a refund-only hold whose transfer paid another
+   *   invoice since: nothing to refund) (409), a timeout or a network error.
    */
   async refund(invoiceId: string, params: RefundParams = {}): Promise<RefundStart> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/refunds`, {
@@ -259,7 +260,8 @@ export class PaymentsModule {
    * @param params - The transaction and your wallet it was sent from.
    * @returns The refund, `submitted`.
    * @throws {QuasarSDKError} `invalid_request` (400), `refund_not_found` (404), `refund_not_submittable` or
-   *   `transaction_already_used` (409), a timeout or a network error.
+   *   `transaction_already_used` (409: a transaction an invoice credited as a payment; one handed over as a payment
+   *   that paid nothing becomes the refund's), a timeout or a network error.
    */
   async submitRefund(refundId: string, params: SubmitRefundParams): Promise<Refund> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/refunds/${segment(refundId)}/submit`, {

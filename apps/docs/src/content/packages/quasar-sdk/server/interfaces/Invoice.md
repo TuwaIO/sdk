@@ -14,7 +14,7 @@ An invoice as the Payments API returns it. Amounts are decimal strings in the in
 
 > **aml**: [`InvoiceAml`](/packages/quasar-sdk/server/interfaces/InvoiceAml.md) \| `null`
 
-Defined in: [modules/payments/types.ts:319](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L319)
+Defined in: [modules/payments/types.ts:321](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L321)
 
 The payer's AML screening, once there was one.
 
@@ -65,7 +65,7 @@ your page; `null` otherwise.
 
 > **createdAt**: `string`
 
-Defined in: [modules/payments/types.ts:335](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L335)
+Defined in: [modules/payments/types.ts:337](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L337)
 
 When it was created.
 
@@ -95,7 +95,7 @@ When it stops being payable.
 
 > **eInvoiceSkipped**: `string`[] \| `null`
 
-Defined in: [modules/payments/types.ts:323](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L323)
+Defined in: [modules/payments/types.ts:325](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L325)
 
 What the e-invoice lacked when the invoice was issued as a plain PDF, for example `buyer.country`.
 
@@ -225,7 +225,7 @@ The payment page while the invoice can be paid: the link its emails carry.
 
 > **period**: `number` \| `null`
 
-Defined in: [modules/payments/types.ts:333](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L333)
+Defined in: [modules/payments/types.ts:335](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L335)
 
 The subscription period it bills.
 
@@ -255,7 +255,7 @@ The locked quote, once there is one.
 
 > **receiptNumber**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:321](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L321)
+Defined in: [modules/payments/types.ts:323](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L323)
 
 The receipt number, once paid.
 
@@ -265,7 +265,7 @@ The receipt number, once paid.
 
 > **refundedTotal**: `string`
 
-Defined in: [modules/payments/types.ts:325](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L325)
+Defined in: [modules/payments/types.ts:327](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L327)
 
 Refunded so far, in the invoice currency.
 
@@ -275,7 +275,7 @@ Refunded so far, in the invoice currency.
 
 > **replacedBy**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:329](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L329)
+Defined in: [modules/payments/types.ts:331](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L331)
 
 The invoice that corrects this one.
 
@@ -285,7 +285,7 @@ The invoice that corrects this one.
 
 > **replaces**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:327](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L327)
+Defined in: [modules/payments/types.ts:329](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L329)
 
 The invoice this one corrects.
 
@@ -305,10 +305,12 @@ Whether it is a reverse-charge invoice.
 
 > **reviewReason**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:317](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L317)
+Defined in: [modules/payments/types.ts:319](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L319)
 
 Why the payment waits for you: `overpaid` when the app flags overpayments, `quote_expired` when it arrived after
-its locked quote expired.
+its locked quote expired, `payer_mismatch` when Quasar could tie it to no invoice (from another wallet than the
+quoted one, or from one that never confirmed the invoice): refund it to the wallet that sent it, it is never
+released.
 
 ***
 
@@ -356,7 +358,7 @@ State of the invoice.
 
 > **subscriptionId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:331](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L331)
+Defined in: [modules/payments/types.ts:333](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L333)
 
 The subscription it bills.
 
@@ -452,6 +454,6 @@ Total to pay.
 
 > **updatedAt**: `string`
 
-Defined in: [modules/payments/types.ts:337](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L337)
+Defined in: [modules/payments/types.ts:339](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L339)
 
 When it last changed.

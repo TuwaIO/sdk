@@ -44,6 +44,8 @@ package; the browser helper for React apps is in `@tuwaio/quasar-sdk/react`.
 - [PaymentQuote](/packages/quasar-sdk/server/interfaces/PaymentQuote.md)
 - [PaymentsList](/packages/quasar-sdk/server/interfaces/PaymentsList.md)
 - [PaymentWebhookEvent](/packages/quasar-sdk/server/interfaces/PaymentWebhookEvent.md)
+- [PaymentWebhookHold](/packages/quasar-sdk/server/interfaces/PaymentWebhookHold.md)
+- [PaymentWebhookHoldVoided](/packages/quasar-sdk/server/interfaces/PaymentWebhookHoldVoided.md)
 - [PulsarPoolStore](/packages/quasar-sdk/server/interfaces/PulsarPoolStore.md)
 - [QuasarConfig](/packages/quasar-sdk/server/interfaces/QuasarConfig.md)
 - [QuasarRequestIssue](/packages/quasar-sdk/server/interfaces/QuasarRequestIssue.md)

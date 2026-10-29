@@ -7,7 +7,14 @@ import { ofetch } from 'ofetch';
 import { BASE_API_URL } from '../constants';
 import { toQuasarSDKError } from '../core/errors';
 import type { Buyer, InvoiceLocale } from '../modules/payments/types';
-import type { CheckoutApi, CheckoutQuote, CheckoutView, GrantPermissionParams } from './types';
+import type {
+  CheckoutApi,
+  CheckoutQuote,
+  CheckoutView,
+  GrantPermissionParams,
+  PayerProofConfirmation,
+  PayerProofMessage,
+} from './types';
 
 /** Path of a checkout route: `/v1/payments/checkout/:token` and below. */
 export const checkoutPath = (token: string, route = '') =>
@@ -36,6 +43,9 @@ export function checkoutApi(token: string, baseUrl: string = BASE_API_URL): Chec
   return {
     view: () => call<CheckoutView>(''),
     quote: (body: { methodId: string; payer?: string; consentGiven?: boolean }) => call<CheckoutQuote>('quote', body),
+    payerProofMessage: (body: { payer: string }) => call<PayerProofMessage>('payer-proof/message', body),
+    payerProof: (body: { payer: string; message: string; signature: string }) =>
+      call<PayerProofConfirmation>('payer-proof', body),
     buyer: (body: { buyer: Buyer; company?: boolean }) => call<CheckoutView>('buyer', body),
     locale: (locale: InvoiceLocale) => call<{ locale: InvoiceLocale }>('locale', { locale }),
     submit: (body: { txKey: string; from?: string; connectorType?: string }) =>

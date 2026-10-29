@@ -1,6 +1,6 @@
 # PaymentWebhookEvent
 
-Defined in: [webhooks.ts:47](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L47)
+Defined in: [webhooks.ts:88](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L88)
 
 The body of a payment webhook (`payments.v1`). `id`, `type` and `createdAt` are those of the ledger event, so
 deduplicate by `id`; `data.invoice` is the invoice when the delivery was sent, so a retry carries its current state.
@@ -11,7 +11,7 @@ deduplicate by `id`; `data.invoice` is the invoice when the delivery was sent, s
 
 > **apiVersion**: `"payments.v1"`
 
-Defined in: [webhooks.ts:53](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L53)
+Defined in: [webhooks.ts:94](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L94)
 
 Always `payments.v1`.
 
@@ -21,7 +21,7 @@ Always `payments.v1`.
 
 > **createdAt**: `string`
 
-Defined in: [webhooks.ts:57](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L57)
+Defined in: [webhooks.ts:98](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L98)
 
 When it happened (ISO 8601).
 
@@ -31,7 +31,7 @@ When it happened (ISO 8601).
 
 > **data**: `object`
 
-Defined in: [webhooks.ts:63](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L63)
+Defined in: [webhooks.ts:104](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L104)
 
 What the event is about.
 
@@ -48,6 +48,13 @@ Why AML held the payment, on a hold by AML.
 ##### aml.reasons
 
 > **reasons**: `unknown`[]
+
+#### hold?
+
+> `optional` **hold?**: [`PaymentWebhookHold`](/packages/quasar-sdk/server/interfaces/PaymentWebhookHold.md) \| [`PaymentWebhookHoldVoided`](/packages/quasar-sdk/server/interfaces/PaymentWebhookHoldVoided.md)
+
+What `invoice.held` holds, or what `invoice.hold_voided` undid. Quasar versions before October 29, 2026 leave it
+out.
 
 #### invoice?
 
@@ -79,7 +86,7 @@ The subscription of a subscription event.
 
 > **environment**: [`PaymentsEnvironment`](/packages/quasar-sdk/server/type-aliases/PaymentsEnvironment.md)
 
-Defined in: [webhooks.ts:61](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L61)
+Defined in: [webhooks.ts:102](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L102)
 
 Live or test.
 
@@ -89,7 +96,7 @@ Live or test.
 
 > **id**: `string`
 
-Defined in: [webhooks.ts:49](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L49)
+Defined in: [webhooks.ts:90](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L90)
 
 Event ID: the same for every delivery and retry of the event.
 
@@ -99,7 +106,7 @@ Event ID: the same for every delivery and retry of the event.
 
 > **object**: `"event"`
 
-Defined in: [webhooks.ts:51](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L51)
+Defined in: [webhooks.ts:92](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L92)
 
 Always `event`.
 
@@ -109,7 +116,7 @@ Always `event`.
 
 > **sentAt**: `string`
 
-Defined in: [webhooks.ts:59](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L59)
+Defined in: [webhooks.ts:100](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L100)
 
 When this delivery was sent; signed with the body, it lets [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebhook.md) refuse old replays.
 
@@ -119,6 +126,6 @@ When this delivery was sent; signed with the body, it lets [verifyWebhook](/pack
 
 > **type**: [`PaymentWebhookEventType`](/packages/quasar-sdk/server/type-aliases/PaymentWebhookEventType.md)
 
-Defined in: [webhooks.ts:55](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L55)
+Defined in: [webhooks.ts:96](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L96)
 
 What happened.

@@ -61,12 +61,9 @@ export interface CheckoutInvoice {
   /** Base units of the quoted asset received so far: an underpaid invoice asks for the rest. */
   amountPaid: string | null;
   /**
-   * Why a payment waits for, or was flagged to, the seller: `screening` (the sender did not pass the check after
-   * paying, or it came from another wallet than the quoted one, which the seller refunds to that wallet; no details
-   * reach the buyer), `late` (it arrived after the invoice expired or was cancelled), `overpaid`, `quote_expired` (it
-   * arrived after its locked quote expired).
+   * Why a payment waits for, or was flagged to, the seller ({@link CheckoutReview}); `null` when none does.
    */
-  review: { reason: 'screening' | 'late' | 'overpaid' | 'quote_expired' } | null;
+  review: CheckoutReview | null;
   /** What was refunded, in minor units (cents) of the invoice currency. */
   refundedTotalMinor: string | null;
   /**
@@ -119,22 +116,49 @@ export interface CheckoutInvoice {
   subscription: CheckoutSubscription | null;
 }
 
+/**
+ * Why a payment of a `held` (or flagged) invoice waits for the seller, as {@link CheckoutInvoice.review} says it:
+ *
+ * - `screening`: the sender did not pass the seller's AML check after paying; no details reach the buyer.
+ * - `late`: it arrived after the invoice expired or was cancelled; the seller accepts or returns it.
+ * - `overpaid`: more arrived than the invoice asks for, and the seller looks at it.
+ * - `quote_expired`: it arrived after its locked quote expired, in an asset whose price moved; the seller accepts or
+ *   returns it.
+ * - `payer_mismatch` and `payer_unconfirmed`, with `refundOnly: true`: Quasar could tie the transfer to no invoice
+ *   (it came from another wallet than the one the quote was locked to, or from that wallet, which never confirmed the
+ *   invoice with {@link CheckoutState.confirmPayer}). Anyone who saw its transaction could have handed it over, so the
+ *   seller never accepts it for this invoice: it only returns it to the wallet that sent it. Say so, never "the seller
+ *   checks your payment": for `payer_mismatch` "The payment came from another wallet than the one that confirmed this
+ *   invoice. {merchant} returns it to the wallet that sent it. Pay from the confirmed wallet.", for
+ *   `payer_unconfirmed` the same with "from a wallet that did not confirm this invoice". A held invoice takes no other
+ *   payment: a payment from the confirmed wallet goes to an invoice that can be paid (a new one from the seller). A
+ *   refund-only hold is undone when the same transfer pays another invoice of the seller (the one its wallet
+ *   confirmed); the invoice then goes back to where it stood, which the page shows once it reads the checkout again.
+ *
+ * Quasar versions before October 29, 2026 show a transfer from another wallet as `screening`.
+ */
+export type CheckoutReview =
+  | { reason: 'screening' | 'late' | 'overpaid' | 'quote_expired' }
+  | { reason: 'payer_mismatch' | 'payer_unconfirmed'; refundOnly: true };
+
 /** A payment of the invoice that failed, as the checkout lists it ({@link CheckoutInvoice.rejectedPayments}). */
 export interface CheckoutRejectedPayment {
   /** The transaction's `txKey`, or the `userOpHash` of a gasless relay that failed before it had a transaction. */
   txKey: string;
   /**
    * Why: `reverted`, `cancelled`, `expired` (a Solana blockhash), `no_matching_transfer` (a wrong amount, asset or
-   * recipient), `tx_already_used` (the transaction pays another invoice of the merchant: the one whose quoted wallet
-   * sent it, also when this invoice's page handed it over first or claimed it), `reference_missing`, `too_early`,
-   * `not_found` (the network never returned the transaction), `timeout` (no receipt in time), `replaced`,
-   * `payer_mismatch` (a transfer from another wallet to an invoice paid or held already; one to a payable invoice is
-   * held for the merchant, who refunds it to the wallet that sent it), `native_from_contract_unverifiable`,
-   * `invoice_not_payable` (a transfer to an invoice paid, held or refunded already), `settlement_failed` (the network
-   * confirmed the transaction, but Quasar has not recorded it yet and settles it again daily for 30 days: not final,
-   * never a second payment, the buyer contacts the merchant), `unresolved_after_24h` (no result seen on chain within 24
-   * hours: only a transaction Quasar read again after that day and the network does not have), a relay's reason
-   * (`user_operation_lost`…), or `transaction_failed` when Quasar does not know.
+   * recipient), `tx_already_used` (the transaction pays another invoice of the merchant: the one the wallet that sent
+   * it confirmed, or whose mark it carries, also when this invoice's page handed it over first or claimed it),
+   * `reference_missing`, `too_early`, `not_found` (the network never returned the transaction), `timeout` (no receipt
+   * in time), `replaced`, `payer_mismatch` (a transfer from another wallet to an invoice paid or held already; one to a
+   * payable invoice is held for a refund only: {@link CheckoutReview}), `payer_unconfirmed` (the same from a wallet that
+   * never confirmed the invoice: it pays no invoice, the merchant returns it to the wallet that sent it; final),
+   * `native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded
+   * already), `settlement_failed` (the network confirmed the transaction, but Quasar has not recorded it yet: not final,
+   * never a second payment, the buyer contacts the merchant; Quasar settles it again daily for 30 days after it learned
+   * of it, while `rechecked`), `unresolved_after_24h` (no result seen on chain within 24 hours: only a transaction
+   * Quasar read again after that day and the network does not have), a relay's reason (`user_operation_lost`…), or
+   * `transaction_failed` when Quasar does not know.
    */
   reason: string;
   /**
@@ -149,20 +173,23 @@ export interface CheckoutRejectedPayment {
   original?: string;
   /**
    * `true` when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`,
-   * `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`,
-   * `invoice_not_payable`), or Quasar has not recorded it yet (`settlement_failed`): it may have moved money. Never say
-   * that it did not go through or that nothing was charged: say that it does not pay the invoice (for
-   * `settlement_failed`: that Quasar has not recorded it yet), and whom to contact if money left the wallet. Quasar
-   * versions before October 29, 2026 leave it out.
+   * `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `payer_unconfirmed`,
+   * `native_from_contract_unverifiable`, `invoice_not_payable`), or Quasar has not recorded it yet
+   * (`settlement_failed`): it may have moved money. Never say that it did not go through or that nothing was charged:
+   * say that it does not pay the invoice (for `settlement_failed`: that Quasar has not recorded it yet; for
+   * `payer_mismatch` and `payer_unconfirmed`: that the merchant returns it to the wallet that sent it), and whom to
+   * contact if money left the wallet. Quasar versions before October 29, 2026 leave it out.
    */
   movedMoney?: true;
   /**
    * `true` while Quasar still reads the transaction again: a rejection for `not_found`, `timeout` or `replaced` of a
-   * payment Quasar learned of within the last 24 hours that nothing has resolved since. Only then may the page promise
-   * that Quasar checks the payment again; a payment still unresolved after the 24 hours is closed with the final reason
-   * `unresolved_after_24h`. Any other reason that is not `final` (a relay operation lost, `transaction_failed`, a
-   * transfer from another wallet…) is never read again: if money left the wallet, the buyer contacts the merchant with
-   * the transaction hash. Quasar versions before October 29, 2026 leave it out.
+   * payment Quasar learned of within the last 24 hours that nothing has resolved since (a payment still unresolved
+   * after the 24 hours is closed with the final reason `unresolved_after_24h`), or a `settlement_failed` one Quasar
+   * still settles again daily (for 30 days after it learned of the payment; Quasar versions before the payer proof,
+   * October 29, 2026, never mark it). Only then may the page promise that Quasar checks the payment again. Any other
+   * reason that is not `final` (a relay operation lost, `transaction_failed`, a transfer from another wallet…) is never
+   * read again: if money left the wallet, the buyer contacts the merchant with the transaction hash. Quasar versions
+   * before October 29, 2026 leave it out.
    */
   rechecked?: true;
 }
@@ -255,6 +282,81 @@ export interface CheckoutMethod {
   markupBps: number;
   /** How much less the method costs than the invoice total, in basis points. */
   discountBps: number;
+  /**
+   * When a payment with the method needs the paying wallet's confirmation of the invoice
+   * ({@link CheckoutState.confirmPayer}): `before_quote` (an EVM method: before the price; the quote answers
+   * `409 payer_proof_required` without it), `unless_relayed` (an EVM method the gasless relay may pay: the price comes
+   * first, the relay's EIP-3009 authorization confirms the wallet, and a transfer or a paymaster payment of it needs
+   * the confirmation first), `none` (Solana: the quote's reference ties the transfer to the invoice). Quasar versions
+   * before October 29, 2026 leave it out: no confirmation.
+   */
+  payerProof?: PayerProofNeed;
+}
+
+/** When a payment with a method needs the paying wallet's confirmation ({@link CheckoutMethod.payerProof}). */
+export type PayerProofNeed = 'before_quote' | 'unless_relayed' | 'none';
+
+/**
+ * How a wallet confirmed the invoice: `eoa` (an EIP-191 signature of Quasar's message, which counts on every EVM
+ * network), `eip1271` and `eip6492` (a smart wallet's signature its contract accepted, deployed or not yet, which
+ * counts on that network only), `authorization` (the EIP-3009 authorization of the invoice's gasless relay, on every
+ * EVM network).
+ */
+export type PayerProofKind = 'eoa' | 'eip1271' | 'eip6492' | 'authorization';
+
+/** A wallet that confirmed the invoice ({@link CheckoutView.payerProofs}). */
+export interface CheckoutPayerProof {
+  /** The wallet, as a CAIP-10 account on the network it confirmed on (the EVM address checksummed). */
+  payer: string;
+  /** How it confirmed. */
+  kind: PayerProofKind;
+  /** The CAIP-2 network it confirmed on: the only one where an `eip1271` or `eip6492` confirmation counts. */
+  chainId: string;
+  /** When. */
+  confirmedAt: string;
+}
+
+/**
+ * What `POST payer-proof/message` answers: the exact EIP-4361 (Sign-In with Ethereum) message the wallet signs, for
+ * free and without moving funds, to confirm that it pays this invoice. Quasar builds it from the page's site (its
+ * `Origin`), the wallet, the invoice number, the seller and the total, the network, a nonce derived from the invoice and
+ * the wallet, the invoice's creation (`Issued At`) and due date (`Expiration Time`); asked twice, it is the same.
+ */
+export interface PayerProofMessage {
+  /** Always `payer_proof_message`. */
+  object: 'payer_proof_message';
+  /** The wallet, as a CAIP-10 account (the EVM address checksummed). */
+  payer: string;
+  /** `true` when the wallet confirmed this invoice already (on this network, for a smart wallet): nothing to sign. */
+  proven: boolean;
+  /** The message to sign as it is, with `personal_sign` (EIP-191). */
+  message: string;
+  /** The site the message names: the host of the page that asked. */
+  domain: string;
+  /** The CAIP-2 network of the wallet. */
+  chainId: string;
+  /** The nonce of the message. */
+  nonce: string;
+  /** When the invoice was created (`Issued At`). */
+  issuedAt: string;
+  /** The invoice's due date (`Expiration Time`), `null` without one. */
+  expiresAt: string | null;
+}
+
+/** What `POST payer-proof` answers: the wallet's confirmation of the invoice, as Quasar recorded it. */
+export interface PayerProofConfirmation {
+  /** Always `payer_proof`. */
+  object: 'payer_proof';
+  /** The wallet, as a CAIP-10 account. */
+  payer: string;
+  /** Always `true`. */
+  proven: true;
+  /** How it confirmed. */
+  kind: PayerProofKind;
+  /** The CAIP-2 network it confirmed on. */
+  chainId: string;
+  /** When. */
+  confirmedAt: string;
 }
 
 /** What a wallet needs to pay a locked quote: the exact amount in base units, never rounded again. */
@@ -354,6 +456,13 @@ export interface CheckoutQuote {
   instructions: PaymentInstructions;
   /** What the merchant sponsors, or `null`: the buyer pays the gas. */
   gasless: GaslessOffer | null;
+  /**
+   * Whether the quoted wallet confirmed the invoice ({@link CheckoutState.confirmPayer}): `required` on an EVM method,
+   * `proven` once it did (`kind` says how). An EVM quote without the confirmation exists only for a method the gasless
+   * relay may pay: a transfer or a paymaster payment from that wallet needs the confirmation first, or Quasar credits it
+   * to no invoice and the merchant returns it. Quasar versions before October 29, 2026 leave it out.
+   */
+  payerProof?: { required: boolean; proven: boolean; kind: PayerProofKind | null };
 }
 
 /** The ERC-7715 `wallet_grantPermissions` request of a subscription with automatic charges. */
@@ -425,6 +534,11 @@ export interface CheckoutView {
   amlScreening: boolean;
   /** The methods that take this invoice. */
   methods: CheckoutMethod[];
+  /**
+   * The wallets that confirmed this invoice ({@link CheckoutState.confirmPayer}), oldest first: a page reopened with
+   * one of them asks for no new signature. Quasar versions before October 29, 2026 leave it out.
+   */
+  payerProofs?: CheckoutPayerProof[];
   /** How long a quote holds once locked, in seconds (never past the invoice deadline). */
   quoteTtlSeconds: number;
   /** The locked quote, if any. */
@@ -443,6 +557,13 @@ export interface CheckoutApi {
   view: () => Promise<CheckoutView>;
   /** Locks a quote for a method and, when connected, the payer, with the buyer's consent when given (`POST quote`). */
   quote: (body: { methodId: string; payer?: string; consentGiven?: boolean }) => Promise<CheckoutQuote>;
+  /**
+   * The message the wallet signs to confirm the invoice (`POST payer-proof/message`). Optional for an `api` written
+   * before payer proofs: without it and {@link CheckoutApi.payerProof}, {@link CheckoutState.confirmPayer} fails.
+   */
+  payerProofMessage?: (body: { payer: string }) => Promise<PayerProofMessage>;
+  /** Sends the signed message, which Quasar checks and records (`POST payer-proof`). Optional like `payerProofMessage`. */
+  payerProof?: (body: { payer: string; message: string; signature: string }) => Promise<PayerProofConfirmation>;
   /** Sends the buyer details (`POST buyer`) and answers with the checkout. */
   buyer: (body: { buyer: Buyer; company?: boolean }) => Promise<CheckoutView>;
   /** Sets the language of the page and the documents still to be issued (`POST locale`). */

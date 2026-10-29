@@ -1,8 +1,15 @@
 import { createHmac } from 'node:crypto';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import { isPaymentWebhookEvent, QuasarWebhookError, verifyWebhook, WEBHOOK_SIGNATURE_HEADER } from '../index';
+import {
+  isPaymentWebhookEvent,
+  type PaymentWebhookEvent,
+  type PaymentWebhookEventType,
+  QuasarWebhookError,
+  verifyWebhook,
+  WEBHOOK_SIGNATURE_HEADER,
+} from '../index';
 
 const SECRET = 'whsec_test_1';
 const sign = (body: string, secret = SECRET) => createHmac('sha256', secret).update(body).digest('hex');
@@ -100,5 +107,34 @@ describe('verifyWebhook', () => {
         code: 'invalid_body',
       });
     }
+  });
+
+  // A refund-only hold undone because its transfer paid another invoice (Quasar, 2026-10-29)
+  it('reads what a hold is about, and the hold Quasar undid when its transfer paid another invoice', async () => {
+    const body = JSON.stringify({
+      ...JSON.parse(paymentEvent('2026-10-10T11:59:59.000Z')),
+      type: 'invoice.hold_voided',
+      data: {
+        invoice: { id: 'inv_1', object: 'invoice', status: 'open' },
+        hold: { voided: true, txHash: '0xfeed', paidInvoice: 'inv_2', status: 'open' },
+      },
+    });
+    const event = await verifyWebhook({ body, signature: sign(body), secret: SECRET, now: NOW });
+    if (!isPaymentWebhookEvent(event)) throw new Error('A payment event');
+    expect(event.type).toBe('invoice.hold_voided');
+    expect(event.data.hold).toEqual({ voided: true, txHash: '0xfeed', paidInvoice: 'inv_2', status: 'open' });
+    expectTypeOf<'invoice.hold_voided'>().toExtend<PaymentWebhookEventType>();
+    expectTypeOf<NonNullable<PaymentWebhookEvent['data']['hold']>>().toEqualTypeOf<
+      | {
+          voided?: undefined;
+          reason: 'late' | 'aml' | 'quote_expired' | 'payer_mismatch' | null;
+          refundOnly: boolean;
+          txHash: string | null;
+          senders?: string[];
+          unconfirmed?: true;
+          late?: true;
+        }
+      | { voided: true; txHash: string | null; paidInvoice: string | null; status: string | null }
+    >();
   });
 });
