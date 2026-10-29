@@ -1,6 +1,6 @@
 # CheckoutMethod
 
-Defined in: [checkout/types.ts:229](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L229)
+Defined in: [checkout/types.ts:237](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L237)
 
 A payment method the invoice can be paid with.
 
@@ -10,7 +10,7 @@ A payment method the invoice can be paid with.
 
 > **assetId**: `string` \| `null`
 
-Defined in: [checkout/types.ts:239](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L239)
+Defined in: [checkout/types.ts:247](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L247)
 
 CAIP-19 asset.
 
@@ -20,7 +20,7 @@ CAIP-19 asset.
 
 > **chainId**: `string`
 
-Defined in: [checkout/types.ts:237](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L237)
+Defined in: [checkout/types.ts:245](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L245)
 
 CAIP-2 chain (`eip155:8453`, `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp`).
 
@@ -30,7 +30,7 @@ CAIP-2 chain (`eip155:8453`, `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp`).
 
 > **decimals**: `number`
 
-Defined in: [checkout/types.ts:241](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L241)
+Defined in: [checkout/types.ts:249](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L249)
 
 Decimals of the token.
 
@@ -40,7 +40,7 @@ Decimals of the token.
 
 > **discountBps**: `number`
 
-Defined in: [checkout/types.ts:249](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L249)
+Defined in: [checkout/types.ts:257](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L257)
 
 How much less the method costs than the invoice total, in basis points.
 
@@ -50,7 +50,7 @@ How much less the method costs than the invoice total, in basis points.
 
 > **featured**: `boolean`
 
-Defined in: [checkout/types.ts:245](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L245)
+Defined in: [checkout/types.ts:253](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L253)
 
 Marked "Popular" by the merchant.
 
@@ -60,7 +60,7 @@ Marked "Popular" by the merchant.
 
 > **gasless**: `string` \| `null`
 
-Defined in: [checkout/types.ts:243](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L243)
+Defined in: [checkout/types.ts:251](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L251)
 
 `auto` when the merchant may sponsor the gas, `off` otherwise.
 
@@ -70,7 +70,7 @@ Defined in: [checkout/types.ts:243](https://github.com/TuwaIO/sdk/blob/main/pack
 
 > **id**: `string`
 
-Defined in: [checkout/types.ts:231](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L231)
+Defined in: [checkout/types.ts:239](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L239)
 
 Method ID, for [CheckoutState.selectMethod](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#selectmethod).
 
@@ -80,7 +80,7 @@ Method ID, for [CheckoutState.selectMethod](/packages/quasar-sdk/checkout/interf
 
 > **markupBps**: `number`
 
-Defined in: [checkout/types.ts:247](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L247)
+Defined in: [checkout/types.ts:255](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L255)
 
 How much more the method costs than the invoice total, in basis points (`150` is 1.5 %).
 
@@ -90,7 +90,7 @@ How much more the method costs than the invoice total, in basis points (`150` is
 
 > **name**: `string`
 
-Defined in: [checkout/types.ts:233](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L233)
+Defined in: [checkout/types.ts:241](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L241)
 
 Its name.
 
@@ -100,6 +100,6 @@ Its name.
 
 > **symbol**: `string`
 
-Defined in: [checkout/types.ts:235](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L235)
+Defined in: [checkout/types.ts:243](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L243)
 
 Token symbol.

@@ -1,6 +1,6 @@
 # CheckoutState
 
-Defined in: [checkout/store.ts:106](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L106)
+Defined in: [checkout/store.ts:120](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L120)
 
 The state and actions of [createCheckoutStore](/packages/quasar-sdk/checkout/functions/createCheckoutStore.md).
 
@@ -10,7 +10,7 @@ The state and actions of [createCheckoutStore](/packages/quasar-sdk/checkout/fun
 
 > **checkout**: [`CheckoutView`](/packages/quasar-sdk/checkout/interfaces/CheckoutView.md) \| `null`
 
-Defined in: [checkout/store.ts:110](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L110)
+Defined in: [checkout/store.ts:124](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L124)
 
 What the checkout token opens; `null` until loaded.
 
@@ -20,7 +20,7 @@ What the checkout token opens; `null` until loaded.
 
 > **consentGiven**: `boolean`
 
-Defined in: [checkout/store.ts:118](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L118)
+Defined in: [checkout/store.ts:132](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L132)
 
 Whether the buyer ticked the merchant's consent (`checkout.consent`).
 
@@ -30,7 +30,7 @@ Whether the buyer ticked the merchant's consent (`checkout.consent`).
 
 > **destroy**: () => `void`
 
-Defined in: [checkout/store.ts:304](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L304)
+Defined in: [checkout/store.ts:335](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L335)
 
 Stops following the invoice (closes the event stream or the reads). Call it when the page goes away.
 
@@ -44,7 +44,7 @@ Stops following the invoice (closes the event stream or the reads). Call it when
 
 > **error**: [`CheckoutError`](/packages/quasar-sdk/checkout/interfaces/CheckoutError.md) \| `null`
 
-Defined in: [checkout/store.ts:178](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L178)
+Defined in: [checkout/store.ts:195](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L195)
 
 Why the last action failed; cleared by the next one.
 
@@ -54,7 +54,7 @@ Why the last action failed; cleared by the next one.
 
 > **grantPermission**: (`params`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:296](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L296)
+Defined in: [checkout/store.ts:325](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L325)
 
 Passes the wallet's answer to `wallet_grantPermissions` for a subscription's automatic charges (`POST permission`).
 
@@ -78,13 +78,14 @@ Whether Quasar accepted it; `checkout.autoCharge` is then `active`.
 
 > `readonly` **invoicePaymentOnTheWay**: `boolean`
 
-Defined in: [checkout/store.ts:152](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L152)
+Defined in: [checkout/store.ts:169](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L169)
 
 Whether Quasar last reported a payment of the invoice on its way (`pendingPayments` above `0`), whoever handed it
-over: another tab, the page before it was reloaded, a Solana Pay transfer Quasar found. While it is `true` on a
-payable invoice the phase is `confirming`, not a payment; on an `expired` invoice the payment may still arrive, and
-the store follows it as it follows [CheckoutState.paymentOnTheWay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#paymentontheway). `false` with a Quasar that does not report
-it, and once the store stops following an expired invoice. Read-only: the store sets it.
+over: another tab, the page before it was reloaded, a Solana Pay transfer Quasar found, this invoice's claim on a
+transaction another invoice handed over first. While it is `true` on a payable invoice the phase is `confirming`,
+not a payment; on an `expired` or `cancelled` invoice the payment may still arrive, and the store follows it as it
+follows [CheckoutState.paymentOnTheWay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#paymentontheway). `false` with a Quasar that does not report it, and once the store
+stops following an expired or cancelled invoice. Read-only: the store sets it.
 
 ***
 
@@ -92,7 +93,7 @@ it, and once the store stops following an expired invoice. Read-only: the store 
 
 > `readonly` **invoicePaymentUnresolved**: `boolean`
 
-Defined in: [checkout/store.ts:166](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L166)
+Defined in: [checkout/store.ts:183](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L183)
 
 Whether Quasar last reported a payment of the invoice that may still arrive (`unresolvedPayments` above `0`, with
 no time limit: also one stuck past the 25 minutes `pendingPayments` counts, and one whose tracker lost sight of it,
@@ -106,7 +107,7 @@ in `unconfirmed` (or `expired` with `payment_unconfirmed`). Read-only: the store
 
 > **invoiceStatus**: [`InvoiceStatus`](/packages/quasar-sdk/server/type-aliases/InvoiceStatus.md) \| `null`
 
-Defined in: [checkout/store.ts:112](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L112)
+Defined in: [checkout/store.ts:126](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L126)
 
 State of the invoice, as Quasar last reported it.
 
@@ -116,7 +117,7 @@ State of the invoice, as Quasar last reported it.
 
 > **load**: () => `Promise`\<`void`\>
 
-Defined in: [checkout/store.ts:208](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L208)
+Defined in: [checkout/store.ts:227](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L227)
 
 Reads the checkout (`GET`) and, while the invoice can change, follows it (server-sent events, else a read every
 `pollMs`). An event that brings an outcome (underpaid, held, paid, refunded, expired, cancelled) updates
@@ -130,13 +131,15 @@ payment Quasar could not confirm (its latest rejection is not `final`), or that 
 rejection that Quasar reads again (`not_found`, `timeout`, `replaced`) no longer counts once Quasar reports no
 payment that may still arrive (`unresolvedPayments` `0`): Quasar resolved it. Hand-overs this tab kept
 ([CheckoutState.submit](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#submit)) that Quasar does not list yet are handed over again at once. It stops at a final
-state, except `expired` while [CheckoutState.paymentOnTheWay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#paymentontheway) or
+state, except `expired` and `cancelled` while [CheckoutState.paymentOnTheWay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#paymentontheway) or
 [CheckoutState.invoicePaymentOnTheWay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#invoicepaymentontheway): it keeps the event stream while Quasar keeps it open for that payment, and
 otherwise closes it and reads the checkout every 20 seconds (or every `pollMs`, when longer), until the payment
 ends the invoice (`paid`, `held`), fails, Quasar reports no payment on its way, 35 minutes past the later of
-`dueAt` and the hand-over (an hour after the expiry without `dueAt`), or `destroy` is called. It never expires the
-invoice by the clock: past `dueAt`, a confirming payment stays `confirming` until Quasar reports the outcome. Sets
-`phase` `error` when the link is wrong or retired.
+`dueAt` and the hand-over for an expired invoice (an hour after the expiry without `dueAt`), 35 minutes after the
+store found the invoice cancelled, or `destroy` is called. A cancelled invoice with a payment that may still arrive
+and none on its way opens with `error` `payment_unconfirmed`, like an expired one. It never expires the invoice by
+the clock: past `dueAt`, a confirming payment stays `confirming` until Quasar reports the outcome. Sets `phase`
+`error` when the link is wrong or retired.
 
 #### Returns
 
@@ -150,7 +153,7 @@ Resolves when the checkout is read.
 
 > **locale**: [`InvoiceLocale`](/packages/quasar-sdk/server/type-aliases/InvoiceLocale.md) \| `null`
 
-Defined in: [checkout/store.ts:122](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L122)
+Defined in: [checkout/store.ts:136](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L136)
 
 Language of the page and the documents still to be issued.
 
@@ -160,7 +163,7 @@ Language of the page and the documents still to be issued.
 
 > **logoUrl**: `string` \| `null`
 
-Defined in: [checkout/store.ts:184](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L184)
+Defined in: [checkout/store.ts:201](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L201)
 
 The merchant's logo (PNG or JPEG, a plain `GET` for an `<img>`); `null` when the merchant has none.
 
@@ -170,7 +173,7 @@ The merchant's logo (PNG or JPEG, a plain `GET` for an `<img>`); `null` when the
 
 > **methodId**: `string` \| `null`
 
-Defined in: [checkout/store.ts:114](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L114)
+Defined in: [checkout/store.ts:128](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L128)
 
 The chosen payment method.
 
@@ -180,11 +183,13 @@ The chosen payment method.
 
 > **payAgain**: () => `void`
 
-Defined in: [checkout/store.ts:302](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L302)
+Defined in: [checkout/store.ts:333](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L333)
 
 Goes back to the payment from `unconfirmed`, once the buyer checked that the payment did not leave the wallet:
 `awaitingPayment` while the locked quote is valid, `underpaid` for the rest of an underpaid invoice, otherwise
-`selectMethod` (the expired quote is dropped). Nothing changes in another phase.
+`selectMethod` (the expired quote is dropped); the outcome of an invoice that no longer takes a payment. Nothing
+changes in another phase, nor while `error.reason` is `tx_already_used` or `settlement_failed`: that payment left
+the wallet and may still pay the invoice.
 
 #### Returns
 
@@ -196,7 +201,7 @@ Goes back to the payment from `unconfirmed`, once the buyer checked that the pay
 
 > **payer**: `string` \| `null`
 
-Defined in: [checkout/store.ts:116](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L116)
+Defined in: [checkout/store.ts:130](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L130)
 
 The connected wallet as a CAIP-10 account on the method's chain.
 
@@ -206,7 +211,7 @@ The connected wallet as a CAIP-10 account on the method's chain.
 
 > **paymasterUrl**: `string` \| `null`
 
-Defined in: [checkout/store.ts:182](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L182)
+Defined in: [checkout/store.ts:199](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L199)
 
 The ERC-7677 paymaster URL for `wallet_sendCalls` when the quote offers sponsored calls; `null` otherwise.
 
@@ -216,7 +221,7 @@ The ERC-7677 paymaster URL for `wallet_sendCalls` when the quote offers sponsore
 
 > `readonly` **paymentCountsUntil**: `string` \| `null`
 
-Defined in: [checkout/store.ts:158](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L158)
+Defined in: [checkout/store.ts:175](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L175)
 
 Until when the invoice waits for a payment Quasar learned of before `dueAt` (`dueAt` plus 30 minutes), while one is
 on its way; `null` otherwise or with a Quasar that does not report it. The page can say from it, not from the
@@ -228,7 +233,7 @@ browser's clock, that the payment was sent in time. Read-only: the store sets it
 
 > `readonly` **paymentOnTheWay**: `boolean`
 
-Defined in: [checkout/store.ts:144](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L144)
+Defined in: [checkout/store.ts:160](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L160)
 
 Whether a payment this store handed to Quasar ([CheckoutState.submit](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#submit), [CheckoutState.relay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#relay), also a
 relay still `sending`, without a `txKey`) is on its way: `true` from the hand-over until the payment settles
@@ -238,11 +243,13 @@ relay's `userOpHash`), on an `open` invoice too: with a final reason `error` is 
 cancelled…) or `payment_mismatch` (a wrong amount or recipient…: it may have moved money) and the buyer may pay
 again; otherwise (not found, no receipt in time…) `error` is
 `payment_unconfirmed` and `phase` `unconfirmed`. The same when the invoice goes back to `open` after `processing`.
-On an `expired` invoice it tells the page that the buyer's payment may still arrive: `false` again once Quasar
-reports no payment of the invoice on its way, or 35 minutes past the later of `dueAt` and the hand-over (an hour
-after the invoice expired when it has no `dueAt`), when the store stops following the invoice (`error`
-`payment_unconfirmed` then, or on a read without a payment on its way, while
-[CheckoutState.invoicePaymentUnresolved](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#invoicepaymentunresolved) is `true`). Read-only: the store sets it.
+On an `expired` or `cancelled` invoice it tells the page that the buyer's payment may still arrive: `false` again
+once Quasar reports no payment of the invoice on its way, or 35 minutes past the later of `dueAt` and the hand-over
+(an hour after the invoice expired when it has no `dueAt`; 35 minutes after the store found the invoice
+cancelled), when the store stops following the invoice (`error` `payment_unconfirmed` then, or on a read without a
+payment on its way, while [CheckoutState.invoicePaymentUnresolved](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#invoicepaymentunresolved) is `true`). Also `true` while Quasar
+decides about a transaction another invoice handed over first (`error.reason` `tx_already_used`). Read-only: the
+store sets it.
 
 ***
 
@@ -250,7 +257,7 @@ after the invoice expired when it has no `dueAt`), when the store stops followin
 
 > `readonly` **paymentSentInTime**: `boolean` \| `null`
 
-Defined in: [checkout/store.ts:174](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L174)
+Defined in: [checkout/store.ts:191](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L191)
 
 Whether the payment this store handed over counts as sent before `dueAt`, as Quasar says (one of its keys is in
 `onTimeTxKeys`): `true` once Quasar lists it, `false` while Quasar lists the payments sent in time without it (one
@@ -264,7 +271,7 @@ Read-only: the store sets it.
 
 > **phase**: [`CheckoutPhase`](/packages/quasar-sdk/checkout/type-aliases/CheckoutPhase.md)
 
-Defined in: [checkout/store.ts:108](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L108)
+Defined in: [checkout/store.ts:122](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L122)
 
 Where the payment stands.
 
@@ -274,7 +281,7 @@ Where the payment stands.
 
 > **quote**: [`CheckoutQuote`](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md) \| `null`
 
-Defined in: [checkout/store.ts:120](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L120)
+Defined in: [checkout/store.ts:134](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L134)
 
 The locked quote.
 
@@ -284,7 +291,7 @@ The locked quote.
 
 > **receiptUrl**: `string` \| `null`
 
-Defined in: [checkout/store.ts:180](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L180)
+Defined in: [checkout/store.ts:197](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L197)
 
 The receipt PDF of a paid invoice (a plain `GET`, for a link); `null` before.
 
@@ -294,7 +301,7 @@ The receipt PDF of a paid invoice (a plain `GET`, for a link); `null` before.
 
 > **relay**: (`signature`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:289](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L289)
+Defined in: [checkout/store.ts:318](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L318)
 
 Sends the payer's signature of `quote.gasless.relay.typedData` (`POST relay`): Quasar sends the transfer and the
 merchant pays the gas.
@@ -320,7 +327,7 @@ Whether it was relayed; `phase` is then `confirming` and [CheckoutState.paymentO
 
 > **releaseQuote**: () => `void`
 
-Defined in: [checkout/store.ts:234](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L234)
+Defined in: [checkout/store.ts:253](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L253)
 
 Forgets the locked quote and goes back to choosing a method ("Back to methods"), also for a Solana Pay QR quote
 that no other action drops. Nothing changes once the payment is on its way (`submitting`, `confirming`) or done.
@@ -336,7 +343,7 @@ Quasar keeps the lock until it ends: a payment of the old quote that still arriv
 
 > **requestQuote**: () => `Promise`\<[`CheckoutQuote`](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md) \| `null`\>
 
-Defined in: [checkout/store.ts:241](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L241)
+Defined in: [checkout/store.ts:260](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L260)
 
 Screens the payer and locks the price (`POST quote`).
 
@@ -353,7 +360,7 @@ The quote, or `null` with `error` set (`phase` `blocked` when AML refuses the wa
 
 > **selectMethod**: (`methodId`) => `void`
 
-Defined in: [checkout/store.ts:214](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L214)
+Defined in: [checkout/store.ts:233](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L233)
 
 Chooses a payment method; a quote for another method is dropped.
 
@@ -375,7 +382,7 @@ One of `checkout.methods`.
 
 > **setBuyer**: (`buyer`, `options?`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:249](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L249)
+Defined in: [checkout/store.ts:268](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L268)
 
 Sends the buyer details the checkout collects (`POST buyer`); the invoice document is issued with them.
 
@@ -407,7 +414,7 @@ Whether they were taken.
 
 > **setConsentGiven**: (`given`) => `void`
 
-Defined in: [checkout/store.ts:228](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L228)
+Defined in: [checkout/store.ts:247](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L247)
 
 Ticks or clears the merchant's consent (`checkout.consent`): a required one must be ticked before
 [CheckoutState.requestQuote](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#requestquote), which sends it with the quote.
@@ -430,7 +437,7 @@ Whether the buyer ticked it.
 
 > **setLocale**: (`locale`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:256](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L256)
+Defined in: [checkout/store.ts:275](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L275)
 
 Changes the language of the page and of the documents still to be issued (`POST locale`).
 
@@ -454,7 +461,7 @@ Whether it was saved.
 
 > **setPayer**: (`payer`) => `void`
 
-Defined in: [checkout/store.ts:221](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L221)
+Defined in: [checkout/store.ts:240](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L240)
 
 Sets the connected wallet; a quote locked to another wallet is dropped.
 
@@ -477,7 +484,7 @@ CAIP-10 account (`eip155:8453:0x…`, `solana:<genesis hash>:<address>`), or `nu
 
 > **submit**: (`params`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:280](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L280)
+Defined in: [checkout/store.ts:309](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L309)
 
 Hands Quasar the transaction the wallet sent (`POST submit`). For an EIP-5792 batch, pass the hash of its
 transaction (from `wallet_getCallsStatus`), not the batch ID.
@@ -488,8 +495,17 @@ The wallet has already sent the transaction, so a hand-over that gets no answer 
 and then every 30 seconds (Quasar takes a transaction once per `txKey`), for up to an hour or until `destroy`;
 after the hour `error.reason` is `submit_failed` (Quasar never received it: the buyer contacts the merchant with
 the transaction hash if money left the wallet). Once Quasar takes it, the store follows it as below; taken while
-the invoice is already `paid`, `held`, `cancelled` or `refunded`, it leaves the phase as it is (Quasar records it
-for the merchant) and the store reads the checkout once more. A refusal (any other 4xx) is not retried.
+the invoice is already `paid`, `held` or `refunded`, it leaves the phase as it is (Quasar records it for the
+merchant) and the store reads the checkout once more; taken while it is `expired` or `cancelled`, the phase stays
+and the store follows the payment until Quasar holds it (or pays the expired invoice in its grace).
+
+Quasar answers `409 tx_already_used` when it tracks the transaction for another invoice whose page handed it over
+first (EVM invoices share the merchant's address, so anyone who saw the hash may have done so). That is not a
+refusal of the payment: Quasar records this invoice's claim and credits the transaction to the invoice whose quoted
+wallet sent it. The store follows it as its payment, with `phase` `unconfirmed` (the outcome's on an expired or
+cancelled invoice) and `error` `payment_unconfirmed` with `reason` `tx_already_used`, and offers no payment
+([CheckoutState.payAgain](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#payagain) does nothing) until Quasar decides. It is not handed over again. Any other refusal
+(4xx) is not retried either.
 
 Until Quasar takes or refuses it, the hand-over is kept in the tab's `sessionStorage`
 ([CheckoutStoreOptions.handOverStorage](/packages/quasar-sdk/checkout/interfaces/CheckoutStoreOptions.md#handoverstorage)), so a page closed or reloaded meanwhile hands it over again on the
@@ -518,9 +534,10 @@ next [CheckoutState.load](/packages/quasar-sdk/checkout/interfaces/CheckoutState
 
 `Promise`\<`boolean`\>
 
-Whether Quasar took it; `phase` is then `confirming` (`expired` when the invoice expired meanwhile: Quasar
-  still takes the transaction, and holds it as a late payment) and [CheckoutState.paymentOnTheWay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#paymentontheway) `true`.
-  `false` while the hand-over is retried.
+Whether Quasar took it; `phase` is then `confirming` (`expired` or `cancelled` when the invoice expired or
+  was cancelled meanwhile: Quasar still takes the transaction, and holds it as a late payment) and
+  [CheckoutState.paymentOnTheWay](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#paymentontheway) `true`. `false` while the hand-over is retried, after a refusal, and for
+  `tx_already_used` (followed all the same).
 
 ***
 
@@ -528,7 +545,7 @@ Whether Quasar took it; `phase` is then `confirming` (`expired` when the invoice
 
 > **txHash**: `string` \| `null`
 
-Defined in: [checkout/store.ts:176](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L176)
+Defined in: [checkout/store.ts:193](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L193)
 
 The payment's transaction, once Quasar has one.
 
@@ -538,7 +555,7 @@ The payment's transaction, once Quasar has one.
 
 > **txKey**: `string` \| `null`
 
-Defined in: [checkout/store.ts:128](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L128)
+Defined in: [checkout/store.ts:142](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L142)
 
 The transaction handed to Quasar: the hash or signature passed to [CheckoutState.submit](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#submit), or the hash of a
 relayed transfer when Quasar returns it. A relay Quasar answers with `sending` has none yet: read

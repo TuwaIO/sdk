@@ -153,13 +153,15 @@ export class PaymentsModule {
 
   /**
    * Accepts a held payment (`POST /v1/payments/invoices/:id/release`): the invoice becomes paid and the buyer gets a
-   * receipt.
+   * receipt. A payment from another wallet than the quoted payer is never released: anyone may hand over for their own
+   * invoice a transaction hash they saw on the network, so refund it to the wallet that sent it instead.
    *
    * @param invoiceId - The invoice.
    * @param params - `reason`, required, recorded in the ledger.
    * @returns The invoice.
-   * @throws {QuasarSDKError} `invoice_not_found` (404), an invoice that is not held (409), a timeout or a network
-   *   error.
+   * @throws {QuasarSDKError} `invoice_not_found` (404); `invoice_not_held`, `invoice_partly_refunded` (refund the rest)
+   *   or `payer_mismatch_refund_only` (a payment from another wallet than the quoted payer: refund it) (409); a timeout
+   *   or a network error.
    */
   async releaseInvoice(invoiceId: string, params: { reason: string }): Promise<Invoice> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/release`, {

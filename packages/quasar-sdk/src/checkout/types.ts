@@ -62,8 +62,9 @@ export interface CheckoutInvoice {
   amountPaid: string | null;
   /**
    * Why a payment waits for, or was flagged to, the seller: `screening` (the sender did not pass the check after
-   * paying; no details reach the buyer), `late` (it arrived after the invoice expired or was cancelled), `overpaid`,
-   * `quote_expired` (it arrived after its locked quote expired).
+   * paying, or it came from another wallet than the quoted one, which the seller refunds to that wallet; no details
+   * reach the buyer), `late` (it arrived after the invoice expired or was cancelled), `overpaid`, `quote_expired` (it
+   * arrived after its locked quote expired).
    */
   review: { reason: 'screening' | 'late' | 'overpaid' | 'quote_expired' } | null;
   /** What was refunded, in minor units (cents) of the invoice currency. */
@@ -71,8 +72,9 @@ export interface CheckoutInvoice {
   /**
    * Payments of the invoice handed over and still on their way, whoever handed them over: tracked transactions
    * settlement has not verified or rejected yet (recorded within the last 25 minutes: Quasar stops counting a stuck
-   * one), and gasless relays still sending (within 35 minutes). Quasar versions before the payment grace (October 2026)
-   * leave it out.
+   * one), gasless relays still sending (within 35 minutes), and claims of this invoice on a transaction another invoice
+   * handed over first that Quasar has not decided yet (within 25 minutes). Quasar versions before the payment grace
+   * (October 2026) leave it out.
    */
   pendingPayments?: number;
   /**
@@ -95,9 +97,10 @@ export interface CheckoutInvoice {
   /**
    * Payments of the invoice that may still arrive, with no time limit: tracked transactions neither confirmed nor
    * rejected for good (also one stuck past the 25 minutes `pendingPayments` counts, and one whose tracker lost sight of
-   * it, `not_found`, `timeout` or `replaced`, which Quasar reads again for 24 hours), and gasless relays still sending.
-   * While it is above `0` the page offers no plain second payment and never says that nothing was charged. Quasar
-   * versions before October 29, 2026 leave it out.
+   * it, `not_found`, `timeout` or `replaced`, which Quasar reads again for 24 hours), gasless relays still sending, and
+   * claims of this invoice on a transaction another invoice handed over first that Quasar has not decided yet. While it
+   * is above `0` the page offers no plain second payment and never says that nothing was charged. Quasar versions
+   * before October 29, 2026 leave it out.
    */
   unresolvedPayments?: number;
   /**
@@ -122,12 +125,16 @@ export interface CheckoutRejectedPayment {
   txKey: string;
   /**
    * Why: `reverted`, `cancelled`, `expired` (a Solana blockhash), `no_matching_transfer` (a wrong amount, asset or
-   * recipient), `tx_already_used`, `reference_missing`, `too_early`, `not_found` (the network never returned the
-   * transaction), `timeout` (no receipt in time), `replaced`, `payer_mismatch` (a transfer from another wallet to an
-   * invoice paid or held already; one to a payable invoice is held for the merchant instead),
-   * `native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded already),
-   * `unresolved_after_24h` (no result seen on chain within 24 hours), a relay's reason (`user_operation_lost`…), or
-   * `transaction_failed` when Quasar does not know.
+   * recipient), `tx_already_used` (the transaction pays another invoice of the merchant: the one whose quoted wallet
+   * sent it, also when this invoice's page handed it over first or claimed it), `reference_missing`, `too_early`,
+   * `not_found` (the network never returned the transaction), `timeout` (no receipt in time), `replaced`,
+   * `payer_mismatch` (a transfer from another wallet to an invoice paid or held already; one to a payable invoice is
+   * held for the merchant, who refunds it to the wallet that sent it), `native_from_contract_unverifiable`,
+   * `invoice_not_payable` (a transfer to an invoice paid, held or refunded already), `settlement_failed` (the network
+   * confirmed the transaction, but Quasar has not recorded it yet and settles it again daily for 30 days: not final,
+   * never a second payment, the buyer contacts the merchant), `unresolved_after_24h` (no result seen on chain within 24
+   * hours: only a transaction Quasar read again after that day and the network does not have), a relay's reason
+   * (`user_operation_lost`…), or `transaction_failed` when Quasar does not know.
    */
   reason: string;
   /**
@@ -143,9 +150,10 @@ export interface CheckoutRejectedPayment {
   /**
    * `true` when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`,
    * `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`,
-   * `invoice_not_payable`): it may have moved money. Never say that it did not go through or that nothing was charged:
-   * say that it does not pay the invoice, and whom to contact if money left the wallet. Quasar versions before October
-   * 29, 2026 leave it out.
+   * `invoice_not_payable`), or Quasar has not recorded it yet (`settlement_failed`): it may have moved money. Never say
+   * that it did not go through or that nothing was charged: say that it does not pay the invoice (for
+   * `settlement_failed`: that Quasar has not recorded it yet), and whom to contact if money left the wallet. Quasar
+   * versions before October 29, 2026 leave it out.
    */
   movedMoney?: true;
   /**
@@ -479,7 +487,7 @@ export interface CheckoutStatusEvent {
   quoteExpiresAt: string | null;
   /**
    * Payments handed over and still on their way, as {@link CheckoutInvoice.pendingPayments}. Quasar keeps the stream of an
-   * `expired` invoice open while it is above `0`.
+   * `expired` or `cancelled` invoice open while it is above `0`.
    */
   pendingPayments?: number;
   /** The keys of the payments that failed, latest first, as {@link CheckoutInvoice.rejectedTxKeys}. */

@@ -1,6 +1,6 @@
 # CheckoutError
 
-Defined in: [checkout/store.ts:78](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L78)
+Defined in: [checkout/store.ts:84](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L84)
 
 Why the last action failed: the Payments `code` (`payer_blocked`, `quote_required`, `invoice_expired`…), or
 `method_required` (no method chosen), `consent_required` (the merchant's consent is not ticked), `payment_failed`
@@ -11,7 +11,8 @@ nothing was charged: say that it does not pay the invoice and to contact the mer
 buyer may pay again once it can never pay the invoice; one that may still pay it keeps `phase` `unconfirmed`, with no
 plain second payment), `payment_unconfirmed` (Quasar could not confirm the transaction, or has not received it yet,
 but it may still have gone through: check the wallet before paying again; `rechecked` says whether Quasar reads it
-again) and `request_failed` (no answer).
+again; `reason` `tx_already_used` and `settlement_failed` say more, see [CheckoutError.reason](/packages/quasar-sdk/checkout/interfaces/CheckoutError.md#reason)) and
+`request_failed` (no answer).
 
 ## Properties
 
@@ -19,7 +20,7 @@ again) and `request_failed` (no answer).
 
 > **code**: `string`
 
-Defined in: [checkout/store.ts:80](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L80)
+Defined in: [checkout/store.ts:86](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L86)
 
 Stable code.
 
@@ -29,7 +30,7 @@ Stable code.
 
 > `optional` **issues?**: [`QuasarRequestIssue`](/packages/quasar-sdk/server/interfaces/QuasarRequestIssue.md)[]
 
-Defined in: [checkout/store.ts:86](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L86)
+Defined in: [checkout/store.ts:92](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L92)
 
 The fields at fault of an invalid request.
 
@@ -39,7 +40,7 @@ The fields at fault of an invalid request.
 
 > **message**: `string`
 
-Defined in: [checkout/store.ts:82](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L82)
+Defined in: [checkout/store.ts:88](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L88)
 
 What to show or log.
 
@@ -49,12 +50,20 @@ What to show or log.
 
 > `optional` **reason?**: `string`
 
-Defined in: [checkout/store.ts:93](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L93)
+Defined in: [checkout/store.ts:107](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L107)
 
 Why Quasar rejected the payment, for `payment_failed`, `payment_mismatch` and `payment_unconfirmed`: a reason of
 [CheckoutRejectedPayment](/packages/quasar-sdk/checkout/interfaces/CheckoutRejectedPayment.md) (`reverted`, `no_matching_transfer`, `not_found`, `timeout`…), `submit_retrying`
 while the store retries handing over a transaction Quasar has not received yet ([CheckoutState.submit](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#submit)), or
-`submit_failed` once it gave up after an hour; left out when Quasar did not say.
+`submit_failed` once it gave up after an hour; left out when Quasar did not say. Two reasons of
+`payment_unconfirmed` are about a payment that left the wallet, and the page offers no payment for them:
+- `tx_already_used` (with `status` `409`): Quasar tracks the transaction for another invoice whose page handed it
+  over first (anyone who saw the hash may have done so). Quasar recorded this invoice's claim on it and credits it
+  to the invoice whose quoted wallet sent it: when it pays this invoice, the invoice becomes `processing` or `paid`
+  and the error clears; when it does not, Quasar rejects it here with `tx_already_used` (`payment_mismatch`).
+- `settlement_failed`: the network confirmed the transaction, but Quasar has not recorded it yet and settles it
+  again daily (for 30 days). The money reached the merchant's address: the buyer contacts the merchant with the
+  transaction hash and does not pay again; never say that it does not pay the invoice or that nothing was charged.
 
 ***
 
@@ -62,7 +71,7 @@ while the store retries handing over a transaction Quasar has not received yet (
 
 > `optional` **rechecked?**: `true`
 
-Defined in: [checkout/store.ts:102](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L102)
+Defined in: [checkout/store.ts:116](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L116)
 
 Set on `payment_unconfirmed` while Quasar still reads the payment again (for up to 24 hours after it learned of
 it): the rejection is `rechecked` ([CheckoutRejectedPayment.rechecked](/packages/quasar-sdk/checkout/interfaces/CheckoutRejectedPayment.md#rechecked)), or there is no rejection and Quasar
@@ -77,6 +86,6 @@ merchant with the transaction hash if money left the wallet.
 
 > `optional` **status?**: `number`
 
-Defined in: [checkout/store.ts:84](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L84)
+Defined in: [checkout/store.ts:90](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L90)
 
 HTTP status, when the API answered.

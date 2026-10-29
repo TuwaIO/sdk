@@ -631,9 +631,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     [
       'release',
       'Release a held payment',
-      'The invoice becomes paid and the buyer gets a receipt.',
+      'The invoice becomes paid and the buyer gets a receipt. A payment from another wallet than the quoted payer is never released: anyone may hand over for their own invoice a transaction hash they saw on the network, so refund it to the wallet that sent it (`originWallet`).',
       z.object({ reason: z.string() }),
-      '`invoice_not_held`.',
+      '`invoice_not_held`, `invoice_partly_refunded` (refund the rest), `payer_mismatch_refund_only` (a payment from another wallet than the quoted payer: refund it).',
     ],
   ] as const) {
     route('post', `/invoices/{id}/${action}`, 'Invoices', summary, description, {
@@ -966,7 +966,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       }),
       reason: z.string().openapi({
         description:
-          'Why: `reverted`, `cancelled`, `expired`, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `not_found`, `timeout`, `replaced`, `payer_mismatch` (a transfer from another wallet to an invoice paid or held already: one to a payable invoice is held for the merchant instead), `native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded already), `unresolved_after_24h` (no result seen on chain within 24 hours: final), a relay reason (`user_operation_lost`…), or `transaction_failed`.',
+          'Why: `reverted`, `cancelled`, `expired`, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used` (the transaction pays another invoice of the merchant: the one whose quoted wallet sent it, also when this invoice handed it over first or claimed it), `not_found`, `timeout`, `replaced`, `payer_mismatch` (a transfer from another wallet to an invoice paid or held already: one to a payable invoice is held for the merchant, who refunds it to the wallet that sent it), `native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded already), `settlement_failed` (the network confirmed the transaction but Quasar has not recorded it yet; it settles it again daily for 30 days: not final, `movedMoney`), `unresolved_after_24h` (final: no result seen on chain within 24 hours, only for a transaction Quasar read again after that day and the network does not have), a relay reason (`user_operation_lost`…), or `transaction_failed`.',
       }),
       final: z.boolean().openapi({
         description:
@@ -979,7 +979,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         .openapi({ description: 'The transaction the checkout handed over, when this one replaced it (sped up).' }),
       movedMoney: z.literal(true).optional().openapi({
         description:
-          'Set when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`, `invoice_not_payable`): it may have moved money, final or not. Never tell the buyer that it did not go through, that nothing was charged or that Quasar checks it again, and offer no plain second payment: say that this transaction does not pay the invoice, and to contact the merchant if money left the wallet.',
+          'Set when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `native_from_contract_unverifiable`, `invoice_not_payable`), or Quasar has not recorded it yet (`settlement_failed`): it may have moved money, final or not. Never tell the buyer that it did not go through, that nothing was charged or that Quasar checks it again, and offer no plain second payment: say that this transaction does not pay the invoice (for `settlement_failed`: that Quasar has not recorded it yet and tries again daily; never offer a second payment for it), and to contact the merchant if money left the wallet.',
       }),
       rechecked: z.literal(true).optional().openapi({
         description:
@@ -1105,12 +1105,12 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           .nullable()
           .openapi({
             description:
-              'Why a payment waits for, or was flagged to, the seller. A late payment from a wallet the screening blocks shows `screening`, and so does a transfer in time from another wallet than the quoted payer (held for the seller to check who paid; `late` when it was late too).',
+              'Why a payment waits for, or was flagged to, the seller. A late payment from a wallet the screening blocks shows `screening`, and so does a transfer in time from another wallet than the quoted payer (held for the seller, who refunds it to the wallet that sent it: it is never released; `late` when it was late too).',
           }),
         refundedTotalMinor: z.string().nullable().openapi({ description: 'Refunded, in minor units (cents).' }),
         pendingPayments: z.number().optional().openapi({
           description:
-            'Payments of the invoice handed over and still on their way, whoever handed them over: tracked transactions not yet verified or rejected (recorded within the last 25 minutes), gasless relays still sending (within 35 minutes). A page that finds one on its way should not offer to pay.',
+            'Payments of the invoice handed over and still on their way, whoever handed them over: tracked transactions not yet verified or rejected (recorded within the last 25 minutes), gasless relays still sending (within 35 minutes), and claims of this invoice on a transaction another invoice handed over first that Quasar has not decided yet (made within 25 minutes). A page that finds one on its way should not offer to pay.',
         }),
         rejectedTxKeys: z.array(z.string()).optional().openapi({
           description:
@@ -1118,7 +1118,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         }),
         rejectedPayments: z.array(RejectedPayment).optional().openapi({
           description:
-            'The payments that failed, latest first (at most 10). `final`: the transaction can never pay the invoice (`reverted`, `cancelled`, `expired` Solana blockhash, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `chain_mismatch`, `no_quote`, `no_payment_method`, a relay the bundler refused or never sent, `unresolved_after_24h`), so the buyer may pay again; otherwise (`not_found`, `timeout`, `replaced`, `payer_mismatch`…) the money may still be on its way or with the merchant: ask the buyer to check the wallet before paying again. `movedMoney`: the transaction went through without paying the invoice and may have moved money. `rechecked`: Quasar still reads the transaction again (a `not_found`, `timeout` or `replaced` rejection, for 24 hours after Quasar learned of the payment, while `unresolvedPayments` counts it): if it arrives, it is recorded (paid within the grace, else held as late); once Quasar reports `unresolvedPayments` 0, such a rejection was resolved. A transaction sped up in the wallet is followed under its new hash and not rejected; `original` is the hash the checkout handed over.',
+            'The payments that failed, latest first (at most 10). `final`: the transaction can never pay the invoice (`reverted`, `cancelled`, `expired` Solana blockhash, `no_matching_transfer`, `reference_missing`, `too_early`, `tx_already_used`, `chain_mismatch`, `no_quote`, `no_payment_method`, a relay the bundler refused or never sent, `unresolved_after_24h`), so the buyer may pay again; otherwise (`not_found`, `timeout`, `replaced`, `payer_mismatch`, `settlement_failed`…) the money may still be on its way or with the merchant: ask the buyer to check the wallet before paying again (for `settlement_failed`, confirmed on chain, to contact the merchant and not pay again). `movedMoney`: the transaction went through without paying the invoice, or Quasar has not recorded it yet, and may have moved money. `rechecked`: Quasar still reads the transaction again (a `not_found`, `timeout` or `replaced` rejection, for 24 hours after Quasar learned of the payment, while `unresolvedPayments` counts it): if it arrives, it is recorded (paid within the grace, else held as late); once Quasar reports `unresolvedPayments` 0, such a rejection was resolved. A transaction sped up in the wallet is followed under its new hash and not rejected; `original` is the hash the checkout handed over.',
         }),
         paymentCountsUntil: z.string().nullable().optional().openapi({
           description:
@@ -1126,7 +1126,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         }),
         unresolvedPayments: z.number().optional().openapi({
           description:
-            'Payments of the invoice that may still arrive: tracked transactions neither verified nor rejected for good (also one stuck past the 25 minutes `pendingPayments` counts, and one rejected with `not_found`, `timeout` or `replaced`), which Quasar reads again for 24 hours after it learned of them and then closes (`unresolved_after_24h`), and gasless relays still sending. While it is above 0, do not offer a plain second payment and never tell the buyer that nothing was charged.',
+            'Payments of the invoice that may still arrive: tracked transactions neither verified nor rejected for good (also one stuck past the 25 minutes `pendingPayments` counts, and one rejected with `not_found`, `timeout` or `replaced`), which Quasar reads again for 24 hours after it learned of them and then closes (`unresolved_after_24h`), gasless relays still sending, and claims of this invoice on a transaction another invoice handed over first that Quasar has not decided yet. While it is above 0, do not offer a plain second payment and never tell the buyer that nothing was charged.',
         }),
         onTimeTxKeys: z.array(z.string()).optional().openapi({
           description:
@@ -1304,7 +1304,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     'post',
     '/submit',
     'Submit the payment transaction',
-    'Quasar tracks it; the invoice is settled when it is final. For an EIP-5792 batch, send the hash of its transaction. An invoice in any state takes it, since the money reaches the merchant whatever the invoice says: an `expired` or `cancelled` invoice holds the payment for the merchant as late (`review.reason` `late`), who credits or returns it; an invoice `paid`, `held` or `refunded` already records it with its amount as a payment that pays nothing (`rejectedPayments`, `invoice_not_payable` or `payer_mismatch`, `movedMoney`). One handed over before `dueAt` keeps the invoice payable for up to 30 minutes past it while it confirms; one handed over after `dueAt` is held as late, even while another payment keeps the invoice payable. The same `txKey` is taken once, and a `txKey` Quasar has already is answered as taken before anything else is checked: a page that got no answer (network, 5xx) hands it over again, also after a reload (`@tuwaio/quasar-sdk` keeps the hand-over in the tab until it is taken), since the wallet has sent it already.',
+    "Quasar tracks it; the invoice is settled when it is final. For an EIP-5792 batch, send the hash of its transaction. An invoice in any state takes it, since the money reaches the merchant whatever the invoice says: an `expired` or `cancelled` invoice holds the payment for the merchant as late (`review.reason` `late`), who credits or returns it; an invoice `paid`, `held` or `refunded` already records it with its amount as a payment that pays nothing (`rejectedPayments`, `invoice_not_payable` or `payer_mismatch`, `movedMoney`). One handed over before `dueAt` keeps the invoice payable for up to 30 minutes past it while it confirms; one handed over after `dueAt` is held as late, even while another payment keeps the invoice payable. The same `txKey` is taken once, and a `txKey` Quasar tracks for this invoice already is answered as taken before anything else is checked: a page that got no answer (network, 5xx) hands it over again, also after a reload (`@tuwaio/quasar-sdk` keeps the hand-over in the tab until it is taken), since the wallet has sent it already. A `txKey` Quasar tracks for another invoice of the app is `409 tx_already_used`, never taken: EVM invoices share the merchant's address and carry no reference, so whoever saw the hash may have handed it over for their own invoice first. For a payment, with a locked quote, Quasar records this invoice's claim on it (once; at most 3 undecided claims) and credits the transaction to the invoice whose quoted wallet sent it: it moves to this invoice when it pays this invoice's quote from its quoted payer and not the other invoice's; otherwise this invoice lists it in `rejectedPayments` with `tx_already_used`. Until then the claim counts in `pendingPayments` and `unresolvedPayments` (and in `onTimeTxKeys` when made before `dueAt`): the page tells the buyer that the transaction was handed over for another invoice and offers no second payment.",
     {
       request: {
         body: json(
@@ -1317,12 +1317,13 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
       responses: {
         202: {
-          description: 'Taken, also when Quasar has the `txKey` already. `status` is the state of the invoice.',
+          description:
+            'Taken, also when Quasar tracks the `txKey` for this invoice already. `status` is the state of the invoice.',
           ...json(z.object({ txKey: z.string(), status: z.string() })),
         },
         400: invalid('`invalid_transaction`, `sender_required`'),
         409: refused(
-          '`quote_required`, `too_many_pending`: the invoice already has 3 unconfirmed transactions; wait until one is confirmed or fails.',
+          "`quote_required`; `too_many_pending`: the invoice already has 3 unconfirmed transactions, wait until one is confirmed or fails; `tx_already_used`: Quasar tracks the transaction for another invoice of the app (this invoice's claim is recorded, see above): not a refusal of the payment, so never offer a second one for it.",
         ),
         ...checkoutErrors,
       },

@@ -1,6 +1,6 @@
 # CheckoutHandOverStorage
 
-Defined in: [checkout/store.ts:353](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L353)
+Defined in: [checkout/store.ts:384](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L384)
 
 The part of the browser's `Storage` (`sessionStorage`) the checkout store keeps its hand-overs in.
 
@@ -10,7 +10,7 @@ The part of the browser's `Storage` (`sessionStorage`) the checkout store keeps 
 
 > **getItem**: (`key`) => `string` \| `null`
 
-Defined in: [checkout/store.ts:355](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L355)
+Defined in: [checkout/store.ts:386](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L386)
 
 Reads an entry; `null` when there is none.
 
@@ -30,7 +30,7 @@ Reads an entry; `null` when there is none.
 
 > **removeItem**: (`key`) => `void`
 
-Defined in: [checkout/store.ts:359](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L359)
+Defined in: [checkout/store.ts:390](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L390)
 
 Removes an entry.
 
@@ -50,7 +50,7 @@ Removes an entry.
 
 > **setItem**: (`key`, `value`) => `void`
 
-Defined in: [checkout/store.ts:357](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L357)
+Defined in: [checkout/store.ts:388](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L388)
 
 Writes an entry.
 
