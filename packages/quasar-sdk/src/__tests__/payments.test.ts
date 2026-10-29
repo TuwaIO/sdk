@@ -96,9 +96,11 @@ describe('quasar.payments', () => {
     await quasar.payments.correctInvoice('inv_1', { buyer: { name: 'Acme Labs GmbH', country: 'DE' } });
     await quasar.payments.replacePayLink('inv_1');
     await quasar.payments.getEvents('inv_1', { verify: true });
+    // A ledger comes a page at a time (owner, 2026-10-29): every payment page a buyer opens locks a quote
+    await quasar.payments.getEvents('inv_1', { limit: 50, cursor: 'cur_1' });
 
     const calls = await Promise.all(
-      [0, 1, 2, 3, 4].map(async (n) => {
+      [0, 1, 2, 3, 4, 5].map(async (n) => {
         const request = sent(n);
         return [request.method, new URL(request.url).pathname + new URL(request.url).search, await request.body()];
       }),
@@ -109,6 +111,7 @@ describe('quasar.payments', () => {
       ['POST', '/v1/payments/invoices/inv_1/correct', { buyer: { name: 'Acme Labs GmbH', country: 'DE' } }],
       ['POST', '/v1/payments/invoices/inv_1/checkout', {}],
       ['GET', '/v1/payments/invoices/inv_1/events?verify=true', undefined],
+      ['GET', '/v1/payments/invoices/inv_1/events?limit=50&cursor=cur_1', undefined],
     ]);
   });
 
@@ -195,8 +198,11 @@ describe('quasar.payments', () => {
     await quasar.payments.undoSubscriptionCancel(subscription.id);
     await quasar.payments.pauseSubscription(subscription.id);
     await quasar.payments.resumeSubscription(subscription.id);
+    // Its invoices and charges grow with every period: lists of their own, a page at a time
+    await quasar.payments.listSubscriptionInvoices(subscription.id, { limit: 5 });
+    await quasar.payments.listSubscriptionCharges(subscription.id, { cursor: 'cur_2' });
 
-    const paths = [1, 2, 3, 4, 5, 6].map((n) => {
+    const paths = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
       const url = new URL(sent(n).url);
       return `${sent(n).method} ${url.pathname}${url.search}`;
     });
@@ -207,6 +213,8 @@ describe('quasar.payments', () => {
       'POST /v1/payments/subscriptions/sub_1/cancel/undo',
       'POST /v1/payments/subscriptions/sub_1/pause',
       'POST /v1/payments/subscriptions/sub_1/resume',
+      'GET /v1/payments/subscriptions/sub_1/invoices?limit=5',
+      'GET /v1/payments/subscriptions/sub_1/charges?cursor=cur_2',
     ]);
     expect(await sent(3).body()).toEqual({ atPeriodEnd: true });
   });

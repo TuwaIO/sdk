@@ -21,7 +21,7 @@ import type {
   Refund,
   RefundStart,
   Subscription,
-  SubscriptionDetails,
+  SubscriptionCharge,
   SubscriptionStart,
 } from '../../packages/quasar-sdk/src';
 import type {
@@ -354,6 +354,17 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           hash: z.string(),
         }),
       ),
+      total: z.number().int().openapi({ description: 'How many steps the whole ledger has.' }),
+      nextCursor: z.string().nullable().openapi({ description: 'Pass it as `cursor` for the next page.' }),
+      summary: z
+        .object({
+          createdBy: z.string().nullable(),
+          stepTimes: z.object({ quoted: z.string().nullable(), receipt: z.string().nullable() }),
+        })
+        .openapi({
+          description:
+            'Who created the invoice (the actor of `invoice.issued`) and when its first quote was locked and its receipt issued.',
+        }),
       verification: z
         .union([
           z.object({ valid: z.literal(true), events: z.number() }),
@@ -363,7 +374,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     })
     .openapi('InvoiceLedger', {
       description:
-        'The ledger, oldest first: each step hashes itself with `prevHash`. `verification` with `?verify=true`.',
+        'A page of the ledger, oldest first: each step hashes itself with `prevHash`. `verification` (the whole chain) with `?verify=true`.',
     });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkLedger: z.ZodType<InvoiceLedger> = InvoiceLedger;
@@ -486,29 +497,26 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   const _checkSubscription: z.ZodType<Subscription> = Subscription;
   registry.register('Subscription', Subscription);
 
-  const SubscriptionDetails = Subscription.extend({
-    invoices: z.array(Invoice),
-    charges: z.array(
-      z.object({
-        id: z.string(),
-        object: z.literal('subscription_charge'),
-        invoiceId: z.string(),
-        period: z.number().nullable(),
-        status: z.enum(['pending', 'sending', 'submitted', 'failed', 'canceled']),
-        reason: z.string().nullable(),
-        attempts: z.number(),
-        amount: z.string().nullable(),
-        chainId: z.string().nullable(),
-        userOpHash: z.string().nullable(),
-        txHash: z.string().nullable(),
-        notBefore: z.string().nullable(),
-        finishedAt: z.string().nullable(),
-        createdAt: z.string(),
-      }),
-    ),
-  }).openapi('SubscriptionDetails');
+  const SubscriptionCharge = z
+    .object({
+      id: z.string(),
+      object: z.literal('subscription_charge'),
+      invoiceId: z.string(),
+      period: z.number().nullable(),
+      status: z.enum(['pending', 'sending', 'submitted', 'failed', 'canceled']),
+      reason: z.string().nullable(),
+      attempts: z.number(),
+      amount: z.string().nullable(),
+      chainId: z.string().nullable(),
+      userOpHash: z.string().nullable(),
+      txHash: z.string().nullable(),
+      notBefore: z.string().nullable(),
+      finishedAt: z.string().nullable(),
+      createdAt: z.string(),
+    })
+    .openapi('SubscriptionCharge', { description: 'An automatic charge of a subscription period.' });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _checkSubscriptionDetails: z.ZodType<SubscriptionDetails> = SubscriptionDetails;
+  const _checkSubscriptionCharge: z.ZodType<SubscriptionCharge> = SubscriptionCharge;
 
   const SubscriptionStart = z
     .object({
@@ -523,6 +531,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkSubscriptionStart: z.ZodType<SubscriptionStart> = SubscriptionStart;
   const SubscriptionList = listOf(Subscription, 'SubscriptionList');
+  const SubscriptionChargeList = listOf(SubscriptionCharge, 'SubscriptionChargeList');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkSubscriptionChargeList: z.ZodType<PaymentsList<SubscriptionCharge>> = SubscriptionChargeList;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkSubscriptionList: z.ZodType<PaymentsList<Subscription>> = SubscriptionList;
 
@@ -693,12 +704,23 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     '/invoices/{id}/events',
     'Invoices',
     'Read the ledger',
-    'Every step of the invoice, chained by hashes.',
+    'Every step of the invoice, chained by hashes, oldest first, up to 100 a page.',
     {
       request: {
         params: idParam('id', 'Invoice ID.'),
         query: z.object({
-          verify: z.enum(['true', 'false']).optional().openapi({ description: '`true` checks the hash chain.' }),
+          verify: z
+            .enum(['true', 'false'])
+            .optional()
+            .openapi({ description: '`true` checks the whole hash chain, whatever the page.' }),
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(100)
+            .optional()
+            .openapi({ description: 'Page size, 1 to 100 (default 100).' }),
+          cursor: z.string().optional().openapi({ description: '`nextCursor` of the previous page.' }),
         }),
       },
       responses: {
@@ -872,16 +894,46 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     '/subscriptions/{id}',
     'Subscriptions',
     'Read a subscription',
-    'With the invoices of its periods and its automatic charges.',
+    'Its invoices and charges are lists of their own.',
     {
       request: { params: idParam('id', 'Subscription ID.') },
       responses: {
-        200: { description: 'The subscription.', ...json(SubscriptionDetails) },
+        200: { description: 'The subscription.', ...json(Subscription) },
         404: refused('`subscription_not_found`.'),
         ...common,
       },
     },
   );
+  for (const [path, summary, description, list] of [
+    ['invoices', 'List the invoices of a subscription', 'The invoices of its periods, newest first.', InvoiceList],
+    [
+      'charges',
+      'List the automatic charges of a subscription',
+      'Its automatic charges, newest first.',
+      SubscriptionChargeList,
+    ],
+  ] as const) {
+    route('get', `/subscriptions/{id}/${path}`, 'Subscriptions', summary, description, {
+      request: {
+        params: idParam('id', 'Subscription ID.'),
+        query: z.object({
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(100)
+            .optional()
+            .openapi({ description: 'Page size, 1 to 100 (default 20).' }),
+          cursor: z.string().optional().openapi({ description: '`nextCursor` of the previous page.' }),
+        }),
+      },
+      responses: {
+        200: { description: 'A page.', ...json(list) },
+        404: refused('`subscription_not_found`.'),
+        ...common,
+      },
+    });
+  }
   for (const [action, summary, description, response, conflict] of [
     [
       'cancel',

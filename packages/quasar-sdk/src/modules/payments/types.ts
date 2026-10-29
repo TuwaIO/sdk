@@ -439,14 +439,38 @@ export interface LedgerEvent {
 export type LedgerVerification =
   { valid: true; events: number } | { valid: false; seq: number; reason: 'sequence' | 'link' | 'hash' | 'head' };
 
-/** An invoice ledger, oldest first, as {@link PaymentsModule.getEvents} returns it. */
+/** Who created an invoice and when its payment steps happened, whatever page of its ledger is read. */
+export interface LedgerSummary {
+  /** The actor of the first step (`invoice.issued`). */
+  createdBy: string | null;
+  /** When the first quote was locked and the receipt issued (ISO 8601); `null` before. */
+  stepTimes: { quoted: string | null; receipt: string | null };
+}
+
+/** A page of an invoice ledger, oldest first, as {@link PaymentsModule.getEvents} returns it. */
 export interface InvoiceLedger {
   /** Always `list`. */
   object: 'list';
-  /** The steps. */
+  /** The steps of the page. */
   data: LedgerEvent[];
-  /** The chain check, when asked for with `verify: true`. */
+  /** How many steps the whole ledger has. */
+  total: number;
+  /** Pass it as `cursor` for the next page; `null` on the last page. */
+  nextCursor: string | null;
+  /** Who created the invoice and when its quote was locked and its receipt issued. */
+  summary: LedgerSummary;
+  /** The check of the whole chain, when asked for with `verify: true`. */
   verification?: LedgerVerification;
+}
+
+/** What {@link PaymentsModule.getEvents} takes. */
+export interface GetEventsParams {
+  /** `true` adds the check of the whole hash chain, whatever the page. */
+  verify?: boolean;
+  /** Page size, 1 to 100. Defaults to `100`. */
+  limit?: number;
+  /** `nextCursor` of the previous page. */
+  cursor?: string;
 }
 
 /** How a refund is priced: at today's price of the invoice amount, or the whole payment as received. */
@@ -769,12 +793,12 @@ export interface SubscriptionCharge {
   createdAt: string;
 }
 
-/** A subscription with the invoices of its periods and its automatic charges, oldest first. */
-export interface SubscriptionDetails extends Subscription {
-  /** The invoices of its periods. */
-  invoices: Invoice[];
-  /** Its automatic charges. */
-  charges: SubscriptionCharge[];
+/** Paging of {@link PaymentsModule.listSubscriptionInvoices} and {@link PaymentsModule.listSubscriptionCharges}. */
+export interface ListSubscriptionItemsParams {
+  /** Page size, 1 to 100. Defaults to `20`. */
+  limit?: number;
+  /** `nextCursor` of the previous page. */
+  cursor?: string;
 }
 
 /** A started or resumed subscription with the invoice of its period and that invoice's payment page. */

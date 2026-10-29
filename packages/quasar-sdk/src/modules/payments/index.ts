@@ -11,12 +11,14 @@ import type {
   CreateInvoiceParams,
   CreateOptions,
   CreateSubscriptionParams,
+  GetEventsParams,
   Invoice,
   InvoiceCorrection,
   InvoiceDetails,
   InvoiceLedger,
   InvoiceWithCheckout,
   ListInvoicesParams,
+  ListSubscriptionItemsParams,
   ListSubscriptionsParams,
   PaymentDocument,
   PaymentDocumentKind,
@@ -29,7 +31,7 @@ import type {
   RefundStart,
   SubmitRefundParams,
   Subscription,
-  SubscriptionDetails,
+  SubscriptionCharge,
   SubscriptionStart,
 } from './types';
 
@@ -204,17 +206,20 @@ export class PaymentsModule {
   }
 
   /**
-   * Reads an invoice ledger, oldest first (`GET /v1/payments/invoices/:id/events`).
+   * Reads a page of an invoice ledger, oldest first (`GET /v1/payments/invoices/:id/events`): up to 100 steps, with
+   * how many the ledger has, who created the invoice and when its quote was locked and its receipt issued. Every
+   * payment page a buyer opens locks a quote, so a ledger can be long.
    *
    * @param invoiceId - The invoice.
-   * @param options - `verify: true` adds the check of its hash chain.
-   * @returns The ledger.
-   * @throws {QuasarSDKError} `invoice_not_found` (404), a timeout or a network error.
+   * @param params - `verify: true` adds the check of the whole hash chain; `limit` and `cursor` page it.
+   * @returns One page; pass `nextCursor` as `cursor` for the next.
+   * @throws {QuasarSDKError} `invoice_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout or a
+   *   network error.
    */
-  async getEvents(invoiceId: string, options: { verify?: boolean } = {}): Promise<InvoiceLedger> {
+  async getEvents(invoiceId: string, params: GetEventsParams = {}): Promise<InvoiceLedger> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/events`, {
       method: 'GET',
-      query: options.verify ? { verify: 'true' } : {},
+      query: query({ verify: params.verify ? 'true' : undefined, limit: params.limit, cursor: params.cursor }),
     });
   }
 
@@ -345,15 +350,54 @@ export class PaymentsModule {
   }
 
   /**
-   * Reads a subscription with the invoices of its periods and its automatic charges
-   * (`GET /v1/payments/subscriptions/:id`).
+   * Reads a subscription (`GET /v1/payments/subscriptions/:id`). The invoices of its periods and its automatic
+   * charges are lists of their own: {@link PaymentsModule.listSubscriptionInvoices} and
+   * {@link PaymentsModule.listSubscriptionCharges}.
    *
    * @param subscriptionId - The subscription.
    * @returns The subscription.
    * @throws {QuasarSDKError} `subscription_not_found` (404), a timeout or a network error.
    */
-  async getSubscription(subscriptionId: string): Promise<SubscriptionDetails> {
+  async getSubscription(subscriptionId: string): Promise<Subscription> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/subscriptions/${segment(subscriptionId)}`, { method: 'GET' });
+  }
+
+  /**
+   * Lists the invoices of a subscription's periods, newest first (`GET /v1/payments/subscriptions/:id/invoices`).
+   *
+   * @param subscriptionId - The subscription.
+   * @param params - Paging.
+   * @returns One page; pass `nextCursor` as `cursor` for the next.
+   * @throws {QuasarSDKError} `subscription_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout
+   *   or a network error.
+   */
+  async listSubscriptionInvoices(
+    subscriptionId: string,
+    params: ListSubscriptionItemsParams = {},
+  ): Promise<PaymentsList<Invoice>> {
+    return this.client.request(`${PAYMENTS_ENDPOINT}/subscriptions/${segment(subscriptionId)}/invoices`, {
+      method: 'GET',
+      query: query({ limit: params.limit, cursor: params.cursor }),
+    });
+  }
+
+  /**
+   * Lists the automatic charges of a subscription, newest first (`GET /v1/payments/subscriptions/:id/charges`).
+   *
+   * @param subscriptionId - The subscription.
+   * @param params - Paging.
+   * @returns One page; pass `nextCursor` as `cursor` for the next.
+   * @throws {QuasarSDKError} `subscription_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout
+   *   or a network error.
+   */
+  async listSubscriptionCharges(
+    subscriptionId: string,
+    params: ListSubscriptionItemsParams = {},
+  ): Promise<PaymentsList<SubscriptionCharge>> {
+    return this.client.request(`${PAYMENTS_ENDPOINT}/subscriptions/${segment(subscriptionId)}/charges`, {
+      method: 'GET',
+      query: query({ limit: params.limit, cursor: params.cursor }),
+    });
   }
 
   /**
