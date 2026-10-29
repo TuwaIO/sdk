@@ -1,6 +1,6 @@
 # LedgerSummary
 
-Defined in: [modules/payments/types.ts:443](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L443)
+Defined in: [modules/payments/types.ts:457](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L457)
 
 Who created an invoice and when its payment steps happened, whatever page of its ledger is read.
 
@@ -10,7 +10,7 @@ Who created an invoice and when its payment steps happened, whatever page of its
 
 > **createdBy**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:445](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L445)
+Defined in: [modules/payments/types.ts:459](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L459)
 
 The actor of the first step (`invoice.issued`).
 
@@ -20,7 +20,7 @@ The actor of the first step (`invoice.issued`).
 
 > **stepTimes**: `object`
 
-Defined in: [modules/payments/types.ts:447](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L447)
+Defined in: [modules/payments/types.ts:461](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L461)
 
 When the first quote was locked and the receipt issued (ISO 8601); `null` before.
 

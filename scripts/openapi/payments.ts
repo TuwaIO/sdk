@@ -11,6 +11,7 @@ import type {
   Invoice,
   InvoiceCorrection,
   InvoiceDetails,
+  InvoiceDocumentRef,
   InvoiceLedger,
   InvoiceSeller,
   InvoiceWithCheckout,
@@ -313,8 +314,14 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   registry.register('Refund', Refund);
 
   const InvoiceDetails = Invoice.extend({
-    refunds: z.array(Refund),
-    creditNotes: z.array(z.object({ number: z.string(), refundId: z.string().nullable(), issuedAt: z.string() })),
+    refunds: z
+      .array(Refund)
+      .openapi({ description: 'Its five newest refunds and every refund still under way, newest first.' }),
+    refundsTotal: z.number().int().openapi({ description: 'How many refunds it has.' }),
+    creditNotesTotal: z
+      .number()
+      .int()
+      .openapi({ description: 'How many credit notes it has (one per refund and correction).' }),
   }).openapi('InvoiceDetails');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkInvoiceDetails: z.ZodType<InvoiceDetails> = InvoiceDetails;
@@ -336,6 +343,26 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   const InvoiceList = listOf(Invoice, 'InvoiceList');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkInvoiceList: z.ZodType<PaymentsList<Invoice>> = InvoiceList;
+  const RefundList = listOf(Refund, 'RefundList');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkRefundList: z.ZodType<PaymentsList<Refund>> = RefundList;
+  const InvoiceDocumentRef = z
+    .object({
+      kind: z.enum(['invoice', 'receipt', 'credit_note']),
+      format: z.enum(['pdf', 'ubl']).openapi({ description: '`ubl` is the e-invoice.' }),
+      number: z.string(),
+      refundId: z
+        .string()
+        .nullable()
+        .openapi({ description: 'The refund a credit note credits; `null` otherwise and for a correction.' }),
+      issuedAt: z.string(),
+    })
+    .openapi('InvoiceDocumentRef');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkDocumentRef: z.ZodType<InvoiceDocumentRef> = InvoiceDocumentRef;
+  const InvoiceDocumentList = listOf(InvoiceDocumentRef, 'InvoiceDocumentList');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkDocumentList: z.ZodType<PaymentsList<InvoiceDocumentRef>> = InvoiceDocumentList;
 
   const InvoiceLedger = z
     .object({
@@ -621,7 +648,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     '/invoices/{id}',
     'Invoices',
     'Read an invoice',
-    'With its refunds and credit notes. Used by `quasar.payments.getInvoice`.',
+    'With its five newest refunds, every refund still under way, and how many refunds and credit notes it has; the full lists are `GET /invoices/{id}/refunds` and `/documents`. Used by `quasar.payments.getInvoice`.',
     {
       request: { params: idParam('id', 'Invoice ID.') },
       responses: {
@@ -730,6 +757,44 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       },
     },
   );
+  for (const [path, tag, summary, description, list] of [
+    [
+      'refunds',
+      'Refunds',
+      'List the refunds of an invoice',
+      'Newest first. Used by `quasar.payments.listInvoiceRefunds`.',
+      RefundList,
+    ],
+    [
+      'documents',
+      'Invoices',
+      'List the documents of an invoice',
+      'The invoice, its receipt and its credit notes as PDF and UBL, newest first. Used by `quasar.payments.listInvoiceDocuments`.',
+      InvoiceDocumentList,
+    ],
+  ] as const) {
+    route('get', `/invoices/{id}/${path}`, tag, summary, description, {
+      request: {
+        params: idParam('id', 'Invoice ID.'),
+        query: z.object({
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(100)
+            .optional()
+            .openapi({ description: 'Page size, 1 to 100 (default 20).' }),
+          cursor: z.string().optional().openapi({ description: '`nextCursor` of the previous page.' }),
+        }),
+      },
+      responses: {
+        200: { description: 'A page.', ...json(list) },
+        400: refused('`invalid_request`, `invalid_cursor`.'),
+        404: refused('`invoice_not_found`.'),
+        ...common,
+      },
+    });
+  }
   const file = (description: string) => ({
     description,
     content: {

@@ -1,6 +1,6 @@
 # PaymentsModule
 
-Defined in: [modules/payments/index.ts:78](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L78)
+Defined in: [modules/payments/index.ts:80](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L80)
 
 The Payments API (`/v1/payments`) of a Payments app, available as `quasar.payments` on a [Quasar](/packages/quasar-sdk/server/classes/Quasar.md) client.
 Quasar issues numbered invoices with PDF (and, when on, e-invoice) documents, checks the on-chain payment, records
@@ -31,7 +31,7 @@ const { invoice, payUrl } = await quasar.payments.createInvoice(
 
 > **cancelInvoice**(`invoiceId`, `params?`): `Promise`\<[`Invoice`](/packages/quasar-sdk/server/interfaces/Invoice.md)\>
 
-Defined in: [modules/payments/index.ts:149](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L149)
+Defined in: [modules/payments/index.ts:190](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L190)
 
 Cancels an open invoice (`POST /v1/payments/invoices/:id/cancel`): it stops being payable; its number stays
 taken. A payment that arrives later is held for you.
@@ -69,7 +69,7 @@ The invoice.
 
 > **cancelSubscription**(`subscriptionId`, `params?`): `Promise`\<[`Subscription`](/packages/quasar-sdk/server/interfaces/Subscription.md)\>
 
-Defined in: [modules/payments/index.ts:413](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L413)
+Defined in: [modules/payments/index.ts:454](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L454)
 
 Cancels a subscription now (its open invoices are cancelled) or when the running period ends
 (`POST /v1/payments/subscriptions/:id/cancel`).
@@ -105,7 +105,7 @@ The subscription.
 
 > **correctInvoice**(`invoiceId`, `params`): `Promise`\<[`InvoiceCorrection`](/packages/quasar-sdk/server/interfaces/InvoiceCorrection.md)\>
 
-Defined in: [modules/payments/index.ts:185](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L185)
+Defined in: [modules/payments/index.ts:226](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L226)
 
 Corrects the buyer details of an open or paid invoice (`POST /v1/payments/invoices/:id/correct`): a credit note
 for it and a new invoice with the corrected details. A paid invoice's payment carries over to the new one.
@@ -141,7 +141,7 @@ The new invoice (with its checkout while it is open) and the one it replaces.
 
 > **createInvoice**(`params`, `options?`): `Promise`\<[`InvoiceWithCheckout`](/packages/quasar-sdk/server/interfaces/InvoiceWithCheckout.md)\>
 
-Defined in: [modules/payments/index.ts:98](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L98)
+Defined in: [modules/payments/index.ts:100](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L100)
 
 Issues an invoice (`POST /v1/payments/invoices`): numbered, with its PDF and, when the app has e-invoices on and
 the buyer details allow, its UBL; the `invoice.issued` webhook follows.
@@ -178,7 +178,7 @@ The invoice, its checkout token and its payment page (also in the invoice view w
 
 > **createSubscription**(`params`, `options?`): `Promise`\<[`SubscriptionStart`](/packages/quasar-sdk/server/interfaces/SubscriptionStart.md)\>
 
-Defined in: [modules/payments/index.ts:330](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L330)
+Defined in: [modules/payments/index.ts:371](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L371)
 
 Starts a subscription (`POST /v1/payments/subscriptions`): each period is one invoice, issued ahead of the period
 and paid like any invoice (`send_invoice`) or charged with the buyer's ERC-7715 permission (`auto_charge`).
@@ -214,7 +214,7 @@ The subscription and, without a trial, its first invoice with the payment page.
 
 > **getCreditNote**(`invoiceId`, `ref`, `format?`): `Promise`\<[`PaymentDocument`](/packages/quasar-sdk/server/interfaces/PaymentDocument.md)\>
 
-Defined in: [modules/payments/index.ts:293](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L293)
+Defined in: [modules/payments/index.ts:334](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L334)
 
 Downloads a credit note of an invoice (`GET /v1/payments/invoices/:id/documents/credit-note/:ref`).
 
@@ -254,7 +254,7 @@ The bytes, media type and file name.
 
 > **getDocument**(`invoiceId`, `kind`): `Promise`\<[`PaymentDocument`](/packages/quasar-sdk/server/interfaces/PaymentDocument.md)\>
 
-Defined in: [modules/payments/index.ts:280](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L280)
+Defined in: [modules/payments/index.ts:321](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L321)
 
 Downloads a stored document of an invoice byte for byte as issued
 (`GET /v1/payments/invoices/:id/documents/:kind`).
@@ -289,7 +289,7 @@ The bytes, media type and file name.
 
 > **getEvents**(`invoiceId`, `params?`): `Promise`\<[`InvoiceLedger`](/packages/quasar-sdk/server/interfaces/InvoiceLedger.md)\>
 
-Defined in: [modules/payments/index.ts:219](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L219)
+Defined in: [modules/payments/index.ts:260](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L260)
 
 Reads a page of an invoice ledger, oldest first (`GET /v1/payments/invoices/:id/events`): up to 100 steps, with
 how many the ledger has, who created the invoice and when its quote was locked and its receipt issued. Every
@@ -326,9 +326,11 @@ One page; pass `nextCursor` as `cursor` for the next.
 
 > **getInvoice**(`invoiceId`): `Promise`\<[`InvoiceDetails`](/packages/quasar-sdk/server/interfaces/InvoiceDetails.md)\>
 
-Defined in: [modules/payments/index.ts:113](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L113)
+Defined in: [modules/payments/index.ts:117](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L117)
 
-Reads an invoice with its refunds and credit notes (`GET /v1/payments/invoices/:id`).
+Reads an invoice with its five newest refunds, every refund still under way, and how many refunds and credit
+notes it has (`GET /v1/payments/invoices/:id`). The full lists are [PaymentsModule.listInvoiceRefunds](/packages/quasar-sdk/server/classes/PaymentsModule.md#listinvoicerefunds) and
+[PaymentsModule.listInvoiceDocuments](/packages/quasar-sdk/server/classes/PaymentsModule.md#listinvoicedocuments).
 
 #### Parameters
 
@@ -354,7 +356,7 @@ The invoice.
 
 > **getRefund**(`refundId`): `Promise`\<[`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md)\>
 
-Defined in: [modules/payments/index.ts:250](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L250)
+Defined in: [modules/payments/index.ts:291](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L291)
 
 Reads a refund (`GET /v1/payments/refunds/:id`).
 
@@ -382,7 +384,7 @@ The refund.
 
 > **getSubscription**(`subscriptionId`): `Promise`\<[`Subscription`](/packages/quasar-sdk/server/interfaces/Subscription.md)\>
 
-Defined in: [modules/payments/index.ts:361](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L361)
+Defined in: [modules/payments/index.ts:402](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L402)
 
 Reads a subscription (`GET /v1/payments/subscriptions/:id`). The invoices of its periods and its automatic
 charges are lists of their own: [PaymentsModule.listSubscriptionInvoices](/packages/quasar-sdk/server/classes/PaymentsModule.md#listsubscriptioninvoices) and
@@ -408,11 +410,83 @@ The subscription.
 
 ***
 
+### listInvoiceDocuments()
+
+> **listInvoiceDocuments**(`invoiceId`, `params?`): `Promise`\<[`PaymentsList`](/packages/quasar-sdk/server/interfaces/PaymentsList.md)\<[`InvoiceDocumentRef`](/packages/quasar-sdk/server/interfaces/InvoiceDocumentRef.md)\>\>
+
+Defined in: [modules/payments/index.ts:148](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L148)
+
+Lists the documents issued for an invoice, newest first (`GET /v1/payments/invoices/:id/documents`): the invoice,
+its receipt and its credit notes, as PDF and UBL. Download them with [PaymentsModule.getDocument](/packages/quasar-sdk/server/classes/PaymentsModule.md#getdocument) and
+[PaymentsModule.getCreditNote](/packages/quasar-sdk/server/classes/PaymentsModule.md#getcreditnote).
+
+#### Parameters
+
+##### invoiceId
+
+`string`
+
+The invoice.
+
+##### params?
+
+[`ListInvoiceItemsParams`](/packages/quasar-sdk/server/interfaces/ListInvoiceItemsParams.md) = `{}`
+
+Paging.
+
+#### Returns
+
+`Promise`\<[`PaymentsList`](/packages/quasar-sdk/server/interfaces/PaymentsList.md)\<[`InvoiceDocumentRef`](/packages/quasar-sdk/server/interfaces/InvoiceDocumentRef.md)\>\>
+
+One page; pass `nextCursor` as `cursor` for the next.
+
+#### Throws
+
+`invoice_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout or a
+  network error.
+
+***
+
+### listInvoiceRefunds()
+
+> **listInvoiceRefunds**(`invoiceId`, `params?`): `Promise`\<[`PaymentsList`](/packages/quasar-sdk/server/interfaces/PaymentsList.md)\<[`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md)\>\>
+
+Defined in: [modules/payments/index.ts:130](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L130)
+
+Lists the refunds of an invoice, newest first (`GET /v1/payments/invoices/:id/refunds`).
+
+#### Parameters
+
+##### invoiceId
+
+`string`
+
+The invoice.
+
+##### params?
+
+[`ListInvoiceItemsParams`](/packages/quasar-sdk/server/interfaces/ListInvoiceItemsParams.md) = `{}`
+
+Paging.
+
+#### Returns
+
+`Promise`\<[`PaymentsList`](/packages/quasar-sdk/server/interfaces/PaymentsList.md)\<[`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md)\>\>
+
+One page; pass `nextCursor` as `cursor` for the next.
+
+#### Throws
+
+`invoice_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout or a
+  network error.
+
+***
+
 ### listInvoices()
 
 > **listInvoices**(`params?`): `Promise`\<[`PaymentsList`](/packages/quasar-sdk/server/interfaces/PaymentsList.md)\<[`Invoice`](/packages/quasar-sdk/server/interfaces/Invoice.md)\>\>
 
-Defined in: [modules/payments/index.ts:124](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L124)
+Defined in: [modules/payments/index.ts:165](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L165)
 
 Lists invoices, newest first (`GET /v1/payments/invoices`).
 
@@ -440,7 +514,7 @@ One page; pass `nextCursor` as `cursor` for the next.
 
 > **listMethods**(): `Promise`\<\{ `data`: [`PaymentMethod`](/packages/quasar-sdk/server/interfaces/PaymentMethod.md)[]; `object`: `"list"`; \}\>
 
-Defined in: [modules/payments/index.ts:316](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L316)
+Defined in: [modules/payments/index.ts:357](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L357)
 
 Lists the app's active payment methods, in their order (`GET /v1/payments/methods`).
 
@@ -460,7 +534,7 @@ A timeout or a network error.
 
 > **listSubscriptionCharges**(`subscriptionId`, `params?`): `Promise`\<[`PaymentsList`](/packages/quasar-sdk/server/interfaces/PaymentsList.md)\<[`SubscriptionCharge`](/packages/quasar-sdk/server/interfaces/SubscriptionCharge.md)\>\>
 
-Defined in: [modules/payments/index.ts:393](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L393)
+Defined in: [modules/payments/index.ts:434](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L434)
 
 Lists the automatic charges of a subscription, newest first (`GET /v1/payments/subscriptions/:id/charges`).
 
@@ -495,7 +569,7 @@ One page; pass `nextCursor` as `cursor` for the next.
 
 > **listSubscriptionInvoices**(`subscriptionId`, `params?`): `Promise`\<[`PaymentsList`](/packages/quasar-sdk/server/interfaces/PaymentsList.md)\<[`Invoice`](/packages/quasar-sdk/server/interfaces/Invoice.md)\>\>
 
-Defined in: [modules/payments/index.ts:374](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L374)
+Defined in: [modules/payments/index.ts:415](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L415)
 
 Lists the invoices of a subscription's periods, newest first (`GET /v1/payments/subscriptions/:id/invoices`).
 
@@ -530,7 +604,7 @@ One page; pass `nextCursor` as `cursor` for the next.
 
 > **listSubscriptions**(`params?`): `Promise`\<[`PaymentsList`](/packages/quasar-sdk/server/interfaces/PaymentsList.md)\<[`Subscription`](/packages/quasar-sdk/server/interfaces/Subscription.md)\>\>
 
-Defined in: [modules/payments/index.ts:345](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L345)
+Defined in: [modules/payments/index.ts:386](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L386)
 
 Lists subscriptions, newest first (`GET /v1/payments/subscriptions`).
 
@@ -558,7 +632,7 @@ One page.
 
 > **pauseSubscription**(`subscriptionId`): `Promise`\<[`Subscription`](/packages/quasar-sdk/server/interfaces/Subscription.md)\>
 
-Defined in: [modules/payments/index.ts:445](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L445)
+Defined in: [modules/payments/index.ts:486](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L486)
 
 Pauses a subscription (`POST /v1/payments/subscriptions/:id/pause`): its open invoices are cancelled and no period
 is billed until it resumes.
@@ -588,7 +662,7 @@ The subscription.
 
 > **quote**(`params`): `Promise`\<[`PaymentQuote`](/packages/quasar-sdk/server/interfaces/PaymentQuote.md)\>
 
-Defined in: [modules/payments/index.ts:306](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L306)
+Defined in: [modules/payments/index.ts:347](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L347)
 
 Prices an amount in a payment method now (`POST /v1/payments/quotes`); nothing is locked.
 
@@ -617,7 +691,7 @@ The price.
 
 > **refund**(`invoiceId`, `params?`): `Promise`\<[`RefundStart`](/packages/quasar-sdk/server/interfaces/RefundStart.md)\>
 
-Defined in: [modules/payments/index.ts:236](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L236)
+Defined in: [modules/payments/index.ts:277](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L277)
 
 Asks for a refund of a paid or held invoice (`POST /v1/payments/invoices/:id/refunds`). Send the returned amount
 from your wallet to the payer, then pass the transaction to [PaymentsModule.submitRefund](/packages/quasar-sdk/server/classes/PaymentsModule.md#submitrefund).
@@ -653,7 +727,7 @@ The refund and what to send where.
 
 > **releaseInvoice**(`invoiceId`, `params`): `Promise`\<[`Invoice`](/packages/quasar-sdk/server/interfaces/Invoice.md)\>
 
-Defined in: [modules/payments/index.ts:168](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L168)
+Defined in: [modules/payments/index.ts:209](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L209)
 
 Accepts a held payment (`POST /v1/payments/invoices/:id/release`): the invoice becomes paid and the buyer gets a
 receipt. A payment from another wallet than the quoted payer is never released: anyone may hand over for their own
@@ -693,7 +767,7 @@ The invoice.
 
 > **replacePayLink**(`invoiceId`): `Promise`\<[`InvoiceWithCheckout`](/packages/quasar-sdk/server/interfaces/InvoiceWithCheckout.md)\>
 
-Defined in: [modules/payments/index.ts:201](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L201)
+Defined in: [modules/payments/index.ts:242](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L242)
 
 Gives an open invoice a new checkout token and payment page (`POST /v1/payments/invoices/:id/checkout`), for
 example when its link leaked. The earlier link stops working, also in the emails already sent; the current link
@@ -723,7 +797,7 @@ The invoice with its new token and page.
 
 > **resumeSubscription**(`subscriptionId`): `Promise`\<[`SubscriptionStart`](/packages/quasar-sdk/server/interfaces/SubscriptionStart.md)\>
 
-Defined in: [modules/payments/index.ts:461](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L461)
+Defined in: [modules/payments/index.ts:502](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L502)
 
 Resumes a paused subscription (`POST /v1/payments/subscriptions/:id/resume`) with a new period that starts now
 and is invoiced at once.
@@ -753,7 +827,7 @@ The subscription and the new period's invoice with its payment page.
 
 > **submitRefund**(`refundId`, `params`): `Promise`\<[`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md)\>
 
-Defined in: [modules/payments/index.ts:264](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L264)
+Defined in: [modules/payments/index.ts:305](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L305)
 
 Hands Quasar the refund transaction (`POST /v1/payments/refunds/:id/submit`); once it is final, the refund is
 confirmed, a credit note issued and `refund.confirmed` sent.
@@ -789,7 +863,7 @@ The refund, `submitted`.
 
 > **undoSubscriptionCancel**(`subscriptionId`): `Promise`\<[`Subscription`](/packages/quasar-sdk/server/interfaces/Subscription.md)\>
 
-Defined in: [modules/payments/index.ts:429](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L429)
+Defined in: [modules/payments/index.ts:470](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/index.ts#L470)
 
 Takes back a cancellation scheduled for the period end (`POST /v1/payments/subscriptions/:id/cancel/undo`): the
 subscription renews again (`subscription.cancel_unscheduled`). Nothing scheduled: nothing changes.

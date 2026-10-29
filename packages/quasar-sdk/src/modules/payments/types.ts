@@ -337,22 +337,36 @@ export interface Invoice {
   updatedAt: string;
 }
 
-/** A credit note of an invoice. */
-export interface CreditNoteRef {
+/**
+ * A document issued for an invoice, as {@link PaymentsModule.listInvoiceDocuments} lists it: the invoice, its receipt
+ * or a credit note, in one format. {@link PaymentsModule.getDocument} downloads the invoice and the receipt,
+ * {@link PaymentsModule.getCreditNote} a credit note by its number or its refund.
+ */
+export interface InvoiceDocumentRef {
+  /** What it is. */
+  kind: 'invoice' | 'receipt' | 'credit_note';
+  /** `pdf`, or `ubl` for the e-invoice. */
+  format: 'pdf' | 'ubl';
   /** Its number. */
   number: string;
-  /** The refund it credits; `null` for the credit note of a correction. */
+  /** The refund a credit note credits; `null` for the invoice, the receipt and the credit note of a correction. */
   refundId: string | null;
   /** When it was issued. */
   issuedAt: string;
 }
 
-/** An invoice with its refunds and credit notes, as {@link PaymentsModule.getInvoice} returns it. */
+/**
+ * An invoice with its newest refunds and how many refunds and credit notes it has, as
+ * {@link PaymentsModule.getInvoice} returns it. Every refund and correction adds a credit note, so the full lists are
+ * {@link PaymentsModule.listInvoiceRefunds} and {@link PaymentsModule.listInvoiceDocuments}.
+ */
 export interface InvoiceDetails extends Invoice {
-  /** Its refunds, oldest first. */
+  /** Its five newest refunds and every refund still under way (`requested`, `submitted`), newest first. */
   refunds: Refund[];
-  /** Its credit notes, oldest first. */
-  creditNotes: CreditNoteRef[];
+  /** How many refunds it has. */
+  refundsTotal: number;
+  /** How many credit notes it has (one per refund and correction). */
+  creditNotesTotal: number;
 }
 
 /** An invoice with its checkout token and payment page. */
@@ -795,6 +809,14 @@ export interface SubscriptionCharge {
 
 /** Paging of {@link PaymentsModule.listSubscriptionInvoices} and {@link PaymentsModule.listSubscriptionCharges}. */
 export interface ListSubscriptionItemsParams {
+  /** Page size, 1 to 100. Defaults to `20`. */
+  limit?: number;
+  /** `nextCursor` of the previous page. */
+  cursor?: string;
+}
+
+/** Paging of {@link PaymentsModule.listInvoiceRefunds} and {@link PaymentsModule.listInvoiceDocuments}. */
+export interface ListInvoiceItemsParams {
   /** Page size, 1 to 100. Defaults to `20`. */
   limit?: number;
   /** `nextCursor` of the previous page. */

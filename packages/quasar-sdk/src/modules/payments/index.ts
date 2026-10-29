@@ -15,8 +15,10 @@ import type {
   Invoice,
   InvoiceCorrection,
   InvoiceDetails,
+  InvoiceDocumentRef,
   InvoiceLedger,
   InvoiceWithCheckout,
+  ListInvoiceItemsParams,
   ListInvoicesParams,
   ListSubscriptionItemsParams,
   ListSubscriptionsParams,
@@ -104,7 +106,9 @@ export class PaymentsModule {
   }
 
   /**
-   * Reads an invoice with its refunds and credit notes (`GET /v1/payments/invoices/:id`).
+   * Reads an invoice with its five newest refunds, every refund still under way, and how many refunds and credit
+   * notes it has (`GET /v1/payments/invoices/:id`). The full lists are {@link PaymentsModule.listInvoiceRefunds} and
+   * {@link PaymentsModule.listInvoiceDocuments}.
    *
    * @param invoiceId - The invoice.
    * @returns The invoice.
@@ -112,6 +116,43 @@ export class PaymentsModule {
    */
   async getInvoice(invoiceId: string): Promise<InvoiceDetails> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}`, { method: 'GET' });
+  }
+
+  /**
+   * Lists the refunds of an invoice, newest first (`GET /v1/payments/invoices/:id/refunds`).
+   *
+   * @param invoiceId - The invoice.
+   * @param params - Paging.
+   * @returns One page; pass `nextCursor` as `cursor` for the next.
+   * @throws {QuasarSDKError} `invoice_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout or a
+   *   network error.
+   */
+  async listInvoiceRefunds(invoiceId: string, params: ListInvoiceItemsParams = {}): Promise<PaymentsList<Refund>> {
+    return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/refunds`, {
+      method: 'GET',
+      query: query({ limit: params.limit, cursor: params.cursor }),
+    });
+  }
+
+  /**
+   * Lists the documents issued for an invoice, newest first (`GET /v1/payments/invoices/:id/documents`): the invoice,
+   * its receipt and its credit notes, as PDF and UBL. Download them with {@link PaymentsModule.getDocument} and
+   * {@link PaymentsModule.getCreditNote}.
+   *
+   * @param invoiceId - The invoice.
+   * @param params - Paging.
+   * @returns One page; pass `nextCursor` as `cursor` for the next.
+   * @throws {QuasarSDKError} `invoice_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout or a
+   *   network error.
+   */
+  async listInvoiceDocuments(
+    invoiceId: string,
+    params: ListInvoiceItemsParams = {},
+  ): Promise<PaymentsList<InvoiceDocumentRef>> {
+    return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/documents`, {
+      method: 'GET',
+      query: query({ limit: params.limit, cursor: params.cursor }),
+    });
   }
 
   /**

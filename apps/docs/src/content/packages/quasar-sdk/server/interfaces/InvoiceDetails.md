@@ -1,8 +1,10 @@
 # InvoiceDetails
 
-Defined in: [modules/payments/types.ts:351](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L351)
+Defined in: [modules/payments/types.ts:363](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L363)
 
-An invoice with its refunds and credit notes, as [PaymentsModule.getInvoice](/packages/quasar-sdk/server/classes/PaymentsModule.md#getinvoice) returns it.
+An invoice with its newest refunds and how many refunds and credit notes it has, as
+[PaymentsModule.getInvoice](/packages/quasar-sdk/server/classes/PaymentsModule.md#getinvoice) returns it. Every refund and correction adds a credit note, so the full lists are
+[PaymentsModule.listInvoiceRefunds](/packages/quasar-sdk/server/classes/PaymentsModule.md#listinvoicerefunds) and [PaymentsModule.listInvoiceDocuments](/packages/quasar-sdk/server/classes/PaymentsModule.md#listinvoicedocuments).
 
 ## Extends
 
@@ -95,13 +97,13 @@ When it was created.
 
 ***
 
-### creditNotes
+### creditNotesTotal
 
-> **creditNotes**: [`CreditNoteRef`](/packages/quasar-sdk/server/interfaces/CreditNoteRef.md)[]
+> **creditNotesTotal**: `number`
 
-Defined in: [modules/payments/types.ts:355](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L355)
+Defined in: [modules/payments/types.ts:369](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L369)
 
-Its credit notes, oldest first.
+How many credit notes it has (one per refund and correction).
 
 ***
 
@@ -389,9 +391,19 @@ Refunded so far, in the invoice currency.
 
 > **refunds**: [`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md)[]
 
-Defined in: [modules/payments/types.ts:353](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L353)
+Defined in: [modules/payments/types.ts:365](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L365)
 
-Its refunds, oldest first.
+Its five newest refunds and every refund still under way (`requested`, `submitted`), newest first.
+
+***
+
+### refundsTotal
+
+> **refundsTotal**: `number`
+
+Defined in: [modules/payments/types.ts:367](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L367)
+
+How many refunds it has.
 
 ***
 
