@@ -152,8 +152,8 @@ export interface CheckoutRejectedPayment {
    * `reference_missing`, `too_early`, `not_found` (the network never returned the transaction), `timeout` (no receipt
    * in time), `replaced`, `payer_mismatch` (a transfer from another wallet to an invoice paid or held already; one to a
    * payable invoice is held for a refund only: {@link CheckoutReview}), `payer_unconfirmed` (the same from a wallet that
-   * never confirmed the invoice: it pays no invoice, the merchant returns it to the wallet that sent it; final),
-   * `native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded
+   * never confirmed the invoice: it pays no invoice; final; a refund only when held, a transfer credited to another
+   * invoice is `tx_already_used`), `native_from_contract_unverifiable`, `invoice_not_payable` (a transfer to an invoice paid, held or refunded
    * already), `settlement_failed` (the network confirmed the transaction, but Quasar has not recorded it yet: not final,
    * never a second payment, the buyer contacts the merchant; Quasar settles it again daily for 30 days after it learned
    * of it, while `rechecked`), `unresolved_after_24h` (no result seen on chain within 24 hours: only a transaction
@@ -177,8 +177,8 @@ export interface CheckoutRejectedPayment {
    * `native_from_contract_unverifiable`, `invoice_not_payable`), or Quasar has not recorded it yet
    * (`settlement_failed`): it may have moved money. Never say that it did not go through or that nothing was charged:
    * say that it does not pay the invoice (for `settlement_failed`: that Quasar has not recorded it yet; for
-   * `payer_mismatch` and `payer_unconfirmed`: that the merchant returns it to the wallet that sent it), and whom to
-   * contact if money left the wallet. Quasar versions before October 29, 2026 leave it out.
+   * `payer_mismatch` and `payer_unconfirmed`: promise a refund only on a held invoice), and whom to contact if money
+   * left the wallet. Quasar versions before October 29, 2026 leave it out.
    */
   movedMoney?: true;
   /**

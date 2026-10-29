@@ -333,11 +333,13 @@ export interface CheckoutState {
    * `unless_relayed`. A wallet confirms an invoice once: a wallet Quasar or this page already knows as confirmed asks
    * for no signature (also one Quasar answers `proven` for, confirmed from another tab), and a method that needs none
    * (`not_needed`) answers `true` at once. The page stays in its phase meanwhile ({@link CheckoutState.payerProof} is
-   * `confirming`). Side effect: a wallet prompt through `sign`.
+   * `confirming` for the wallet being asked, never for another one). A new call replaces a confirmation under way, so a
+   * prompt the buyer closed that never answers blocks nothing: call it again to try again. The replaced attempt's late
+   * answer only records the wallet's proof (no `error`, no phase change). Side effect: a wallet prompt through `sign`.
    *
    * @param sign - Signs the message with the wallet ({@link PayerProofSigner}).
    * @returns Whether the wallet confirmed the invoice; {@link CheckoutState.payerProof} is then `confirmed`. `false`
-   *   while another confirmation is under way (nothing changes), and with `error` set: `payer_required` (no wallet),
+   *   for a replaced attempt that did not confirm it (nothing changes), and with `error` set: `payer_required` (no wallet),
    *   `request_failed` (an `api` without the payer proof calls), `payer_proof_declined` (`sign` rejected: the buyer
    *   refused, or the wallet cannot sign messages), or Quasar's refusal (`payer_proof_invalid`, `payer_proof_unavailable`,
    *   `payer_chain_mismatch`, `origin_required`, `rate_limited`, `too_many_payers`, `invoice_not_payable`;
@@ -574,7 +576,10 @@ interface KeptHandOver {
   at: number;
 }
 
-/** Rejection reasons of a transfer Quasar could tie to no invoice: the merchant returns it to the wallet that sent it. */
+/**
+ * Rejection reasons of a transfer from a wallet that did not confirm the invoice. Only a refund-only hold (the invoice
+ * `held`, its review `refundOnly`) is returned to the wallet that sent it; a rejection without one promises no refund.
+ */
 const REFUND_ONLY_REASONS: ReadonlySet<string> = new Set(['payer_mismatch', 'payer_unconfirmed']);
 
 /** Kinds of payer proof that count on every EVM network: the key behind the address signs for it everywhere. */
@@ -716,11 +721,11 @@ function endedError(ended: Ending): CheckoutError {
   // Confirmed on chain, not recorded yet: the merchant has the money, Quasar may still retry it
   if (ended.reason === SETTLEMENT_FAILED) return settlementFailedError(ended.rechecked);
   if (ended.reason && REFUND_ONLY_REASONS.has(ended.reason)) {
-    // Tied to no invoice: only the wallet that sent it gets it back
+    // No hold of this invoice for it (a held invoice is the `held` phase, whose review says so): no refund promised
     return {
       code: 'payment_mismatch',
       message:
-        'This transaction came from a wallet that did not confirm this invoice, so it pays no invoice. The merchant returns it to the wallet that sent it.',
+        'This transaction came from a wallet that did not confirm this invoice, so it does not pay it. If money left your wallet, contact the merchant.',
       ...reason,
     };
   }
@@ -933,8 +938,13 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
   const submitRetries = new Map<string, ReturnType<typeof setTimeout>>();
   /** Whether Quasar last reported a payment of the invoice that it reads again (`unresolvedPayments` above `0`). */
   let quasarRechecks = false;
-  /** Whether {@link CheckoutState.confirmPayer} is under way. */
-  let confirming = false;
+  /**
+   * The number of the latest {@link CheckoutState.confirmPayer} attempt: a new call replaces the one under way (a
+   * prompt the buyer closed may never answer), whose late answer only records the wallet's proof.
+   */
+  let proofAttempt = 0;
+  /** The wallet the latest attempt asks to sign, while it is under way; `null` otherwise. */
+  let signingPayer: string | null = null;
   /** The confirmations this page got ({@link CheckoutState.confirmPayer}), on top of Quasar's `payerProofs`. */
   const confirmedHere: KnownProof[] = [];
   /** The wallets Quasar refused a quote for until they confirm the invoice (`409 payer_proof_required`). */
@@ -993,9 +1003,9 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
     const { payer, quote } = state;
     const method = state.checkout?.methods.find(({ id }) => id === state.methodId);
     const demanded = payer !== null && proofDemanded.has(payer);
-    const need = method?.payerProof ?? (demanded ? 'before_quote' : 'none');
+    // Quasar's `409 payer_proof_required` wins over a checkout read before the merchant changed the method
+    const need = demanded ? 'before_quote' : (method?.payerProof ?? 'none');
     if (need === 'none' || !method) return 'not_needed';
-    if (confirming) return 'confirming';
     // The quote says whether its wallet confirmed the invoice (the relay's authorization, too)
     const quoted: KnownProof[] =
       quote?.payerProof?.proven === true && quote.payer !== null
@@ -1010,7 +1020,9 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
     if (payer && confirmedBy([...(state.checkout?.payerProofs ?? []), ...confirmedHere, ...quoted], payer)) {
       return 'confirmed';
     }
-    return demanded || need === 'before_quote' ? 'required' : 'unless_relayed';
+    // Only the wallet the latest attempt asks to sign waits for it: another one confirms on its own
+    if (payer !== null && payer === signingPayer) return 'confirming';
+    return need === 'before_quote' ? 'required' : 'unless_relayed';
   };
 
   const store = createStore<CheckoutState>()((set, get) => {
@@ -1645,7 +1657,6 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           update({ error: null });
           return true;
         }
-        if (confirming) return false;
         const { payerProofMessage, payerProof } = api;
         if (!payerProofMessage || !payerProof) {
           update({
@@ -1656,14 +1667,18 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           });
           return false;
         }
-        confirming = true;
+        // A new attempt replaces the one under way: its prompt may never answer (the buyer closed it)
+        const attempt = ++proofAttempt;
+        signingPayer = payer;
         update({ error: null });
         /** Ends the confirmation: `known` is what Quasar recorded, `failure` why it did not. */
         const end = (known: KnownProof | null, failure?: unknown) => {
-          confirming = false;
           if (known) confirmedHere.push(known);
+          const latest = attempt === proofAttempt;
+          if (latest) signingPayer = null;
           if (destroyed) return;
-          if (failure === undefined) update({});
+          // A replaced attempt's late answer only records the proof: the page belongs to the latest one
+          if (failure === undefined || !latest) update({});
           else if (failure instanceof Error && failure.name === 'PayerProofDeclined') {
             update({
               error: {

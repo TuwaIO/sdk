@@ -2563,7 +2563,8 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     checkout.getState().destroy();
   });
 
-  it('names a transfer from a wallet that never confirmed the invoice: it pays no invoice and goes back to its wallet', async () => {
+  // Security review 7: only a held invoice shows a refund-only hold; a rejection without one promises no refund
+  it('names a transfer from a wallet that never confirmed the invoice without promising a refund it was not held for', async () => {
     const unconfirmed = rejection('0xfeed', 'payer_unconfirmed', true);
     answer({ invoice: { ...view().invoice, pendingPayments: 0, rejectedPayments: [unconfirmed] } });
     const reopened = store({ EventSource: null });
@@ -2572,9 +2573,86 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
       phase: 'selectMethod',
       error: { code: 'payment_mismatch', reason: 'payer_unconfirmed' },
     });
-    expect(reopened.getState().error?.message).toMatch(/wallet that sent it/);
+    expect(reopened.getState().error?.message).toMatch(/did not confirm this invoice/);
+    expect(reopened.getState().error?.message).toMatch(/contact the merchant/);
+    expect(reopened.getState().error?.message).not.toMatch(/returns it|refund/i);
     expect(reopened.getState().error?.message).not.toMatch(/did not go through|nothing/i);
     reopened.getState().destroy();
+  });
+
+  // UX review 1: a signature prompt that never answers (the buyer pressed Cancel) blocks no wallet
+  it('lets a new confirmation replace one the wallet never answered, and a late answer only records its proof', async () => {
+    answer();
+    const checkout = store();
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_evm');
+    checkout.getState().setPayer(PAYER);
+
+    let answerFirst: (signature: string) => void = () => undefined;
+    const firstSign = vi.fn(
+      () =>
+        new Promise<string>((resolve) => {
+          answerFirst = resolve;
+        }),
+    );
+    const first = checkout.getState().confirmPayer(firstSign);
+    await vi.waitFor(() => expect(firstSign).toHaveBeenCalled());
+    expect(checkout.getState().payerProof).toBe('confirming');
+
+    // Another wallet is not the one signing now
+    checkout.getState().setPayer(OTHER);
+    expect(checkout.getState().payerProof).toBe('required');
+    let declineLost: (reason: Error) => void = () => undefined;
+    const lostSign = vi.fn(
+      () =>
+        new Promise<string>((_, reject) => {
+          declineLost = reject;
+        }),
+    );
+    const lost = checkout.getState().confirmPayer(lostSign);
+    await vi.waitFor(() => expect(lostSign).toHaveBeenCalled());
+    expect(checkout.getState().payerProof).toBe('confirming');
+
+    // Cancel, then try again: the new attempt replaces the open one instead of being refused
+    const sign = vi.fn().mockResolvedValue('0xsig');
+    expect(await checkout.getState().confirmPayer(sign)).toBe(true);
+    expect(sign).toHaveBeenCalledTimes(1);
+    expect(checkout.getState()).toMatchObject({ payerProof: 'confirmed', error: null });
+
+    // The replaced prompts answer late: a refusal changes nothing, a signature only records the wallet's proof
+    declineLost(new Error('User rejected'));
+    expect(await lost).toBe(false);
+    expect(checkout.getState()).toMatchObject({ payerProof: 'confirmed', error: null, phase: 'selectMethod' });
+    answerFirst('0xsig');
+    expect(await first).toBe(true);
+    expect(checkout.getState()).toMatchObject({ payerProof: 'confirmed', error: null, phase: 'selectMethod' });
+    checkout.getState().setPayer(PAYER);
+    expect(checkout.getState().payerProof).toBe('confirmed');
+    checkout.getState().destroy();
+  });
+
+  // UX review 3: Quasar's word wins over a checkout read before the merchant changed the method
+  it('asks for the confirmation when Quasar demands one for a method the checkout announced without it', async () => {
+    answer(
+      { methods: [...METHODS, { ...view().methods[0], id: 'ap_plain', gasless: 'off', payerProof: 'none' as const }] },
+      {
+        quote: () =>
+          json(
+            { error: { code: 'payer_proof_required', message: 'Confirm the paying wallet first', payer: PAYER } },
+            409,
+          ),
+      },
+    );
+    const checkout = store();
+    await checkout.getState().load();
+    checkout.getState().selectMethod('ap_plain');
+    checkout.getState().setPayer(PAYER);
+    expect(checkout.getState().payerProof).toBe('not_needed');
+    expect(await checkout.getState().requestQuote()).toBeNull();
+    expect(checkout.getState()).toMatchObject({ phase: 'selectMethod', payerProof: 'required' });
+    expect(await checkout.getState().confirmPayer(async () => '0xsig')).toBe(true);
+    expect(checkout.getState().payerProof).toBe('confirmed');
+    checkout.getState().destroy();
   });
 
   it('promises the daily retry of a payment Quasar has not recorded only while Quasar retries it', async () => {
