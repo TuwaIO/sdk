@@ -2,7 +2,7 @@
 
 > **preFlightTxCheck**(`customApiUrl?`): `Promise`\<`void`\>
 
-Defined in: [react/index.ts:34](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/react/index.ts#L34)
+Defined in: react/index.ts:34
 
 Checks, before a transaction starts, that the user is signed in with SIWX and that the Quasar API responds. Use it
 as the `beforeTxProcess` callback of `createPulsarStore` from `@tuwaio/pulsar-core`: with the default

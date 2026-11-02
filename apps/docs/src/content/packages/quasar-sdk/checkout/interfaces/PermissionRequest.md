@@ -1,6 +1,6 @@
 # PermissionRequest
 
-Defined in: [checkout/types.ts:270](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L270)
+Defined in: checkout/types.ts:270
 
 The ERC-7715 `wallet_grantPermissions` request of a subscription with automatic charges.
 
@@ -10,7 +10,7 @@ The ERC-7715 `wallet_grantPermissions` request of a subscription with automatic 
 
 > **chainId**: `string`
 
-Defined in: [checkout/types.ts:272](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L272)
+Defined in: checkout/types.ts:272
 
 Chain as hex.
 
@@ -20,7 +20,7 @@ Chain as hex.
 
 > **permission**: `object`
 
-Defined in: [checkout/types.ts:276](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L276)
+Defined in: checkout/types.ts:276
 
 A periodic ERC-20 allowance.
 
@@ -62,7 +62,7 @@ A periodic ERC-20 allowance.
 
 > **rules**: `object`[]
 
-Defined in: [checkout/types.ts:288](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L288)
+Defined in: checkout/types.ts:288
 
 Expiry, payee and redeemer rules.
 
@@ -80,6 +80,6 @@ Expiry, payee and redeemer rules.
 
 > **to**: `string`
 
-Defined in: [checkout/types.ts:274](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L274)
+Defined in: checkout/types.ts:274
 
 The app's collector account, which redeems the permission.

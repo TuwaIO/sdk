@@ -1,6 +1,6 @@
 # PaymentQuote
 
-Defined in: [modules/payments/types.ts:558](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L558)
+Defined in: modules/payments/types.ts:558
 
 The price of an amount in a payment method now; nothing is locked.
 
@@ -10,7 +10,7 @@ The price of an amount in a payment method now; nothing is locked.
 
 > **amount**: `string`
 
-Defined in: [modules/payments/types.ts:568](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L568)
+Defined in: modules/payments/types.ts:568
 
 The fiat amount.
 
@@ -20,7 +20,7 @@ The fiat amount.
 
 > **amountToSend**: `string`
 
-Defined in: [modules/payments/types.ts:574](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L574)
+Defined in: modules/payments/types.ts:574
 
 Token amount the buyer sends (grossed up for a transfer fee), in base units.
 
@@ -30,7 +30,7 @@ Token amount the buyer sends (grossed up for a transfer fee), in base units.
 
 > **chainId**: `string`
 
-Defined in: [modules/payments/types.ts:566](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L566)
+Defined in: modules/payments/types.ts:566
 
 CAIP-2 chain.
 
@@ -40,7 +40,7 @@ CAIP-2 chain.
 
 > **cryptoAmount**: `string`
 
-Defined in: [modules/payments/types.ts:572](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L572)
+Defined in: modules/payments/types.ts:572
 
 Token amount the merchant receives, in base units.
 
@@ -50,7 +50,7 @@ Token amount the merchant receives, in base units.
 
 > **currency**: [`PaymentsCurrency`](/packages/quasar-sdk/server/type-aliases/PaymentsCurrency.md)
 
-Defined in: [modules/payments/types.ts:570](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L570)
+Defined in: modules/payments/types.ts:570
 
 Its currency.
 
@@ -60,7 +60,7 @@ Its currency.
 
 > **decimals**: `number`
 
-Defined in: [modules/payments/types.ts:578](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L578)
+Defined in: modules/payments/types.ts:578
 
 Decimals of the token.
 
@@ -70,7 +70,7 @@ Decimals of the token.
 
 > **discountBps**: `number`
 
-Defined in: [modules/payments/types.ts:582](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L582)
+Defined in: modules/payments/types.ts:582
 
 Discount of the method in basis points.
 
@@ -80,7 +80,7 @@ Discount of the method in basis points.
 
 > **markupBps**: `number`
 
-Defined in: [modules/payments/types.ts:580](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L580)
+Defined in: modules/payments/types.ts:580
 
 Markup of the method in basis points.
 
@@ -90,7 +90,7 @@ Markup of the method in basis points.
 
 > **methodId**: `string`
 
-Defined in: [modules/payments/types.ts:562](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L562)
+Defined in: modules/payments/types.ts:562
 
 The payment method.
 
@@ -100,7 +100,7 @@ The payment method.
 
 > **object**: `"quote"`
 
-Defined in: [modules/payments/types.ts:560](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L560)
+Defined in: modules/payments/types.ts:560
 
 Always `quote`.
 
@@ -110,7 +110,7 @@ Always `quote`.
 
 > **quotedAt**: `string`
 
-Defined in: [modules/payments/types.ts:586](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L586)
+Defined in: modules/payments/types.ts:586
 
 When it was priced.
 
@@ -120,7 +120,7 @@ When it was priced.
 
 > **rates**: `unknown`
 
-Defined in: [modules/payments/types.ts:584](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L584)
+Defined in: modules/payments/types.ts:584
 
 Price rounds used, as evidence.
 
@@ -130,7 +130,7 @@ Price rounds used, as evidence.
 
 > **symbol**: `string`
 
-Defined in: [modules/payments/types.ts:564](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L564)
+Defined in: modules/payments/types.ts:564
 
 Token symbol.
 
@@ -140,6 +140,6 @@ Token symbol.
 
 > **transferFee**: \{ `bps`: `number`; `maxFee`: `string` \| `null`; `source`: `"method"` \| `"contract"`; \} \| `null`
 
-Defined in: [modules/payments/types.ts:576](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L576)
+Defined in: modules/payments/types.ts:576
 
 The token's transfer fee, when it takes one.

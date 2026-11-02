@@ -1,6 +1,6 @@
 {
   "name": "@tuwaio/quasar-sdk",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
@@ -92,8 +92,8 @@
     }
   },
   "devDependencies": {
-    "@tuwaio/pulsar-core": "^0.11.0",
-    "@tuwaio/siwx-react": "^0.6.4",
+    "@tuwaio/pulsar-core": "^0.11.1",
+    "@tuwaio/siwx-react": "^0.6.5",
     "tsup": "^9.0.0",
     "typescript": "6.0.3",
     "zustand": "^5.0.15"

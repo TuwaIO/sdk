@@ -14,7 +14,7 @@
     "format": "prettier --write .",
     "test": "pnpm --filter \"./packages/**\" test",
     "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && find . -name dist -type d -prune -exec rm -rf '{}' + && rm -rf .turbo",
-    "docs:gen": "rm -rf apps/docs/src/content/packages && typedoc && node apps/docs/typedoc/packagePages.mjs && cp -R apps/docs/typedoc/meta/. apps/docs/src/content/packages/",
+    "docs:gen": "rm -rf apps/docs/src/content/packages && typedoc && node apps/docs/typedoc/packagePages.mjs && cp -R apps/docs/typedoc/meta/. apps/docs/src/content/packages/ && pnpm --filter @tuwaio/sdk-docs i18n:check",
     "openapi:gen": "tsx scripts/generate-openapi.ts",
     "prepare": "husky"
   },
@@ -39,7 +39,7 @@
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/release-notes-generator": "^14.1.1",
     "@tuwaio/orbit-core": "^0.6.0",
-    "@tuwaio/pulsar-core": "^0.11.0",
+    "@tuwaio/pulsar-core": "^0.11.1",
     "@types/node": "^26.6.5",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
@@ -56,7 +56,7 @@
     "typedoc": "^0.28.20",
     "typedoc-plugin-markdown": "^4.14.1",
     "typescript": "6.0.3",
-    "typescript-eslint": "^8.72.0",
+    "typescript-eslint": "^8.72.1",
     "vitest": "^5.0.5",
     "yaml": "^2.9.1",
     "zod": "^4.6.7"
