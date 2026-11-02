@@ -2,13 +2,13 @@
 
 > **verifyWebhook**(`params`): `Promise`\<[`QuasarWebhook`](/packages/quasar-sdk/server/type-aliases/QuasarWebhook.md)\>
 
-Defined in: webhooks.ts:205
+Defined in: webhooks.ts:229
 
 Verifies a Quasar webhook and returns its body. Checks the signature (`x-quasar-signature`, the hex HMAC-SHA256 of
-the raw body keyed with the endpoint's signing secret) in constant time, parses the body and, for a payment event,
-refuses a delivery whose `sentAt` is further from now than `toleranceSeconds` (a replay of an old delivery). Uses
-Web Crypto, so it runs in Node.js 20+, edge runtimes and Workers. Payment events are delivered at least once:
-deduplicate them by `id`.
+the raw body keyed with the endpoint's signing secret) in constant time, parses the body and refuses a delivery
+whose send time (`sentAt`, falling back to `timestamp` for older transaction webhooks) is further from now than
+`toleranceSeconds` (a replay of an old delivery). Uses Web Crypto, so it runs in Node.js 20+, edge runtimes and
+Workers. Payment events are delivered at least once: deduplicate them by `id`.
 
 ## Parameters
 
@@ -27,7 +27,8 @@ The body: a [PaymentWebhookEvent](/packages/quasar-sdk/server/interfaces/Payment
 ## Throws
 
 `missing_secret`, `missing_signature`, `invalid_signature`, `invalid_body` (not a
-  JSON object) or `stale` (a payment event outside the tolerance).
+  JSON object), `invalid_options` (an invalid `toleranceSeconds`) or `stale` (an event outside the tolerance or
+  missing its send time).
 
 ## Example
 

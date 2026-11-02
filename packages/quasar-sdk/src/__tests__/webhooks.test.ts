@@ -78,7 +78,7 @@ describe('verifyWebhook', () => {
     ).rejects.toMatchObject({ code: 'stale' });
   });
 
-  it('reads a transaction webhook, which has no send time to check', async () => {
+  it('reads a transaction webhook whose timestamp is within tolerance', async () => {
     const body = JSON.stringify({
       txKey: '0x3a5f',
       hash: '0x3a5f',
@@ -86,12 +86,140 @@ describe('verifyWebhook', () => {
       action: 'Success',
       txType: 'SWAP',
       chainId: '1',
-      timestamp: 1_700_000_000,
+      timestamp: Math.floor(NOW.getTime() / 1000),
       metadata: { amount: 100 },
     });
     const event = await verifyWebhook({ body, signature: sign(body), secret: SECRET, now: NOW });
     expect(isPaymentWebhookEvent(event)).toBe(false);
     expect(event).toMatchObject({ txKey: '0x3a5f', status: 'Success' });
+  });
+
+  it('refuses an old transaction webhook captured by a researcher (8.77 h old, no sentAt)', async () => {
+    const capturedBody =
+      '{"hash": "0x6a6d07862acf7b72066686004db37279de16b283081e3dbd712ed8bf8c6643e4", "txKey": "0x6a6d07862acf7b72066686004db37279de16b283081e3dbd712ed8bf8c6643e4", "action": "Failed", "status": "Failed", "txType": "contract-call", "chainId": "11155111", "timestamp": 1793353943}';
+    const capturedNow = new Date((1793353943 + Math.round(8.77 * 3600)) * 1000);
+
+    // Default tolerance (300 s)
+    await expect(
+      verifyWebhook({ body: capturedBody, signature: sign(capturedBody), secret: SECRET, now: capturedNow }),
+    ).rejects.toMatchObject({
+      code: 'stale',
+      message: 'The event was sent outside the 300 s tolerance (timestamp)',
+    });
+
+    // toleranceSeconds: 1
+    await expect(
+      verifyWebhook({
+        body: capturedBody,
+        signature: sign(capturedBody),
+        secret: SECRET,
+        now: capturedNow,
+        toleranceSeconds: 1,
+      }),
+    ).rejects.toMatchObject({
+      code: 'stale',
+      message: 'The event was sent outside the 1 s tolerance (timestamp)',
+    });
+
+    // toleranceSeconds: false accepts it regardless of age
+    await expect(
+      verifyWebhook({
+        body: capturedBody,
+        signature: sign(capturedBody),
+        secret: SECRET,
+        now: capturedNow,
+        toleranceSeconds: false,
+      }),
+    ).resolves.toMatchObject({
+      txKey: '0x6a6d07862acf7b72066686004db37279de16b283081e3dbd712ed8bf8c6643e4',
+    });
+  });
+
+  it('accepts a transaction webhook retry with a fresh sentAt and an old timestamp', async () => {
+    const body = JSON.stringify({
+      txKey: '0x3a5f',
+      status: 'Success',
+      action: 'Success',
+      chainId: '1',
+      timestamp: 1_700_000_000,
+      sentAt: '2026-10-10T11:59:59.000Z',
+    });
+    const event = await verifyWebhook({ body, signature: sign(body), secret: SECRET, now: NOW });
+    expect(isPaymentWebhookEvent(event)).toBe(false);
+    expect(event).toMatchObject({ txKey: '0x3a5f', status: 'Success' });
+  });
+
+  it('refuses a transaction webhook with sentAt older than the tolerance, naming sentAt in the message', async () => {
+    const body = JSON.stringify({
+      txKey: '0x3a5f',
+      status: 'Success',
+      action: 'Success',
+      chainId: '1',
+      timestamp: Math.floor(NOW.getTime() / 1000),
+      sentAt: '2026-10-10T11:50:00.000Z',
+    });
+    await expect(verifyWebhook({ body, signature: sign(body), secret: SECRET, now: NOW })).rejects.toMatchObject({
+      code: 'stale',
+      message: 'The event was sent outside the 300 s tolerance (sentAt)',
+    });
+  });
+
+  it('refuses a transaction webhook whose sentAt is not a date, without falling back to timestamp', async () => {
+    const body = JSON.stringify({
+      txKey: '0x3a5f',
+      status: 'Success',
+      action: 'Success',
+      chainId: '1',
+      timestamp: Math.floor(NOW.getTime() / 1000),
+      sentAt: 'yesterday',
+    });
+    await expect(verifyWebhook({ body, signature: sign(body), secret: SECRET, now: NOW })).rejects.toMatchObject({
+      code: 'stale',
+      message: 'The event carries no valid send time (sentAt)',
+    });
+  });
+
+  it('refuses a transaction webhook with neither sentAt nor timestamp', async () => {
+    const body = JSON.stringify({
+      txKey: '0x3a5f',
+      status: 'Success',
+      action: 'Success',
+      chainId: '1',
+    });
+    await expect(verifyWebhook({ body, signature: sign(body), secret: SECRET, now: NOW })).rejects.toMatchObject({
+      code: 'stale',
+    });
+  });
+
+  it('validates toleranceSeconds and rejects 0, negative numbers, NaN or Infinity with invalid_options', async () => {
+    const body = JSON.stringify({
+      txKey: '0x3a5f',
+      status: 'Success',
+      action: 'Success',
+      chainId: '1',
+      timestamp: Math.floor(NOW.getTime() / 1000),
+    });
+    for (const toleranceSeconds of [0, -1, Number.NaN, Number.POSITIVE_INFINITY] as (number | false)[]) {
+      await expect(
+        verifyWebhook({ body, signature: sign(body), secret: SECRET, now: NOW, toleranceSeconds }),
+      ).rejects.toMatchObject({ code: 'invalid_options' });
+    }
+  });
+
+  it('refuses a transaction webhook with a tampered body or wrong secret with invalid_signature', async () => {
+    const body = JSON.stringify({
+      txKey: '0x3a5f',
+      status: 'Success',
+      action: 'Success',
+      chainId: '1',
+      timestamp: Math.floor(NOW.getTime() / 1000),
+    });
+    await expect(
+      verifyWebhook({ body: `${body} `, signature: sign(body), secret: SECRET, now: NOW }),
+    ).rejects.toMatchObject({ code: 'invalid_signature' });
+    await expect(
+      verifyWebhook({ body, signature: sign(body, 'whsec_wrong'), secret: SECRET, now: NOW }),
+    ).rejects.toMatchObject({ code: 'invalid_signature' });
   });
 
   it('refuses a signed body that is not a webhook', async () => {

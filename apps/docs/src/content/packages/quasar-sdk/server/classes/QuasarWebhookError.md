@@ -1,6 +1,6 @@
 # QuasarWebhookError
 
-Defined in: webhooks.ts:105
+Defined in: webhooks.ts:110
 
 Error thrown by [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebhook.md): answer the delivery with 400 (or 401) and do not act on it.
 
@@ -14,7 +14,7 @@ Error thrown by [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebh
 
 > **new QuasarWebhookError**(`code`, `message`): `QuasarWebhookError`
 
-Defined in: webhooks.ts:115
+Defined in: webhooks.ts:120
 
 Creates the error.
 
@@ -46,6 +46,6 @@ What to log.
 
 > `readonly` **code**: [`QuasarWebhookErrorCode`](/packages/quasar-sdk/server/type-aliases/QuasarWebhookErrorCode.md)
 
-Defined in: webhooks.ts:107
+Defined in: webhooks.ts:112
 
 Why the delivery was refused.

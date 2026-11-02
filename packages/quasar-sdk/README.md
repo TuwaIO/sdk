@@ -14,7 +14,7 @@
 - **EIP-5792 batches:** a batch sent with `wallet_sendCalls` is synced by its batch ID; `watchBatchHashes` reads the hash of its transaction from the Pulsar store in the browser, and `quasar.pulsar.syncHash` sends it to Quasar from the server.
 - **Payments:** `quasar.payments` issues invoices (with their PDF and e-invoice documents and a payment page), lists and reads them with their hash-chained ledger, cancels, releases and corrects them, refunds payments, prices amounts, and runs subscriptions billed every period.
 - **Headless checkout:** `createCheckoutStore` from `@tuwaio/quasar-sdk/checkout` follows the payment of one invoice in the buyer's browser (methods, the quote, AML-screened when the merchant checks paying wallets, buyer details, language, the transaction or gasless signature, live status) with its checkout token and no key; `createRefundStore` refunds a payment from the merchant's wallet through calls the app runs on its server. Neither sends a transaction: Pulsar or the wallet does.
-- **Webhook verification:** `verifyWebhook` checks the signature of a webhook (and, for a payment event, the time it was sent) and returns its typed body.
+- **Webhook verification:** `verifyWebhook` checks the signature of a webhook and the time it was sent (`sentAt`, or `timestamp` for a transaction webhook of an older engine), and returns its typed body.
 - **Errors:** every failed request throws a `QuasarSDKError` with the HTTP `status` and, from the Payments API, a stable `code` and the fields at fault (`issues`).
 - **Pre-flight check:** `preFlightTxCheck` from `@tuwaio/quasar-sdk/react` stops a Pulsar transaction in the browser when the user is not signed in with SIWX or the Quasar API does not respond.
 - **Webhook relay:** `npx @tuwaio/quasar-sdk listen` receives the deliveries of a webhook endpoint with a `localhost` URL and posts them to your local app, without a tunnel.
@@ -123,6 +123,8 @@ export async function POST(request: Request) {
   }
 }
 ```
+
+`verifyWebhook` refuses a delivery sent further from now than `toleranceSeconds` (default 300) as `stale`, so a captured webhook cannot be replayed later. It reads `sentAt`, set on every delivery attempt; a transaction webhook from an engine that does not send `sentAt` yet is checked by its `timestamp`, the time it was created, which its retries reuse: raise `toleranceSeconds` (1200 covers the retries) until the engine is updated. `toleranceSeconds: false` turns the check off.
 
 ### Checkout in the browser
 

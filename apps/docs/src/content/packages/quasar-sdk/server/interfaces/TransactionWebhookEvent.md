@@ -40,9 +40,20 @@ Its on-chain hash, when it has one.
 
 > `optional` **metadata?**: `unknown`
 
-Defined in: webhooks.ts:94
+Defined in: webhooks.ts:99
 
 The `payload` of the Pulsar transaction.
+
+***
+
+### sentAt?
+
+> `optional` **sentAt?**: `string`
+
+Defined in: webhooks.ts:97
+
+When this delivery attempt was sent (ISO 8601), signed with the body. Quasar engines released before Payments omit
+it; [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebhook.md) then checks `timestamp`.
 
 ***
 

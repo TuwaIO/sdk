@@ -1,6 +1,6 @@
 /**
- * @file Verification of Quasar webhooks: the HMAC-SHA256 signature of the raw body and, for payment events, the time
- * they were sent; and the types of their bodies.
+ * @file Verification of Quasar webhooks: the HMAC-SHA256 signature of the raw body and the time deliveries were sent;
+ * and the types of their bodies.
  */
 
 import type { Invoice, InvoiceSettlement, PaymentsEnvironment, Refund, Subscription } from './modules/payments/types';
@@ -90,6 +90,11 @@ export interface TransactionWebhookEvent {
   chainId: string;
   /** Unix time in seconds when the webhook was created. */
   timestamp: number;
+  /**
+   * When this delivery attempt was sent (ISO 8601), signed with the body. Quasar engines released before Payments omit
+   * it; {@link verifyWebhook} then checks `timestamp`.
+   */
+  sentAt?: string;
   /** The `payload` of the Pulsar transaction. */
   metadata?: unknown;
 }
@@ -99,7 +104,7 @@ export type QuasarWebhook = PaymentWebhookEvent | TransactionWebhookEvent;
 
 /** Why {@link verifyWebhook} refused a delivery. */
 export type QuasarWebhookErrorCode =
-  'missing_secret' | 'missing_signature' | 'invalid_signature' | 'invalid_body' | 'stale';
+  'missing_secret' | 'missing_signature' | 'invalid_signature' | 'invalid_body' | 'invalid_options' | 'stale';
 
 /** Error thrown by {@link verifyWebhook}: answer the delivery with 400 (or 401) and do not act on it. */
 export class QuasarWebhookError extends Error {
@@ -128,8 +133,10 @@ export interface VerifyWebhookParams {
   /** The signing secret of the webhook endpoint. */
   secret: string;
   /**
-   * How far `sentAt` of a payment event may be from now, in seconds; `false` turns the check off. Defaults to `300`.
-   * Transaction webhooks carry no send time and are not checked.
+   * How far the send time may be from now, in seconds: a finite number above 0, or `false` to turn the check off
+   * (`0`, a negative number, `NaN` or `Infinity` throw `invalid_options`). Defaults to `300`. The send time is
+   * `sentAt`; a transaction webhook of an engine that sends no `sentAt` is checked by its `timestamp`, the time it was
+   * created, which its retries reuse, so a retry later than the tolerance is refused.
    */
   toleranceSeconds?: number | false;
   /** The current time, for tests. Defaults to now. */
@@ -160,6 +167,22 @@ function sameText(a: string, b: string): boolean {
 }
 
 /**
+ * When a delivery was sent, in milliseconds (`NaN` when the body has no valid time), and the field it was read from:
+ * `sentAt`, set on every attempt; a transaction webhook of an engine that sends no `sentAt` has only `timestamp`, in
+ * seconds, set when the webhook was created and reused by its retries.
+ */
+function sendTime(event: QuasarWebhook): { field: 'sentAt' | 'timestamp'; time: number } {
+  if (isPaymentWebhookEvent(event) || event.sentAt != null) {
+    return { field: 'sentAt', time: typeof event.sentAt === 'string' ? Date.parse(event.sentAt) : NaN };
+  }
+  const { timestamp } = event;
+  return {
+    field: 'timestamp',
+    time: typeof timestamp === 'number' && Number.isFinite(timestamp) ? timestamp * 1000 : NaN,
+  };
+}
+
+/**
  * Whether a verified webhook is a payment event (`apiVersion: 'payments.v1'`) rather than a transaction webhook.
  *
  * @param event - A body returned by {@link verifyWebhook}.
@@ -171,15 +194,16 @@ export function isPaymentWebhookEvent(event: QuasarWebhook): event is PaymentWeb
 
 /**
  * Verifies a Quasar webhook and returns its body. Checks the signature (`x-quasar-signature`, the hex HMAC-SHA256 of
- * the raw body keyed with the endpoint's signing secret) in constant time, parses the body and, for a payment event,
- * refuses a delivery whose `sentAt` is further from now than `toleranceSeconds` (a replay of an old delivery). Uses
- * Web Crypto, so it runs in Node.js 20+, edge runtimes and Workers. Payment events are delivered at least once:
- * deduplicate them by `id`.
+ * the raw body keyed with the endpoint's signing secret) in constant time, parses the body and refuses a delivery
+ * whose send time (`sentAt`, falling back to `timestamp` for older transaction webhooks) is further from now than
+ * `toleranceSeconds` (a replay of an old delivery). Uses Web Crypto, so it runs in Node.js 20+, edge runtimes and
+ * Workers. Payment events are delivered at least once: deduplicate them by `id`.
  *
  * @param params - The raw body, the signature header, the secret and the tolerance.
  * @returns The body: a {@link PaymentWebhookEvent} or a {@link TransactionWebhookEvent}.
  * @throws {QuasarWebhookError} `missing_secret`, `missing_signature`, `invalid_signature`, `invalid_body` (not a
- *   JSON object) or `stale` (a payment event outside the tolerance).
+ *   JSON object), `invalid_options` (an invalid `toleranceSeconds`) or `stale` (an event outside the tolerance or
+ *   missing its send time).
  *
  * @example
  * ```ts
@@ -204,6 +228,12 @@ export function isPaymentWebhookEvent(event: QuasarWebhook): event is PaymentWeb
  */
 export async function verifyWebhook(params: VerifyWebhookParams): Promise<QuasarWebhook> {
   const { body, signature, secret, toleranceSeconds = DEFAULT_TOLERANCE_SECONDS, now = new Date() } = params;
+  if (
+    toleranceSeconds !== false &&
+    (typeof toleranceSeconds !== 'number' || !Number.isFinite(toleranceSeconds) || toleranceSeconds <= 0)
+  ) {
+    throw new QuasarWebhookError('invalid_options', 'toleranceSeconds must be a finite number above 0, or false');
+  }
   if (!secret) throw new QuasarWebhookError('missing_secret', 'No signing secret to verify the webhook with');
   if (!signature)
     throw new QuasarWebhookError('missing_signature', `The ${WEBHOOK_SIGNATURE_HEADER} header is missing`);
@@ -225,10 +255,14 @@ export async function verifyWebhook(params: VerifyWebhookParams): Promise<Quasar
   }
 
   const event = parsed as QuasarWebhook;
-  if (isPaymentWebhookEvent(event) && toleranceSeconds !== false) {
-    const sentAt = Date.parse(event.sentAt);
-    if (Number.isNaN(sentAt) || Math.abs(now.getTime() - sentAt) > toleranceSeconds * 1000) {
-      throw new QuasarWebhookError('stale', `The event was sent outside the ${toleranceSeconds} s tolerance`);
+  if (toleranceSeconds !== false) {
+    const { field, time } = sendTime(event);
+    if (Number.isNaN(time)) throw new QuasarWebhookError('stale', `The event carries no valid send time (${field})`);
+    if (Math.abs(now.getTime() - time) > toleranceSeconds * 1000) {
+      throw new QuasarWebhookError(
+        'stale',
+        `The event was sent outside the ${toleranceSeconds} s tolerance (${field})`,
+      );
     }
   }
   return event;

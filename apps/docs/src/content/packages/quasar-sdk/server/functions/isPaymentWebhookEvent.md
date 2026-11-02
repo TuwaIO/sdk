@@ -2,7 +2,7 @@
 
 > **isPaymentWebhookEvent**(`event`): `event is PaymentWebhookEvent`
 
-Defined in: webhooks.ts:168
+Defined in: webhooks.ts:191
 
 Whether a verified webhook is a payment event (`apiVersion: 'payments.v1'`) rather than a transaction webhook.
 
