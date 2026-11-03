@@ -595,8 +595,9 @@ interface KeptHandOver {
 }
 
 /**
- * Rejection reasons of a transfer from a wallet that did not confirm the invoice. Only a refund-only hold (the invoice
- * `held`, its review `refundOnly`) is returned to the wallet that sent it; a rejection without one promises no refund.
+ * Rejection reasons of a transfer from a wallet that did not confirm the invoice. Quasar records such a transfer as a
+ * held transfer of its own (`held`), which the merchant returns to the wallet that sent it, and the invoice stays as
+ * it was; a rejection without `held` promises no refund.
  */
 const REFUND_ONLY_REASONS: ReadonlySet<string> = new Set(['payer_mismatch', 'payer_unconfirmed']);
 
@@ -760,12 +761,14 @@ function endedError(ended: Ending): CheckoutError {
   // Confirmed on chain, not recorded yet: the merchant has the money, Quasar may still retry it
   if (ended.reason === SETTLEMENT_FAILED) return settlementFailedError(ended.rechecked);
   if (ended.reason && REFUND_ONLY_REASONS.has(ended.reason)) {
-    // No hold of this invoice for it (a held invoice is the `held` phase, whose review says so): no refund promised
+    // Held for a refund to its sender, the invoice still open: the confirmed wallet can pay it
     return {
       code: 'payment_mismatch',
-      message:
-        'This transaction came from a wallet that did not confirm this invoice, so it does not pay it. If money left your wallet, contact the merchant.',
+      message: ended.held
+        ? 'This transaction came from a wallet that did not confirm this invoice, so it does not pay it. The merchant returns it to the wallet that sent it, and the invoice can still be paid from the wallet that confirmed it.'
+        : 'This transaction came from a wallet that did not confirm this invoice, so it does not pay it. If money left your wallet, contact the merchant.',
       ...reason,
+      ...(ended.held ? { held: true as const } : {}),
     };
   }
   const other = ended.otherInvoice ? { otherInvoice: ended.otherInvoice } : {};

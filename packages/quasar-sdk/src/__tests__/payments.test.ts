@@ -119,6 +119,29 @@ describe('quasar.payments', () => {
     ]);
   });
 
+  // A transfer tied to no invoice is a record of its own, refunded as a whole to the wallet that sent it
+  it('lists held transfers, of the app or of one invoice, and asks for the refund of one', async () => {
+    const transfer = { id: 'ht_1', invoice: 'inv_1', status: 'held' };
+    fetchMock
+      .mockResolvedValueOnce(json({ heldTransfers: [transfer] }))
+      .mockResolvedValueOnce(json({ heldTransfers: [transfer, { ...transfer, id: 'ht_2', status: 'refunded' }] }))
+      .mockResolvedValueOnce(json({ refund: { id: 'ref_1', heldTransfer: 'ht_1' }, instructions: {} }));
+
+    expect(await quasar.payments.listHeldTransfers({ status: 'held' })).toEqual([transfer]);
+    expect(await quasar.payments.listHeldTransfers({ invoice: 'inv/1', status: 'held' })).toEqual([transfer]);
+    expect((await quasar.payments.refundHeldTransfer('ht_1')).refund.heldTransfer).toBe('ht_1');
+
+    const paths = [0, 1, 2].map((n) => {
+      const url = new URL(sent(n).url);
+      return `${sent(n).method} ${url.pathname}${url.search}`;
+    });
+    expect(paths).toEqual([
+      'GET /v1/payments/held-transfers?status=held',
+      'GET /v1/payments/invoices/inv%2F1/held-transfers',
+      'POST /v1/payments/held-transfers/ht_1/refund',
+    ]);
+  });
+
   it('acts on an invoice: cancel, release, correct, a new payment link and its ledger with the chain check', async () => {
     fetchMock.mockImplementation(async () => json(INVOICE));
     await quasar.payments.cancelInvoice('inv_1', { reason: 'Duplicate order' });

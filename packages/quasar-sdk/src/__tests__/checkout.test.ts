@@ -209,9 +209,8 @@ describe('createCheckoutStore', () => {
       checkout: { amlScreening: false, invoice: { review: { reason: 'quote_expired' } } },
     });
     expectTypeOf<CheckoutView['amlScreening']>().toEqualTypeOf<boolean>();
-    // The reasons of a refund-only hold came with the payer proof
     expectTypeOf<NonNullable<CheckoutInvoice['review']>['reason']>().toExtend<
-      'screening' | 'late' | 'overpaid' | 'quote_expired' | 'payer_mismatch' | 'payer_unconfirmed'
+      'screening' | 'late' | 'overpaid' | 'quote_expired'
     >();
     checkout.getState().destroy();
   });
@@ -2216,7 +2215,7 @@ describe('createCheckoutStore: a hash taken by another invoice, settlement failu
   });
 });
 
-describe('createCheckoutStore: the paying wallet confirms the invoice, refund-only holds, honest follow windows', () => {
+describe('createCheckoutStore: the paying wallet confirms the invoice, held transfers, honest follow windows', () => {
   beforeEach(() => {
     fetchMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
@@ -2542,28 +2541,25 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     simulated.getState().destroy();
   });
 
-  // A transfer credited to no invoice is held only to be refunded to the wallet that sent it
-  it('tells a refund-only hold apart from a payment the merchant may release', async () => {
-    const held = {
-      ...view().invoice,
-      status: 'held',
-      amountPaid: '49000000',
-      review: { reason: 'payer_mismatch', refundOnly: true },
-    };
-    answer({ invoice: held as CheckoutView['invoice'] });
-    const checkout = store({ EventSource: null });
-    await checkout.getState().load();
-    expect(checkout.getState()).toMatchObject({
-      phase: 'held',
-      checkout: { invoice: { review: { reason: 'payer_mismatch', refundOnly: true } } },
+  // A transfer tied to no invoice never holds the invoice: the merchant returns it, the confirmed wallet still pays
+  it('says the merchant returns a held transfer, and keeps the invoice payable', async () => {
+    const held = rejection('0xfeed', 'payer_unconfirmed', true, { held: true });
+    answer({ invoice: { ...view().invoice, pendingPayments: 0, rejectedPayments: [held] } });
+    const reopened = store({ EventSource: null });
+    await reopened.getState().load();
+    expect(reopened.getState()).toMatchObject({
+      phase: 'selectMethod',
+      error: { code: 'payment_mismatch', reason: 'payer_unconfirmed', held: true },
     });
+    expect(reopened.getState().error?.message).toMatch(/returns it to the wallet that sent it/);
+    expect(reopened.getState().error?.message).toMatch(/can still be paid/);
     expectTypeOf<NonNullable<CheckoutInvoice['review']>['reason']>().toEqualTypeOf<
-      'screening' | 'late' | 'overpaid' | 'quote_expired' | 'payer_mismatch' | 'payer_unconfirmed'
+      'screening' | 'late' | 'overpaid' | 'quote_expired'
     >();
-    checkout.getState().destroy();
+    reopened.getState().destroy();
   });
 
-  // Security review 7: only a held invoice shows a refund-only hold; a rejection without one promises no refund
+  // A rejection without a held transfer promises no refund
   it('names a transfer from a wallet that never confirmed the invoice without promising a refund it was not held for', async () => {
     const unconfirmed = rejection('0xfeed', 'payer_unconfirmed', true);
     answer({ invoice: { ...view().invoice, pendingPayments: 0, rejectedPayments: [unconfirmed] } });
@@ -2580,7 +2576,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     reopened.getState().destroy();
   });
 
-  // UX review 1: a signature prompt that never answers (the buyer pressed Cancel) blocks no wallet
+  // A signature prompt that never answers (the buyer pressed Cancel) blocks no wallet
   it('lets a new confirmation replace one the wallet never answered, and a late answer only records its proof', async () => {
     answer();
     const checkout = store();
@@ -2631,7 +2627,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     checkout.getState().destroy();
   });
 
-  // UX review 8, item 1: a cancelled signature on a method the relay may pay never blocks a new price
+  // A cancelled signature on a method the relay may pay never blocks a new price
   it('quotes an expired price after a cancelled signature on a relayed method', async () => {
     answer();
     const checkout = store();
@@ -2653,7 +2649,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     checkout.getState().destroy();
   });
 
-  // UX review 8, item 2: the wallet confirmed through an earlier prompt; declining the later one is no error
+  // The wallet confirmed through an earlier prompt; declining the later one is no error
   it('sets no error when the buyer declines a later prompt of a wallet already confirmed', async () => {
     answer();
     const checkout = store();
@@ -2731,7 +2727,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     checkout.getState().destroy();
   });
 
-  // UX review 3: Quasar's word wins over a checkout read before the merchant changed the method
+  // Quasar's word wins over a checkout read before the merchant changed the method
   it('asks for the confirmation when Quasar demands one for a method the checkout announced without it', async () => {
     answer(
       { methods: [...METHODS, { ...view().methods[0], id: 'ap_plain', gasless: 'off', payerProof: 'none' as const }] },

@@ -1,6 +1,6 @@
 # QuasarWebhookError
 
-Defined in: [webhooks.ts:156](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L156)
+Defined in: [webhooks.ts:176](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L176)
 
 Error thrown by [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebhook.md): answer the delivery with 400 (or 401) and do not act on it.
 
@@ -14,7 +14,7 @@ Error thrown by [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebh
 
 > **new QuasarWebhookError**(`code`, `message`): `QuasarWebhookError`
 
-Defined in: [webhooks.ts:166](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L166)
+Defined in: [webhooks.ts:186](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L186)
 
 Creates the error.
 
@@ -46,6 +46,6 @@ What to log.
 
 > `readonly` **code**: [`QuasarWebhookErrorCode`](/packages/quasar-sdk/server/type-aliases/QuasarWebhookErrorCode.md)
 
-Defined in: [webhooks.ts:158](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L158)
+Defined in: [webhooks.ts:178](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L178)
 
 Why the delivery was refused.

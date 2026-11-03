@@ -237,32 +237,45 @@ describe('verifyWebhook', () => {
     }
   });
 
-  // A refund-only hold undone because its transfer paid another invoice (Quasar)
-  it('reads what a hold is about, and the hold Quasar undid when its transfer paid another invoice', async () => {
-    const body = JSON.stringify({
+  // A transfer tied to no invoice is a record of its own: the invoice is never held for it
+  it('reads a held transfer and the one Quasar voided when its transaction paid another invoice', async () => {
+    const held = JSON.stringify({
       ...JSON.parse(paymentEvent('2026-10-10T11:59:59.000Z')),
-      type: 'invoice.hold_voided',
+      type: 'invoice.transfer_held',
       data: {
         invoice: { id: 'inv_1', object: 'invoice', status: 'open' },
-        hold: { voided: true, txHash: '0xfeed', paidInvoice: 'inv_2', status: 'open' },
+        heldTransfer: {
+          id: 'ht_1',
+          txHash: '0xfeed',
+          amount: '500000',
+          senders: ['0x3f2a'],
+          reason: 'payer_unconfirmed',
+          late: true,
+        },
       },
     });
-    const event = await verifyWebhook({ body, signature: sign(body), secret: SECRET, now: NOW });
+    const event = await verifyWebhook({ body: held, signature: sign(held), secret: SECRET, now: NOW });
     if (!isPaymentWebhookEvent(event)) throw new Error('A payment event');
-    expect(event.type).toBe('invoice.hold_voided');
-    expect(event.data.hold).toEqual({ voided: true, txHash: '0xfeed', paidInvoice: 'inv_2', status: 'open' });
-    expectTypeOf<'invoice.hold_voided'>().toExtend<PaymentWebhookEventType>();
-    expectTypeOf<NonNullable<PaymentWebhookEvent['data']['hold']>>().toEqualTypeOf<
-      | {
-          voided?: undefined;
-          reason: 'late' | 'aml' | 'quote_expired' | 'payer_mismatch' | null;
-          refundOnly: boolean;
-          txHash: string | null;
-          senders?: string[];
-          unconfirmed?: true;
-          late?: true;
-        }
-      | { voided: true; txHash: string | null; paidInvoice: string | null; status: string | null }
-    >();
+    expect(event.type).toBe('invoice.transfer_held');
+    expect(event.data.heldTransfer).toMatchObject({ id: 'ht_1', reason: 'payer_unconfirmed', late: true });
+    expect(event.data.hold).toBeUndefined();
+
+    const voided = JSON.stringify({
+      ...JSON.parse(paymentEvent('2026-10-10T11:59:59.000Z')),
+      type: 'invoice.transfer_hold_voided',
+      data: { heldTransfer: { id: 'ht_1', voided: true, txHash: '0xfeed', paidInvoice: 'inv_2' } },
+    });
+    const undone = await verifyWebhook({ body: voided, signature: sign(voided), secret: SECRET, now: NOW });
+    if (!isPaymentWebhookEvent(undone)) throw new Error('A payment event');
+    expect(undone.data.heldTransfer).toEqual({ id: 'ht_1', voided: true, txHash: '0xfeed', paidInvoice: 'inv_2' });
+
+    expectTypeOf<'invoice.transfer_held' | 'invoice.transfer_hold_voided'>().toExtend<PaymentWebhookEventType>();
+    expectTypeOf<'invoice.hold_voided'>().not.toExtend<PaymentWebhookEventType>();
+    expectTypeOf<NonNullable<PaymentWebhookEvent['data']['hold']>>().toEqualTypeOf<{
+      reason: 'late' | 'aml' | 'quote_expired' | null;
+      txHash: string | null;
+      senders?: string[];
+      late?: true;
+    }>();
   });
 });

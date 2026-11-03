@@ -1,12 +1,10 @@
 # PaymentWebhookHold
 
-Defined in: [webhooks.ts:51](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L51)
+Defined in: [webhooks.ts:50](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L50)
 
-What a hold is about (`data.hold` of `invoice.held`): `reason` (`late`, `aml`, `quote_expired`, `payer_mismatch`),
-whether you can only refund it (`refundOnly`: a transfer Quasar could tie to no invoice, from another wallet than the
-quoted one or from one that never confirmed the invoice, `unconfirmed`; never release it, refund it to the wallet that
-sent it), its transaction (`txHash`: a refund-only hold has no `settlement`), the wallets that sent it (`senders`) and
-whether it came late (`late`).
+What a hold is about (`data.hold` of `invoice.held`): an invoice paid in a way that waits for your decision. `reason`
+(`late`, `aml`, `quote_expired`), its transaction (`txHash`), the wallets that sent it (`senders`) and whether it came
+late (`late`). Release it with [PaymentsModule.releaseInvoice](/packages/quasar-sdk/server/classes/PaymentsModule.md#releaseinvoice) or refund it.
 
 ## Properties
 
@@ -14,7 +12,7 @@ whether it came late (`late`).
 
 > `optional` **late?**: `true`
 
-Defined in: [webhooks.ts:65](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L65)
+Defined in: [webhooks.ts:58](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L58)
 
 It arrived after the invoice expired or was cancelled, or was handed over after `dueAt`.
 
@@ -22,21 +20,11 @@ It arrived after the invoice expired or was cancelled, or was handed over after 
 
 ### reason
 
-> **reason**: `"late"` \| `"aml"` \| `"quote_expired"` \| `"payer_mismatch"` \| `null`
+> **reason**: `"late"` \| `"aml"` \| `"quote_expired"` \| `null`
 
-Defined in: [webhooks.ts:55](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L55)
+Defined in: [webhooks.ts:52](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L52)
 
 Why the payment is held; `null` when Quasar did not record why.
-
-***
-
-### refundOnly
-
-> **refundOnly**: `boolean`
-
-Defined in: [webhooks.ts:57](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L57)
-
-Whether you can only refund it to the wallet that sent it.
 
 ***
 
@@ -44,7 +32,7 @@ Whether you can only refund it to the wallet that sent it.
 
 > `optional` **senders?**: `string`[]
 
-Defined in: [webhooks.ts:61](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L61)
+Defined in: [webhooks.ts:56](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L56)
 
 The wallets that sent it.
 
@@ -54,26 +42,6 @@ The wallets that sent it.
 
 > **txHash**: `string` \| `null`
 
-Defined in: [webhooks.ts:59](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L59)
+Defined in: [webhooks.ts:54](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L54)
 
 The transaction of the held payment.
-
-***
-
-### unconfirmed?
-
-> `optional` **unconfirmed?**: `true`
-
-Defined in: [webhooks.ts:63](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L63)
-
-It came from the quoted wallet, which never confirmed the invoice.
-
-***
-
-### voided?
-
-> `optional` **voided?**: `undefined`
-
-Defined in: [webhooks.ts:53](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L53)
-
-Not set: the hold stands.

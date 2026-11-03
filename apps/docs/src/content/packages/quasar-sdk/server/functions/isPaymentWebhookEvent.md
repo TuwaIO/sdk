@@ -2,7 +2,7 @@
 
 > **isPaymentWebhookEvent**(`event`): `event is PaymentWebhookEvent`
 
-Defined in: [webhooks.ts:237](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L237)
+Defined in: [webhooks.ts:257](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L257)
 
 Whether a verified webhook is a payment event (`apiVersion: 'payments.v1'`) rather than a transaction webhook.
 

@@ -1,6 +1,6 @@
 # CheckoutRejectedPayment
 
-Defined in: [checkout/types.ts:145](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L145)
+Defined in: [checkout/types.ts:134](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L134)
 
 A payment of the invoice that failed, as the checkout lists it ([CheckoutInvoice.rejectedPayments](/packages/quasar-sdk/checkout/interfaces/CheckoutInvoice.md#rejectedpayments)).
 
@@ -10,7 +10,7 @@ A payment of the invoice that failed, as the checkout lists it ([CheckoutInvoice
 
 > **final**: `boolean`
 
-Defined in: [checkout/types.ts:170](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L170)
+Defined in: [checkout/types.ts:159](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L159)
 
 Whether the transaction can never pay the invoice, so the buyer may pay again. When `false` (`not_found`,
 `timeout`, `replaced`…) the money may still be on its way or already with the merchant: the buyer checks the wallet
@@ -22,11 +22,12 @@ before paying again. A final rejection may still have moved money: read `movedMo
 
 > `optional` **held?**: `true`
 
-Defined in: [checkout/types.ts:201](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L201)
+Defined in: [checkout/types.ts:191](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L191)
 
-`true` on a `tx_already_used` rejection whose transfer another invoice of the merchant holds for a refund only
-(`otherInvoice`): it pays neither invoice and the merchant returns it to the wallet that sent it, once. Say that it
-is tied to another invoice, never that it pays one. Quasar versions before October 29, 2026 leave it out.
+`true` when Quasar records the transfer as a held transfer, which the merchant returns to the wallet that sent it:
+a `payer_mismatch` or `payer_unconfirmed` rejection (the invoice stays payable from the wallet that confirmed it),
+or a `tx_already_used` one whose transfer is held at another invoice of the merchant (`otherInvoice`; say that it is
+tied to another invoice, never that it pays one). Quasar versions before October 29, 2026 leave it out.
 
 ***
 
@@ -34,7 +35,7 @@ is tied to another invoice, never that it pays one. Quasar versions before Octob
 
 > `optional` **movedMoney?**: `true`
 
-Defined in: [checkout/types.ts:184](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L184)
+Defined in: [checkout/types.ts:173](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L173)
 
 `true` when the transaction succeeded on chain without paying the invoice (`no_matching_transfer`,
 `reference_missing`, `too_early`, `tx_already_used`, `payer_mismatch`, `payer_unconfirmed`,
@@ -50,7 +51,7 @@ left the wallet. Quasar versions before October 29, 2026 leave it out.
 
 > `optional` **original?**: `string`
 
-Defined in: [checkout/types.ts:174](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L174)
+Defined in: [checkout/types.ts:163](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L163)
 
 The transaction the checkout handed over, when this one replaced it (a payment sped up in the wallet).
 
@@ -60,7 +61,7 @@ The transaction the checkout handed over, when this one replaced it (a payment s
 
 > `optional` **otherInvoice?**: `string`
 
-Defined in: [checkout/types.ts:203](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L203)
+Defined in: [checkout/types.ts:193](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L193)
 
 The invoice of the merchant the transaction is credited to or held on, when Quasar names it.
 
@@ -70,7 +71,7 @@ The invoice of the merchant the transaction is credited to or held on, when Quas
 
 > **reason**: `string`
 
-Defined in: [checkout/types.ts:164](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L164)
+Defined in: [checkout/types.ts:153](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L153)
 
 Why: `reverted`, `cancelled`, `expired` (a Solana blockhash), `no_matching_transfer` (a wrong amount, asset or
 recipient), `tx_already_used` (the transaction pays another invoice of the merchant: the one the wallet that sent
@@ -93,7 +94,7 @@ Quasar read again after that day and the network does not have), a relay's reaso
 
 > `optional` **rechecked?**: `true`
 
-Defined in: [checkout/types.ts:195](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L195)
+Defined in: [checkout/types.ts:184](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L184)
 
 `true` while Quasar still reads the transaction again: a rejection for `not_found`, `timeout` or `replaced` of a
 payment Quasar learned of within the last 24 hours that nothing has resolved since (a payment still unresolved
@@ -110,7 +111,7 @@ before October 29, 2026 leave it out.
 
 > **txKey**: `string`
 
-Defined in: [checkout/types.ts:147](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L147)
+Defined in: [checkout/types.ts:136](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L136)
 
 The transaction's `txKey`, or the `userOpHash` of a gasless relay that failed before it had a transaction.
 
@@ -120,6 +121,6 @@ The transaction's `txKey`, or the `userOpHash` of a gasless relay that failed be
 
 > `optional` **userOpHash?**: `string`
 
-Defined in: [checkout/types.ts:172](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L172)
+Defined in: [checkout/types.ts:161](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L161)
 
 The relay operation the transaction came from, which the page knows when the relay answered `sending`.

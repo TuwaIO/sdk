@@ -1,6 +1,6 @@
 # CheckoutView
 
-Defined in: [checkout/types.ts:523](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L523)
+Defined in: [checkout/types.ts:513](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L513)
 
 What the checkout token opens, as [CheckoutState.checkout](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#checkout) holds it.
 
@@ -10,7 +10,7 @@ What the checkout token opens, as [CheckoutState.checkout](/packages/quasar-sdk/
 
 > **amlScreening**: `boolean`
 
-Defined in: [checkout/types.ts:543](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L543)
+Defined in: [checkout/types.ts:533](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L533)
 
 `true` when the merchant checks paying wallets before payment (its AML mode is `block` or `flag`); the checkout
 says so to the buyer only then.
@@ -21,7 +21,7 @@ says so to the buyer only then.
 
 > **autoCharge**: [`AutoChargeOffer`](/packages/quasar-sdk/checkout/type-aliases/AutoChargeOffer.md) \| `null`
 
-Defined in: [checkout/types.ts:556](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L556)
+Defined in: [checkout/types.ts:546](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L546)
 
 The automatic-charge offer of a subscription invoice; `null` otherwise.
 
@@ -31,7 +31,7 @@ The automatic-charge offer of a subscription invoice; `null` otherwise.
 
 > **buyer**: `object`
 
-Defined in: [checkout/types.ts:536](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L536)
+Defined in: [checkout/types.ts:526](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L526)
 
 Whether the page collects the buyer: `collect` is `off`, `email` or `full`; `required` while the invoice document
 waits for them; `companyInvoice` when the page may offer an invoice for a company.
@@ -54,7 +54,7 @@ waits for them; `companyInvoice` when the page may offer an invoice for a compan
 
 > **consent**: [`CheckoutConsent`](/packages/quasar-sdk/checkout/interfaces/CheckoutConsent.md) \| `null`
 
-Defined in: [checkout/types.ts:538](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L538)
+Defined in: [checkout/types.ts:528](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L528)
 
 The line the buyer ticks before paying; `null` when the merchant asks none.
 
@@ -64,7 +64,7 @@ The line the buyer ticks before paying; `null` when the merchant asks none.
 
 > **invoice**: [`CheckoutInvoice`](/packages/quasar-sdk/checkout/interfaces/CheckoutInvoice.md)
 
-Defined in: [checkout/types.ts:531](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L531)
+Defined in: [checkout/types.ts:521](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L521)
 
 The invoice.
 
@@ -74,7 +74,7 @@ The invoice.
 
 > **merchant**: [`CheckoutMerchant`](/packages/quasar-sdk/checkout/interfaces/CheckoutMerchant.md)
 
-Defined in: [checkout/types.ts:527](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L527)
+Defined in: [checkout/types.ts:517](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L517)
 
 Who is paid and on what terms.
 
@@ -84,7 +84,7 @@ Who is paid and on what terms.
 
 > **methods**: [`CheckoutMethod`](/packages/quasar-sdk/checkout/interfaces/CheckoutMethod.md)[]
 
-Defined in: [checkout/types.ts:545](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L545)
+Defined in: [checkout/types.ts:535](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L535)
 
 The methods that take this invoice.
 
@@ -94,7 +94,7 @@ The methods that take this invoice.
 
 > **object**: `"checkout"`
 
-Defined in: [checkout/types.ts:525](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L525)
+Defined in: [checkout/types.ts:515](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L515)
 
 Always `checkout`.
 
@@ -104,7 +104,7 @@ Always `checkout`.
 
 > `optional` **payerProofs?**: [`CheckoutPayerProof`](/packages/quasar-sdk/checkout/interfaces/CheckoutPayerProof.md)[]
 
-Defined in: [checkout/types.ts:550](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L550)
+Defined in: [checkout/types.ts:540](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L540)
 
 The wallets that confirmed this invoice ([CheckoutState.confirmPayer](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#confirmpayer)), oldest first: a page reopened with
 one of them asks for no new signature. Quasar versions before October 29, 2026 leave it out.
@@ -115,7 +115,7 @@ one of them asks for no new signature. Quasar versions before October 29, 2026 l
 
 > **quote**: [`CheckoutQuote`](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md) \| `null`
 
-Defined in: [checkout/types.ts:554](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L554)
+Defined in: [checkout/types.ts:544](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L544)
 
 The locked quote, if any.
 
@@ -125,7 +125,7 @@ The locked quote, if any.
 
 > **quoteTtlSeconds**: `number`
 
-Defined in: [checkout/types.ts:552](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L552)
+Defined in: [checkout/types.ts:542](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L542)
 
 How long a quote holds once locked, in seconds (never past the invoice deadline).
 
@@ -135,6 +135,6 @@ How long a quote holds once locked, in seconds (never past the invoice deadline)
 
 > **theme**: [`CheckoutTheme`](/packages/quasar-sdk/checkout/interfaces/CheckoutTheme.md)
 
-Defined in: [checkout/types.ts:529](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L529)
+Defined in: [checkout/types.ts:519](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L519)
 
 The look the merchant chose.

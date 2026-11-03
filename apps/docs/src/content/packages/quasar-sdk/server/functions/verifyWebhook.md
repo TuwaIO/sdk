@@ -2,7 +2,7 @@
 
 > **verifyWebhook**(`params`): `Promise`\<[`QuasarWebhook`](/packages/quasar-sdk/server/type-aliases/QuasarWebhook.md)\>
 
-Defined in: [webhooks.ts:275](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L275)
+Defined in: [webhooks.ts:295](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L295)
 
 Verifies a Quasar webhook and returns its body. Checks the signature (`x-quasar-signature`, the hex HMAC-SHA256 of
 the raw body keyed with the endpoint's signing secret) in constant time, parses the body and refuses a delivery

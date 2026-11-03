@@ -536,10 +536,71 @@ export interface Refund {
   failureReason: string | null;
   /** Its credit note, once confirmed. */
   creditNoteNumber: string | null;
+  /** The held transfer it returns to its sender ({@link HeldTransfer}), or `null` for a refund of the invoice. */
+  heldTransfer: string | null;
   /** When it was asked for. */
   createdAt: string;
   /** When it was confirmed. */
   confirmedAt: string | null;
+}
+
+/** How far a {@link HeldTransfer} got: held, its refund on the way, refunded, or voided because it paid an invoice. */
+export type HeldTransferStatus = 'held' | 'refunding' | 'refunded' | 'voided';
+
+/**
+ * A transfer that reached the address of one of your invoices without being tied to it by proof: from another wallet
+ * than the one the quote was for (`payer_mismatch`), or from the quoted wallet that never confirmed the invoice
+ * (`payer_unconfirmed`). It paid nothing and the invoice stays as it was; refund it as a whole to the wallet that sent
+ * it with {@link PaymentsModule.refundHeldTransfer}. When the same transaction is proven to pay an invoice, Quasar
+ * voids the record (`voided`, `voidedBy`).
+ */
+export interface HeldTransfer {
+  /** Held transfer ID. */
+  id: string;
+  /** The invoice whose address it reached. */
+  invoice: string;
+  /** Where it is. */
+  status: HeldTransferStatus;
+  /** Why it is tied to no invoice. */
+  reason: 'payer_mismatch' | 'payer_unconfirmed';
+  /** Whether it arrived after the invoice expired or was cancelled. */
+  late: boolean;
+  /** CAIP-2 chain. */
+  chainId: string;
+  /** CAIP-19 asset it carried. */
+  assetId: string;
+  /** Symbol of the token. */
+  symbol: string;
+  /** Decimals of the token. */
+  decimals: number;
+  /** Its transaction. */
+  txHash: string;
+  /** What it carried, in base units. */
+  amount: string;
+  /** Its value at the rate of the invoice's quote, in minor units of `currency`. */
+  valueMinor: string | null;
+  /** Currency of `valueMinor`. */
+  currency: string | null;
+  /** The wallet it came from (CAIP-10): the refund goes back to it. */
+  sender: string;
+  /** Every wallet that sent it. */
+  senders: string[];
+  /** The sanctions screening of the sender: `blocked` gets no refund. */
+  screening: string | null;
+  /** The invoice it paid, once voided. */
+  voidedBy: string | null;
+  /** When Quasar recorded it. */
+  createdAt: string;
+  /** When it last changed. */
+  updatedAt: string;
+}
+
+/** What {@link PaymentsModule.listHeldTransfers} takes. */
+export interface ListHeldTransfersParams {
+  /** Only the held transfers of one invoice. */
+  invoice?: string;
+  /** Only those in one state; `held` for those still to refund. */
+  status?: HeldTransferStatus;
 }
 
 /** The answer of {@link PaymentsModule.refund}: the refund and what to send where. */

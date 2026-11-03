@@ -18,7 +18,8 @@ export type PaymentWebhookEventType =
   | 'invoice.paid'
   | 'invoice.underpaid'
   | 'invoice.held'
-  | 'invoice.hold_voided'
+  | 'invoice.transfer_held'
+  | 'invoice.transfer_hold_voided'
   | 'invoice.released'
   | 'invoice.expired'
   | 'invoice.cancelled'
@@ -42,43 +43,60 @@ export type PaymentWebhookEventType =
   | 'subscription.permission_revoked';
 
 /**
- * What a hold is about (`data.hold` of `invoice.held`): `reason` (`late`, `aml`, `quote_expired`, `payer_mismatch`),
- * whether you can only refund it (`refundOnly`: a transfer Quasar could tie to no invoice, from another wallet than the
- * quoted one or from one that never confirmed the invoice, `unconfirmed`; never release it, refund it to the wallet that
- * sent it), its transaction (`txHash`: a refund-only hold has no `settlement`), the wallets that sent it (`senders`) and
- * whether it came late (`late`).
+ * What a hold is about (`data.hold` of `invoice.held`): an invoice paid in a way that waits for your decision. `reason`
+ * (`late`, `aml`, `quote_expired`), its transaction (`txHash`), the wallets that sent it (`senders`) and whether it came
+ * late (`late`). Release it with {@link PaymentsModule.releaseInvoice} or refund it.
  */
 export interface PaymentWebhookHold {
-  /** Not set: the hold stands. */
-  voided?: undefined;
   /** Why the payment is held; `null` when Quasar did not record why. */
-  reason: 'late' | 'aml' | 'quote_expired' | 'payer_mismatch' | null;
-  /** Whether you can only refund it to the wallet that sent it. */
-  refundOnly: boolean;
+  reason: 'late' | 'aml' | 'quote_expired' | null;
   /** The transaction of the held payment. */
   txHash: string | null;
   /** The wallets that sent it. */
   senders?: string[];
-  /** It came from the quoted wallet, which never confirmed the invoice. */
-  unconfirmed?: true;
   /** It arrived after the invoice expired or was cancelled, or was handed over after `dueAt`. */
   late?: true;
 }
 
 /**
- * What Quasar undid (`data.hold` of `invoice.hold_voided`): a refund-only hold whose transfer paid another invoice of
- * yours since (`paidInvoice`, the one its wallet confirmed); the invoice went back to `status`, as before the hold, and
- * there is nothing to refund.
+ * A transfer that reached the invoice's address without being tied to it by proof (`data.heldTransfer` of
+ * `invoice.transfer_held`): it paid nothing and the invoice stays as it was. It is a record of its own, which you
+ * refund as a whole to the wallet that sent it ({@link PaymentsModule.refundHeldTransfer}): `reason` is
+ * `payer_mismatch` (another wallet than the one the quote was for) or `payer_unconfirmed` (the quoted wallet never
+ * confirmed the invoice).
  */
-export interface PaymentWebhookHoldVoided {
+export interface PaymentWebhookHeldTransfer {
+  /** Not set: the transfer is held. */
+  voided?: undefined;
+  /** The held transfer ({@link HeldTransfer}). */
+  id: string | null;
+  /** Its transaction. */
+  txHash: string | null;
+  /** What it carried, in base units of its token. */
+  amount: string | null;
+  /** The wallets that sent it. */
+  senders: string[];
+  /** Why it is tied to no invoice. */
+  reason: 'payer_mismatch' | 'payer_unconfirmed' | null;
+  /** It arrived after the invoice expired or was cancelled. */
+  late?: true;
+  /** Set when AML blocked its sender: Quasar refunds it to no one. */
+  screening?: { status: 'blocked'; reasons: unknown[] };
+}
+
+/**
+ * A held transfer Quasar voided (`data.heldTransfer` of `invoice.transfer_hold_voided`): the same transaction was
+ * proven to pay another invoice of yours since (`paidInvoice`), so there is nothing to refund.
+ */
+export interface PaymentWebhookHeldTransferVoided {
+  /** The held transfer. */
+  id: string | null;
   /** Always `true`. */
   voided: true;
-  /** The transaction of the hold. */
+  /** Its transaction. */
   txHash: string | null;
   /** The invoice the transaction paid instead. */
   paidInvoice: string | null;
-  /** The state the invoice went back to. */
-  status: string | null;
 }
 
 /**
@@ -110,11 +128,13 @@ export interface PaymentWebhookEvent {
     refund?: Refund;
     /** Why AML held the payment, on a hold by AML. */
     aml?: { decision: 'block'; reasons: unknown[] };
+    /** What `invoice.held` holds. Quasar versions before October 29, 2026 leave it out. */
+    hold?: PaymentWebhookHold;
     /**
-     * What `invoice.held` holds, or what `invoice.hold_voided` undid. Quasar versions before October 29, 2026 leave it
-     * out.
+     * The transfer of `invoice.transfer_held` and `invoice.transfer_hold_voided`. The refund of a held transfer names
+     * it in `refund.heldTransfer`.
      */
-    hold?: PaymentWebhookHold | PaymentWebhookHoldVoided;
+    heldTransfer?: PaymentWebhookHeldTransfer | PaymentWebhookHeldTransferVoided;
     /** The subscription of a subscription event. */
     subscription?: Subscription;
   };

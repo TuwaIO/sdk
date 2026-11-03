@@ -124,22 +124,11 @@ export interface CheckoutInvoice {
  * - `overpaid`: more arrived than the invoice asks for, and the seller looks at it.
  * - `quote_expired`: it arrived after its locked quote expired, in an asset whose price moved; the seller accepts or
  *   returns it.
- * - `payer_mismatch` and `payer_unconfirmed`, with `refundOnly: true`: Quasar could tie the transfer to no invoice
- *   (it came from another wallet than the one the quote was locked to, or from that wallet, which never confirmed the
- *   invoice with {@link CheckoutState.confirmPayer}). Anyone who saw its transaction could have handed it over, so the
- *   seller never accepts it for this invoice: it only returns it to the wallet that sent it. Say so, never "the seller
- *   checks your payment": for `payer_mismatch` "The payment came from another wallet than the one that confirmed this
- *   invoice. {merchant} returns it to the wallet that sent it. Pay from the confirmed wallet.", for
- *   `payer_unconfirmed` the same with "from a wallet that did not confirm this invoice". A held invoice takes no other
- *   payment: a payment from the confirmed wallet goes to an invoice that can be paid (a new one from the seller). A
- *   refund-only hold is undone when the same transfer pays another invoice of the seller (the one its wallet
- *   confirmed); the invoice then goes back to where it stood, which the page shows once it reads the checkout again.
  *
- * Quasar versions before October 29, 2026 show a transfer from another wallet as `screening`.
+ * A transfer Quasar could tie to no invoice never holds the invoice: it is a rejected payment with `held`
+ * ({@link CheckoutRejectedPayment.held}), which the seller returns to the wallet that sent it.
  */
-export type CheckoutReview =
-  | { reason: 'screening' | 'late' | 'overpaid' | 'quote_expired' }
-  | { reason: 'payer_mismatch' | 'payer_unconfirmed'; refundOnly: true };
+export type CheckoutReview = { reason: 'screening' | 'late' | 'overpaid' | 'quote_expired' };
 
 /** A payment of the invoice that failed, as the checkout lists it ({@link CheckoutInvoice.rejectedPayments}). */
 export interface CheckoutRejectedPayment {
@@ -194,9 +183,10 @@ export interface CheckoutRejectedPayment {
    */
   rechecked?: true;
   /**
-   * `true` on a `tx_already_used` rejection whose transfer another invoice of the merchant holds for a refund only
-   * (`otherInvoice`): it pays neither invoice and the merchant returns it to the wallet that sent it, once. Say that it
-   * is tied to another invoice, never that it pays one. Quasar versions before October 29, 2026 leave it out.
+   * `true` when Quasar records the transfer as a held transfer, which the merchant returns to the wallet that sent it:
+   * a `payer_mismatch` or `payer_unconfirmed` rejection (the invoice stays payable from the wallet that confirmed it),
+   * or a `tx_already_used` one whose transfer is held at another invoice of the merchant (`otherInvoice`; say that it is
+   * tied to another invoice, never that it pays one). Quasar versions before October 29, 2026 leave it out.
    */
   held?: true;
   /** The invoice of the merchant the transaction is credited to or held on, when Quasar names it. */

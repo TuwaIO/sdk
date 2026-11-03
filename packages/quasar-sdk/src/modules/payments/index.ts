@@ -12,12 +12,14 @@ import type {
   CreateOptions,
   CreateSubscriptionParams,
   GetEventsParams,
+  HeldTransfer,
   Invoice,
   InvoiceCorrection,
   InvoiceDetails,
   InvoiceDocumentRef,
   InvoiceLedger,
   InvoiceWithCheckout,
+  ListHeldTransfersParams,
   ListInvoiceItemsParams,
   ListInvoicesParams,
   ListSubscriptionItemsParams,
@@ -196,15 +198,14 @@ export class PaymentsModule {
 
   /**
    * Accepts a held payment (`POST /v1/payments/invoices/:id/release`): the invoice becomes paid and the buyer gets a
-   * receipt. A payment Quasar could tie to no invoice (from another wallet than the quoted payer, or from one that
-   * never confirmed the invoice: `reviewReason` `payer_mismatch`) is never released: anyone may hand over for their own
-   * invoice a transaction hash they saw on the network, so refund it to the wallet that sent it instead.
+   * receipt. A transfer Quasar could tie to no invoice is never an invoice hold: it is a {@link HeldTransfer} of its
+   * own, refunded with {@link PaymentsModule.refundHeldTransfer}.
    *
    * @param invoiceId - The invoice.
    * @param params - `reason`, required, recorded in the ledger.
    * @returns The invoice.
-   * @throws {QuasarSDKError} `invoice_not_found` (404); `invoice_not_held`, `invoice_partly_refunded` (refund the rest)
-   *   or `payer_mismatch_refund_only` (a payment tied to no invoice: refund it) (409); a timeout or a network error.
+   * @throws {QuasarSDKError} `invoice_not_found` (404); `invoice_not_held` or `invoice_partly_refunded` (refund the rest)
+   *   (409); a timeout or a network error.
    */
   async releaseInvoice(invoiceId: string, params: { reason: string }): Promise<Invoice> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/release`, {
@@ -271,10 +272,8 @@ export class PaymentsModule {
    * @param invoiceId - The invoice.
    * @param params - Amount (everything left when omitted), mode and reason.
    * @returns The refund and what to send where.
-   * @throws {QuasarSDKError} `invalid_request` (400), `invoice_not_found` (404), an invoice that cannot be refunded,
-   *   an amount above what is left, or `payment_credited_elsewhere` (a refund-only hold whose transfer paid another
-   *   invoice since: nothing to refund) or `payment_held_elsewhere` (`details.invoice`: another invoice holds the same
-   *   transfer for a refund; refund it there, once) (409), a timeout or a network error.
+   * @throws {QuasarSDKError} `invalid_request` (400), `invoice_not_found` (404), an invoice that cannot be refunded or
+   *   an amount above what is left (409), a timeout or a network error.
    */
   async refund(invoiceId: string, params: RefundParams = {}): Promise<RefundStart> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/refunds`, {
@@ -309,6 +308,45 @@ export class PaymentsModule {
     return this.client.request(`${PAYMENTS_ENDPOINT}/refunds/${segment(refundId)}/submit`, {
       method: 'POST',
       body: params,
+    });
+  }
+
+  /**
+   * Lists held transfers, newest first (`GET /v1/payments/held-transfers`, or `GET /v1/payments/invoices/:id/held-transfers`
+   * with `invoice`): transfers that reached your invoices without being tied to them by proof, to refund to their senders.
+   *
+   * @param params - One invoice, one state (`held` for those still to refund), or neither.
+   * @returns The held transfers, at most 100.
+   * @throws {QuasarSDKError} a timeout or a network error.
+   */
+  async listHeldTransfers(params: ListHeldTransfersParams = {}): Promise<HeldTransfer[]> {
+    const path = params.invoice
+      ? `${PAYMENTS_ENDPOINT}/invoices/${segment(params.invoice)}/held-transfers`
+      : `${PAYMENTS_ENDPOINT}/held-transfers`;
+    const answer = await this.client.request<{ heldTransfers: HeldTransfer[] }>(path, {
+      method: 'GET',
+      query: params.invoice ? {} : query({ status: params.status }),
+    });
+    return params.invoice && params.status
+      ? answer.heldTransfers.filter((transfer) => transfer.status === params.status)
+      : answer.heldTransfers;
+  }
+
+  /**
+   * Asks for the refund of a held transfer, the whole of it to the wallet that sent it
+   * (`POST /v1/payments/held-transfers/:id/refund`): send it from your wallet, then hand the transaction over with
+   * {@link PaymentsModule.submitRefund}. The refund's `heldTransfer` names the transfer, which becomes `refunding`, then
+   * `refunded` once the refund is confirmed.
+   *
+   * @param heldTransferId - The held transfer.
+   * @returns The refund and what to send where.
+   * @throws {QuasarSDKError} `held_transfer_not_found` (404); `held_transfer_not_refundable` (it is not `held`) or
+   *   `sender_blocked` (AML blocked the wallet that sent it) (409); a timeout or a network error.
+   */
+  async refundHeldTransfer(heldTransferId: string): Promise<RefundStart> {
+    return this.client.request(`${PAYMENTS_ENDPOINT}/held-transfers/${segment(heldTransferId)}/refund`, {
+      method: 'POST',
+      body: {},
     });
   }
 
