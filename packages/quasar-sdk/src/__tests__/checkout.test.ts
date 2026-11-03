@@ -209,7 +209,7 @@ describe('createCheckoutStore', () => {
       checkout: { amlScreening: false, invoice: { review: { reason: 'quote_expired' } } },
     });
     expectTypeOf<CheckoutView['amlScreening']>().toEqualTypeOf<boolean>();
-    // The reasons of a refund-only hold came with the payer proof (Quasar, October 29, 2026)
+    // The reasons of a refund-only hold came with the payer proof
     expectTypeOf<NonNullable<CheckoutInvoice['review']>['reason']>().toExtend<
       'screening' | 'late' | 'overpaid' | 'quote_expired' | 'payer_mismatch' | 'payer_unconfirmed'
     >();
@@ -239,7 +239,7 @@ describe('createCheckoutStore', () => {
     checkout.getState().destroy();
   });
 
-  // The line the merchant asks the buyer to tick before paying (Quasar plan 12 §9.8)
+  // The line the merchant asks the buyer to tick before paying
   it('asks for a required consent before the quote, and sends the consent with it', async () => {
     const consent = { text: 'I ask Acme to start at once.', required: true };
     fetchMock.mockResolvedValueOnce(json(view({ consent }))).mockResolvedValueOnce(json(QUOTE));
@@ -1597,7 +1597,7 @@ describe('createCheckoutStore: honest re-check states, moved money, hand-overs k
       handOverStorage,
     });
 
-  // N1: the page may promise that Quasar checks the payment again only when Quasar does
+  // The page may promise that Quasar checks the payment again only when Quasar does
   it('says that Quasar checks a payment again only for one Quasar still reads again', async () => {
     answer({
       pendingPayments: 0,
@@ -1672,7 +1672,7 @@ describe('createCheckoutStore: honest re-check states, moved money, hand-overs k
     relayLost.getState().destroy();
   });
 
-  // N1: a transfer that moved money without paying the invoice is never a plain "pay again", final or not
+  // A transfer that moved money without paying the invoice is never a plain "pay again", final or not
   it('names a transfer that moved money as a mismatch whatever Quasar says of it, with no plain second payment', async () => {
     answer({ pendingPayments: 0, rejectedPayments: [] });
     const followed = store();
@@ -1712,7 +1712,7 @@ describe('createCheckoutStore: honest re-check states, moved money, hand-overs k
     reloaded.getState().destroy();
   });
 
-  // N6: a rejection Quasar reads again stops counting once Quasar reports nothing unresolved
+  // A rejection Quasar reads again stops counting once Quasar reports nothing unresolved
   it('opens on the payment when Quasar resolved the payment it could not confirm', async () => {
     answer({
       pendingPayments: 0,
@@ -1760,7 +1760,7 @@ describe('createCheckoutStore: honest re-check states, moved money, hand-overs k
     checkout.getState().destroy();
   });
 
-  // N8: the page may close between the broadcast and the hand-over: the next load hands it over
+  // The page may close between the broadcast and the hand-over: the next load hands it over
   it('keeps a hand-over Quasar has not taken in the tab and hands it over again on the next load', async () => {
     vi.useFakeTimers({ now: Date.parse('2026-10-28T12:00:00.000Z') });
     const storage = new MemoryStorage();
@@ -2102,7 +2102,7 @@ describe('createCheckoutStore: a hash taken by another invoice, settlement failu
     followed.getState().destroy();
   });
 
-  // Owner rule: a payment that may still arrive on a cancelled invoice is followed until it is held
+  // A payment that may still arrive on a cancelled invoice is followed until it is held
   it('follows a cancelled invoice while its payment is on the way, until Quasar holds the payment', async () => {
     answer({ pendingPayments: 0, rejectedPayments: [] });
     const checkout = store();
@@ -2285,7 +2285,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
   const paths = () =>
     fetchMock.mock.calls.map(([input]) => new URL(input instanceof Request ? input.url : (input as string)).pathname);
 
-  // Owner, 2026-10-29: one free signature before an EVM payment the buyer's wallet sends, after the wallet and the
+  // One free signature before an EVM payment the buyer's wallet sends, after the wallet and the
   // method are chosen and before the price; one per invoice and wallet
   it('asks the wallet to confirm the invoice before the price of an EVM payment, once per invoice and wallet', async () => {
     answer();
@@ -2542,7 +2542,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     simulated.getState().destroy();
   });
 
-  // N2: a transfer credited to no invoice is held only to be refunded to the wallet that sent it
+  // A transfer credited to no invoice is held only to be refunded to the wallet that sent it
   it('tells a refund-only hold apart from a payment the merchant may release', async () => {
     const held = {
       ...view().invoice,
@@ -2687,7 +2687,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     checkout.getState().destroy();
   });
 
-  // Owner, 2026-10-29: a transfer held on another invoice for a refund only pays nothing
+  // A transfer held on another invoice for a refund only pays nothing
   it('names a transfer held on another invoice as tied to it, never as paying it', async () => {
     const held = rejection('0xfeed', 'tx_already_used', true, { movedMoney: true, held: true, otherInvoice: 'inv_2' });
     answer({ invoice: { ...view().invoice, pendingPayments: 0, rejectedPayments: [held] } });
@@ -2704,7 +2704,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, refund-on
     reopened.getState().destroy();
   });
 
-  // Owner, 2026-10-29: the rest of an underpaid invoice comes from the wallet that paid first
+  // The rest of an underpaid invoice comes from the wallet that paid first
   it('names the wallet that paid first when Quasar refuses a price for the rest from another one', async () => {
     answer(
       { invoice: { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'] },

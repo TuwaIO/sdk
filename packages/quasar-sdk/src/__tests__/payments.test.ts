@@ -89,7 +89,7 @@ describe('quasar.payments', () => {
     expect(sent(1).url).toBe('https://quasar.example/v1/payments/invoices/inv%2F1');
   });
 
-  // Every refund and correction adds a credit note (owner, 2026-10-29): an invoice's refunds and documents page
+  // Every refund and correction adds a credit note: an invoice's refunds and documents page
   it("pages an invoice's refunds and documents newest first, with a cursor", async () => {
     const document = {
       kind: 'credit_note',
@@ -126,7 +126,7 @@ describe('quasar.payments', () => {
     await quasar.payments.correctInvoice('inv_1', { buyer: { name: 'Acme Labs GmbH', country: 'DE' } });
     await quasar.payments.replacePayLink('inv_1');
     await quasar.payments.getEvents('inv_1', { verify: true });
-    // A ledger comes a page at a time (owner, 2026-10-29): every payment page a buyer opens locks a quote
+    // A ledger comes a page at a time: every payment page a buyer opens locks a quote
     await quasar.payments.getEvents('inv_1', { limit: 50, cursor: 'cur_1' });
 
     const calls = await Promise.all(

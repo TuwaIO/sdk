@@ -237,7 +237,7 @@ describe('verifyWebhook', () => {
     }
   });
 
-  // A refund-only hold undone because its transfer paid another invoice (Quasar, 2026-10-29)
+  // A refund-only hold undone because its transfer paid another invoice (Quasar)
   it('reads what a hold is about, and the hold Quasar undid when its transfer paid another invoice', async () => {
     const body = JSON.stringify({
       ...JSON.parse(paymentEvent('2026-10-10T11:59:59.000Z')),

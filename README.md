@@ -13,7 +13,7 @@ The **TUWA SDK** is the shortest way to use TUWA in a React app. `@tuwaio/sdk` r
 
 ## 🏛️ Ecosystem Layer Architecture
 
-TUWA is built in stages. The SDK is **Stage 5 (SDK Integration)**: it adds no logic of its own and packages the client projects of the stages below it — [Orbit Utils](https://orbit.docs.tuwa.io/) and [SIWX](https://siwx.docs.tuwa.io/) (Stage 1), [Satellite Connect](https://satellite.docs.tuwa.io/) and [Pulsar](https://pulsar.docs.tuwa.io/) (Stage 2), [Nova UI Kit](https://stories.tuwa.io/) (Stage 4). `@tuwaio/quasar-sdk` belongs to [Quasar](https://docs.tuwa.io/quasar) (Stage 3).
+TUWA is built in stages. The SDK is **Stage 5 (SDK Integration)**: it adds no logic of its own and packages the client projects of the stages below it — [Orbit Utils](https://orbit.docs.tuwa.io/) and [SIWX](https://siwx.docs.tuwa.io/), [Satellite Connect](https://satellite.docs.tuwa.io/) and [Pulsar](https://pulsar.docs.tuwa.io/), [Nova UI Kit](https://stories.tuwa.io/). `@tuwaio/quasar-sdk` belongs to [Quasar](https://docs.tuwa.io/quasar).
 
 ### Layer 8: SDK (L8)
 

@@ -151,7 +151,7 @@ export interface CheckoutError {
 }
 
 /**
- * Whether the connected wallet must confirm the invoice before it pays (owner rule of October 29, 2026: a transfer is
+ * Whether the connected wallet must confirm the invoice before it pays (a transfer is
  * credited only to an invoice it is tied to by proof):
  *
  * - `not_needed`: no method chosen, a Solana method (the quote's reference ties the transfer), or a Quasar before payer
@@ -770,7 +770,7 @@ function endedError(ended: Ending): CheckoutError {
   }
   const other = ended.otherInvoice ? { otherInvoice: ended.otherInvoice } : {};
   if (ended.held) {
-    // Held on another invoice for a refund only: it pays neither invoice (owner, 2026-10-29)
+    // Held on another invoice for a refund only: it pays neither invoice
     return {
       code: 'payment_mismatch',
       message:
@@ -864,7 +864,7 @@ const isTakenElsewhere = (error: CheckoutError | null) =>
 const recheckedOf = (signals: Pick<CheckoutStatusEvent, 'unresolvedPayments'>) => (signals.unresolvedPayments ?? 0) > 0;
 
 /**
- * Whether Quasar resolved a rejection it reads again since (N6): a reason it re-reads, no longer `rechecked`, and
+ * Whether Quasar resolved a rejection it reads again since: a reason it re-reads, no longer `rechecked`, and
  * Quasar reports no payment of the invoice that may still arrive.
  */
 const resolvedSince = (rejection: Rejection, signals: Pick<CheckoutStatusEvent, 'unresolvedPayments'>) =>
@@ -1673,7 +1673,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           return null;
         }
         if (get().payerProof === 'required' || get().payerProof === 'confirming') {
-          // The wallet confirms the invoice before the price (owner, 2026-10-29): Quasar would refuse the quote
+          // The wallet confirms the invoice before the price: Quasar would refuse the quote
           update({
             error: {
               code: 'payer_proof_required',

@@ -4,7 +4,7 @@
 
 Defined in: [checkout/store.ts:173](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L173)
 
-Whether the connected wallet must confirm the invoice before it pays (owner rule of October 29, 2026: a transfer is
+Whether the connected wallet must confirm the invoice before it pays (a transfer is
 credited only to an invoice it is tied to by proof):
 
 - `not_needed`: no method chosen, a Solana method (the quote's reference ties the transfer), or a Quasar before payer
