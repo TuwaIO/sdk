@@ -2,7 +2,7 @@
 
 > **createCheckoutStore**(`options`): [`CheckoutStore`](/packages/quasar-sdk/checkout/type-aliases/CheckoutStore.md)
 
-Defined in: checkout/store.ts:297
+Defined in: [checkout/store.ts:957](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L957)
 
 Creates the headless checkout of one invoice for the buyer's browser: a vanilla Zustand store with the invoice,
 its methods, the locked quote and where the payment stands, and the actions that move it on. The wallet is the
@@ -11,9 +11,13 @@ wallet to execute, and takes the result with `submit` or `relay`. It needs no ke
 invoice only. `@tuwaio/nova-payments` renders it.
 
 Side effects: requests to `<baseUrl>/v1/payments/checkout/<token>` (the page's origin must be one of the app's
-domains, when it lists any); after `load`, an `EventSource` on its `events` route (or a `GET` every `pollMs`) until
-the invoice reaches a final state or `destroy` is called, and a `GET` of the checkout when an event brings an
-outcome. Nothing is stored in the browser.
+domains, when it lists any; its `Origin` is the site the payer proof message names); a wallet prompt to sign a
+message through the `sign` passed to [CheckoutState.confirmPayer](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#confirmpayer), never by itself; after `load`, an `EventSource` on its `events` route (or a `GET` every `pollMs`) until
+the invoice reaches a final state or `destroy` is called (an invoice that expired or was cancelled while a payment
+confirms is followed on, for a limited time, until that payment ends it as `paid` or `held`), and a `GET` of the
+checkout when an event brings an outcome. A hand-over Quasar has not taken yet is kept in the tab's `sessionStorage` under
+`quasar-sdk:checkoutHandOvers:<token>` ([CheckoutStoreOptions.handOverStorage](/packages/quasar-sdk/checkout/interfaces/CheckoutStoreOptions.md#handoverstorage)) until Quasar takes or refuses
+it; nothing else is stored in the browser.
 
 ## Parameters
 
@@ -38,6 +42,10 @@ const checkout = createCheckoutStore({ token });
 await checkout.getState().load();
 checkout.getState().selectMethod(checkout.getState().checkout!.methods[0].id);
 checkout.getState().setPayer(`eip155:8453:${address}`);
+// An EVM payment the wallet sends: the wallet confirms the invoice first, with a free signature
+if (checkout.getState().payerProof === 'required') {
+  await checkout.getState().confirmPayer((message) => walletClient.signMessage({ account: address, message }));
+}
 const quote = await checkout.getState().requestQuote();
 // Send quote.instructions with the wallet, then:
 await checkout.getState().submit({ txKey: hash });

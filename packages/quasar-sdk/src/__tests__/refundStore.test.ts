@@ -68,6 +68,23 @@ describe('createRefundStore', () => {
     expect(store.getState()).toMatchObject({ phase: 'failed', refund: { failureReason: 'wrong_amount' } });
   });
 
+  it('names the invoice a transfer is held on too, for one refund only', async () => {
+    const refusal = new QuasarSDKError('[Quasar SDK] Request Failed (409): Held elsewhere', 409, new Error('x'), {
+      code: 'payment_held_elsewhere',
+      details: { invoice: 'inv_2' },
+    });
+    const store = createRefundStore({
+      request: vi.fn().mockRejectedValue(refusal),
+      submit: vi.fn(),
+      get: vi.fn(),
+    });
+    expect(await store.getState().start('inv_1')).toBe(false);
+    expect(store.getState()).toMatchObject({
+      phase: 'idle',
+      error: { code: 'payment_held_elsewhere', status: 409, otherInvoice: 'inv_2' },
+    });
+  });
+
   it('keeps the refusal of the server and lets the merchant try again', async () => {
     const refusal = new QuasarSDKError('[Quasar SDK] Request Failed (409): Already used', 409, new Error('x'), {
       code: 'transaction_already_used',

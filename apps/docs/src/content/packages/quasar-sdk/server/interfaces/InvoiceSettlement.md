@@ -1,6 +1,6 @@
 # InvoiceSettlement
 
-Defined in: modules/payments/types.ts:184
+Defined in: [modules/payments/types.ts:184](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L184)
 
 The payment that settled an invoice.
 
@@ -10,7 +10,7 @@ The payment that settled an invoice.
 
 > **amountPaid**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:194
+Defined in: [modules/payments/types.ts:194](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L194)
 
 Amount received, in base units.
 
@@ -20,7 +20,7 @@ Amount received, in base units.
 
 > **blockRef**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:192
+Defined in: [modules/payments/types.ts:192](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L192)
 
 Block (EVM) or slot (Solana) of the transaction.
 
@@ -30,7 +30,7 @@ Block (EVM) or slot (Solana) of the transaction.
 
 > **chainId**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:188
+Defined in: [modules/payments/types.ts:188](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L188)
 
 CAIP-2 chain ID of the payment.
 
@@ -40,7 +40,7 @@ CAIP-2 chain ID of the payment.
 
 > **methodId**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:186
+Defined in: [modules/payments/types.ts:186](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L186)
 
 ID of the payment method paid with (see `listMethods`): its token and network read [InvoiceSettlement.amountPaid](/packages/quasar-sdk/server/interfaces/InvoiceSettlement.md#amountpaid).
 
@@ -50,7 +50,7 @@ ID of the payment method paid with (see `listMethods`): its token and network re
 
 > **originWallet**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:196
+Defined in: [modules/payments/types.ts:196](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L196)
 
 The address that paid.
 
@@ -60,7 +60,7 @@ The address that paid.
 
 > **overpaid**: `string`
 
-Defined in: modules/payments/types.ts:200
+Defined in: [modules/payments/types.ts:200](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L200)
 
 Base units received beyond what was due; a refund can return them.
 
@@ -70,7 +70,7 @@ Base units received beyond what was due; a refund can return them.
 
 > **paidAt**: `string` \| `null`
 
-Defined in: modules/payments/types.ts:198
+Defined in: [modules/payments/types.ts:198](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L198)
 
 When it was paid.
 
@@ -80,6 +80,6 @@ When it was paid.
 
 > **txHash**: `string`
 
-Defined in: modules/payments/types.ts:190
+Defined in: [modules/payments/types.ts:190](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L190)
 
 Transaction hash or Solana signature.

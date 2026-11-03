@@ -1,6 +1,6 @@
 # TransferAuthorizationTypedData
 
-Defined in: checkout/types.ts:210
+Defined in: [checkout/types.ts:411](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L411)
 
 EIP-712 typed data of an EIP-3009 transfer authorization, ready for `eth_signTypedData_v4`.
 
@@ -10,7 +10,7 @@ EIP-712 typed data of an EIP-3009 transfer authorization, ready for `eth_signTyp
 
 > **domain**: `Record`\<`string`, `unknown`\>
 
-Defined in: checkout/types.ts:212
+Defined in: [checkout/types.ts:413](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L413)
 
 The token's EIP-712 domain.
 
@@ -20,7 +20,7 @@ The token's EIP-712 domain.
 
 > **message**: `Record`\<`string`, `string`\>
 
-Defined in: checkout/types.ts:218
+Defined in: [checkout/types.ts:419](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L419)
 
 The authorization: from the payer to the merchant, the quoted amount, a validity window and a nonce.
 
@@ -30,7 +30,7 @@ The authorization: from the payer to the merchant, the quoted amount, a validity
 
 > **primaryType**: `string`
 
-Defined in: checkout/types.ts:216
+Defined in: [checkout/types.ts:417](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L417)
 
 `TransferWithAuthorization`.
 
@@ -40,6 +40,6 @@ Defined in: checkout/types.ts:216
 
 > **types**: `Record`\<`string`, `object`[]\>
 
-Defined in: checkout/types.ts:214
+Defined in: [checkout/types.ts:415](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L415)
 
 The types, with `EIP712Domain`.

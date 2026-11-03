@@ -11,12 +11,14 @@ import type {
   CreateInvoiceParams,
   CreateOptions,
   CreateSubscriptionParams,
+  GetEventsParams,
   Invoice,
   InvoiceCorrection,
   InvoiceDetails,
   InvoiceLedger,
   InvoiceWithCheckout,
   ListInvoicesParams,
+  ListSubscriptionItemsParams,
   ListSubscriptionsParams,
   PaymentDocument,
   PaymentDocumentKind,
@@ -29,7 +31,7 @@ import type {
   RefundStart,
   SubmitRefundParams,
   Subscription,
-  SubscriptionDetails,
+  SubscriptionCharge,
   SubscriptionStart,
 } from './types';
 
@@ -153,13 +155,15 @@ export class PaymentsModule {
 
   /**
    * Accepts a held payment (`POST /v1/payments/invoices/:id/release`): the invoice becomes paid and the buyer gets a
-   * receipt.
+   * receipt. A payment Quasar could tie to no invoice (from another wallet than the quoted payer, or from one that
+   * never confirmed the invoice: `reviewReason` `payer_mismatch`) is never released: anyone may hand over for their own
+   * invoice a transaction hash they saw on the network, so refund it to the wallet that sent it instead.
    *
    * @param invoiceId - The invoice.
    * @param params - `reason`, required, recorded in the ledger.
    * @returns The invoice.
-   * @throws {QuasarSDKError} `invoice_not_found` (404), an invoice that is not held (409), a timeout or a network
-   *   error.
+   * @throws {QuasarSDKError} `invoice_not_found` (404); `invoice_not_held`, `invoice_partly_refunded` (refund the rest)
+   *   or `payer_mismatch_refund_only` (a payment tied to no invoice: refund it) (409); a timeout or a network error.
    */
   async releaseInvoice(invoiceId: string, params: { reason: string }): Promise<Invoice> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/release`, {
@@ -202,17 +206,20 @@ export class PaymentsModule {
   }
 
   /**
-   * Reads an invoice ledger, oldest first (`GET /v1/payments/invoices/:id/events`).
+   * Reads a page of an invoice ledger, oldest first (`GET /v1/payments/invoices/:id/events`): up to 100 steps, with
+   * how many the ledger has, who created the invoice and when its quote was locked and its receipt issued. Every
+   * payment page a buyer opens locks a quote, so a ledger can be long.
    *
    * @param invoiceId - The invoice.
-   * @param options - `verify: true` adds the check of its hash chain.
-   * @returns The ledger.
-   * @throws {QuasarSDKError} `invoice_not_found` (404), a timeout or a network error.
+   * @param params - `verify: true` adds the check of the whole hash chain; `limit` and `cursor` page it.
+   * @returns One page; pass `nextCursor` as `cursor` for the next.
+   * @throws {QuasarSDKError} `invoice_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout or a
+   *   network error.
    */
-  async getEvents(invoiceId: string, options: { verify?: boolean } = {}): Promise<InvoiceLedger> {
+  async getEvents(invoiceId: string, params: GetEventsParams = {}): Promise<InvoiceLedger> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/events`, {
       method: 'GET',
-      query: options.verify ? { verify: 'true' } : {},
+      query: query({ verify: params.verify ? 'true' : undefined, limit: params.limit, cursor: params.cursor }),
     });
   }
 
@@ -223,8 +230,10 @@ export class PaymentsModule {
    * @param invoiceId - The invoice.
    * @param params - Amount (everything left when omitted), mode and reason.
    * @returns The refund and what to send where.
-   * @throws {QuasarSDKError} `invalid_request` (400), `invoice_not_found` (404), an invoice that cannot be refunded
-   *   or an amount above what is left (409), a timeout or a network error.
+   * @throws {QuasarSDKError} `invalid_request` (400), `invoice_not_found` (404), an invoice that cannot be refunded,
+   *   an amount above what is left, or `payment_credited_elsewhere` (a refund-only hold whose transfer paid another
+   *   invoice since: nothing to refund) or `payment_held_elsewhere` (`details.invoice`: another invoice holds the same
+   *   transfer for a refund; refund it there, once) (409), a timeout or a network error.
    */
   async refund(invoiceId: string, params: RefundParams = {}): Promise<RefundStart> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/refunds`, {
@@ -252,7 +261,8 @@ export class PaymentsModule {
    * @param params - The transaction and your wallet it was sent from.
    * @returns The refund, `submitted`.
    * @throws {QuasarSDKError} `invalid_request` (400), `refund_not_found` (404), `refund_not_submittable` or
-   *   `transaction_already_used` (409), a timeout or a network error.
+   *   `transaction_already_used` (409: a transaction an invoice credited as a payment; one handed over as a payment
+   *   that paid nothing becomes the refund's), a timeout or a network error.
    */
   async submitRefund(refundId: string, params: SubmitRefundParams): Promise<Refund> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/refunds/${segment(refundId)}/submit`, {
@@ -343,15 +353,54 @@ export class PaymentsModule {
   }
 
   /**
-   * Reads a subscription with the invoices of its periods and its automatic charges
-   * (`GET /v1/payments/subscriptions/:id`).
+   * Reads a subscription (`GET /v1/payments/subscriptions/:id`). The invoices of its periods and its automatic
+   * charges are lists of their own: {@link PaymentsModule.listSubscriptionInvoices} and
+   * {@link PaymentsModule.listSubscriptionCharges}.
    *
    * @param subscriptionId - The subscription.
    * @returns The subscription.
    * @throws {QuasarSDKError} `subscription_not_found` (404), a timeout or a network error.
    */
-  async getSubscription(subscriptionId: string): Promise<SubscriptionDetails> {
+  async getSubscription(subscriptionId: string): Promise<Subscription> {
     return this.client.request(`${PAYMENTS_ENDPOINT}/subscriptions/${segment(subscriptionId)}`, { method: 'GET' });
+  }
+
+  /**
+   * Lists the invoices of a subscription's periods, newest first (`GET /v1/payments/subscriptions/:id/invoices`).
+   *
+   * @param subscriptionId - The subscription.
+   * @param params - Paging.
+   * @returns One page; pass `nextCursor` as `cursor` for the next.
+   * @throws {QuasarSDKError} `subscription_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout
+   *   or a network error.
+   */
+  async listSubscriptionInvoices(
+    subscriptionId: string,
+    params: ListSubscriptionItemsParams = {},
+  ): Promise<PaymentsList<Invoice>> {
+    return this.client.request(`${PAYMENTS_ENDPOINT}/subscriptions/${segment(subscriptionId)}/invoices`, {
+      method: 'GET',
+      query: query({ limit: params.limit, cursor: params.cursor }),
+    });
+  }
+
+  /**
+   * Lists the automatic charges of a subscription, newest first (`GET /v1/payments/subscriptions/:id/charges`).
+   *
+   * @param subscriptionId - The subscription.
+   * @param params - Paging.
+   * @returns One page; pass `nextCursor` as `cursor` for the next.
+   * @throws {QuasarSDKError} `subscription_not_found` (404), `invalid_request` or `invalid_cursor` (400), a timeout
+   *   or a network error.
+   */
+  async listSubscriptionCharges(
+    subscriptionId: string,
+    params: ListSubscriptionItemsParams = {},
+  ): Promise<PaymentsList<SubscriptionCharge>> {
+    return this.client.request(`${PAYMENTS_ENDPOINT}/subscriptions/${segment(subscriptionId)}/charges`, {
+      method: 'GET',
+      query: query({ limit: params.limit, cursor: params.cursor }),
+    });
   }
 
   /**
