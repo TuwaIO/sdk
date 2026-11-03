@@ -64,10 +64,10 @@ describe('quasar.payments', () => {
     });
   });
 
-  it('lists invoices by status and in pages, and reads one with its refunds and credit notes', async () => {
+  it('lists invoices by status and in pages, and reads one with its newest refunds and its totals', async () => {
     fetchMock
       .mockResolvedValueOnce(json({ object: 'list', data: [INVOICE], nextCursor: 'c_2' }))
-      .mockResolvedValueOnce(json({ ...INVOICE, refunds: [], creditNotes: [] }));
+      .mockResolvedValueOnce(json({ ...INVOICE, refunds: [], refundsTotal: 0, creditNotesTotal: 0 }));
 
     const page = await quasar.payments.listInvoices({
       status: ['paid', 'held'],
@@ -84,9 +84,39 @@ describe('quasar.payments', () => {
     });
 
     const invoice = await quasar.payments.getInvoice('inv/1');
-    expect(invoice.creditNotes).toEqual([]);
+    expect(invoice).toMatchObject({ refunds: [], refundsTotal: 0, creditNotesTotal: 0 });
     // IDs are path segments: encoded, never a path of their own
     expect(sent(1).url).toBe('https://quasar.example/v1/payments/invoices/inv%2F1');
+  });
+
+  // Every refund and correction adds a credit note (owner, 2026-10-29): an invoice's refunds and documents page
+  it("pages an invoice's refunds and documents newest first, with a cursor", async () => {
+    const document = {
+      kind: 'credit_note',
+      format: 'pdf',
+      number: 'CN-2026-1',
+      refundId: 'ref_1',
+      issuedAt: '2026-10-09T00:00:00.000Z',
+    };
+    fetchMock
+      .mockResolvedValueOnce(json({ object: 'list', data: [], nextCursor: 'cur_2' }))
+      .mockResolvedValueOnce(json({ object: 'list', data: [], nextCursor: null }))
+      .mockResolvedValueOnce(json({ object: 'list', data: [document], nextCursor: null }));
+
+    expect((await quasar.payments.listInvoiceRefunds('inv/1', { limit: 5 })).nextCursor).toBe('cur_2');
+    await quasar.payments.listInvoiceRefunds('inv_1', { cursor: 'cur_2' });
+    const documents = await quasar.payments.listInvoiceDocuments('inv_1');
+    expect(documents.data).toEqual([document]);
+
+    const paths = [0, 1, 2].map((n) => {
+      const url = new URL(sent(n).url);
+      return `${sent(n).method} ${url.pathname}${url.search}`;
+    });
+    expect(paths).toEqual([
+      'GET /v1/payments/invoices/inv%2F1/refunds?limit=5',
+      'GET /v1/payments/invoices/inv_1/refunds?cursor=cur_2',
+      'GET /v1/payments/invoices/inv_1/documents',
+    ]);
   });
 
   it('acts on an invoice: cancel, release, correct, a new payment link and its ledger with the chain check', async () => {

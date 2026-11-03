@@ -1,6 +1,6 @@
 # GetEventsParams
 
-Defined in: [modules/payments/types.ts:469](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L469)
+Defined in: [modules/payments/types.ts:483](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L483)
 
 What [PaymentsModule.getEvents](/packages/quasar-sdk/server/classes/PaymentsModule.md#getevents) takes.
 
@@ -10,7 +10,7 @@ What [PaymentsModule.getEvents](/packages/quasar-sdk/server/classes/PaymentsModu
 
 > `optional` **cursor?**: `string`
 
-Defined in: [modules/payments/types.ts:475](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L475)
+Defined in: [modules/payments/types.ts:489](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L489)
 
 `nextCursor` of the previous page.
 
@@ -20,7 +20,7 @@ Defined in: [modules/payments/types.ts:475](https://github.com/TuwaIO/sdk/blob/m
 
 > `optional` **limit?**: `number`
 
-Defined in: [modules/payments/types.ts:473](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L473)
+Defined in: [modules/payments/types.ts:487](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L487)
 
 Page size, 1 to 100. Defaults to `100`.
 
@@ -30,6 +30,6 @@ Page size, 1 to 100. Defaults to `100`.
 
 > `optional` **verify?**: `boolean`
 
-Defined in: [modules/payments/types.ts:471](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L471)
+Defined in: [modules/payments/types.ts:485](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L485)
 
 `true` adds the check of the whole hash chain, whatever the page.
