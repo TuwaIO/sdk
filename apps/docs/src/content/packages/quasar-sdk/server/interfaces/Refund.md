@@ -1,6 +1,6 @@
 # Refund
 
-Defined in: [modules/payments/types.ts:514](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L514)
+Defined in: [modules/payments/types.ts:576](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L576)
 
 A refund. You send it from your wallet; Quasar verifies the transaction and issues the credit note.
 
@@ -10,7 +10,7 @@ A refund. You send it from your wallet; Quasar verifies the transaction and issu
 
 > **amount**: `string`
 
-Defined in: [modules/payments/types.ts:524](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L524)
+Defined in: [modules/payments/types.ts:586](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L586)
 
 Amount in the invoice currency.
 
@@ -20,7 +20,7 @@ Amount in the invoice currency.
 
 > **assetId**: `string`
 
-Defined in: [modules/payments/types.ts:532](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L532)
+Defined in: [modules/payments/types.ts:594](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L594)
 
 CAIP-19 asset to send.
 
@@ -30,7 +30,7 @@ CAIP-19 asset to send.
 
 > **chainId**: `string`
 
-Defined in: [modules/payments/types.ts:534](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L534)
+Defined in: [modules/payments/types.ts:596](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L596)
 
 CAIP-2 chain to send on.
 
@@ -40,7 +40,7 @@ CAIP-2 chain to send on.
 
 > **confirmedAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:552](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L552)
+Defined in: [modules/payments/types.ts:614](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L614)
 
 When it was confirmed.
 
@@ -50,7 +50,7 @@ When it was confirmed.
 
 > **createdAt**: `string`
 
-Defined in: [modules/payments/types.ts:550](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L550)
+Defined in: [modules/payments/types.ts:612](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L612)
 
 When it was asked for.
 
@@ -60,7 +60,7 @@ When it was asked for.
 
 > **creditNoteNumber**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:546](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L546)
+Defined in: [modules/payments/types.ts:608](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L608)
 
 Its credit note, once confirmed.
 
@@ -70,7 +70,7 @@ Its credit note, once confirmed.
 
 > **cryptoAmount**: `string`
 
-Defined in: [modules/payments/types.ts:530](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L530)
+Defined in: [modules/payments/types.ts:592](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L592)
 
 Token amount to send, in base units.
 
@@ -80,7 +80,7 @@ Token amount to send, in base units.
 
 > **currency**: `string`
 
-Defined in: [modules/payments/types.ts:526](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L526)
+Defined in: [modules/payments/types.ts:588](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L588)
 
 Invoice currency.
 
@@ -90,7 +90,7 @@ Invoice currency.
 
 > **failureReason**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:544](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L544)
+Defined in: [modules/payments/types.ts:606](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L606)
 
 Why it failed.
 
@@ -100,7 +100,7 @@ Why it failed.
 
 > **from**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:540](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L540)
+Defined in: [modules/payments/types.ts:602](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L602)
 
 The address it was sent from.
 
@@ -110,7 +110,7 @@ The address it was sent from.
 
 > **heldTransfer**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:548](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L548)
+Defined in: [modules/payments/types.ts:610](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L610)
 
 The held transfer it returns to its sender ([HeldTransfer](/packages/quasar-sdk/server/interfaces/HeldTransfer.md)), or `null` for a refund of the invoice.
 
@@ -120,7 +120,7 @@ The held transfer it returns to its sender ([HeldTransfer](/packages/quasar-sdk/
 
 > **id**: `string`
 
-Defined in: [modules/payments/types.ts:516](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L516)
+Defined in: [modules/payments/types.ts:578](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L578)
 
 Refund ID.
 
@@ -130,7 +130,7 @@ Refund ID.
 
 > **invoiceId**: `string`
 
-Defined in: [modules/payments/types.ts:520](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L520)
+Defined in: [modules/payments/types.ts:582](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L582)
 
 The invoice.
 
@@ -140,7 +140,7 @@ The invoice.
 
 > **mode**: [`RefundMode`](/packages/quasar-sdk/server/type-aliases/RefundMode.md)
 
-Defined in: [modules/payments/types.ts:528](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L528)
+Defined in: [modules/payments/types.ts:590](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L590)
 
 How it was priced.
 
@@ -150,7 +150,7 @@ How it was priced.
 
 > **object**: `"refund"`
 
-Defined in: [modules/payments/types.ts:518](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L518)
+Defined in: [modules/payments/types.ts:580](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L580)
 
 Always `refund`.
 
@@ -160,7 +160,7 @@ Always `refund`.
 
 > **reason**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:542](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L542)
+Defined in: [modules/payments/types.ts:604](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L604)
 
 Why.
 
@@ -170,7 +170,7 @@ Why.
 
 > **status**: `"requested"` \| `"submitted"` \| `"confirmed"` \| `"failed"`
 
-Defined in: [modules/payments/types.ts:522](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L522)
+Defined in: [modules/payments/types.ts:584](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L584)
 
 `requested` (waits for its transaction), `submitted`, `confirmed` or `failed`.
 
@@ -180,7 +180,7 @@ Defined in: [modules/payments/types.ts:522](https://github.com/TuwaIO/sdk/blob/m
 
 > **to**: `string`
 
-Defined in: [modules/payments/types.ts:536](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L536)
+Defined in: [modules/payments/types.ts:598](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L598)
 
 The payer's address: refunds go back to it.
 
@@ -190,6 +190,6 @@ The payer's address: refunds go back to it.
 
 > **txHash**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:538](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L538)
+Defined in: [modules/payments/types.ts:600](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L600)
 
 The refund transaction, once submitted.

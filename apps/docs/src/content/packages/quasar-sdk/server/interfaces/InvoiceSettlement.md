@@ -1,8 +1,9 @@
 # InvoiceSettlement
 
-Defined in: [modules/payments/types.ts:192](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L192)
+Defined in: [modules/payments/types.ts:195](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L195)
 
-The payment that settled an invoice.
+The payment that settled an invoice. An invoice paid in parts has several transfers: this names the last one, and
+[InvoiceDetails.payments](/packages/quasar-sdk/server/interfaces/InvoiceDetails.md#payments) names them all.
 
 ## Properties
 
@@ -10,9 +11,9 @@ The payment that settled an invoice.
 
 > **amountPaid**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:202](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L202)
+Defined in: [modules/payments/types.ts:205](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L205)
 
-Amount received, in base units.
+Amount received in all, in base units.
 
 ***
 
@@ -20,9 +21,9 @@ Amount received, in base units.
 
 > **blockRef**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:200](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L200)
+Defined in: [modules/payments/types.ts:203](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L203)
 
-Block (EVM) or slot (Solana) of the transaction.
+Block (EVM) or slot (Solana) of the last transfer.
 
 ***
 
@@ -30,7 +31,7 @@ Block (EVM) or slot (Solana) of the transaction.
 
 > **chainId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:196](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L196)
+Defined in: [modules/payments/types.ts:199](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L199)
 
 CAIP-2 chain ID of the payment.
 
@@ -40,7 +41,7 @@ CAIP-2 chain ID of the payment.
 
 > **methodId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:194](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L194)
+Defined in: [modules/payments/types.ts:197](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L197)
 
 ID of the payment method paid with (see `listMethods`): its token and network read [InvoiceSettlement.amountPaid](/packages/quasar-sdk/server/interfaces/InvoiceSettlement.md#amountpaid).
 
@@ -50,7 +51,7 @@ ID of the payment method paid with (see `listMethods`): its token and network re
 
 > **originWallet**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:204](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L204)
+Defined in: [modules/payments/types.ts:207](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L207)
 
 The address that paid.
 
@@ -60,7 +61,7 @@ The address that paid.
 
 > **overpaid**: `string`
 
-Defined in: [modules/payments/types.ts:208](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L208)
+Defined in: [modules/payments/types.ts:211](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L211)
 
 Base units received beyond what was due; a refund can return them.
 
@@ -70,7 +71,7 @@ Base units received beyond what was due; a refund can return them.
 
 > **paidAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:206](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L206)
+Defined in: [modules/payments/types.ts:209](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L209)
 
 When it was paid.
 
@@ -80,6 +81,6 @@ When it was paid.
 
 > **txHash**: `string`
 
-Defined in: [modules/payments/types.ts:198](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L198)
+Defined in: [modules/payments/types.ts:201](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L201)
 
-Transaction hash or Solana signature.
+Transaction hash or Solana signature of the last transfer.

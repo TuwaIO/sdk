@@ -10,11 +10,14 @@ import { z } from 'zod';
 import type {
   HeldTransfer,
   Invoice,
+  InvoiceAttempt,
   InvoiceCorrection,
   InvoiceDetails,
   InvoiceDocumentRef,
   InvoiceLedger,
+  InvoicePayment,
   InvoiceSeller,
+  InvoiceWalletConfirmation,
   InvoiceWithCheckout,
   PaymentMethod,
   PaymentQuote,
@@ -51,7 +54,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   // -------------------------------------------------------------------------
   const Currency = z.enum(['USD', 'EUR']).openapi('PaymentsCurrency', { description: 'Fiat currency.' });
   const Locale = z
-    .enum(['en', 'zh-CN', 'es', 'de', 'uk', 'it'])
+    .enum(['en', 'uk', 'zh-CN', 'es', 'it', 'de'])
     .openapi('InvoiceLocale', { description: 'Language of the invoice, its documents and emails.' });
   const TaxCategory = z.enum(['S', 'Z', 'E', 'AE', 'K', 'G', 'O']).openapi('TaxCategory', {
     description:
@@ -261,9 +264,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
             description: 'The payment method paid with (`GET /methods`): its token and network read `amountPaid`.',
           }),
           chainId: z.string().nullable(),
-          txHash: z.string(),
-          blockRef: z.string().nullable(),
-          amountPaid: z.string().nullable(),
+          txHash: z.string().openapi({ description: 'The last transfer; `payments` of the invoice names them all.' }),
+          blockRef: z.string().nullable().openapi({ description: 'Block or slot of the last transfer.' }),
+          amountPaid: z.string().nullable().openapi({ description: 'What arrived in all, in base units.' }),
           originWallet: z.string().nullable(),
           paidAt: z.string().nullable(),
           overpaid: z.string(),
@@ -327,6 +330,58 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   const _checkRefund: z.ZodType<Refund> = Refund;
   registry.register('Refund', Refund);
 
+  const InvoicePayment = z
+    .object({
+      txHash: z.string(),
+      chainId: z.string().nullable(),
+      amount: z.string().openapi({ description: 'What it credited, in base units of the token of the quote.' }),
+      senders: z.array(z.string()),
+      blockRef: z.string().nullable(),
+      at: z.string(),
+    })
+    .openapi('InvoicePayment', { description: 'A transfer credited to an invoice.' });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkInvoicePayment: z.ZodType<InvoicePayment> = InvoicePayment;
+
+  const InvoiceAttempt = z
+    .object({
+      txHash: z.string().nullable(),
+      chainId: z.string().nullable(),
+      reason: z.string().openapi({
+        description: 'Why it did not pay the invoice, such as `payer_mismatch`, `quote_expired` or `aml`.',
+      }),
+      held: z
+        .boolean()
+        .openapi({ description: 'It reached you and waits as a held transfer for a refund to its sender.' }),
+      at: z.string(),
+    })
+    .openapi('InvoiceAttempt', { description: 'A transaction that was tied to an invoice and did not pay it.' });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkInvoiceAttempt: z.ZodType<InvoiceAttempt> = InvoiceAttempt;
+
+  const InvoiceWalletConfirmation = z
+    .object({
+      account: z.string().openapi({ description: 'The wallet, as a CAIP-10 account on the network it signed on.' }),
+      kind: z.string().openapi({
+        description:
+          '`eoa`, `eip1271` and `eip6492` signed an EIP-4361 message; `authorization` signed the EIP-3009 authorization of a relayed payment.',
+      }),
+      chainId: z.string(),
+      signature: z.string().nullable(),
+      message: z
+        .string()
+        .nullable()
+        .openapi({ description: 'The EIP-4361 message it signed; `null` for an authorization.' }),
+      domain: z.string().nullable(),
+      nonce: z.string().nullable(),
+      at: z.string(),
+    })
+    .openapi('InvoiceWalletConfirmation', {
+      description: 'What a wallet signed to confirm an invoice: the evidence that this wallet pays it.',
+    });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkInvoiceWalletConfirmation: z.ZodType<InvoiceWalletConfirmation> = InvoiceWalletConfirmation;
+
   const InvoiceDetails = Invoice.extend({
     refunds: z
       .array(Refund)
@@ -336,6 +391,13 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       .number()
       .int()
       .openapi({ description: 'How many credit notes it has (one per refund and correction).' }),
+    payments: z
+      .array(InvoicePayment)
+      .openapi({ description: 'Every transfer credited to it, oldest first: an invoice paid in parts has several.' }),
+    attempts: z.array(InvoiceAttempt).openapi({ description: 'Every transaction that did not pay it, oldest first.' }),
+    walletConfirmations: z
+      .array(InvoiceWalletConfirmation)
+      .openapi({ description: 'What the wallets that confirmed it signed, oldest first.' }),
   }).openapi('InvoiceDetails');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkInvoiceDetails: z.ZodType<InvoiceDetails> = InvoiceDetails;
@@ -1858,6 +1920,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       data: z.object({
         invoice: Invoice.optional(),
         settlement: Invoice.shape.settlement.unwrap().optional(),
+        payments: z.array(InvoicePayment).optional().openapi({
+          description:
+            'Every transfer credited to the invoice so far, on `invoice.paid`, `invoice.underpaid`, `invoice.held` and `invoice.released`.',
+        }),
         refund: Refund.optional(),
         aml: z.object({ decision: z.literal('block'), reasons: z.array(z.unknown()) }).optional(),
         subscription: Subscription.optional(),

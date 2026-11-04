@@ -1,6 +1,6 @@
 # PaymentWebhookHold
 
-Defined in: [webhooks.ts:50](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L50)
+Defined in: [webhooks.ts:57](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L57)
 
 What a hold is about (`data.hold` of `invoice.held`): an invoice paid in a way that waits for your decision. `reason`
 (`late`, `aml`, `quote_expired`), its transaction (`txHash`), the wallets that sent it (`senders`) and whether it came
@@ -12,7 +12,7 @@ late (`late`). Release it with [PaymentsModule.releaseInvoice](/packages/quasar-
 
 > `optional` **late?**: `true`
 
-Defined in: [webhooks.ts:58](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L58)
+Defined in: [webhooks.ts:65](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L65)
 
 It arrived after the invoice expired or was cancelled, or was handed over after `dueAt`.
 
@@ -22,7 +22,7 @@ It arrived after the invoice expired or was cancelled, or was handed over after 
 
 > **reason**: `"late"` \| `"aml"` \| `"quote_expired"` \| `null`
 
-Defined in: [webhooks.ts:52](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L52)
+Defined in: [webhooks.ts:59](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L59)
 
 Why the payment is held; `null` when Quasar did not record why.
 
@@ -32,7 +32,7 @@ Why the payment is held; `null` when Quasar did not record why.
 
 > `optional` **senders?**: `string`[]
 
-Defined in: [webhooks.ts:56](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L56)
+Defined in: [webhooks.ts:63](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L63)
 
 The wallets that sent it.
 
@@ -42,6 +42,6 @@ The wallets that sent it.
 
 > **txHash**: `string` \| `null`
 
-Defined in: [webhooks.ts:54](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L54)
+Defined in: [webhooks.ts:61](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L61)
 
 The transaction of the held payment.

@@ -7,7 +7,7 @@
 export type PaymentsCurrency = 'USD' | 'EUR';
 
 /** Language of an invoice, its documents and its emails. */
-export type InvoiceLocale = 'en' | 'zh-CN' | 'es' | 'de' | 'uk' | 'it';
+export type InvoiceLocale = 'en' | 'uk' | 'zh-CN' | 'es' | 'it' | 'de';
 
 /**
  * VAT category of a line (EN 16931 UNCL5305): `S` standard rate, `Z` zero rated, `E` exempt (needs
@@ -188,17 +188,20 @@ export interface InvoiceQuote {
   reference: string | null;
 }
 
-/** The payment that settled an invoice. */
+/**
+ * The payment that settled an invoice. An invoice paid in parts has several transfers: this names the last one, and
+ * {@link InvoiceDetails.payments} names them all.
+ */
 export interface InvoiceSettlement {
   /** ID of the payment method paid with (see `listMethods`): its token and network read {@link InvoiceSettlement.amountPaid}. */
   methodId: string | null;
   /** CAIP-2 chain ID of the payment. */
   chainId: string | null;
-  /** Transaction hash or Solana signature. */
+  /** Transaction hash or Solana signature of the last transfer. */
   txHash: string;
-  /** Block (EVM) or slot (Solana) of the transaction. */
+  /** Block (EVM) or slot (Solana) of the last transfer. */
   blockRef: string | null;
-  /** Amount received, in base units. */
+  /** Amount received in all, in base units. */
   amountPaid: string | null;
   /** The address that paid. */
   originWallet: string | null;
@@ -365,9 +368,62 @@ export interface InvoiceDocumentRef {
   issuedAt: string;
 }
 
+/** A transfer credited to an invoice. An invoice paid in parts has several. */
+export interface InvoicePayment {
+  /** Transaction hash or Solana signature. */
+  txHash: string;
+  /** CAIP-2 chain ID of the transfer. */
+  chainId: string | null;
+  /** What it credited, in base units of the token of the quote. */
+  amount: string;
+  /** The addresses that sent it. */
+  senders: string[];
+  /** Block (EVM) or slot (Solana). */
+  blockRef: string | null;
+  /** When it was verified. */
+  at: string;
+}
+
+/** A transaction that was tied to an invoice and did not pay it. */
+export interface InvoiceAttempt {
+  /** Transaction hash or Solana signature. */
+  txHash: string | null;
+  /** CAIP-2 chain ID of the transaction. */
+  chainId: string | null;
+  /** Why it did not pay the invoice, such as `payer_mismatch`, `quote_expired` or `aml`. */
+  reason: string;
+  /** Whether it reached you and waits as a held transfer for a refund to its sender. */
+  held: boolean;
+  /** When it was recorded. */
+  at: string;
+}
+
+/** What a wallet signed to confirm an invoice: the evidence that this wallet pays it. */
+export interface InvoiceWalletConfirmation {
+  /** The wallet, as a CAIP-10 account on the network it signed on. */
+  account: string;
+  /**
+   * How it confirmed: `eoa`, `eip1271` and `eip6492` signed an EIP-4361 message; `authorization` signed the EIP-3009
+   * authorization of a relayed payment.
+   */
+  kind: string;
+  /** CAIP-2 chain ID it signed on. */
+  chainId: string;
+  /** The signature. */
+  signature: string | null;
+  /** The EIP-4361 message it signed; `null` for an authorization. */
+  message: string | null;
+  /** The domain the message names. */
+  domain: string | null;
+  /** The nonce the message names. */
+  nonce: string | null;
+  /** When it was confirmed. */
+  at: string;
+}
+
 /**
  * An invoice with its newest refunds and how many refunds and credit notes it has, as
- * {@link PaymentsModule.getInvoice} returns it. Every refund and correction adds a credit note, so the full lists are
+ * {@link PaymentsModule.getInvoice} returns it. It also names what happened to the money, oldest first. Every refund and correction adds a credit note, so the full lists are
  * {@link PaymentsModule.listInvoiceRefunds} and {@link PaymentsModule.listInvoiceDocuments}.
  */
 export interface InvoiceDetails extends Invoice {
@@ -377,6 +433,12 @@ export interface InvoiceDetails extends Invoice {
   refundsTotal: number;
   /** How many credit notes it has (one per refund and correction). */
   creditNotesTotal: number;
+  /** Every transfer credited to it: an invoice paid in parts has several. */
+  payments: InvoicePayment[];
+  /** Every transaction that did not pay it. */
+  attempts: InvoiceAttempt[];
+  /** What the wallets that confirmed it signed. */
+  walletConfirmations: InvoiceWalletConfirmation[];
 }
 
 /** An invoice with its checkout token and payment page. */

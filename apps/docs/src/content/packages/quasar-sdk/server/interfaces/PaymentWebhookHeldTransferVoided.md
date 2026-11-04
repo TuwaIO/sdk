@@ -1,6 +1,6 @@
 # PaymentWebhookHeldTransferVoided
 
-Defined in: [webhooks.ts:91](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L91)
+Defined in: [webhooks.ts:98](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L98)
 
 A held transfer Quasar voided (`data.heldTransfer` of `invoice.transfer_hold_voided`): the same transaction was
 proven to pay another invoice of yours since (`paidInvoice`), so there is nothing to refund.
@@ -11,7 +11,7 @@ proven to pay another invoice of yours since (`paidInvoice`), so there is nothin
 
 > **id**: `string` \| `null`
 
-Defined in: [webhooks.ts:93](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L93)
+Defined in: [webhooks.ts:100](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L100)
 
 The held transfer.
 
@@ -21,7 +21,7 @@ The held transfer.
 
 > **paidInvoice**: `string` \| `null`
 
-Defined in: [webhooks.ts:99](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L99)
+Defined in: [webhooks.ts:106](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L106)
 
 The invoice the transaction paid instead.
 
@@ -31,7 +31,7 @@ The invoice the transaction paid instead.
 
 > **txHash**: `string` \| `null`
 
-Defined in: [webhooks.ts:97](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L97)
+Defined in: [webhooks.ts:104](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L104)
 
 Its transaction.
 
@@ -41,6 +41,6 @@ Its transaction.
 
 > **voided**: `true`
 
-Defined in: [webhooks.ts:95](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L95)
+Defined in: [webhooks.ts:102](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L102)
 
 Always `true`.

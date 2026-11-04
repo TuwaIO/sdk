@@ -3,7 +3,14 @@
  * and the types of their bodies.
  */
 
-import type { Invoice, InvoiceSettlement, PaymentsEnvironment, Refund, Subscription } from './modules/payments/types';
+import type {
+  Invoice,
+  InvoicePayment,
+  InvoiceSettlement,
+  PaymentsEnvironment,
+  Refund,
+  Subscription,
+} from './modules/payments/types';
 
 /** The header that carries the signature of a webhook: the hex HMAC-SHA256 of the raw body, keyed with the secret. */
 export const WEBHOOK_SIGNATURE_HEADER = 'x-quasar-signature';
@@ -124,6 +131,11 @@ export interface PaymentWebhookEvent {
     invoice?: Invoice;
     /** The payment, once the invoice has one. */
     settlement?: InvoiceSettlement;
+    /**
+     * Every transfer credited to the invoice so far, on `invoice.paid`, `invoice.underpaid`, `invoice.held` and
+     * `invoice.released`: an invoice paid in parts has several.
+     */
+    payments?: InvoicePayment[];
     /** The refund of a refund event. */
     refund?: Refund;
     /** Why AML held the payment, on a hold by AML. */

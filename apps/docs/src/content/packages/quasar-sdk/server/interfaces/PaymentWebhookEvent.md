@@ -1,6 +1,6 @@
 # PaymentWebhookEvent
 
-Defined in: [webhooks.ts:106](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L106)
+Defined in: [webhooks.ts:113](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L113)
 
 The body of a payment webhook (`payments.v1`). `id`, `type` and `createdAt` are those of the ledger event, so
 deduplicate by `id`; `data.invoice` is the invoice when the delivery was sent, so a retry carries its current state.
@@ -11,7 +11,7 @@ deduplicate by `id`; `data.invoice` is the invoice when the delivery was sent, s
 
 > **apiVersion**: `"payments.v1"`
 
-Defined in: [webhooks.ts:112](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L112)
+Defined in: [webhooks.ts:119](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L119)
 
 Always `payments.v1`.
 
@@ -21,7 +21,7 @@ Always `payments.v1`.
 
 > **createdAt**: `string`
 
-Defined in: [webhooks.ts:116](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L116)
+Defined in: [webhooks.ts:123](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L123)
 
 When it happened (ISO 8601).
 
@@ -31,7 +31,7 @@ When it happened (ISO 8601).
 
 > **data**: `object`
 
-Defined in: [webhooks.ts:122](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L122)
+Defined in: [webhooks.ts:129](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L129)
 
 What the event is about.
 
@@ -68,6 +68,13 @@ What `invoice.held` holds. Quasar versions before October 29, 2026 leave it out.
 
 The invoice now (subscription events carry the invoice of their period, when there is one).
 
+#### payments?
+
+> `optional` **payments?**: [`InvoicePayment`](/packages/quasar-sdk/server/interfaces/InvoicePayment.md)[]
+
+Every transfer credited to the invoice so far, on `invoice.paid`, `invoice.underpaid`, `invoice.held` and
+`invoice.released`: an invoice paid in parts has several.
+
 #### refund?
 
 > `optional` **refund?**: [`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md)
@@ -92,7 +99,7 @@ The subscription of a subscription event.
 
 > **environment**: [`PaymentsEnvironment`](/packages/quasar-sdk/server/type-aliases/PaymentsEnvironment.md)
 
-Defined in: [webhooks.ts:120](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L120)
+Defined in: [webhooks.ts:127](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L127)
 
 Live or test.
 
@@ -102,7 +109,7 @@ Live or test.
 
 > **id**: `string`
 
-Defined in: [webhooks.ts:108](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L108)
+Defined in: [webhooks.ts:115](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L115)
 
 Event ID: the same for every delivery and retry of the event.
 
@@ -112,7 +119,7 @@ Event ID: the same for every delivery and retry of the event.
 
 > **object**: `"event"`
 
-Defined in: [webhooks.ts:110](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L110)
+Defined in: [webhooks.ts:117](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L117)
 
 Always `event`.
 
@@ -122,7 +129,7 @@ Always `event`.
 
 > **sentAt**: `string`
 
-Defined in: [webhooks.ts:118](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L118)
+Defined in: [webhooks.ts:125](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L125)
 
 When this delivery was sent; signed with the body, it lets [verifyWebhook](/packages/quasar-sdk/server/functions/verifyWebhook.md) refuse old replays.
 
@@ -132,6 +139,6 @@ When this delivery was sent; signed with the body, it lets [verifyWebhook](/pack
 
 > **type**: [`PaymentWebhookEventType`](/packages/quasar-sdk/server/type-aliases/PaymentWebhookEventType.md)
 
-Defined in: [webhooks.ts:114](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L114)
+Defined in: [webhooks.ts:121](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L121)
 
 What happened.
