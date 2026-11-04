@@ -436,11 +436,13 @@ export interface CheckoutState {
   grantPermission: (params: GrantPermissionParams) => Promise<boolean>;
   /**
    * Tells Quasar that the wallet sent the transaction that revokes the permission (`autoCharge.revocation`): Quasar asks
-   * the chain (`POST permission/revoked`), and `checkout.autoCharge` follows what it finds.
+   * the chain (`POST permission/revoked`), and `checkout.autoCharge` follows what it finds. Neither the phase nor the
+   * error of the store change: it may be asked from any screen, and what that screen says stands.
    *
-   * @returns Whether the permission has ended; `false` while the chain does not show it yet, or on an error.
+   * @returns Whether the permission has ended; `false` while the chain does not show it yet; `null` when Quasar could not
+   * be asked.
    */
-  permissionRevoked: () => Promise<boolean>;
+  permissionRevoked: () => Promise<boolean | null>;
   /**
    * Goes back to the payment from `unconfirmed`, once the buyer checked that the payment did not leave the wallet:
    * `awaitingPayment` while the locked quote is valid, `underpaid` for the rest of an underpaid invoice, otherwise
@@ -571,6 +573,7 @@ const MOVED_MONEY_REASONS: ReadonlySet<string> = new Set([
   'payer_mismatch',
   'payer_unconfirmed',
   'already_paid',
+  'quote_changed',
   'native_from_contract_unverifiable',
   'invoice_not_payable',
   'settlement_failed',
@@ -613,6 +616,8 @@ interface KeptHandOver {
  * it was; a rejection without `held` promises no refund.
  */
 const REFUND_ONLY_REASONS: ReadonlySet<string> = new Set(['payer_mismatch', 'payer_unconfirmed']);
+/** An automatic charge that landed after the buyer chose another way to pay: held for a refund, the invoice still open. */
+const CHARGE_AFTER_REQUOTE = 'quote_changed';
 
 /** Kinds of payer proof that count on every EVM network: the key behind the address signs for it everywhere. */
 const ANY_NETWORK_PROOFS: ReadonlySet<string> = new Set(['eoa', 'authorization']);
@@ -790,6 +795,15 @@ function endedError(ended: Ending): CheckoutError {
   const reason = ended.reason ? { reason: ended.reason } : {};
   // Confirmed on chain, not recorded yet: the merchant has the money, Quasar may still retry it
   if (ended.reason === SETTLEMENT_FAILED) return settlementFailedError(ended.rechecked);
+  if (ended.reason === CHARGE_AFTER_REQUOTE) {
+    return {
+      code: 'payment_mismatch',
+      message:
+        'An automatic charge reached the merchant after another way to pay was chosen, so it does not pay this invoice. The merchant returns it to the wallet that sent it, and the invoice can still be paid.',
+      ...reason,
+      held: true,
+    };
+  }
   if (ended.reason && REFUND_ONLY_REASONS.has(ended.reason)) {
     // Held for a refund to its sender, the invoice still open: the confirmed wallet can pay it
     return {
@@ -1907,15 +1921,14 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       },
 
       permissionRevoked: async () => {
-        update({ error: null });
+        // Asked from any screen, so what the screen says stands: an error here may say not to pay again
         try {
           const { autoCharge } = await api.permissionRevoked();
           const checkout = get().checkout;
           if (checkout) update({ checkout: { ...checkout, autoCharge } });
           return autoCharge?.status !== 'active';
-        } catch (error) {
-          fail(error, get().phase);
-          return false;
+        } catch {
+          return null;
         }
       },
 

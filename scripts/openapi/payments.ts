@@ -536,9 +536,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       id: z.string(),
       invoice: z.string().openapi({ description: 'The invoice whose address it reached.' }),
       status: HeldTransferStatus,
-      reason: z.enum(['payer_mismatch', 'payer_unconfirmed', 'already_paid']).openapi({
+      reason: z.enum(['payer_mismatch', 'payer_unconfirmed', 'already_paid', 'quote_changed']).openapi({
         description:
-          '`already_paid`: a relay or an automatic charge Quasar sent reached an invoice already paid; `payer_mismatch`: from another wallet than the one the quote was for; `payer_unconfirmed`: from the quoted wallet, which never confirmed the invoice.',
+          '`already_paid`: a relay or an automatic charge Quasar sent reached an invoice already paid; `quote_changed`: an automatic charge landed after the invoice was quoted in another asset, network or recipient; `payer_mismatch`: from another wallet than the one the quote was for; `payer_unconfirmed`: from the quoted wallet, which never confirmed the invoice.',
       }),
       late: z.boolean(),
       chainId: z.string(),
@@ -2030,7 +2030,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
               txHash: z.string().nullable(),
               amount: z.string().nullable(),
               senders: z.array(z.string()),
-              reason: z.enum(['payer_mismatch', 'payer_unconfirmed', 'already_paid']).nullable(),
+              reason: z.enum(['payer_mismatch', 'payer_unconfirmed', 'already_paid', 'quote_changed']).nullable(),
               late: z.literal(true).optional(),
               screening: z.object({ status: z.literal('blocked'), reasons: z.array(z.unknown()) }).optional(),
             }),

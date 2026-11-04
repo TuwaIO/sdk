@@ -261,6 +261,22 @@ describe('createCheckoutStore', () => {
     checkout.getState().destroy();
   });
 
+  it('asks whether a permission ended without touching what the screen says', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json(view({ invoice: { ...view().invoice, status: 'expired' } })))
+      .mockRejectedValueOnce(new Error('network'))
+      .mockResolvedValueOnce(json({ autoCharge: null }));
+    const checkout = store();
+    await checkout.getState().load();
+    const shut = { code: 'payment_mismatch', message: 'Do not pay again' };
+    checkout.setState({ error: shut });
+    expect(await checkout.getState().permissionRevoked()).toBeNull();
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', error: shut });
+    expect(await checkout.getState().permissionRevoked()).toBe(true);
+    expect(checkout.getState()).toMatchObject({ phase: 'expired', error: shut });
+    checkout.getState().destroy();
+  });
+
   // The line the merchant asks the buyer to tick before paying
   it('asks for a required consent before the quote, and sends the consent with it', async () => {
     const consent = { text: 'I ask Acme to start at once.', required: true };

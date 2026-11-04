@@ -69,7 +69,7 @@ Whether the buyer ticked the merchant's consent (`checkout.consent`).
 
 > **destroy**: () => `void`
 
-Defined in: [checkout/store.ts:453](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L453)
+Defined in: [checkout/store.ts:455](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L455)
 
 Stops following the invoice (closes the event stream or the reads). Call it when the page goes away.
 
@@ -239,7 +239,7 @@ The chosen payment method.
 
 > **payAgain**: () => `void`
 
-Defined in: [checkout/store.ts:451](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L451)
+Defined in: [checkout/store.ts:453](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L453)
 
 Goes back to the payment from `unconfirmed`, once the buyer checked that the payment did not leave the wallet:
 `awaitingPayment` while the locked quote is valid, `underpaid` for the rest of an underpaid invoice, otherwise
@@ -334,18 +334,20 @@ Read-only: the store sets it.
 
 ### permissionRevoked
 
-> **permissionRevoked**: () => `Promise`\<`boolean`\>
+> **permissionRevoked**: () => `Promise`\<`boolean` \| `null`\>
 
-Defined in: [checkout/store.ts:443](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L443)
+Defined in: [checkout/store.ts:445](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L445)
 
 Tells Quasar that the wallet sent the transaction that revokes the permission (`autoCharge.revocation`): Quasar asks
-the chain (`POST permission/revoked`), and `checkout.autoCharge` follows what it finds.
+the chain (`POST permission/revoked`), and `checkout.autoCharge` follows what it finds. Neither the phase nor the
+error of the store change: it may be asked from any screen, and what that screen says stands.
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`\<`boolean` \| `null`\>
 
-Whether the permission has ended; `false` while the chain does not show it yet, or on an error.
+Whether the permission has ended; `false` while the chain does not show it yet; `null` when Quasar could not
+be asked.
 
 ***
 

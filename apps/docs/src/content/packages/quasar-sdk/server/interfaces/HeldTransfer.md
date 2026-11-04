@@ -102,7 +102,7 @@ Whether it arrived after the invoice expired or was cancelled.
 
 ### reason
 
-> **reason**: `"payer_mismatch"` \| `"payer_unconfirmed"` \| `"already_paid"`
+> **reason**: `"payer_mismatch"` \| `"payer_unconfirmed"` \| `"already_paid"` \| `"quote_changed"`
 
 Defined in: [modules/payments/types.ts:643](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L643)
 
