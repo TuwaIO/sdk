@@ -1,6 +1,6 @@
 # InvoiceDetails
 
-Defined in: [modules/payments/types.ts:429](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L429)
+Defined in: [modules/payments/types.ts:435](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L435)
 
 An invoice with its newest refunds and how many refunds and credit notes it has, as
 [PaymentsModule.getInvoice](/packages/quasar-sdk/server/classes/PaymentsModule.md#getinvoice) returns it. It also names what happened to the money, oldest first. Every refund and correction adds a credit note, so the full lists are
@@ -30,9 +30,19 @@ The payer's AML screening, once there was one.
 
 > **attempts**: [`InvoiceAttempt`](/packages/quasar-sdk/server/interfaces/InvoiceAttempt.md)[]
 
-Defined in: [modules/payments/types.ts:439](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L439)
+Defined in: [modules/payments/types.ts:445](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L445)
 
-Every transaction that did not pay it.
+The ten newest transactions that did not pay it, newest first; the ledger has them all.
+
+***
+
+### attemptsTotal
+
+> **attemptsTotal**: `number`
+
+Defined in: [modules/payments/types.ts:447](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L447)
+
+How many transactions did not pay it.
 
 ***
 
@@ -111,7 +121,7 @@ When it was created.
 
 > **creditNotesTotal**: `number`
 
-Defined in: [modules/payments/types.ts:435](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L435)
+Defined in: [modules/payments/types.ts:441](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L441)
 
 How many credit notes it has (one per refund and correction).
 
@@ -317,9 +327,9 @@ BT-13.
 
 > **payments**: [`InvoicePayment`](/packages/quasar-sdk/server/interfaces/InvoicePayment.md)[]
 
-Defined in: [modules/payments/types.ts:437](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L437)
+Defined in: [modules/payments/types.ts:443](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L443)
 
-Every transfer credited to it: an invoice paid in parts has several.
+Every transfer credited to it, oldest first, also through a correction: an invoice paid in parts has several.
 
 ***
 
@@ -411,7 +421,7 @@ Refunded so far, in the invoice currency.
 
 > **refunds**: [`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md)[]
 
-Defined in: [modules/payments/types.ts:431](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L431)
+Defined in: [modules/payments/types.ts:437](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L437)
 
 Its five newest refunds and every refund still under way (`requested`, `submitted`), newest first.
 
@@ -421,7 +431,7 @@ Its five newest refunds and every refund still under way (`requested`, `submitte
 
 > **refundsTotal**: `number`
 
-Defined in: [modules/payments/types.ts:433](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L433)
+Defined in: [modules/payments/types.ts:439](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L439)
 
 How many refunds it has.
 
@@ -688,6 +698,6 @@ When it last changed.
 
 > **walletConfirmations**: [`InvoiceWalletConfirmation`](/packages/quasar-sdk/server/interfaces/InvoiceWalletConfirmation.md)[]
 
-Defined in: [modules/payments/types.ts:441](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L441)
+Defined in: [modules/payments/types.ts:449](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L449)
 
-What the wallets that confirmed it signed.
+What the wallets that confirmed it signed, oldest first.

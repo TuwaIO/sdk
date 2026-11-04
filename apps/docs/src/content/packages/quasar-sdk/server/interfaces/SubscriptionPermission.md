@@ -1,6 +1,6 @@
 # SubscriptionPermission
 
-Defined in: [modules/payments/types.ts:825](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L825)
+Defined in: [modules/payments/types.ts:833](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L833)
 
 The automatic-charge permission a buyer granted (ERC-7715), without its context.
 
@@ -10,7 +10,7 @@ The automatic-charge permission a buyer granted (ERC-7715), without its context.
 
 > **chainId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:829](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L829)
+Defined in: [modules/payments/types.ts:837](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L837)
 
 CAIP-2 chain.
 
@@ -20,7 +20,7 @@ CAIP-2 chain.
 
 > **expiresAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:843](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L843)
+Defined in: [modules/payments/types.ts:851](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L851)
 
 When it expires.
 
@@ -30,7 +30,7 @@ When it expires.
 
 > **grantedAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:845](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L845)
+Defined in: [modules/payments/types.ts:853](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L853)
 
 When it was granted.
 
@@ -40,7 +40,7 @@ When it was granted.
 
 > **methodId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:831](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L831)
+Defined in: [modules/payments/types.ts:839](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L839)
 
 The payment method.
 
@@ -50,7 +50,7 @@ The payment method.
 
 > **payer**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:833](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L833)
+Defined in: [modules/payments/types.ts:841](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L841)
 
 The buyer's CAIP-10 account.
 
@@ -60,7 +60,7 @@ The buyer's CAIP-10 account.
 
 > **periodAmount**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:837](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L837)
+Defined in: [modules/payments/types.ts:845](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L845)
 
 Amount per window, in base units.
 
@@ -70,7 +70,7 @@ Amount per window, in base units.
 
 > **periodSeconds**: `number`
 
-Defined in: [modules/payments/types.ts:839](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L839)
+Defined in: [modules/payments/types.ts:847](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L847)
 
 Window length.
 
@@ -80,7 +80,7 @@ Window length.
 
 > **revokedAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:847](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L847)
+Defined in: [modules/payments/types.ts:855](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L855)
 
 When it was revoked.
 
@@ -90,7 +90,7 @@ When it was revoked.
 
 > **startsAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:841](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L841)
+Defined in: [modules/payments/types.ts:849](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L849)
 
 When the first window starts.
 
@@ -100,7 +100,7 @@ When the first window starts.
 
 > **status**: `"expired"` \| `"active"` \| `"revoked"`
 
-Defined in: [modules/payments/types.ts:827](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L827)
+Defined in: [modules/payments/types.ts:835](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L835)
 
 Whether it can still be charged.
 
@@ -110,6 +110,6 @@ Whether it can still be charged.
 
 > **tokenAddress**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:835](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L835)
+Defined in: [modules/payments/types.ts:843](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L843)
 
 The token.

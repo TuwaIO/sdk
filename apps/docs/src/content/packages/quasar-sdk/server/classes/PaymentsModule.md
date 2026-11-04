@@ -331,8 +331,8 @@ Defined in: [modules/payments/index.ts:121](https://github.com/TuwaIO/sdk/blob/m
 Reads an invoice with its five newest refunds, every refund still under way, and how many refunds and credit
 notes it has (`GET /v1/payments/invoices/:id`). The full lists are [PaymentsModule.listInvoiceRefunds](/packages/quasar-sdk/server/classes/PaymentsModule.md#listinvoicerefunds) and
 [PaymentsModule.listInvoiceDocuments](/packages/quasar-sdk/server/classes/PaymentsModule.md#listinvoicedocuments). It also names every transfer credited to it (`payments`: an invoice
-paid in parts has several), every transaction that did not pay it (`attempts`) and what the wallets that confirmed
-it signed (`walletConfirmations`).
+paid in parts has several), the newest transactions that did not pay it (`attempts`, `attemptsTotal`) and what the
+wallets that confirmed it signed (`walletConfirmations`).
 
 #### Parameters
 

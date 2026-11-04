@@ -334,10 +334,13 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     .object({
       txHash: z.string(),
       chainId: z.string().nullable(),
-      amount: z.string().openapi({ description: 'What it credited, in base units of the token of the quote.' }),
+      amount: z.string().openapi({ description: 'What it credited, in base units of the token of `methodId`.' }),
+      methodId: z.string().nullable().openapi({ description: 'The payment method paid with (`GET /methods`).' }),
       senders: z.array(z.string()),
       blockRef: z.string().nullable(),
-      at: z.string(),
+      at: z
+        .string()
+        .openapi({ description: 'When it was mined, or when it was verified if the network named no time.' }),
     })
     .openapi('InvoicePayment', { description: 'A transfer credited to an invoice.' });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -348,11 +351,15 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       txHash: z.string().nullable(),
       chainId: z.string().nullable(),
       reason: z.string().openapi({
-        description: 'Why it did not pay the invoice, such as `payer_mismatch`, `quote_expired` or `aml`.',
+        description: 'Why it did not pay the invoice, such as `reverted`, `no_matching_transfer` or `payer_mismatch`.',
       }),
-      held: z
-        .boolean()
-        .openapi({ description: 'It reached you and waits as a held transfer for a refund to its sender.' }),
+      amount: z.string().nullable().openapi({
+        description: "What it carried to you without paying anything, when it did: base units of the invoice's token.",
+      }),
+      senders: z.array(z.string()),
+      heldTransfer: z.string().nullable().openapi({
+        description: 'The held transfer it became, for a refund to its sender (`GET /invoices/:id/held-transfers`).',
+      }),
       at: z.string(),
     })
     .openapi('InvoiceAttempt', { description: 'A transaction that was tied to an invoice and did not pay it.' });
@@ -377,7 +384,8 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       at: z.string(),
     })
     .openapi('InvoiceWalletConfirmation', {
-      description: 'What a wallet signed to confirm an invoice: the evidence that this wallet pays it.',
+      description:
+        'What a wallet signed to confirm an invoice. A wallet that confirms may still not be the one that pays: `senders` of `payments` names who did.',
     });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkInvoiceWalletConfirmation: z.ZodType<InvoiceWalletConfirmation> = InvoiceWalletConfirmation;
@@ -391,10 +399,14 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       .number()
       .int()
       .openapi({ description: 'How many credit notes it has (one per refund and correction).' }),
-    payments: z
-      .array(InvoicePayment)
-      .openapi({ description: 'Every transfer credited to it, oldest first: an invoice paid in parts has several.' }),
-    attempts: z.array(InvoiceAttempt).openapi({ description: 'Every transaction that did not pay it, oldest first.' }),
+    payments: z.array(InvoicePayment).openapi({
+      description:
+        'Every transfer credited to it, oldest first, also through a correction: an invoice paid in parts has several.',
+    }),
+    attempts: z.array(InvoiceAttempt).openapi({
+      description: 'The ten newest transactions that did not pay it, newest first; the ledger has them all.',
+    }),
+    attemptsTotal: z.number().int().openapi({ description: 'How many transactions did not pay it.' }),
     walletConfirmations: z
       .array(InvoiceWalletConfirmation)
       .openapi({ description: 'What the wallets that confirmed it signed, oldest first.' }),

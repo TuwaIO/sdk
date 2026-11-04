@@ -374,13 +374,15 @@ export interface InvoicePayment {
   txHash: string;
   /** CAIP-2 chain ID of the transfer. */
   chainId: string | null;
-  /** What it credited, in base units of the token of the quote. */
+  /** What it credited, in base units of the token of `methodId`. */
   amount: string;
+  /** ID of the payment method paid with (see `listMethods`). */
+  methodId: string | null;
   /** The addresses that sent it. */
   senders: string[];
   /** Block (EVM) or slot (Solana). */
   blockRef: string | null;
-  /** When it was verified. */
+  /** When it was mined, or when it was verified if the network named no time. */
   at: string;
 }
 
@@ -390,15 +392,19 @@ export interface InvoiceAttempt {
   txHash: string | null;
   /** CAIP-2 chain ID of the transaction. */
   chainId: string | null;
-  /** Why it did not pay the invoice, such as `payer_mismatch`, `quote_expired` or `aml`. */
+  /** Why it did not pay the invoice, such as `reverted`, `no_matching_transfer` or `payer_mismatch`. */
   reason: string;
-  /** Whether it reached you and waits as a held transfer for a refund to its sender. */
-  held: boolean;
+  /** What it carried to you without paying anything, when it did: base units of the invoice's token. */
+  amount: string | null;
+  /** The addresses that sent what it carried. */
+  senders: string[];
+  /** The held transfer it became, for a refund to its sender (see `listHeldTransfers`, which keeps its state). */
+  heldTransfer: string | null;
   /** When it was recorded. */
   at: string;
 }
 
-/** What a wallet signed to confirm an invoice: the evidence that this wallet pays it. */
+/** What a wallet signed to confirm an invoice. A wallet that confirms may still not be the one that pays: `InvoicePayment.senders` names who did. */
 export interface InvoiceWalletConfirmation {
   /** The wallet, as a CAIP-10 account on the network it signed on. */
   account: string;
@@ -433,11 +439,13 @@ export interface InvoiceDetails extends Invoice {
   refundsTotal: number;
   /** How many credit notes it has (one per refund and correction). */
   creditNotesTotal: number;
-  /** Every transfer credited to it: an invoice paid in parts has several. */
+  /** Every transfer credited to it, oldest first, also through a correction: an invoice paid in parts has several. */
   payments: InvoicePayment[];
-  /** Every transaction that did not pay it. */
+  /** The ten newest transactions that did not pay it, newest first; the ledger has them all. */
   attempts: InvoiceAttempt[];
-  /** What the wallets that confirmed it signed. */
+  /** How many transactions did not pay it. */
+  attemptsTotal: number;
+  /** What the wallets that confirmed it signed, oldest first. */
   walletConfirmations: InvoiceWalletConfirmation[];
 }
 
