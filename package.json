@@ -14,7 +14,7 @@
     "format": "prettier --write .",
     "test": "pnpm --filter \"./packages/**\" test",
     "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && find . -name dist -type d -prune -exec rm -rf '{}' + && rm -rf .turbo",
-    "docs:gen": "rm -rf apps/docs/src/content/packages && node apps/docs/pages/packagePages.mjs && cp -R apps/docs/pages/meta/. apps/docs/src/content/packages/ && pnpm --filter @tuwaio/sdk-docs i18n:check",
+    "docs:gen": "rm -rf apps/docs/src/content/packages && node apps/docs/package-pages/packagePages.mjs && cp -R apps/docs/package-pages/meta/. apps/docs/src/content/packages/ && pnpm --filter @tuwaio/sdk-docs i18n:check",
     "prepare": "husky"
   },
   "repository": {

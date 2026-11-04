@@ -42,8 +42,8 @@ TUWA 按阶段构建，每个阶段都建立在之前的阶段之上：
 | 软件包                                       | 层级 | 提供的功能                                                                        | 对等依赖                                                     |
 | -------------------------------------------- | ---- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | [`@tuwaio/sdk`](/packages/sdk)               | L8   | 通过子路径提供 Orbit、Pulsar、Satellite Connect、SIWX 与 Nova UI Kit；Nova 样式表 | `react`, `react-dom` (>=19.2.3)                              |
-| [`@tuwaio/evm-sdk`](/packages/evm-sdk)       | L9   | Orbit、Satellite Connect、Pulsar、SIWX 与 Nova Connect 的 EVM 包                  | `@tuwaio/sdk` ≥ 0.4, `@wagmi/core` 3.x, `viem` 2.x           |
-| [`@tuwaio/solana-sdk`](/packages/solana-sdk) | L9   | Orbit、Satellite Connect、Pulsar、SIWX 与 Nova Connect 的 Solana 包               | `@tuwaio/sdk` ≥ 0.4, `@solana/kit` ≥ 8.2, Wallet Standard 包 |
+| [`@tuwaio/evm-sdk`](/packages/evm-sdk)       | L9   | Orbit、Satellite Connect、Pulsar、SIWX 与 Nova Connect 的 EVM 包                  | `@tuwaio/sdk` ≥ 0.6, `@wagmi/core` 3.x, `viem` 2.x           |
+| [`@tuwaio/solana-sdk`](/packages/solana-sdk) | L9   | Orbit、Satellite Connect、Pulsar、SIWX 与 Nova Connect 的 Solana 包               | `@tuwaio/sdk` ≥ 0.6, `@solana/kit` ≥ 8.2, Wallet Standard 包 |
 
 `@tuwaio/sdk`、`@tuwaio/evm-sdk` 与 `@tuwaio/solana-sdk` 的页面列出各自的子路径，并附有指向每个被重导出包参考文档的链接。
 

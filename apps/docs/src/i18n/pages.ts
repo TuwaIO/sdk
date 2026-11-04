@@ -3,7 +3,7 @@ import type { LocalizedPageLoaders } from '@tuwaio/docs-ui/nextra/page';
 /**
  * The translated pages of the site by route. Each translation mirrors its English page: `uk/index.mdx` translates
  * `src/content/index.mdx`, `uk/packages/index.mdx` the generated `src/content/packages/index.md` (whose text is
- * `pages/packages-overview.md`). Package READMEs and the API reference stay in English. `tuwa-docs-i18n-check` keeps
+ * `package-pages/packages-overview.md`). Package READMEs and the API reference stay in English. `tuwa-docs-i18n-check` keeps
  * the translations in line with the English pages.
  */
 export const localizedPages: Record<string, LocalizedPageLoaders> = {

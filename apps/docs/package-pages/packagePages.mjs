@@ -17,7 +17,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const out = join(root, 'apps/docs/src/content/packages');
 
 mkdirSync(out, { recursive: true });
-copyFileSync(join(root, 'apps/docs/pages/packages-overview.md'), join(out, 'index.md'));
+copyFileSync(join(root, 'apps/docs/package-pages/packages-overview.md'), join(out, 'index.md'));
 
 for (const name of ['sdk', 'evm-sdk', 'solana-sdk']) {
   mkdirSync(join(out, name), { recursive: true });

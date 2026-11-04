@@ -33,7 +33,7 @@ sdk/
 ├── apps/
 │   └── docs/                   # sdk.docs.tuwa.io (Next.js 16 + Nextra 4)
 │       ├── src/content/        # Introduction (MDX) + generated `packages/` pages
-│       └── pages/              # Packages overview page, page script and sidebar templates
+│       └── package-pages/      # Packages overview page, page script and sidebar templates
 ├── packages/
 │   ├── sdk/                    # L8: re-exports of the TUWA client packages and the Nova stylesheets
 │   ├── evm-sdk/                # L9: re-exports of the EVM packages
