@@ -17,6 +17,11 @@
       "import": "./dist/satellite.js",
       "require": "./dist/satellite.cjs"
     },
+    "./satellite/react": {
+      "types": "./dist/satellite-react.d.ts",
+      "import": "./dist/satellite-react.js",
+      "require": "./dist/satellite-react.cjs"
+    },
     "./nova-connect": {
       "types": "./dist/nova-connect.d.ts",
       "import": "./dist/nova-connect.js",
@@ -62,26 +67,6 @@
       "import": "./dist/nova-transactions-providers.js",
       "require": "./dist/nova-transactions-providers.cjs"
     },
-    "./nova-payments": {
-      "types": "./dist/nova-payments.d.ts",
-      "import": "./dist/nova-payments.js",
-      "require": "./dist/nova-payments.cjs"
-    },
-    "./nova-payments/i18n": {
-      "types": "./dist/nova-payments-i18n.d.ts",
-      "import": "./dist/nova-payments-i18n.js",
-      "require": "./dist/nova-payments-i18n.cjs"
-    },
-    "./nova-payments/evm": {
-      "types": "./dist/nova-payments-evm.d.ts",
-      "import": "./dist/nova-payments-evm.js",
-      "require": "./dist/nova-payments-evm.cjs"
-    },
-    "./nova-payments/solana": {
-      "types": "./dist/nova-payments-solana.d.ts",
-      "import": "./dist/nova-payments-solana.js",
-      "require": "./dist/nova-payments-solana.cjs"
-    },
     "./nova-transactions/i18n": {
       "types": "./dist/nova-transactions-i18n.d.ts",
       "import": "./dist/nova-transactions-i18n.js",
@@ -102,15 +87,9 @@
       "import": "./dist/orbit.js",
       "require": "./dist/orbit.cjs"
     },
-    "./quasar/checkout": {
-      "types": "./dist/quasar-checkout.d.ts",
-      "import": "./dist/quasar-checkout.js",
-      "require": "./dist/quasar-checkout.cjs"
-    },
     "./styles/nova-core.css": "./dist/styles/nova-core.css",
     "./styles/nova-transactions.css": "./dist/styles/nova-transactions.css",
     "./styles/nova-connect.css": "./dist/styles/nova-connect.css",
-    "./styles/nova-payments.css": "./dist/styles/nova-payments.css",
     "./styles/all.css": "./dist/styles/all.css",
     "./siwx": {
       "types": "./dist/siwx.d.ts",
@@ -202,12 +181,10 @@
     "@radix-ui/react-select": "^2.4.1",
     "@tuwaio/nova-connect": "1.0.0-feat-payments-alpha.39.88205eb5",
     "@tuwaio/nova-core": "1.0.0-feat-payments-alpha.39.88205eb5",
-    "@tuwaio/nova-payments": "1.0.0-feat-payments-alpha.39.88205eb5",
     "@tuwaio/nova-transactions": "1.0.0-feat-payments-alpha.39.88205eb5",
     "@tuwaio/orbit-core": "^0.6.0",
     "@tuwaio/pulsar-core": "^0.11.1",
     "@tuwaio/pulsar-react": "^0.7.0",
-    "@tuwaio/quasar-sdk": "workspace:^",
     "@tuwaio/satellite-core": "^0.11.2",
     "@tuwaio/satellite-react": "^0.10.2",
     "@tuwaio/siwx-core": "^0.7.1",
@@ -225,8 +202,6 @@
     "zustand": "^5.0.16"
   },
   "peerDependencies": {
-    "@solana-program/system": ">=0.15",
-    "@solana-program/token": ">=0.17",
     "@solana/kit": ">=8.2",
     "@tuwaio/orbit-evm": ">=0.3",
     "@tuwaio/orbit-solana": ">=0.4",
@@ -239,12 +214,6 @@
     "viem": "2.x.x"
   },
   "peerDependenciesMeta": {
-    "@solana-program/system": {
-      "optional": true
-    },
-    "@solana-program/token": {
-      "optional": true
-    },
     "@solana/kit": {
       "optional": true
     },
@@ -271,8 +240,6 @@
     }
   },
   "devDependencies": {
-    "@solana-program/system": "^0.15.0",
-    "@solana-program/token": "^0.17.0",
     "@solana/kit": "^8.5.0",
     "@tuwaio/orbit-evm": "^0.4.0",
     "@tuwaio/orbit-solana": "^0.7.2",

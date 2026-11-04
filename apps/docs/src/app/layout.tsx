@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: '%s – TUWA SDK',
   },
   description:
-    'Documentation for the TUWA SDK: @tuwaio/sdk and its EVM and Solana add-ons, one set of packages for React apps built on the TUWA ecosystem, and @tuwaio/quasar-sdk, the client of the Quasar API.',
+    'Documentation for the TUWA SDK: @tuwaio/sdk and its EVM and Solana add-ons, one set of packages for React apps built on the TUWA ecosystem.',
   manifest: '/manifest.json',
   icons: {
     icon: 'https://tuwa.io/brand/icon0.svg',
@@ -39,7 +39,6 @@ export const metadata: Metadata = {
     'solana',
     '@solana/kit',
     'siwx',
-    'quasar',
     'typescript',
   ],
   authors: [{ name: 'TUWA', url: 'https://github.com/TuwaIO' }],
@@ -47,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'TUWA SDK Documentation',
     description:
-      'Documentation for the TUWA SDK: @tuwaio/sdk and its EVM and Solana add-ons, one set of packages for React apps built on the TUWA ecosystem, and @tuwaio/quasar-sdk, the client of the Quasar API.',
+      'Documentation for the TUWA SDK: @tuwaio/sdk and its EVM and Solana add-ons, one set of packages for React apps built on the TUWA ecosystem.',
     url: 'https://sdk.docs.tuwa.io/',
     siteName: 'TUWA SDK Docs',
     images: [
@@ -65,7 +64,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'TUWA SDK Documentation',
     description:
-      'Documentation for the TUWA SDK: @tuwaio/sdk and its EVM and Solana add-ons, one set of packages for React apps built on the TUWA ecosystem, and @tuwaio/quasar-sdk, the client of the Quasar API.',
+      'Documentation for the TUWA SDK: @tuwaio/sdk and its EVM and Solana add-ons, one set of packages for React apps built on the TUWA ecosystem.',
     images: ['https://tuwa.io/brand/preview-logo.png'],
   },
 };

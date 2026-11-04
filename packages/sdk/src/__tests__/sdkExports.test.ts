@@ -5,15 +5,13 @@ import * as novaConnectComponents from '../nova-connect-components.js';
 import * as novaConnectHooks from '../nova-connect-hooks.js';
 import * as novaCore from '../nova-core.js';
 import * as novaCoreUtils from '../nova-core-utils.js';
-import * as novaPayments from '../nova-payments.js';
-import * as novaPaymentsI18n from '../nova-payments-i18n.js';
 import * as novaTransactions from '../nova-transactions.js';
 import * as novaTransactionsI18n from '../nova-transactions-i18n.js';
 import * as novaTransactionsProviders from '../nova-transactions-providers.js';
 import * as orbit from '../orbit.js';
 import * as pulsar from '../pulsar.js';
-import * as quasarCheckout from '../quasar-checkout.js';
 import * as satellite from '../satellite.js';
+import * as satelliteReact from '../satellite-react.js';
 import * as siwxReact from '../siwx.js';
 import * as siwxCore from '../siwx-core.js';
 import * as siwxServer from '../siwx-server.js';
@@ -82,24 +80,9 @@ describe('Unified SDK Re-Exports', () => {
     expect(novaConnectComponents.ConnectButton).toBeDefined();
   });
 
-  it('exports the checkout of Nova Payments, its labels, and the checkout store of the Quasar SDK it runs on', () => {
-    expect(typeof novaPayments.PaymentCheckout).toBe('function');
-    expect(typeof novaPayments.NovaPaymentsProvider).toBe('function');
-    expect(typeof novaPayments.useCheckoutContext).toBe('function');
-    expect(typeof novaPaymentsI18n.loadLabels).toBe('function');
-    expect(novaPaymentsI18n.CHECKOUT_LOCALES.map((locale) => locale.code)).toContain('uk');
-    expect(typeof quasarCheckout.createCheckoutStore).toBe('function');
-    expect(typeof quasarCheckout.createRefundStore).toBe('function');
-  });
-
-  it('keeps the chain adapters of Nova Payments out of its main subpath', () => {
-    expect('paymentsEVMAdapter' in novaPayments).toBe(false);
-    expect('paymentsSolanaAdapter' in novaPayments).toBe(false);
-  });
-
-  it('exports the chain adapters of Nova Payments from their own subpaths, for the add-ons', async () => {
-    expect(typeof (await import('../nova-payments-evm.js')).paymentsEVMAdapter).toBe('function');
-    expect(typeof (await import('../nova-payments-solana.js')).paymentsSolanaAdapter).toBe('function');
+  it('exports Satellite React with its own names from its own subpath, for the Payments module', () => {
+    expect(typeof satelliteReact.SatelliteConnectProvider).toBe('function');
+    expect(typeof satelliteReact.useSatelliteConnectStore).toBe('function');
   });
 
   it('exports transaction i18n labels from nova-transactions-i18n', () => {

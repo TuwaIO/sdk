@@ -4,7 +4,7 @@
   "private": true,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
-  "description": "Documentation site for the TUWA SDK (sdk.docs.tuwa.io): the Introduction and the pages of @tuwaio/sdk, @tuwaio/evm-sdk, @tuwaio/solana-sdk and @tuwaio/quasar-sdk.",
+  "description": "Documentation site for the TUWA SDK (sdk.docs.tuwa.io): the Introduction and the pages of @tuwaio/sdk, @tuwaio/evm-sdk and @tuwaio/solana-sdk.",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "tuwa-docs-i18n-check && next build && pnpm postbuild",

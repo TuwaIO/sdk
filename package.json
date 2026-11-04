@@ -5,7 +5,7 @@
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
   "packageManager": "pnpm@12.15.0",
-  "description": "Monorepo for the TUWA SDK: @tuwaio/sdk (L8) and its EVM and Solana add-ons (L9), which re-export the TUWA projects for React apps, and @tuwaio/quasar-sdk (L5), the client of the Quasar API.",
+  "description": "Monorepo for the TUWA SDK: @tuwaio/sdk (L8) and its EVM and Solana add-ons (L9), which re-export the TUWA projects for React apps.",
   "scripts": {
     "build": "pnpm --filter \"./packages/**\" build",
     "postinstall": "pnpm build",
@@ -14,8 +14,7 @@
     "format": "prettier --write .",
     "test": "pnpm --filter \"./packages/**\" test",
     "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && find . -name dist -type d -prune -exec rm -rf '{}' + && rm -rf .turbo",
-    "docs:gen": "rm -rf apps/docs/src/content/packages && typedoc && node apps/docs/typedoc/packagePages.mjs && cp -R apps/docs/typedoc/meta/. apps/docs/src/content/packages/ && pnpm --filter @tuwaio/sdk-docs i18n:check",
-    "openapi:gen": "tsx scripts/generate-openapi.ts",
+    "docs:gen": "rm -rf apps/docs/src/content/packages && node apps/docs/pages/packagePages.mjs && cp -R apps/docs/pages/meta/. apps/docs/src/content/packages/ && pnpm --filter @tuwaio/sdk-docs i18n:check",
     "prepare": "husky"
   },
   "repository": {
@@ -33,13 +32,10 @@
     }
   ],
   "devDependencies": {
-    "@asteasolutions/zod-to-openapi": "^9.1.0",
     "@eslint/js": "^10.0.1",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/release-notes-generator": "^14.1.1",
-    "@tuwaio/orbit-core": "^0.6.0",
-    "@tuwaio/pulsar-core": "^0.11.1",
     "@types/node": "^26.6.5",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
@@ -52,13 +48,8 @@
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "semantic-release": "^25.0.9",
-    "tsx": "^4.23.15",
-    "typedoc": "^0.28.20",
-    "typedoc-plugin-markdown": "^4.14.1",
     "typescript": "6.0.3",
     "typescript-eslint": "^8.72.1",
-    "vitest": "^5.0.5",
-    "yaml": "^2.9.1",
-    "zod": "^4.6.7"
+    "vitest": "^5.0.5"
   }
 }
