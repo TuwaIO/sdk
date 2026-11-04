@@ -242,6 +242,25 @@ describe('createCheckoutStore', () => {
     checkout.getState().destroy();
   });
 
+  it('goes back to the outcome when a quote finds the invoice final: nothing else would bring it back', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json(view({ invoice: { ...view().invoice, status: 'paid' } })))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: 'A paid invoice cannot be paid', code: 'invoice_not_payable' }), {
+          status: 409,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().phase).toBe('paid');
+    checkout.getState().selectMethod('ap_1');
+    checkout.getState().setPayer(QUOTE.payer);
+    expect(await checkout.getState().requestQuote()).toBeNull();
+    expect(checkout.getState()).toMatchObject({ phase: 'paid', error: null });
+    checkout.getState().destroy();
+  });
+
   // The line the merchant asks the buyer to tick before paying
   it('asks for a required consent before the quote, and sends the consent with it', async () => {
     const consent = { text: 'I ask Acme to start at once.', required: true };

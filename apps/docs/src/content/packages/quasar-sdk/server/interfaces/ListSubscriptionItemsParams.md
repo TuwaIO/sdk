@@ -1,6 +1,6 @@
 # ListSubscriptionItemsParams
 
-Defined in: [modules/payments/types.ts:974](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L974)
+Defined in: [modules/payments/types.ts:976](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L976)
 
 Paging of [PaymentsModule.listSubscriptionInvoices](/packages/quasar-sdk/server/classes/PaymentsModule.md#listsubscriptioninvoices) and [PaymentsModule.listSubscriptionCharges](/packages/quasar-sdk/server/classes/PaymentsModule.md#listsubscriptioncharges).
 
@@ -10,7 +10,7 @@ Paging of [PaymentsModule.listSubscriptionInvoices](/packages/quasar-sdk/server/
 
 > `optional` **cursor?**: `string`
 
-Defined in: [modules/payments/types.ts:978](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L978)
+Defined in: [modules/payments/types.ts:980](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L980)
 
 `nextCursor` of the previous page.
 
@@ -20,6 +20,6 @@ Defined in: [modules/payments/types.ts:978](https://github.com/TuwaIO/sdk/blob/m
 
 > `optional` **limit?**: `number`
 
-Defined in: [modules/payments/types.ts:976](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L976)
+Defined in: [modules/payments/types.ts:978](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L978)
 
 Page size, 1 to 100. Defaults to `20`.

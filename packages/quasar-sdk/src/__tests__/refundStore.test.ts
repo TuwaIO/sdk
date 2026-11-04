@@ -94,6 +94,7 @@ describe('createRefundStore', () => {
       decimals: 6,
       received: '50000000',
       atPaymentRate: '10000000',
+      exactPossible: true,
     };
     const preview = vi.fn().mockResolvedValue(shown);
     const request = vi.fn();
@@ -112,6 +113,15 @@ describe('createRefundStore', () => {
     const without = createRefundStore({ request, submit: vi.fn(), get: vi.fn() });
     expect(await without.getState().preview('inv_1')).toBeNull();
     expect(without.getState().error).toBeNull();
+  });
+
+  it('forgets an earlier refusal when asked to look again, even with no way to look first', async () => {
+    const refused = new QuasarSDKError('Too much', 400, new Error('x'), { code: 'amount_exceeds_refundable' });
+    const store = createRefundStore({ request: vi.fn().mockRejectedValue(refused), submit: vi.fn(), get: vi.fn() });
+    expect(await store.getState().start('inv_1', { amount: '999.00' })).toBe(false);
+    expect(store.getState().error?.code).toBe('amount_exceeds_refundable');
+    expect(await store.getState().preview('inv_1', { amount: '9.00' })).toBeNull();
+    expect(store.getState().error).toBeNull();
   });
 
   it('keeps the refusal of the server and lets the merchant try again', async () => {

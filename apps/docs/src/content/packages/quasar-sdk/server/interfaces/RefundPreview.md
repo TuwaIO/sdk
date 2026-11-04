@@ -58,6 +58,16 @@ Decimals of the token.
 
 ***
 
+### exactPossible
+
+> **exactPossible**: `boolean`
+
+Defined in: [modules/payments/types.ts:726](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L726)
+
+Whether `exact_received` would be taken now: it returns the whole invoice, so nothing may be refunded yet.
+
+***
+
 ### received
 
 > **received**: `string` \| `null`

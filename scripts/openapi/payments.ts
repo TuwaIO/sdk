@@ -522,6 +522,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       atPaymentRate: z.string().nullable().openapi({
         description: 'This amount at the rate of the payment, in base units; `null` for `exact_received`.',
       }),
+      exactPossible: z.boolean().openapi({
+        description: 'Whether `exact_received` would be taken now: it returns the whole invoice, so nothing may be refunded yet.',
+      }),
     })
     .openapi('RefundPreview');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

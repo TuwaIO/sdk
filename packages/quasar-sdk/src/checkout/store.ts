@@ -1756,6 +1756,12 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           const status = get().invoiceStatus;
           return status !== null && !PAYABLE.has(status);
         };
+        // The page goes back to the invoice's outcome, which nothing else would bring back: a final invoice has no events
+        const outcomeStands = () => {
+          const status = get().invoiceStatus;
+          if (status) update({ phase: phaseOfStatus(status), error: null });
+          return null;
+        };
         try {
           const quote = await api.quote({
             methodId,
@@ -1763,7 +1769,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
             ...(checkout?.consent && consentGiven && !rest ? { consentGiven: true } : {}),
           });
           // The invoice settled meanwhile: its outcome stands, and nothing follows it any more
-          if (settledMeanwhile()) return null;
+          if (settledMeanwhile()) return outcomeStands();
           update({ quote, phase: get().invoicePaymentOnTheWay ? 'confirming' : 'awaitingPayment' });
           return quote;
         } catch (error) {
@@ -1771,7 +1777,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           if (error instanceof QuasarSDKError && error.code === 'payer_proof_required' && payer) {
             proofDemanded.add(payer);
           }
-          if (settledMeanwhile()) return null;
+          if (settledMeanwhile()) return outcomeStands();
           const refusal = errorOf(error);
           // The rest has no methods to go back to, and its outcome says why, what the payment step has no text for
           if (rest && !LEAVES_REST.has(refusal.code)) update({ error: refusal, phase: 'underpaid' });

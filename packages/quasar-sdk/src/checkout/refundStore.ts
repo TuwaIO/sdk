@@ -152,8 +152,9 @@ export function createRefundStore(options: RefundStoreOptions): RefundStore {
       error: null,
 
       preview: async (invoiceId, params = {}) => {
-        if (!options.preview) return null;
+        // A refusal of an earlier try is over, whether or not this store can look first
         set({ error: null });
+        if (!options.preview) return null;
         try {
           return await options.preview(invoiceId, params);
         } catch (error) {

@@ -722,6 +722,8 @@ export interface RefundPreview {
   received: string | null;
   /** What this amount was worth in tokens at the rate of the payment, in base units; `null` for `exact_received`. */
   atPaymentRate: string | null;
+  /** Whether `exact_received` would be taken now: it returns the whole invoice, so nothing may be refunded yet. */
+  exactPossible: boolean;
 }
 
 /** What {@link PaymentsModule.submitRefund} takes. */
