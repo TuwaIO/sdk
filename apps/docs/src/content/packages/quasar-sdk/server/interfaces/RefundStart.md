@@ -1,6 +1,6 @@
 # RefundStart
 
-Defined in: [modules/payments/types.ts:612](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L612)
+Defined in: [modules/payments/types.ts:615](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L615)
 
 The answer of [PaymentsModule.refund](/packages/quasar-sdk/server/classes/PaymentsModule.md#refund): the refund and what to send where.
 
@@ -10,7 +10,7 @@ The answer of [PaymentsModule.refund](/packages/quasar-sdk/server/classes/Paymen
 
 > **instructions**: `object`
 
-Defined in: [modules/payments/types.ts:616](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L616)
+Defined in: [modules/payments/types.ts:619](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L619)
 
 The transfer to make from your wallet, then pass its hash to [PaymentsModule.submitRefund](/packages/quasar-sdk/server/classes/PaymentsModule.md#submitrefund).
 
@@ -56,6 +56,6 @@ Recipient: the payer.
 
 > **refund**: [`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md)
 
-Defined in: [modules/payments/types.ts:614](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L614)
+Defined in: [modules/payments/types.ts:617](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L617)
 
 The refund, `requested`.

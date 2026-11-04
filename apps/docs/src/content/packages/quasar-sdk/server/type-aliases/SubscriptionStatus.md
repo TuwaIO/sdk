@@ -2,7 +2,7 @@
 
 > **SubscriptionStatus** = `"trialing"` \| `"incomplete"` \| `"active"` \| `"past_due"` \| `"paused"` \| `"canceled"` \| `"ended"`
 
-Defined in: [modules/payments/types.ts:736](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L736)
+Defined in: [modules/payments/types.ts:739](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L739)
 
 State of a subscription: `trialing`, `incomplete` (its first or resumed period is unpaid), `active`, `past_due`,
 `paused`, `canceled`, `ended`.

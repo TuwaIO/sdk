@@ -168,7 +168,10 @@ export interface InvoiceQuote {
   payer: string;
   /** Token amount that settles the invoice, in base units. */
   cryptoAmountExpected: string | null;
-  /** What must still arrive, in base units: the whole amount, or the rest of an `underpaid` invoice. */
+  /**
+   * What must still arrive, in base units, while the invoice takes a payment: the whole amount, or the rest of an
+   * `underpaid` invoice. `null` otherwise.
+   */
   amountDue: string | null;
   /**
    * What the buyer sends, in base units: what must still arrive (the whole price, or the rest of an `underpaid` invoice)

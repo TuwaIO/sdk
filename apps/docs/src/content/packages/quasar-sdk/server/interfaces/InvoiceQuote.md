@@ -10,9 +10,10 @@ The price an invoice was quoted at, once a buyer chose how to pay.
 
 > **amountDue**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:172](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L172)
+Defined in: [modules/payments/types.ts:175](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L175)
 
-What must still arrive, in base units: the whole amount, or the rest of an `underpaid` invoice.
+What must still arrive, in base units, while the invoice takes a payment: the whole amount, or the rest of an
+`underpaid` invoice. `null` otherwise.
 
 ***
 
@@ -20,7 +21,7 @@ What must still arrive, in base units: the whole amount, or the rest of an `unde
 
 > **amountToSend**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:177](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L177)
+Defined in: [modules/payments/types.ts:180](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L180)
 
 What the buyer sends, in base units: what must still arrive (the whole price, or the rest of an `underpaid` invoice)
 grossed up for a token's transfer fee.
@@ -41,7 +42,7 @@ Token amount that settles the invoice, in base units.
 
 > **expiresAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:181](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L181)
+Defined in: [modules/payments/types.ts:184](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L184)
 
 When the quote expires.
 
@@ -51,7 +52,7 @@ When the quote expires.
 
 > **lockedAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:179](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L179)
+Defined in: [modules/payments/types.ts:182](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L182)
 
 When the quote was locked.
 
@@ -81,7 +82,7 @@ CAIP-10 account the quote was issued to.
 
 > **rate**: `unknown`
 
-Defined in: [modules/payments/types.ts:183](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L183)
+Defined in: [modules/payments/types.ts:186](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L186)
 
 The price rounds the quote used, as evidence.
 
@@ -91,6 +92,6 @@ The price rounds the quote used, as evidence.
 
 > **reference**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:185](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L185)
+Defined in: [modules/payments/types.ts:188](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L188)
 
 Solana Pay reference key of the quote.

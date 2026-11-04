@@ -1,6 +1,6 @@
 # ListInvoicesParams
 
-Defined in: [modules/payments/types.ts:404](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L404)
+Defined in: [modules/payments/types.ts:407](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L407)
 
 Filters and paging of [PaymentsModule.listInvoices](/packages/quasar-sdk/server/classes/PaymentsModule.md#listinvoices).
 
@@ -10,7 +10,7 @@ Filters and paging of [PaymentsModule.listInvoices](/packages/quasar-sdk/server/
 
 > `optional` **createdAfter?**: `string` \| `Date`
 
-Defined in: [modules/payments/types.ts:412](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L412)
+Defined in: [modules/payments/types.ts:415](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L415)
 
 Created at or after.
 
@@ -20,7 +20,7 @@ Created at or after.
 
 > `optional` **createdBefore?**: `string` \| `Date`
 
-Defined in: [modules/payments/types.ts:414](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L414)
+Defined in: [modules/payments/types.ts:417](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L417)
 
 Created before.
 
@@ -30,7 +30,7 @@ Created before.
 
 > `optional` **cursor?**: `string`
 
-Defined in: [modules/payments/types.ts:418](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L418)
+Defined in: [modules/payments/types.ts:421](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L421)
 
 `nextCursor` of the previous page.
 
@@ -40,7 +40,7 @@ Defined in: [modules/payments/types.ts:418](https://github.com/TuwaIO/sdk/blob/m
 
 > `optional` **environment?**: [`PaymentsEnvironment`](/packages/quasar-sdk/server/type-aliases/PaymentsEnvironment.md)
 
-Defined in: [modules/payments/types.ts:408](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L408)
+Defined in: [modules/payments/types.ts:411](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L411)
 
 Live or test invoices.
 
@@ -50,7 +50,7 @@ Live or test invoices.
 
 > `optional` **externalId?**: `string`
 
-Defined in: [modules/payments/types.ts:410](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L410)
+Defined in: [modules/payments/types.ts:413](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L413)
 
 `buyer.externalId`.
 
@@ -60,7 +60,7 @@ Defined in: [modules/payments/types.ts:410](https://github.com/TuwaIO/sdk/blob/m
 
 > `optional` **limit?**: `number`
 
-Defined in: [modules/payments/types.ts:416](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L416)
+Defined in: [modules/payments/types.ts:419](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L419)
 
 Page size, 1 to 100. Defaults to `20`.
 
@@ -70,6 +70,6 @@ Page size, 1 to 100. Defaults to `20`.
 
 > `optional` **status?**: [`InvoiceStatus`](/packages/quasar-sdk/server/type-aliases/InvoiceStatus.md) \| [`InvoiceStatus`](/packages/quasar-sdk/server/type-aliases/InvoiceStatus.md)[]
 
-Defined in: [modules/payments/types.ts:406](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L406)
+Defined in: [modules/payments/types.ts:409](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L409)
 
 One status or several.

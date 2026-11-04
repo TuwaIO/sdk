@@ -1,6 +1,6 @@
 # InvoiceSeller
 
-Defined in: [modules/payments/types.ts:212](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L212)
+Defined in: [modules/payments/types.ts:215](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L215)
 
 The seller of an invoice as printed, copied from the app's payment settings when it was issued. Every field may be
 missing or `null`: invoices issued before the address had its parts carry only `address`.
@@ -11,7 +11,7 @@ missing or `null`: invoices issued before the address had its parts carry only `
 
 > `optional` **address?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:218](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L218)
+Defined in: [modules/payments/types.ts:221](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L221)
 
 The postal address as one text, as the checkout shows it.
 
@@ -21,7 +21,7 @@ The postal address as one text, as the checkout shows it.
 
 > `optional` **addressLine1?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:220](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L220)
+Defined in: [modules/payments/types.ts:223](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L223)
 
 First address line.
 
@@ -31,7 +31,7 @@ First address line.
 
 > `optional` **addressLine2?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:222](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L222)
+Defined in: [modules/payments/types.ts:225](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L225)
 
 Second address line.
 
@@ -41,7 +41,7 @@ Second address line.
 
 > `optional` **city?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:226](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L226)
+Defined in: [modules/payments/types.ts:229](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L229)
 
 City.
 
@@ -51,7 +51,7 @@ City.
 
 > `optional` **country?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:228](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L228)
+Defined in: [modules/payments/types.ts:231](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L231)
 
 ISO 3166-1 alpha-2 country code.
 
@@ -61,7 +61,7 @@ ISO 3166-1 alpha-2 country code.
 
 > `optional` **legalName?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:214](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L214)
+Defined in: [modules/payments/types.ts:217](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L217)
 
 Legal name.
 
@@ -71,7 +71,7 @@ Legal name.
 
 > `optional` **postalCode?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:224](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L224)
+Defined in: [modules/payments/types.ts:227](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L227)
 
 Postal code.
 
@@ -81,7 +81,7 @@ Postal code.
 
 > `optional` **registrationNumber?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:230](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L230)
+Defined in: [modules/payments/types.ts:233](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L233)
 
 Company registration number.
 
@@ -91,7 +91,7 @@ Company registration number.
 
 > `optional` **supportEmail?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:234](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L234)
+Defined in: [modules/payments/types.ts:237](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L237)
 
 Support email address.
 
@@ -101,7 +101,7 @@ Support email address.
 
 > `optional` **taxId?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:232](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L232)
+Defined in: [modules/payments/types.ts:235](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L235)
 
 VAT or other tax ID.
 
@@ -111,7 +111,7 @@ VAT or other tax ID.
 
 > `optional` **tradingName?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:216](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L216)
+Defined in: [modules/payments/types.ts:219](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L219)
 
 The name buyers know.
 
@@ -121,6 +121,6 @@ The name buyers know.
 
 > `optional` **website?**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:236](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L236)
+Defined in: [modules/payments/types.ts:239](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L239)
 
 Website.

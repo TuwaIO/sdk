@@ -2,7 +2,7 @@
 
 > **createCheckoutStore**(`options`): [`CheckoutStore`](/packages/quasar-sdk/checkout/type-aliases/CheckoutStore.md)
 
-Defined in: [checkout/store.ts:978](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L978)
+Defined in: [checkout/store.ts:980](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L980)
 
 Creates the headless checkout of one invoice for the buyer's browser: a vanilla Zustand store with the invoice,
 its methods, the locked quote and where the payment stands, and the actions that move it on. The wallet is the

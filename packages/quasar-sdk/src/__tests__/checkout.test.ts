@@ -2788,7 +2788,12 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
   // The rest of an underpaid invoice has a payment step, and the invoice stays underpaid during it
   describe('on the payment step of a rest', () => {
     const rest = { ...QUOTE, cryptoAmountExpected: '49000000', amountDue: '48000000', amountToSend: '48000000' };
-    const invoice = { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'];
+    const invoice = {
+      ...view().invoice,
+      status: 'underpaid',
+      amountPaid: '1000000',
+      restPayable: true,
+    } as CheckoutView['invoice'];
     const event = (amountPaid: string, signals = {}) => ({
       ...signal('underpaid', 7, signals),
       amountPaid,
@@ -2847,6 +2852,129 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
         quote: { amountDue: '48000000' },
         payer: another,
       });
+      checkout.getState().destroy();
+    });
+
+    it('keeps a rest that may still arrive on its check, and never offers it again', async () => {
+      // Reopened: Quasar reads a rest again
+      fetchMock.mockResolvedValueOnce(
+        json(view({ invoice: { ...invoice, unresolvedPayments: 1, pendingPayments: 0 }, quote: rest as never })),
+      );
+      const checkout = store();
+      await checkout.getState().load();
+      expect(checkout.getState().phase).toBe('unconfirmed');
+      FakeEventSource.instances.at(-1)!.emit('status', event('1000000', { pendingPayments: 0, unresolvedPayments: 1 }));
+      expect(checkout.getState().phase).toBe('unconfirmed');
+      checkout.getState().destroy();
+    });
+
+    it('keeps a rest that went unanswered on its check when an event follows', async () => {
+      const { checkout, events } = await onRest();
+      fetchMock.mockRejectedValueOnce(new TypeError('offline')).mockRejectedValueOnce(new TypeError('offline'));
+      fetchMock.mockRejectedValue(new TypeError('offline'));
+      await checkout.getState().submit({ txKey: '0xFEED' });
+      expect(checkout.getState()).toMatchObject({
+        phase: 'unconfirmed',
+        error: { code: 'payment_unconfirmed', reason: 'submit_retrying' },
+      });
+      events.emit('status', event('1000000', { pendingPayments: 0 }));
+      expect(checkout.getState().phase).toBe('unconfirmed');
+      checkout.getState().destroy();
+    });
+
+    it('keeps the question open on a rest another invoice handed over first: no second payment', async () => {
+      const { checkout, events } = await onRest();
+      fetchMock.mockResolvedValueOnce(
+        json({ error: { code: 'tx_already_used', message: 'Tracked for another invoice' } }, 409),
+      );
+      await checkout.getState().submit({ txKey: '0xFEED' });
+      expect(checkout.getState()).toMatchObject({ phase: 'unconfirmed', error: { code: 'payment_unconfirmed' } });
+      const asked = checkout.getState().error;
+      events.emit('status', event('1000000', { pendingPayments: 1, unresolvedPayments: 1 }));
+      expect(checkout.getState()).toMatchObject({ phase: 'unconfirmed', error: asked });
+      checkout.getState().destroy();
+    });
+
+    it('asks to check a rest that stopped counting as on its way without more money arriving', async () => {
+      const { checkout, events } = await onRest();
+      fetchMock.mockResolvedValueOnce(json({ txKey: '0xfeed', status: 'underpaid' }, 202));
+      vi.useFakeTimers({ toFake: ['Date'] });
+      await checkout.getState().submit({ txKey: '0xFEED' });
+      events.emit('status', event('1000000', { pendingPayments: 1, unresolvedPayments: 0, rejectedPayments: [] }));
+      expect(checkout.getState().phase).toBe('confirming');
+      // Quasar counts a stuck transaction for 25 minutes
+      vi.setSystemTime(Date.now() + 26 * 60_000);
+      events.emit(
+        'status',
+        event('1000000', { pendingPayments: 0, unresolvedPayments: 1, rejectedPayments: [], ledgerSeq: 8 } as object),
+      );
+      expect(checkout.getState().phase).toBe('unconfirmed');
+      checkout.getState().destroy();
+    });
+
+    it('goes to the outcome when the rest stayed short: more money arrived', async () => {
+      const { checkout, events } = await onRest();
+      fetchMock.mockResolvedValueOnce(json({ txKey: '0xfeed', status: 'underpaid' }, 202));
+      await checkout.getState().submit({ txKey: '0xFEED' });
+      fetchMock.mockResolvedValueOnce(
+        json(view({ invoice: { ...invoice, amountPaid: '2000000' }, quote: rest as never })),
+      );
+      events.emit('status', event('2000000', { pendingPayments: 0 }));
+      expect(checkout.getState()).toMatchObject({ phase: 'underpaid', paymentOnTheWay: false });
+      checkout.getState().destroy();
+    });
+
+    it('leaves the payment step when a read says the rest can no longer be paid', async () => {
+      fetchMock
+        .mockResolvedValueOnce(json(view({ invoice: { ...invoice, restPayable: true }, quote: rest as never })))
+        .mockResolvedValueOnce(json(rest))
+        .mockResolvedValueOnce(json(view({ invoice: { ...invoice, restPayable: false }, quote: rest as never })));
+      vi.useFakeTimers();
+      const checkout = store({ EventSource: null });
+      await checkout.getState().load();
+      checkout.getState().setPayer(QUOTE.payer);
+      await checkout.getState().requestQuote();
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(checkout.getState().phase).toBe('underpaid');
+      checkout.getState().destroy();
+    });
+
+    // Refused from the payment step (a renewal): the outcome says why, the payment step has no text for these
+    it.each(['method_not_found', 'rate_limited', 'payer_blocked'])('goes to the outcome on %s', async (code) => {
+      const { checkout } = await onRest();
+      fetchMock.mockResolvedValueOnce(json({ error: { code, message: 'Refused' } }, 409));
+      expect(await checkout.getState().requestQuote()).toBeNull();
+      expect(checkout.getState()).toMatchObject({ phase: 'underpaid', error: { code } });
+      checkout.getState().destroy();
+    });
+
+    it('keeps an outcome that arrived during the quote', async () => {
+      const { checkout, events } = await onRest();
+      let answerQuote: (response: Response) => void = () => undefined;
+      fetchMock.mockImplementationOnce(() => new Promise((resolve) => (answerQuote = resolve)));
+      const asked = checkout.getState().requestQuote();
+      fetchMock.mockResolvedValueOnce(
+        json(view({ invoice: { ...invoice, status: 'paid' } as never, quote: rest as never })),
+      );
+      events.emit('status', { ...event('49000000'), status: 'paid' });
+      answerQuote(json(rest));
+      await asked;
+      expect(checkout.getState().phase).toBe('paid');
+      checkout.getState().destroy();
+    });
+
+    it('forgets what went wrong before when a first part arrives: that is the answer', async () => {
+      fetchMock
+        .mockResolvedValueOnce(json(view({ quote: QUOTE as never })))
+        .mockResolvedValueOnce(json({ error: { code: 'method_not_found', message: 'No such method' } }, 404))
+        .mockResolvedValueOnce(json(view({ invoice, quote: rest as never })));
+      const checkout = store();
+      await checkout.getState().load();
+      checkout.getState().setPayer(QUOTE.payer);
+      await checkout.getState().requestQuote();
+      expect(checkout.getState().error).toMatchObject({ code: 'method_not_found' });
+      FakeEventSource.instances[0].emit('status', event('1000000'));
+      expect(checkout.getState()).toMatchObject({ phase: 'underpaid', error: null });
       checkout.getState().destroy();
     });
 

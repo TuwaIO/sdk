@@ -241,7 +241,8 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           payer: z.string(),
           cryptoAmountExpected: z.string().nullable(),
           amountDue: z.string().nullable().openapi({
-            description: 'What must still arrive: the whole price, or the rest of an `underpaid` invoice.',
+            description:
+              'What must still arrive while the invoice takes a payment: the whole price, or the rest of an `underpaid` invoice. `null` otherwise.',
           }),
           amountToSend: z.string().nullable().openapi({
             description:

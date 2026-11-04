@@ -709,17 +709,16 @@ const quoteValid = (quote: CheckoutQuote | null, now: number): quote is Checkout
 const OUTCOMES: ReadonlySet<string> = new Set([...FINAL, 'underpaid']);
 
 /**
- * Whether the buyer stays on the payment step of the rest of an underpaid invoice: it stays underpaid during it, and
- * the quote of the rest is itself an event. Only more money arriving makes the amounts of the quote old.
+ * Where a page stays while an underpaid invoice stays as it was: paying its rest, whose quote is itself an event, or
+ * following a rest on its way or one that may still arrive. Only more money arriving leaves them for the outcome.
  */
-function payingRest(phase: CheckoutPhase, quote: CheckoutQuote | null, event: CheckoutStatusEvent): boolean {
-  if (event.status !== 'underpaid') return false;
-  if (phase === 'quoting') return true;
-  if (phase !== 'awaitingPayment' && phase !== 'submitting') return false;
-  return (
-    Boolean(quote) && BigInt(quote!.cryptoAmountExpected) - BigInt(event.amountPaid ?? 0) === BigInt(quote!.amountDue)
-  );
-}
+const KEEPS_REST: ReadonlySet<CheckoutPhase> = new Set([
+  'quoting',
+  'awaitingPayment',
+  'submitting',
+  'confirming',
+  'unconfirmed',
+]);
 
 /** The phase an invoice state stands for, once a payment is under way or over. */
 function phaseOfStatus(status: InvoiceStatus): CheckoutPhase {
@@ -759,6 +758,9 @@ const PHASE_OF_REFUSAL: Record<string, CheckoutPhase> = {
   payer_mismatch: 'underpaid',
   rest_method_mismatch: 'underpaid',
 };
+
+/** Refusals of a quote of a rest that do not lead back to the underpaid outcome. */
+const LEAVES_REST: ReadonlySet<string> = new Set(['invoice_expired', 'invoice_processing']);
 
 /** How a payment the store follows, or the latest one of a reopened page, ended without paying the invoice. */
 type Ending = {
@@ -996,6 +998,8 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
   let adopted = false;
   /** The keys of the failed payments Quasar listed last, and of the ones it had listed when the payment was taken. */
   let knownRejected: string[] = [];
+  /** What Quasar last said arrived: an underpaid invoice stays underpaid when more does. */
+  let lastPaid: string | null = null;
   let rejectedAtHandOver: ReadonlySet<string> = new Set();
   /** When the payment was handed over, and how many hand-overs so far (a read started before the last one is stale). */
   let handedOverAt = 0;
@@ -1290,15 +1294,19 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       }
       const followed = paymentOnTheWay || adopted;
       const pending = event.pendingPayments ?? 0;
+      const paidMoved = event.amountPaid !== undefined && event.amountPaid !== null && event.amountPaid !== lastPaid;
+      if (paidMoved) lastPaid = event.amountPaid;
+      // An underpaid invoice that stays as it was: its rest is being paid, on its way, or may still arrive
+      const restStands = previous === 'underpaid' && event.status === 'underpaid' && !paidMoved;
       // How the payment the store follows ended, when it did without settling
       let ended: Ending | null = null;
       if (followed && current && UNSETTLED.has(event.status)) {
         ended = rejectionNow(event, rejections);
-        // No longer on its way and not rejected on an open invoice: Quasar stopped counting a stuck transaction (it
-        // counts one for 25 minutes), or one the page found on its way. It may still have gone through
+        // No longer on its way and not rejected on an invoice that stays as it was: Quasar stopped counting a stuck
+        // transaction (it counts one for 25 minutes), or one the page found on its way. It may still have gone through
         if (
           !ended &&
-          event.status === 'open' &&
+          (event.status === 'open' || restStands) &&
           event.pendingPayments === 0 &&
           event.rejectedPayments &&
           (adopted || Date.now() - handedOverAt >= TRACKING_CEILING_MS) &&
@@ -1338,15 +1346,30 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         });
       } else if (event.status === 'open') {
         if (phase === 'loading') partial.phase = 'selectMethod';
-      } else if (!(previous === 'underpaid' && payingRest(phase, get().quote, event))) {
+      } else if (
+        !restStands ||
+        !KEEPS_REST.has(phase) ||
+        // A read says the rest can no longer be paid, with nothing of it on its way
+        (phase === 'awaitingPayment' && view?.invoice.restPayable === false)
+      ) {
         partial.phase = phaseOfStatus(event.status);
+        // A first part arrived: that is the answer to what went wrong before, unless it moved money without counting
+        const earlier = get().error;
+        if (
+          event.status === 'underpaid' &&
+          previous !== 'underpaid' &&
+          earlier &&
+          earlier.code !== 'payment_mismatch'
+        ) {
+          partial.error = null;
+        }
       }
       if (followed && !ended) {
         const nothingOnItsWay = current && event.pendingPayments === 0;
         const settled =
           SETTLED.has(event.status) ||
           // It made the invoice underpaid, or topped up an underpaid one that stays short
-          (event.status === 'underpaid' && (previous !== 'underpaid' || nothingOnItsWay)) ||
+          (event.status === 'underpaid' && !restStands) ||
           // A read of the expired or cancelled invoice: Quasar has no payment of it on its way any longer
           (CLOSED.has(event.status) && view !== undefined && nothingOnItsWay);
         if (settled) Object.assign(partial, paymentEnded());
@@ -1373,7 +1396,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       if (
         claimShown &&
         partial.error === undefined &&
-        (event.status === 'processing' || event.status === 'underpaid' || SETTLED.has(event.status))
+        (event.status === 'processing' || (event.status === 'underpaid' && !restStands) || SETTLED.has(event.status))
       ) {
         partial.error = null;
       }
@@ -1612,6 +1635,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           const { invoice } = view;
           const rejections = rejectionsOf(invoice);
           if (rejections) knownRejected = rejections.flatMap(({ keys }) => keys);
+          lastPaid = invoice.amountPaid;
           let phase = phaseOfView(view, Date.now());
           let error: CheckoutError | null = null;
           // A payment of the invoice is on its way (the page was reloaded or reopened): follow it, offer no payment
@@ -1718,20 +1742,30 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           return null;
         }
         update({ phase: 'quoting', error: null });
+        const settledMeanwhile = () => {
+          const status = get().invoiceStatus;
+          return status !== null && !PAYABLE.has(status);
+        };
         try {
           const quote = await api.quote({
             methodId,
             ...(payer ? { payer } : {}),
             ...(checkout?.consent && consentGiven && !rest ? { consentGiven: true } : {}),
           });
-          update({ quote, phase: 'awaitingPayment' });
+          // The invoice settled meanwhile: its outcome stands, and nothing follows it any more
+          if (settledMeanwhile()) return null;
+          update({ quote, phase: get().invoicePaymentOnTheWay ? 'confirming' : 'awaitingPayment' });
           return quote;
         } catch (error) {
           // A wallet Quasar wants confirmed first, although the checkout did not say so (read before the method changed)
           if (error instanceof QuasarSDKError && error.code === 'payer_proof_required' && payer) {
             proofDemanded.add(payer);
           }
-          fail(error, phase === 'quoting' ? 'selectMethod' : phase);
+          if (settledMeanwhile()) return null;
+          const refusal = errorOf(error);
+          // The rest has no methods to go back to, and its outcome says why, what the payment step has no text for
+          if (rest && !LEAVES_REST.has(refusal.code)) update({ error: refusal, phase: 'underpaid' });
+          else fail(error, phase === 'quoting' ? 'selectMethod' : phase);
           return null;
         }
       },
