@@ -1,6 +1,6 @@
 # Subscription
 
-Defined in: [modules/payments/types.ts:781](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L781)
+Defined in: [modules/payments/types.ts:784](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L784)
 
 A subscription as the Payments API returns it.
 
@@ -10,7 +10,7 @@ A subscription as the Payments API returns it.
 
 > **buyer**: [`Buyer`](/packages/quasar-sdk/server/interfaces/Buyer.md) \| `null`
 
-Defined in: [modules/payments/types.ts:791](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L791)
+Defined in: [modules/payments/types.ts:794](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L794)
 
 The buyer.
 
@@ -20,7 +20,7 @@ The buyer.
 
 > **cancelAtPeriodEnd**: `boolean`
 
-Defined in: [modules/payments/types.ts:823](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L823)
+Defined in: [modules/payments/types.ts:826](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L826)
 
 Whether it is canceled when the running period ends.
 
@@ -30,7 +30,7 @@ Whether it is canceled when the running period ends.
 
 > **canceledAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:825](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L825)
+Defined in: [modules/payments/types.ts:828](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L828)
 
 When it was canceled.
 
@@ -40,7 +40,7 @@ When it was canceled.
 
 > **cancellationReason**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:827](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L827)
+Defined in: [modules/payments/types.ts:830](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L830)
 
 Why.
 
@@ -50,7 +50,7 @@ Why.
 
 > **collection**: `"send_invoice"` \| `"auto_charge"`
 
-Defined in: [modules/payments/types.ts:805](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L805)
+Defined in: [modules/payments/types.ts:808](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L808)
 
 How it is collected.
 
@@ -60,7 +60,7 @@ How it is collected.
 
 > **createdAt**: `string`
 
-Defined in: [modules/payments/types.ts:835](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L835)
+Defined in: [modules/payments/types.ts:838](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L838)
 
 When it was created.
 
@@ -70,7 +70,7 @@ When it was created.
 
 > **currency**: [`PaymentsCurrency`](/packages/quasar-sdk/server/type-aliases/PaymentsCurrency.md)
 
-Defined in: [modules/payments/types.ts:797](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L797)
+Defined in: [modules/payments/types.ts:800](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L800)
 
 Currency.
 
@@ -80,7 +80,7 @@ Currency.
 
 > **currentPeriod**: `number`
 
-Defined in: [modules/payments/types.ts:813](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L813)
+Defined in: [modules/payments/types.ts:816](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L816)
 
 The running period, from 1 (0 during a trial).
 
@@ -90,7 +90,7 @@ The running period, from 1 (0 during a trial).
 
 > **currentPeriodEnd**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:817](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L817)
+Defined in: [modules/payments/types.ts:820](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L820)
 
 End of the running period.
 
@@ -100,7 +100,7 @@ End of the running period.
 
 > **currentPeriodStart**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:815](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L815)
+Defined in: [modules/payments/types.ts:818](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L818)
 
 Start of the running period.
 
@@ -110,7 +110,7 @@ Start of the running period.
 
 > **cycles**: `number` \| `null`
 
-Defined in: [modules/payments/types.ts:819](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L819)
+Defined in: [modules/payments/types.ts:822](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L822)
 
 Periods bought.
 
@@ -120,7 +120,7 @@ Periods bought.
 
 > **endedAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:831](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L831)
+Defined in: [modules/payments/types.ts:834](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L834)
 
 When it ended.
 
@@ -130,7 +130,7 @@ When it ended.
 
 > **endsAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:821](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L821)
+Defined in: [modules/payments/types.ts:824](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L824)
 
 When it ends.
 
@@ -140,7 +140,7 @@ When it ends.
 
 > **environment**: [`PaymentsEnvironment`](/packages/quasar-sdk/server/type-aliases/PaymentsEnvironment.md)
 
-Defined in: [modules/payments/types.ts:789](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L789)
+Defined in: [modules/payments/types.ts:792](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L792)
 
 Live or test.
 
@@ -150,7 +150,7 @@ Live or test.
 
 > **expectedPayer**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:793](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L793)
+Defined in: [modules/payments/types.ts:796](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L796)
 
 The CAIP-10 account you expect to pay.
 
@@ -160,7 +160,7 @@ The CAIP-10 account you expect to pay.
 
 > **graceDays**: `number`
 
-Defined in: [modules/payments/types.ts:811](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L811)
+Defined in: [modules/payments/types.ts:814](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L814)
 
 Grace days.
 
@@ -170,7 +170,7 @@ Grace days.
 
 > **id**: `string`
 
-Defined in: [modules/payments/types.ts:783](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L783)
+Defined in: [modules/payments/types.ts:786](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L786)
 
 Subscription ID.
 
@@ -180,7 +180,7 @@ Subscription ID.
 
 > **interval**: [`SubscriptionInterval`](/packages/quasar-sdk/server/type-aliases/SubscriptionInterval.md)
 
-Defined in: [modules/payments/types.ts:799](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L799)
+Defined in: [modules/payments/types.ts:802](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L802)
 
 Period unit.
 
@@ -190,7 +190,7 @@ Period unit.
 
 > **intervalCount**: `number`
 
-Defined in: [modules/payments/types.ts:801](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L801)
+Defined in: [modules/payments/types.ts:804](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L804)
 
 Units per period.
 
@@ -200,7 +200,7 @@ Units per period.
 
 > **lineItems**: [`InvoiceLineInput`](/packages/quasar-sdk/server/interfaces/InvoiceLineInput.md)[]
 
-Defined in: [modules/payments/types.ts:795](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L795)
+Defined in: [modules/payments/types.ts:798](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L798)
 
 The plan's lines, as you sent them.
 
@@ -210,7 +210,7 @@ The plan's lines, as you sent them.
 
 > **metadata**: `Record`\<`string`, `unknown`\> \| `null`
 
-Defined in: [modules/payments/types.ts:833](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L833)
+Defined in: [modules/payments/types.ts:836](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L836)
 
 Your data.
 
@@ -220,7 +220,7 @@ Your data.
 
 > **object**: `"subscription"`
 
-Defined in: [modules/payments/types.ts:785](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L785)
+Defined in: [modules/payments/types.ts:788](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L788)
 
 Always `subscription`.
 
@@ -230,7 +230,7 @@ Always `subscription`.
 
 > **pausedAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:829](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L829)
+Defined in: [modules/payments/types.ts:832](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L832)
 
 When it was paused.
 
@@ -240,7 +240,7 @@ When it was paused.
 
 > **permission**: [`SubscriptionPermission`](/packages/quasar-sdk/server/interfaces/SubscriptionPermission.md) \| `null`
 
-Defined in: [modules/payments/types.ts:809](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L809)
+Defined in: [modules/payments/types.ts:812](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L812)
 
 The automatic-charge permission, once granted.
 
@@ -250,7 +250,7 @@ The automatic-charge permission, once granted.
 
 > **preferredMethodId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:807](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L807)
+Defined in: [modules/payments/types.ts:810](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L810)
 
 The preferred payment method.
 
@@ -260,7 +260,7 @@ The preferred payment method.
 
 > **status**: [`SubscriptionStatus`](/packages/quasar-sdk/server/type-aliases/SubscriptionStatus.md)
 
-Defined in: [modules/payments/types.ts:787](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L787)
+Defined in: [modules/payments/types.ts:790](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L790)
 
 State.
 
@@ -270,6 +270,6 @@ State.
 
 > **trialDays**: `number`
 
-Defined in: [modules/payments/types.ts:803](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L803)
+Defined in: [modules/payments/types.ts:806](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L806)
 
 Trial days.

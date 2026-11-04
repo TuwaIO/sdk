@@ -1,6 +1,6 @@
 # PayerProofMessage
 
-Defined in: [checkout/types.ts:324](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L324)
+Defined in: [checkout/types.ts:330](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L330)
 
 What `POST payer-proof/message` answers: the exact EIP-4361 (Sign-In with Ethereum) message the wallet signs, for
 free and without moving funds, to confirm that it pays this invoice. Quasar builds it from the page's site (its
@@ -13,7 +13,7 @@ the wallet, the invoice's creation (`Issued At`) and due date (`Expiration Time`
 
 > **chainId**: `string`
 
-Defined in: [checkout/types.ts:336](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L336)
+Defined in: [checkout/types.ts:342](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L342)
 
 The CAIP-2 network of the wallet.
 
@@ -23,7 +23,7 @@ The CAIP-2 network of the wallet.
 
 > **domain**: `string`
 
-Defined in: [checkout/types.ts:334](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L334)
+Defined in: [checkout/types.ts:340](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L340)
 
 The site the message names: the host of the page that asked.
 
@@ -33,7 +33,7 @@ The site the message names: the host of the page that asked.
 
 > **expiresAt**: `string` \| `null`
 
-Defined in: [checkout/types.ts:342](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L342)
+Defined in: [checkout/types.ts:348](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L348)
 
 The invoice's due date (`Expiration Time`), `null` without one.
 
@@ -43,7 +43,7 @@ The invoice's due date (`Expiration Time`), `null` without one.
 
 > **issuedAt**: `string`
 
-Defined in: [checkout/types.ts:340](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L340)
+Defined in: [checkout/types.ts:346](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L346)
 
 When the invoice was created (`Issued At`).
 
@@ -53,7 +53,7 @@ When the invoice was created (`Issued At`).
 
 > **message**: `string`
 
-Defined in: [checkout/types.ts:332](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L332)
+Defined in: [checkout/types.ts:338](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L338)
 
 The message to sign as it is, with `personal_sign` (EIP-191).
 
@@ -63,7 +63,7 @@ The message to sign as it is, with `personal_sign` (EIP-191).
 
 > **nonce**: `string`
 
-Defined in: [checkout/types.ts:338](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L338)
+Defined in: [checkout/types.ts:344](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L344)
 
 The nonce of the message.
 
@@ -73,7 +73,7 @@ The nonce of the message.
 
 > **object**: `"payer_proof_message"`
 
-Defined in: [checkout/types.ts:326](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L326)
+Defined in: [checkout/types.ts:332](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L332)
 
 Always `payer_proof_message`.
 
@@ -83,7 +83,7 @@ Always `payer_proof_message`.
 
 > **payer**: `string`
 
-Defined in: [checkout/types.ts:328](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L328)
+Defined in: [checkout/types.ts:334](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L334)
 
 The wallet, as a CAIP-10 account (the EVM address checksummed).
 
@@ -93,6 +93,6 @@ The wallet, as a CAIP-10 account (the EVM address checksummed).
 
 > **proven**: `boolean`
 
-Defined in: [checkout/types.ts:330](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L330)
+Defined in: [checkout/types.ts:336](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L336)
 
 `true` when the wallet confirmed this invoice already (on this network, for a smart wallet): nothing to sign.

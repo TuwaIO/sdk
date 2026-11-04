@@ -61,6 +61,12 @@ export interface CheckoutInvoice {
   /** Base units of the quoted asset received so far: an underpaid invoice asks for the rest. */
   amountPaid: string | null;
   /**
+   * Whether the rest of an underpaid invoice can be quoted now ({@link CheckoutQuote.amountDue}): its method is still on
+   * and its rate still holds. A stablecoin of the invoice currency holds it until the due date, any other asset only as
+   * long as the quote that locked the rate. `false` for an invoice in any other state.
+   */
+  restPayable: boolean;
+  /**
    * Why a payment waits for, or was flagged to, the seller ({@link CheckoutReview}); `null` when none does.
    */
   review: CheckoutReview | null;
@@ -429,9 +435,14 @@ export interface CheckoutQuote {
   methodId: string;
   /** CAIP-10 account the quote was locked to; `null` for a Solana Pay QR quote. */
   payer: string | null;
-  /** Token amount the merchant receives, in base units. */
+  /** Token amount the whole invoice costs at the quoted rate, in base units. */
   cryptoAmountExpected: string;
-  /** Token amount the buyer sends (grossed up for a transfer fee), in base units. */
+  /**
+   * Token amount that must still arrive, in base units: {@link CheckoutQuote.cryptoAmountExpected}, or on an underpaid
+   * invoice what is left of it after what arrived, at the same rate.
+   */
+  amountDue: string;
+  /** Token amount the buyer sends: {@link CheckoutQuote.amountDue} grossed up for a transfer fee, in base units. */
   amountToSend: string;
   /** The token's transfer fee, when it takes one. */
   transferFee: { bps: number; maxFee: string | null; source: 'contract' | 'method' } | null;

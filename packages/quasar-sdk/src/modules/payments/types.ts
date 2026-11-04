@@ -168,7 +168,10 @@ export interface InvoiceQuote {
   payer: string;
   /** Token amount that settles the invoice, in base units. */
   cryptoAmountExpected: string | null;
-  /** What the buyer sends: the price grossed up for a token's transfer fee, in base units. */
+  /**
+   * What the buyer sends, in base units: what must still arrive (the whole price, or the rest of an `underpaid` invoice)
+   * grossed up for a token's transfer fee.
+   */
   amountToSend: string | null;
   /** When the quote was locked. */
   lockedAt: string | null;

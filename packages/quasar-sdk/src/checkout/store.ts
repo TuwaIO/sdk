@@ -338,8 +338,11 @@ export interface CheckoutState {
    * @returns The quote, or `null` with `error` set (`phase` `blocked` when AML refuses the wallet, `buyer` when the
    *   details come first; `consent_required`, without a request, when a required consent is not ticked;
    *   `payer_proof_required`, without a request while {@link CheckoutState.payerProof} is `required`, and from Quasar
-   *   for a wallet it wants confirmed first, `phase` back at `selectMethod`; `payer_mismatch` (`409`) with
-   *   {@link CheckoutError.originWallet} on an underpaid invoice: the rest is paid from the wallet that paid first).
+   *   for a wallet it wants confirmed first, `phase` back at `selectMethod`). On an underpaid invoice it prices the
+   *   rest ({@link CheckoutQuote.amountDue}) at the rate of the first quote, with no consent asked again, and refuses
+   *   with `409`: `payer_mismatch` and {@link CheckoutError.originWallet} (the rest is paid from the wallet that paid
+   *   first), `rest_method_mismatch` (in the method that paid first) or `rest_rate_expired`
+   *   (`checkout.invoice.restPayable` is `false`: the rate no longer holds, and the merchant can refund what arrived).
    */
   requestQuote: () => Promise<CheckoutQuote | null>;
   /**
@@ -1666,12 +1669,14 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       },
 
       requestQuote: async () => {
-        const { methodId, payer, phase, checkout, consentGiven } = get();
+        const { methodId, payer, phase, checkout, consentGiven, invoiceStatus } = get();
         if (!methodId) {
           update({ error: { code: 'method_required', message: 'Choose a payment method first' } });
           return null;
         }
-        if (checkout?.consent?.required && !consentGiven) {
+        // The first payment of an underpaid invoice gave the consent
+        const rest = (invoiceStatus ?? checkout?.invoice.status) === 'underpaid';
+        if (checkout?.consent?.required && !consentGiven && !rest) {
           update({ error: { code: 'consent_required', message: 'Tick the consent of the checkout first' } });
           return null;
         }
@@ -1690,7 +1695,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
           const quote = await api.quote({
             methodId,
             ...(payer ? { payer } : {}),
-            ...(checkout?.consent && consentGiven ? { consentGiven: true } : {}),
+            ...(checkout?.consent && consentGiven && !rest ? { consentGiven: true } : {}),
           });
           update({ quote, phase: 'awaitingPayment' });
           return quote;

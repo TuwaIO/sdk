@@ -2,7 +2,7 @@
 
 > **EventSourceConstructor** = new (`url`) => [`EventSourceLike`](/packages/quasar-sdk/checkout/interfaces/EventSourceLike.md)
 
-Defined in: [checkout/store.ts:457](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L457)
+Defined in: [checkout/store.ts:460](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L460)
 
 A constructor of [EventSourceLike](/packages/quasar-sdk/checkout/interfaces/EventSourceLike.md), such as the browser's `EventSource`.
 

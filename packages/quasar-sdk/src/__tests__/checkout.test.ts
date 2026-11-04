@@ -73,6 +73,7 @@ const view = (overrides: Partial<CheckoutView> = {}): CheckoutView => ({
     successUrl: null,
     cancelUrl: null,
     amountPaid: null,
+    restPayable: false,
     review: null,
     refundedTotalMinor: null,
     replacedBy: null,
@@ -106,6 +107,7 @@ const QUOTE = {
   methodId: 'ap_1',
   payer: 'eip155:8453:0x1111111111111111111111111111111111111111',
   cryptoAmountExpected: '49000000',
+  amountDue: '49000000',
   amountToSend: '49000000',
   transferFee: null,
   decimals: 6,
@@ -2724,6 +2726,49 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
     checkout.getState().setPayer(PAYER);
     expect(await checkout.getState().requestQuote()).toBeNull();
     expect(checkout.getState().error).toMatchObject({ code: 'payer_mismatch', status: 409, originWallet: OTHER });
+    checkout.getState().destroy();
+  });
+
+  it('prices the rest of an underpaid invoice for the wallet that paid first, asking for no consent again', async () => {
+    const rest = { ...QUOTE, amountDue: '48000000', amountToSend: '48000000' };
+    const invoice = { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'];
+    fetchMock
+      .mockResolvedValueOnce(
+        json(
+          view({ invoice, quote: QUOTE as never, consent: { text: 'I ask Acme to start at once.', required: true } }),
+        ),
+      )
+      .mockResolvedValueOnce(json(rest));
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    expect(checkout.getState()).toMatchObject({ phase: 'underpaid', methodId: 'ap_1', consentGiven: false });
+    checkout.getState().setPayer(QUOTE.payer);
+
+    expect(await checkout.getState().requestQuote()).toMatchObject({ amountDue: '48000000' });
+    expect(JSON.parse(fetchMock.mock.calls[1]![1].body as string)).toEqual({ methodId: 'ap_1', payer: QUOTE.payer });
+    expect(checkout.getState()).toMatchObject({ phase: 'awaitingPayment', quote: { amountToSend: '48000000' } });
+    checkout.getState().destroy();
+  });
+
+  it('stays on the underpaid outcome when the rate of the rest no longer holds', async () => {
+    answer(
+      {
+        invoice: { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'],
+        quote: QUOTE as never,
+      },
+      {
+        quote: () =>
+          json({ error: { code: 'rest_rate_expired', message: 'The rate of this invoice no longer holds' } }, 409),
+      },
+    );
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    checkout.getState().setPayer(PAYER);
+    expect(await checkout.getState().requestQuote()).toBeNull();
+    expect(checkout.getState()).toMatchObject({
+      phase: 'underpaid',
+      error: { code: 'rest_rate_expired', status: 409 },
+    });
     checkout.getState().destroy();
   });
 

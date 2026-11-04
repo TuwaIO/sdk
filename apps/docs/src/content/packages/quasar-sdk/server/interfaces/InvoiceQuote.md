@@ -10,9 +10,10 @@ The price an invoice was quoted at, once a buyer chose how to pay.
 
 > **amountToSend**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:172](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L172)
+Defined in: [modules/payments/types.ts:175](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L175)
 
-What the buyer sends: the price grossed up for a token's transfer fee, in base units.
+What the buyer sends, in base units: what must still arrive (the whole price, or the rest of an `underpaid` invoice)
+grossed up for a token's transfer fee.
 
 ***
 
@@ -30,7 +31,7 @@ Token amount that settles the invoice, in base units.
 
 > **expiresAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:176](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L176)
+Defined in: [modules/payments/types.ts:179](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L179)
 
 When the quote expires.
 
@@ -40,7 +41,7 @@ When the quote expires.
 
 > **lockedAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:174](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L174)
+Defined in: [modules/payments/types.ts:177](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L177)
 
 When the quote was locked.
 
@@ -70,7 +71,7 @@ CAIP-10 account the quote was issued to.
 
 > **rate**: `unknown`
 
-Defined in: [modules/payments/types.ts:178](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L178)
+Defined in: [modules/payments/types.ts:181](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L181)
 
 The price rounds the quote used, as evidence.
 
@@ -80,6 +81,6 @@ The price rounds the quote used, as evidence.
 
 > **reference**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:180](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L180)
+Defined in: [modules/payments/types.ts:183](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L183)
 
 Solana Pay reference key of the quote.

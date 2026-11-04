@@ -1,6 +1,6 @@
 # CheckoutSubscription
 
-Defined in: [checkout/types.ts:197](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L197)
+Defined in: [checkout/types.ts:203](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L203)
 
 The subscription period an invoice bills, as the checkout shows it.
 
@@ -10,7 +10,7 @@ The subscription period an invoice bills, as the checkout shows it.
 
 > **cancelAtPeriodEnd**: `boolean`
 
-Defined in: [checkout/types.ts:215](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L215)
+Defined in: [checkout/types.ts:221](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L221)
 
 Whether it ends with the current period.
 
@@ -20,7 +20,7 @@ Whether it ends with the current period.
 
 > **cycles**: `number` \| `null`
 
-Defined in: [checkout/types.ts:211](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L211)
+Defined in: [checkout/types.ts:217](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L217)
 
 How many periods the subscription runs; `null` until it is cancelled.
 
@@ -30,7 +30,7 @@ How many periods the subscription runs; `null` until it is cancelled.
 
 > **endsAt**: `string` \| `null`
 
-Defined in: [checkout/types.ts:213](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L213)
+Defined in: [checkout/types.ts:219](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L219)
 
 When it ends at the latest, if set.
 
@@ -40,7 +40,7 @@ When it ends at the latest, if set.
 
 > **interval**: [`SubscriptionInterval`](/packages/quasar-sdk/server/type-aliases/SubscriptionInterval.md)
 
-Defined in: [checkout/types.ts:201](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L201)
+Defined in: [checkout/types.ts:207](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L207)
 
 Unit of a period.
 
@@ -50,7 +50,7 @@ Unit of a period.
 
 > **intervalCount**: `number`
 
-Defined in: [checkout/types.ts:203](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L203)
+Defined in: [checkout/types.ts:209](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L209)
 
 Units in a period (`3` with `month` is a quarter).
 
@@ -60,7 +60,7 @@ Units in a period (`3` with `month` is a quarter).
 
 > **period**: `number`
 
-Defined in: [checkout/types.ts:205](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L205)
+Defined in: [checkout/types.ts:211](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L211)
 
 The period this invoice bills, from 1.
 
@@ -70,7 +70,7 @@ The period this invoice bills, from 1.
 
 > **periodEnd**: `string`
 
-Defined in: [checkout/types.ts:209](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L209)
+Defined in: [checkout/types.ts:215](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L215)
 
 When it ends, which is when the next one is billed.
 
@@ -80,7 +80,7 @@ When it ends, which is when the next one is billed.
 
 > **periodStart**: `string`
 
-Defined in: [checkout/types.ts:207](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L207)
+Defined in: [checkout/types.ts:213](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L213)
 
 When the period starts.
 
@@ -90,6 +90,6 @@ When the period starts.
 
 > **status**: [`SubscriptionStatus`](/packages/quasar-sdk/server/type-aliases/SubscriptionStatus.md)
 
-Defined in: [checkout/types.ts:199](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L199)
+Defined in: [checkout/types.ts:205](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L205)
 
 State of the subscription.

@@ -20,7 +20,7 @@ What the checkout token opens; `null` until loaded.
 
 > **confirmPayer**: (`sign`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:366](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L366)
+Defined in: [checkout/store.ts:369](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L369)
 
 Confirms that the connected wallet pays this invoice: asks Quasar for the exact message
 (`POST payer-proof/message`), has `sign` sign it with the wallet (a free signature that moves no funds), and sends
@@ -69,7 +69,7 @@ Whether the buyer ticked the merchant's consent (`checkout.consent`).
 
 > **destroy**: () => `void`
 
-Defined in: [checkout/store.ts:441](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L441)
+Defined in: [checkout/store.ts:444](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L444)
 
 Stops following the invoice (closes the event stream or the reads). Call it when the page goes away.
 
@@ -111,7 +111,7 @@ whenever it comes; a reloaded page reads the outcome. Read-only: the store sets 
 
 > **grantPermission**: (`params`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:431](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L431)
+Defined in: [checkout/store.ts:434](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L434)
 
 Passes the wallet's answer to `wallet_grantPermissions` for a subscription's automatic charges (`POST permission`).
 
@@ -239,7 +239,7 @@ The chosen payment method.
 
 > **payAgain**: () => `void`
 
-Defined in: [checkout/store.ts:439](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L439)
+Defined in: [checkout/store.ts:442](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L442)
 
 Goes back to the payment from `unconfirmed`, once the buyer checked that the payment did not leave the wallet:
 `awaitingPayment` while the locked quote is valid, `underpaid` for the rest of an underpaid invoice, otherwise
@@ -366,7 +366,7 @@ The receipt PDF of a paid invoice (a plain `GET`, for a link); `null` before.
 
 > **relay**: (`signature`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:424](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L424)
+Defined in: [checkout/store.ts:427](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L427)
 
 Sends the payer's signature of `quote.gasless.relay.typedData` (`POST relay`): Quasar sends the transfer and the
 merchant pays the gas.
@@ -408,7 +408,7 @@ Quasar keeps the lock until it ends: a payment of the old quote that still arriv
 
 > **requestQuote**: () => `Promise`\<[`CheckoutQuote`](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md) \| `null`\>
 
-Defined in: [checkout/store.ts:344](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L344)
+Defined in: [checkout/store.ts:347](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L347)
 
 Screens the payer and locks the price (`POST quote`).
 
@@ -419,8 +419,11 @@ Screens the payer and locks the price (`POST quote`).
 The quote, or `null` with `error` set (`phase` `blocked` when AML refuses the wallet, `buyer` when the
   details come first; `consent_required`, without a request, when a required consent is not ticked;
   `payer_proof_required`, without a request while [CheckoutState.payerProof](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#payerproof) is `required`, and from Quasar
-  for a wallet it wants confirmed first, `phase` back at `selectMethod`; `payer_mismatch` (`409`) with
-  [CheckoutError.originWallet](/packages/quasar-sdk/checkout/interfaces/CheckoutError.md#originwallet) on an underpaid invoice: the rest is paid from the wallet that paid first).
+  for a wallet it wants confirmed first, `phase` back at `selectMethod`). On an underpaid invoice it prices the
+  rest ([CheckoutQuote.amountDue](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md#amountdue)) at the rate of the first quote, with no consent asked again, and refuses
+  with `409`: `payer_mismatch` and [CheckoutError.originWallet](/packages/quasar-sdk/checkout/interfaces/CheckoutError.md#originwallet) (the rest is paid from the wallet that paid
+  first), `rest_method_mismatch` (in the method that paid first) or `rest_rate_expired`
+  (`checkout.invoice.restPayable` is `false`: the rate no longer holds, and the merchant can refund what arrived).
 
 ***
 
@@ -450,7 +453,7 @@ One of `checkout.methods`.
 
 > **setBuyer**: (`buyer`, `options?`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:374](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L374)
+Defined in: [checkout/store.ts:377](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L377)
 
 Sends the buyer details the checkout collects (`POST buyer`); the invoice document is issued with them.
 
@@ -505,7 +508,7 @@ Whether the buyer ticked it.
 
 > **setLocale**: (`locale`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:381](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L381)
+Defined in: [checkout/store.ts:384](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L384)
 
 Changes the language of the page and of the documents still to be issued (`POST locale`).
 
@@ -552,7 +555,7 @@ CAIP-10 account (`eip155:8453:0x…`, `solana:<genesis hash>:<address>`), or `nu
 
 > **submit**: (`params`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/store.ts:415](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L415)
+Defined in: [checkout/store.ts:418](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L418)
 
 Hands Quasar the transaction the wallet sent (`POST submit`). For an EIP-5792 batch, pass the hash of its
 transaction (from `wallet_getCallsStatus`), not the batch ID.

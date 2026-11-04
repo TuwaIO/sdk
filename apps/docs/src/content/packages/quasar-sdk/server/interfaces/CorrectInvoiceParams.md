@@ -1,6 +1,6 @@
 # CorrectInvoiceParams
 
-Defined in: [modules/payments/types.ts:391](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L391)
+Defined in: [modules/payments/types.ts:394](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L394)
 
 What [PaymentsModule.correctInvoice](/packages/quasar-sdk/server/classes/PaymentsModule.md#correctinvoice) takes.
 
@@ -10,7 +10,7 @@ What [PaymentsModule.correctInvoice](/packages/quasar-sdk/server/classes/Payment
 
 > `optional` **buyer?**: [`Buyer`](/packages/quasar-sdk/server/interfaces/Buyer.md)
 
-Defined in: [modules/payments/types.ts:393](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L393)
+Defined in: [modules/payments/types.ts:396](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L396)
 
 The corrected buyer; the buyer of the invoice stays when omitted.
 
@@ -20,6 +20,6 @@ The corrected buyer; the buyer of the invoice stays when omitted.
 
 > `optional` **reason?**: `string`
 
-Defined in: [modules/payments/types.ts:395](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L395)
+Defined in: [modules/payments/types.ts:398](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L398)
 
 The reason the credit note gives.

@@ -1,6 +1,6 @@
 # InvoiceDocumentRef
 
-Defined in: [modules/payments/types.ts:347](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L347)
+Defined in: [modules/payments/types.ts:350](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L350)
 
 A document issued for an invoice, as [PaymentsModule.listInvoiceDocuments](/packages/quasar-sdk/server/classes/PaymentsModule.md#listinvoicedocuments) lists it: the invoice, its receipt
 or a credit note, in one format. [PaymentsModule.getDocument](/packages/quasar-sdk/server/classes/PaymentsModule.md#getdocument) downloads the invoice and the receipt,
@@ -12,7 +12,7 @@ or a credit note, in one format. [PaymentsModule.getDocument](/packages/quasar-s
 
 > **format**: `"pdf"` \| `"ubl"`
 
-Defined in: [modules/payments/types.ts:351](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L351)
+Defined in: [modules/payments/types.ts:354](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L354)
 
 `pdf`, or `ubl` for the e-invoice.
 
@@ -22,7 +22,7 @@ Defined in: [modules/payments/types.ts:351](https://github.com/TuwaIO/sdk/blob/m
 
 > **issuedAt**: `string`
 
-Defined in: [modules/payments/types.ts:357](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L357)
+Defined in: [modules/payments/types.ts:360](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L360)
 
 When it was issued.
 
@@ -32,7 +32,7 @@ When it was issued.
 
 > **kind**: `"invoice"` \| `"receipt"` \| `"credit_note"`
 
-Defined in: [modules/payments/types.ts:349](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L349)
+Defined in: [modules/payments/types.ts:352](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L352)
 
 What it is.
 
@@ -42,7 +42,7 @@ What it is.
 
 > **number**: `string`
 
-Defined in: [modules/payments/types.ts:353](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L353)
+Defined in: [modules/payments/types.ts:356](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L356)
 
 Its number.
 
@@ -52,6 +52,6 @@ Its number.
 
 > **refundId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:355](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L355)
+Defined in: [modules/payments/types.ts:358](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L358)
 
 The refund a credit note credits; `null` for the invoice, the receipt and the credit note of a correction.
