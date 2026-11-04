@@ -328,8 +328,9 @@ export interface CheckoutState {
   setConsentGiven: (given: boolean) => void;
   /**
    * Forgets the locked quote and goes back to choosing a method ("Back to methods"), also for a Solana Pay QR quote
-   * that no other action drops. Nothing changes once the payment is on its way (`submitting`, `confirming`) or done.
-   * Quasar keeps the lock until it ends: a payment of the old quote that still arrives is credited.
+   * that no other action drops; from the quote of a rest it goes back to the `underpaid` outcome. Nothing changes once
+   * the payment is on its way (`submitting`, `confirming`) or done. Quasar keeps the lock until it ends: a payment of the
+   * old quote that still arrives is credited.
    */
   releaseQuote: () => void;
   /**
@@ -743,6 +744,8 @@ const PHASE_OF_REFUSAL: Record<string, CheckoutPhase> = {
   buyer_required: 'buyer',
   invoice_expired: 'expired',
   invoice_processing: 'confirming',
+  rest_method_mismatch: 'underpaid',
+  rest_rate_expired: 'underpaid',
 };
 
 /** How a payment the store follows, or the latest one of a reopened page, ended without paying the invoice. */
@@ -1664,8 +1667,11 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       setConsentGiven: (given) => update({ consentGiven: given, error: null }),
 
       releaseQuote: () => {
-        if (get().phase !== 'awaitingPayment') return;
-        update({ quote: null, error: null, phase: 'selectMethod' });
+        const { phase, invoiceStatus, checkout } = get();
+        if (phase !== 'awaitingPayment') return;
+        // The rest of an underpaid invoice has no methods to go back to, and its outcome reads the amounts of the quote
+        if ((invoiceStatus ?? checkout?.invoice.status) === 'underpaid') update({ error: null, phase: 'underpaid' });
+        else update({ quote: null, error: null, phase: 'selectMethod' });
       },
 
       requestQuote: async () => {

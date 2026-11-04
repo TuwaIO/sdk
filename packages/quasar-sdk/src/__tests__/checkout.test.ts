@@ -2772,6 +2772,40 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
     checkout.getState().destroy();
   });
 
+  it('goes back to the underpaid outcome from the quote of a rest, keeping what it says about the amounts', async () => {
+    const rest = { ...QUOTE, amountDue: '48000000', amountToSend: '48000000' };
+    const invoice = { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'];
+    fetchMock.mockResolvedValueOnce(json(view({ invoice, quote: QUOTE as never }))).mockResolvedValueOnce(json(rest));
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    checkout.getState().setPayer(QUOTE.payer);
+    await checkout.getState().requestQuote();
+    expect(checkout.getState().phase).toBe('awaitingPayment');
+
+    checkout.getState().releaseQuote();
+    expect(checkout.getState()).toMatchObject({ phase: 'underpaid', quote: { amountDue: '48000000' }, error: null });
+    checkout.getState().destroy();
+  });
+
+  it('leaves the payment step for the underpaid outcome when the rate of the rest ended meanwhile', async () => {
+    const invoice = { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'];
+    fetchMock
+      .mockResolvedValueOnce(json(view({ invoice, quote: QUOTE as never })))
+      .mockResolvedValueOnce(json(QUOTE))
+      .mockResolvedValueOnce(
+        json({ error: { code: 'rest_rate_expired', message: 'The rate of this invoice no longer holds' } }, 409),
+      );
+    const checkout = store({ EventSource: null });
+    await checkout.getState().load();
+    checkout.getState().setPayer(QUOTE.payer);
+    await checkout.getState().requestQuote();
+    expect(checkout.getState().phase).toBe('awaitingPayment');
+
+    expect(await checkout.getState().requestQuote()).toBeNull();
+    expect(checkout.getState()).toMatchObject({ phase: 'underpaid', error: { code: 'rest_rate_expired' } });
+    checkout.getState().destroy();
+  });
+
   // Quasar's word wins over a checkout read before the merchant changed the method
   it('asks for the confirmation when Quasar demands one for a method the checkout announced without it', async () => {
     answer(
