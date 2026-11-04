@@ -864,6 +864,31 @@ describe('createCheckoutStore', () => {
     checkout.getState().destroy();
   });
 
+  it('keeps what the page says about a payment when the page, not the buyer, chooses a method', async () => {
+    fetchMock.mockResolvedValueOnce(
+      json(
+        view({
+          invoice: {
+            ...view().invoice,
+            rejectedPayments: [
+              { txKey: '0xfeed', reason: 'payer_unconfirmed', final: true, movedMoney: true, held: true },
+            ],
+          } as never,
+        }),
+      ),
+    );
+    const checkout = store();
+    await checkout.getState().load();
+    expect(checkout.getState().error).toMatchObject({ code: 'payment_mismatch', held: true });
+
+    checkout.getState().selectMethod('ap_1', { keepError: true });
+    expect(checkout.getState()).toMatchObject({ methodId: 'ap_1', error: { code: 'payment_mismatch' } });
+    // The buyer chooses: they have moved on
+    checkout.getState().selectMethod('ap_2');
+    expect(checkout.getState().error).toBeNull();
+    checkout.getState().destroy();
+  });
+
   it("points to the merchant's logo only when the merchant has one", async () => {
     fetchMock.mockResolvedValueOnce(json(view()));
     const without = store();

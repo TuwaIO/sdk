@@ -310,8 +310,10 @@ export interface CheckoutState {
    * Chooses a payment method; a quote for another method is dropped.
    *
    * @param methodId - One of `checkout.methods`.
+   * @param options - `keepError`: the page chose it, not the buyer, so what it says about a payment that left the wallet
+   * stays.
    */
-  selectMethod: (methodId: string) => void;
+  selectMethod: (methodId: string, options?: { keepError?: boolean }) => void;
   /**
    * Sets the connected wallet; a quote locked to another wallet is dropped.
    *
@@ -1692,12 +1694,12 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         }
       },
 
-      selectMethod: (methodId) => {
-        const { quote, phase } = get();
+      selectMethod: (methodId, options) => {
+        const { quote, phase, error } = get();
         const drop = quote && quote.methodId !== methodId;
         update({
           methodId,
-          error: null,
+          error: options?.keepError ? error : null,
           ...(drop ? { quote: null, phase: phase === 'awaitingPayment' ? 'selectMethod' : phase } : {}),
         });
       },
