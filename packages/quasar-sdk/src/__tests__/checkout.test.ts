@@ -827,7 +827,18 @@ describe('createCheckoutStore', () => {
     fetchMock
       .mockResolvedValueOnce(json(view({ quote: QUOTE as never, autoCharge: autoCharge as never })))
       .mockResolvedValueOnce(json({ status: 'submitted', userOpHash: '0xop', txHash: '0xbeef' }))
-      .mockResolvedValueOnce(json({ permission: { status: 'active', payer: QUOTE.payer } }));
+      .mockResolvedValueOnce(
+        json({
+          permission: { status: 'active', payer: QUOTE.payer },
+          autoCharge: {
+            status: 'active',
+            permission: { status: 'active', payer: QUOTE.payer },
+            revocation: { to: '0x5', data: '0xdead' },
+          },
+        }),
+      )
+      .mockResolvedValueOnce(json({ autoCharge: { status: 'active', permission: {}, revocation: null } }))
+      .mockResolvedValueOnce(json({ autoCharge: autoCharge }));
     const checkout = store();
     await checkout.getState().load();
 
@@ -839,7 +850,17 @@ describe('createCheckoutStore', () => {
     const granted = { payer: QUOTE.payer, context: '0xabcd', delegationManager: '0x5' };
     expect(await checkout.getState().grantPermission(granted)).toBe(true);
     expect(await sent(2)).toEqual({ method: 'POST', path: '/v1/payments/checkout/tok_1/permission', body: granted });
+    expect(checkout.getState().checkout?.autoCharge).toMatchObject({
+      status: 'active',
+      revocation: { to: '0x5', data: '0xdead' },
+    });
+
+    // The wallet sent the revocation: the chain does not show it yet, then it does
+    expect(await checkout.getState().permissionRevoked()).toBe(false);
+    expect(await sent(3)).toEqual({ method: 'POST', path: '/v1/payments/checkout/tok_1/permission/revoked', body: {} });
     expect(checkout.getState().checkout?.autoCharge).toMatchObject({ status: 'active' });
+    expect(await checkout.getState().permissionRevoked()).toBe(true);
+    expect(checkout.getState().checkout?.autoCharge).toEqual(autoCharge);
     checkout.getState().destroy();
   });
 
@@ -867,6 +888,7 @@ describe('createCheckoutStore', () => {
       submit: vi.fn().mockResolvedValue({ txKey: '0xbeef', status: 'processing' }),
       relay: vi.fn(),
       permission: vi.fn(),
+      permissionRevoked: vi.fn(),
       url: (route: string) => `sim://checkout/${route}`,
     };
     const checkout = createCheckoutStore({ token: 'tok_1', api, EventSource: null, pollMs: 1_000 });
@@ -1886,7 +1908,8 @@ describe('createCheckoutStore: honest re-check states, moved money, hand-overs k
       locale: async (locale) => ({ locale }),
       submit: () => Promise.reject(new TypeError('Failed')),
       relay: async () => ({ status: 'submitted', txHash: '0xfeed' }),
-      permission: async () => ({ permission: null }),
+      permission: async () => ({ permission: null, autoCharge: null }),
+      permissionRevoked: async () => ({ autoCharge: null }),
       url: (route) => `sim://${route}`,
     };
     const playground = createCheckoutStore({ token: 'tok_1', api, EventSource: null });
@@ -2520,6 +2543,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
       submit: vi.fn(),
       relay: vi.fn(),
       permission: vi.fn(),
+      permissionRevoked: vi.fn(),
       payerProofMessage: vi.fn().mockResolvedValue(messageOf(PAYER)),
       payerProof: vi.fn().mockResolvedValue(proofOf(PAYER)),
       url: (route: string) => `sim://checkout/${route}`,

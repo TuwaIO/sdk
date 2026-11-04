@@ -2,6 +2,6 @@
 
 > **CheckoutStore** = `StoreApi`\<[`CheckoutState`](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md)\>
 
-Defined in: [checkout/store.ts:503](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L503)
+Defined in: [checkout/store.ts:510](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L510)
 
 The store [createCheckoutStore](/packages/quasar-sdk/checkout/functions/createCheckoutStore.md) returns: a vanilla Zustand store (use it with `useStore` of `zustand`).

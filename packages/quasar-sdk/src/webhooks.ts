@@ -84,7 +84,7 @@ export interface PaymentWebhookHeldTransfer {
   /** The wallets that sent it. */
   senders: string[];
   /** Why it is tied to no invoice. */
-  reason: 'payer_mismatch' | 'payer_unconfirmed' | null;
+  reason: 'payer_mismatch' | 'payer_unconfirmed' | 'already_paid' | null;
   /** It arrived after the invoice expired or was cancelled. */
   late?: true;
   /** Set when AML blocked its sender: Quasar refunds it to no one. */

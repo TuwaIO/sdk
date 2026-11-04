@@ -522,6 +522,11 @@ export type AutoChargeOffer =
       status: 'active';
       /** The permission. */
       permission: SubscriptionPermission | null;
+      /**
+       * The transaction that revokes it, for the wallet that granted it to send and pay for; then
+       * {@link CheckoutState.permissionRevoked}. `null` when it cannot be built.
+       */
+      revocation: { to: string; data: string } | null;
     }
   | {
       /** Not possible now; the buyer pays each invoice. */
@@ -597,7 +602,9 @@ export interface CheckoutApi {
   /** Relays the signed EIP-3009 authorization (`POST relay`). */
   relay: (signature: string) => Promise<{ status: 'submitted' | 'sending'; userOpHash?: string; txHash?: string }>;
   /** Sends the ERC-7715 permission the wallet granted (`POST permission`). */
-  permission: (body: GrantPermissionParams) => Promise<{ permission: unknown }>;
+  permission: (body: GrantPermissionParams) => Promise<{ permission: unknown; autoCharge: AutoChargeOffer | null }>;
+  /** `POST permission/revoked`: Quasar asks the chain whether the permission was revoked. */
+  permissionRevoked: () => Promise<{ autoCharge: AutoChargeOffer | null }>;
   /** The URL of a route that is read without the store: `receipt`, `logo`, `paymaster`, `events`. */
   url: (route: string) => string;
 }

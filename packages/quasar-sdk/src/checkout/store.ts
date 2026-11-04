@@ -433,6 +433,13 @@ export interface CheckoutState {
    */
   grantPermission: (params: GrantPermissionParams) => Promise<boolean>;
   /**
+   * Tells Quasar that the wallet sent the transaction that revokes the permission (`autoCharge.revocation`): Quasar asks
+   * the chain (`POST permission/revoked`), and `checkout.autoCharge` follows what it finds.
+   *
+   * @returns Whether the permission has ended; `false` while the chain does not show it yet, or on an error.
+   */
+  permissionRevoked: () => Promise<boolean>;
+  /**
    * Goes back to the payment from `unconfirmed`, once the buyer checked that the payment did not leave the wallet:
    * `awaitingPayment` while the locked quote is valid, `underpaid` for the rest of an underpaid invoice, otherwise
    * `selectMethod` (the expired quote is dropped); the outcome of an invoice that no longer takes a payment. Nothing
@@ -561,6 +568,7 @@ const MOVED_MONEY_REASONS: ReadonlySet<string> = new Set([
   'tx_already_used',
   'payer_mismatch',
   'payer_unconfirmed',
+  'already_paid',
   'native_from_contract_unverifiable',
   'invoice_not_payable',
   'settlement_failed',
@@ -1880,17 +1888,23 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       grantPermission: async (params) => {
         update({ error: null });
         try {
-          const { permission } = await api.permission(params);
+          const { autoCharge } = await api.permission(params);
           const checkout = get().checkout;
-          if (checkout) {
-            update({
-              checkout: {
-                ...checkout,
-                autoCharge: { status: 'active', permission: permission as never },
-              },
-            });
-          }
+          if (checkout) update({ checkout: { ...checkout, autoCharge } });
           return true;
+        } catch (error) {
+          fail(error, get().phase);
+          return false;
+        }
+      },
+
+      permissionRevoked: async () => {
+        update({ error: null });
+        try {
+          const { autoCharge } = await api.permissionRevoked();
+          const checkout = get().checkout;
+          if (checkout) update({ checkout: { ...checkout, autoCharge } });
+          return autoCharge?.status !== 'active';
         } catch (error) {
           fail(error, get().phase);
           return false;

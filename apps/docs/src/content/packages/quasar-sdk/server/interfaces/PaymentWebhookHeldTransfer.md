@@ -42,7 +42,7 @@ It arrived after the invoice expired or was cancelled.
 
 ### reason
 
-> **reason**: `"payer_mismatch"` \| `"payer_unconfirmed"` \| `null`
+> **reason**: `"payer_mismatch"` \| `"payer_unconfirmed"` \| `"already_paid"` \| `null`
 
 Defined in: [webhooks.ts:87](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/webhooks.ts#L87)
 

@@ -516,9 +516,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
       id: z.string(),
       invoice: z.string().openapi({ description: 'The invoice whose address it reached.' }),
       status: HeldTransferStatus,
-      reason: z.enum(['payer_mismatch', 'payer_unconfirmed']).openapi({
+      reason: z.enum(['payer_mismatch', 'payer_unconfirmed', 'already_paid']).openapi({
         description:
-          '`payer_mismatch`: from another wallet than the one the quote was for; `payer_unconfirmed`: from the quoted wallet, which never confirmed the invoice.',
+          '`already_paid`: a relay or an automatic charge Quasar sent reached an invoice already paid; `payer_mismatch`: from another wallet than the one the quote was for; `payer_unconfirmed`: from the quoted wallet, which never confirmed the invoice.',
       }),
       late: z.boolean(),
       chainId: z.string(),
@@ -647,6 +647,14 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     .openapi('Subscription', { description: 'A subscription: each period is one invoice.' });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkSubscription: z.ZodType<Subscription> = Subscription;
+
+  const ActiveAutoCharge = z.object({
+    status: z.literal('active'),
+    permission: Subscription.shape.permission,
+    revocation: z.object({ to: z.string(), data: z.string() }).nullable().openapi({
+      description: 'The transaction that revokes the permission, for the wallet that granted it to send and pay for.',
+    }),
+  });
   registry.register('Subscription', Subscription);
 
   const SubscriptionCharge = z
@@ -1536,7 +1544,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
               rules: z.array(z.object({ type: z.string(), data: z.unknown() })),
             }),
           }),
-          z.object({ status: z.literal('active'), permission: Subscription.shape.permission }),
+          ActiveAutoCharge,
           z.object({ status: z.literal('unavailable'), reason: z.string() }),
         ])
         .nullable()
@@ -1800,9 +1808,27 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         ),
       },
       responses: {
-        200: { description: 'The permission.', ...json(z.object({ permission: Subscription.shape.permission })) },
+        200: {
+          description: 'The permission, and what the checkout now offers.',
+          ...json(z.object({ permission: Subscription.shape.permission, autoCharge: ActiveAutoCharge })),
+        },
         400: invalid('`payer_chain_mismatch`, `permission_invalid`: the context does not grant the requested terms'),
         409: refused('`subscription_not_active`, `auto_charge_unavailable`.'),
+        ...checkoutErrors,
+      },
+    },
+  );
+  checkout(
+    'post',
+    '/permission/revoked',
+    'Check that automatic charges were revoked',
+    "The wallet sent the transaction of `autoCharge.revocation`. Quasar asks the chain and ends the permission if its delegation is disabled; the page's word changes nothing.",
+    {
+      responses: {
+        200: {
+          description: 'What the checkout now offers: `active` while the chain does not show the revocation yet.',
+          ...json(z.object({ autoCharge: z.unknown().openapi({ description: 'Same as `autoCharge` of the view.' }) })),
+        },
         ...checkoutErrors,
       },
     },
@@ -1955,7 +1981,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
               txHash: z.string().nullable(),
               amount: z.string().nullable(),
               senders: z.array(z.string()),
-              reason: z.enum(['payer_mismatch', 'payer_unconfirmed']).nullable(),
+              reason: z.enum(['payer_mismatch', 'payer_unconfirmed', 'already_paid']).nullable(),
               late: z.literal(true).optional(),
               screening: z.object({ status: z.literal('blocked'), reasons: z.array(z.unknown()) }).optional(),
             }),

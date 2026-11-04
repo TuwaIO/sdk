@@ -8,6 +8,7 @@ import { BASE_API_URL } from '../constants';
 import { toQuasarSDKError } from '../core/errors';
 import type { Buyer, InvoiceLocale } from '../modules/payments/types';
 import type {
+  AutoChargeOffer,
   CheckoutApi,
   CheckoutQuote,
   CheckoutView,
@@ -52,7 +53,9 @@ export function checkoutApi(token: string, baseUrl: string = BASE_API_URL): Chec
       call<{ txKey: string; status: string }>('submit', body),
     relay: (signature: string) =>
       call<{ status: 'submitted' | 'sending'; userOpHash?: string; txHash?: string }>('relay', { signature }),
-    permission: (body: GrantPermissionParams) => call<{ permission: unknown }>('permission', body),
+    permission: (body: GrantPermissionParams) =>
+      call<{ permission: unknown; autoCharge: AutoChargeOffer | null }>('permission', body),
+    permissionRevoked: () => call<{ autoCharge: AutoChargeOffer | null }>('permission/revoked', {}),
     url: (route: string) => `${baseUrl.replace(/\/+$/, '')}${checkoutPath(token, route)}`,
   };
 }

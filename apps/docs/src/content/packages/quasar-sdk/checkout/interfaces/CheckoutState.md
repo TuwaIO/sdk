@@ -69,7 +69,7 @@ Whether the buyer ticked the merchant's consent (`checkout.consent`).
 
 > **destroy**: () => `void`
 
-Defined in: [checkout/store.ts:444](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L444)
+Defined in: [checkout/store.ts:451](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L451)
 
 Stops following the invoice (closes the event stream or the reads). Call it when the page goes away.
 
@@ -239,7 +239,7 @@ The chosen payment method.
 
 > **payAgain**: () => `void`
 
-Defined in: [checkout/store.ts:442](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L442)
+Defined in: [checkout/store.ts:449](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L449)
 
 Goes back to the payment from `unconfirmed`, once the buyer checked that the payment did not leave the wallet:
 `awaitingPayment` while the locked quote is valid, `underpaid` for the rest of an underpaid invoice, otherwise
@@ -329,6 +329,23 @@ Whether the payment this store handed over counts as sent before `dueAt`, as Qua
 handed over after `dueAt`, which Quasar holds as late), `null` before Quasar reported it, with a Quasar that does
 not report it, or without a payment of this page. Use it, not the browser clock. Reset by the next hand-over.
 Read-only: the store sets it.
+
+***
+
+### permissionRevoked
+
+> **permissionRevoked**: () => `Promise`\<`boolean`\>
+
+Defined in: [checkout/store.ts:441](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/store.ts#L441)
+
+Tells Quasar that the wallet sent the transaction that revokes the permission (`autoCharge.revocation`): Quasar asks
+the chain (`POST permission/revoked`), and `checkout.autoCharge` follows what it finds.
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+Whether the permission has ended; `false` while the chain does not show it yet, or on an error.
 
 ***
 

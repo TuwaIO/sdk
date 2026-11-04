@@ -1,6 +1,6 @@
 # AutoChargeOffer
 
-> **AutoChargeOffer** = \{ `methodId`: `string`; `request`: [`PermissionRequest`](/packages/quasar-sdk/checkout/interfaces/PermissionRequest.md); `status`: `"available"`; \} \| \{ `permission`: [`SubscriptionPermission`](/packages/quasar-sdk/server/interfaces/SubscriptionPermission.md) \| `null`; `status`: `"active"`; \} \| \{ `reason`: `string`; `status`: `"unavailable"`; \}
+> **AutoChargeOffer** = \{ `methodId`: `string`; `request`: [`PermissionRequest`](/packages/quasar-sdk/checkout/interfaces/PermissionRequest.md); `status`: `"available"`; \} \| \{ `permission`: [`SubscriptionPermission`](/packages/quasar-sdk/server/interfaces/SubscriptionPermission.md) \| `null`; `revocation`: \{ `data`: `string`; `to`: `string`; \} \| `null`; `status`: `"active"`; \} \| \{ `reason`: `string`; `status`: `"unavailable"`; \}
 
 Defined in: [checkout/types.ts:511](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L511)
 
@@ -34,13 +34,20 @@ Ask the wallet with `request`, then pass its answer to [CheckoutState.grantPermi
 
 ### Type Literal
 
-\{ `permission`: [`SubscriptionPermission`](/packages/quasar-sdk/server/interfaces/SubscriptionPermission.md) \| `null`; `status`: `"active"`; \}
+\{ `permission`: [`SubscriptionPermission`](/packages/quasar-sdk/server/interfaces/SubscriptionPermission.md) \| `null`; `revocation`: \{ `data`: `string`; `to`: `string`; \} \| `null`; `status`: `"active"`; \}
 
 #### permission
 
 > **permission**: [`SubscriptionPermission`](/packages/quasar-sdk/server/interfaces/SubscriptionPermission.md) \| `null`
 
 The permission.
+
+#### revocation
+
+> **revocation**: \{ `data`: `string`; `to`: `string`; \} \| `null`
+
+The transaction that revokes it, for the wallet that granted it to send and pay for; then
+[CheckoutState.permissionRevoked](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#permissionrevoked). `null` when it cannot be built.
 
 #### status
 
