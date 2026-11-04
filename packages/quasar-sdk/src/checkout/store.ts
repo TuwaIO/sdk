@@ -744,6 +744,7 @@ const PHASE_OF_REFUSAL: Record<string, CheckoutPhase> = {
   buyer_required: 'buyer',
   invoice_expired: 'expired',
   invoice_processing: 'confirming',
+  payer_mismatch: 'underpaid',
   rest_method_mismatch: 'underpaid',
   rest_rate_expired: 'underpaid',
 };

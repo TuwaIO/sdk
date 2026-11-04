@@ -2787,14 +2787,13 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
     checkout.getState().destroy();
   });
 
-  it('leaves the payment step for the underpaid outcome when the rate of the rest ended meanwhile', async () => {
+  // The rate ended, or another wallet became active over the quote of the rest
+  it.each(['rest_rate_expired', 'payer_mismatch'])('leaves the payment step of a rest on %s', async (code) => {
     const invoice = { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'];
     fetchMock
       .mockResolvedValueOnce(json(view({ invoice, quote: QUOTE as never })))
       .mockResolvedValueOnce(json(QUOTE))
-      .mockResolvedValueOnce(
-        json({ error: { code: 'rest_rate_expired', message: 'The rate of this invoice no longer holds' } }, 409),
-      );
+      .mockResolvedValueOnce(json({ error: { code, message: 'Refused' } }, 409));
     const checkout = store({ EventSource: null });
     await checkout.getState().load();
     checkout.getState().setPayer(QUOTE.payer);
@@ -2802,7 +2801,7 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
     expect(checkout.getState().phase).toBe('awaitingPayment');
 
     expect(await checkout.getState().requestQuote()).toBeNull();
-    expect(checkout.getState()).toMatchObject({ phase: 'underpaid', error: { code: 'rest_rate_expired' } });
+    expect(checkout.getState()).toMatchObject({ phase: 'underpaid', error: { code } });
     checkout.getState().destroy();
   });
 
