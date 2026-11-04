@@ -1,6 +1,6 @@
 # CheckoutQuote
 
-Defined in: [checkout/types.ts:431](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L431)
+Defined in: [checkout/types.ts:435](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L435)
 
 A locked quote: the price for this payer, valid until `expiresAt`.
 
@@ -10,7 +10,7 @@ A locked quote: the price for this payer, valid until `expiresAt`.
 
 > **amountDue**: `string`
 
-Defined in: [checkout/types.ts:444](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L444)
+Defined in: [checkout/types.ts:448](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L448)
 
 Token amount that must still arrive, in base units: [CheckoutQuote.cryptoAmountExpected](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md#cryptoamountexpected), or on an underpaid
 invoice what is left of it after what arrived, at the same rate.
@@ -21,7 +21,7 @@ invoice what is left of it after what arrived, at the same rate.
 
 > **amountToSend**: `string`
 
-Defined in: [checkout/types.ts:446](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L446)
+Defined in: [checkout/types.ts:450](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L450)
 
 Token amount the buyer sends: [CheckoutQuote.amountDue](/packages/quasar-sdk/checkout/interfaces/CheckoutQuote.md#amountdue) grossed up for a transfer fee, in base units.
 
@@ -31,7 +31,7 @@ Token amount the buyer sends: [CheckoutQuote.amountDue](/packages/quasar-sdk/che
 
 > **cryptoAmountExpected**: `string`
 
-Defined in: [checkout/types.ts:439](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L439)
+Defined in: [checkout/types.ts:443](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L443)
 
 Token amount the whole invoice costs at the quoted rate, in base units.
 
@@ -41,7 +41,7 @@ Token amount the whole invoice costs at the quoted rate, in base units.
 
 > **decimals**: `number`
 
-Defined in: [checkout/types.ts:450](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L450)
+Defined in: [checkout/types.ts:460](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L460)
 
 Decimals of the token.
 
@@ -51,7 +51,7 @@ Decimals of the token.
 
 > **discountBps**: `number`
 
-Defined in: [checkout/types.ts:464](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L464)
+Defined in: [checkout/types.ts:474](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L474)
 
 Discount of the method in basis points.
 
@@ -61,7 +61,7 @@ Discount of the method in basis points.
 
 > **expiresAt**: `string` \| `null`
 
-Defined in: [checkout/types.ts:456](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L456)
+Defined in: [checkout/types.ts:466](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L466)
 
 When it expires; ask for a new quote after that.
 
@@ -71,7 +71,7 @@ When it expires; ask for a new quote after that.
 
 > **gasless**: [`GaslessOffer`](/packages/quasar-sdk/checkout/interfaces/GaslessOffer.md) \| `null`
 
-Defined in: [checkout/types.ts:468](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L468)
+Defined in: [checkout/types.ts:478](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L478)
 
 What the merchant sponsors, or `null`: the buyer pays the gas.
 
@@ -81,7 +81,7 @@ What the merchant sponsors, or `null`: the buyer pays the gas.
 
 > **instructions**: [`PaymentInstructions`](/packages/quasar-sdk/checkout/type-aliases/PaymentInstructions.md)
 
-Defined in: [checkout/types.ts:466](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L466)
+Defined in: [checkout/types.ts:476](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L476)
 
 What the wallet sends.
 
@@ -91,7 +91,7 @@ What the wallet sends.
 
 > **lockedAt**: `string` \| `null`
 
-Defined in: [checkout/types.ts:454](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L454)
+Defined in: [checkout/types.ts:464](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L464)
 
 When it was locked.
 
@@ -101,7 +101,7 @@ When it was locked.
 
 > **markupBps**: `number`
 
-Defined in: [checkout/types.ts:462](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L462)
+Defined in: [checkout/types.ts:472](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L472)
 
 Markup of the method in basis points.
 
@@ -111,7 +111,7 @@ Markup of the method in basis points.
 
 > **methodId**: `string`
 
-Defined in: [checkout/types.ts:435](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L435)
+Defined in: [checkout/types.ts:439](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L439)
 
 The payment method.
 
@@ -121,7 +121,7 @@ The payment method.
 
 > **object**: `"checkout_quote"`
 
-Defined in: [checkout/types.ts:433](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L433)
+Defined in: [checkout/types.ts:437](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L437)
 
 Always `checkout_quote`.
 
@@ -131,7 +131,7 @@ Always `checkout_quote`.
 
 > **payer**: `string` \| `null`
 
-Defined in: [checkout/types.ts:437](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L437)
+Defined in: [checkout/types.ts:441](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L441)
 
 CAIP-10 account the quote was locked to; `null` for a Solana Pay QR quote.
 
@@ -141,7 +141,7 @@ CAIP-10 account the quote was locked to; `null` for a Solana Pay QR quote.
 
 > `optional` **payerProof?**: `object`
 
-Defined in: [checkout/types.ts:475](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L475)
+Defined in: [checkout/types.ts:485](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L485)
 
 Whether the quoted wallet confirmed the invoice ([CheckoutState.confirmPayer](/packages/quasar-sdk/checkout/interfaces/CheckoutState.md#confirmpayer)): `required` on an EVM method,
 `proven` once it did (`kind` says how). An EVM quote without the confirmation exists only for a method the gasless
@@ -162,11 +162,23 @@ to no invoice and the merchant returns it. Quasar versions before October 29, 20
 
 ***
 
+### rateHeldUntil
+
+> **rateHeldUntil**: `string` \| `null`
+
+Defined in: [checkout/types.ts:456](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L456)
+
+On the quote of a rest in an asset that moves against the invoice currency: until when its rate holds. The quote may
+run longer; a payment after this time waits for the merchant to accept or refund it (`review.reason`
+`quote_expired`). `null` otherwise.
+
+***
+
 ### rates
 
 > **rates**: `unknown`
 
-Defined in: [checkout/types.ts:460](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L460)
+Defined in: [checkout/types.ts:470](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L470)
 
 Price rounds used, as evidence.
 
@@ -176,7 +188,7 @@ Price rounds used, as evidence.
 
 > **reference**: `string` \| `null`
 
-Defined in: [checkout/types.ts:458](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L458)
+Defined in: [checkout/types.ts:468](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L468)
 
 The Solana Pay reference key.
 
@@ -186,7 +198,7 @@ The Solana Pay reference key.
 
 > **symbol**: `string`
 
-Defined in: [checkout/types.ts:452](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L452)
+Defined in: [checkout/types.ts:462](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L462)
 
 Token symbol.
 
@@ -196,6 +208,6 @@ Token symbol.
 
 > **transferFee**: \{ `bps`: `number`; `maxFee`: `string` \| `null`; `source`: `"method"` \| `"contract"`; \} \| `null`
 
-Defined in: [checkout/types.ts:448](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L448)
+Defined in: [checkout/types.ts:458](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L458)
 
 The token's transfer fee, when it takes one.

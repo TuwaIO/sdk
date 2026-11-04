@@ -61,11 +61,15 @@ export interface CheckoutInvoice {
   /** Base units of the quoted asset received so far: an underpaid invoice asks for the rest. */
   amountPaid: string | null;
   /**
-   * Whether the rest of an underpaid invoice can be quoted now ({@link CheckoutQuote.amountDue}): its method is still on
-   * and its rate still holds. A stablecoin of the invoice currency holds it until the due date, any other asset only as
-   * long as the quote that locked the rate. `false` for an invoice in any other state.
+   * Whether the rest of an underpaid invoice can be quoted now ({@link CheckoutQuote.amountDue}): its method is still on,
+   * something is left and it is not past the due date. `false` for an invoice in any other state.
    */
   restPayable: boolean;
+  /**
+   * The wallet that paid an underpaid invoice first, the only one that pays the rest: an address, or a CAIP-10 account.
+   * `null` for an invoice in any other state.
+   */
+  originWallet: string | null;
   /**
    * Why a payment waits for, or was flagged to, the seller ({@link CheckoutReview}); `null` when none does.
    */
@@ -444,6 +448,12 @@ export interface CheckoutQuote {
   amountDue: string;
   /** Token amount the buyer sends: {@link CheckoutQuote.amountDue} grossed up for a transfer fee, in base units. */
   amountToSend: string;
+  /**
+   * On the quote of a rest in an asset that moves against the invoice currency: until when its rate holds. The quote may
+   * run longer; a payment after this time waits for the merchant to accept or refund it (`review.reason`
+   * `quote_expired`). `null` otherwise.
+   */
+  rateHeldUntil: string | null;
   /** The token's transfer fee, when it takes one. */
   transferFee: { bps: number; maxFee: string | null; source: 'contract' | 'method' } | null;
   /** Decimals of the token. */

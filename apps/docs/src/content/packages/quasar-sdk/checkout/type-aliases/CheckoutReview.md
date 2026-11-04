@@ -2,7 +2,7 @@
 
 > **CheckoutReview** = `object`
 
-Defined in: [checkout/types.ts:137](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L137)
+Defined in: [checkout/types.ts:141](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L141)
 
 Why a payment of a `held` (or flagged) invoice waits for the seller, as [CheckoutInvoice.review](/packages/quasar-sdk/checkout/interfaces/CheckoutInvoice.md#review) says it:
 
@@ -21,4 +21,4 @@ A transfer Quasar could tie to no invoice never holds the invoice: it is a rejec
 
 > **reason**: `"screening"` \| `"late"` \| `"overpaid"` \| `"quote_expired"`
 
-Defined in: [checkout/types.ts:137](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L137)
+Defined in: [checkout/types.ts:141](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/types.ts#L141)

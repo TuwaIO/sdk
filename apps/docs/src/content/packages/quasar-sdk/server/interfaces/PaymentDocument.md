@@ -1,6 +1,6 @@
 # PaymentDocument
 
-Defined in: [modules/payments/types.ts:642](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L642)
+Defined in: [modules/payments/types.ts:644](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L644)
 
 A downloaded document, byte for byte as issued.
 
@@ -10,7 +10,7 @@ A downloaded document, byte for byte as issued.
 
 > **bytes**: `Uint8Array`
 
-Defined in: [modules/payments/types.ts:644](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L644)
+Defined in: [modules/payments/types.ts:646](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L646)
 
 The file.
 
@@ -20,7 +20,7 @@ The file.
 
 > **contentType**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:646](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L646)
+Defined in: [modules/payments/types.ts:648](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L648)
 
 Its media type, for example `application/pdf`.
 
@@ -30,6 +30,6 @@ Its media type, for example `application/pdf`.
 
 > **filename**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:648](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L648)
+Defined in: [modules/payments/types.ts:650](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L650)
 
 Its file name, from `Content-Disposition`.

@@ -341,9 +341,8 @@ export interface CheckoutState {
    *   `payer_proof_required`, without a request while {@link CheckoutState.payerProof} is `required`, and from Quasar
    *   for a wallet it wants confirmed first, `phase` back at `selectMethod`). On an underpaid invoice it prices the
    *   rest ({@link CheckoutQuote.amountDue}) at the rate of the first quote, with no consent asked again, and refuses
-   *   with `409`: `payer_mismatch` and {@link CheckoutError.originWallet} (the rest is paid from the wallet that paid
-   *   first), `rest_method_mismatch` (in the method that paid first) or `rest_rate_expired`
-   *   (`checkout.invoice.restPayable` is `false`: the rate no longer holds, and the merchant can refund what arrived).
+   *   with `409`, back at `underpaid`: `payer_mismatch` and {@link CheckoutError.originWallet} (the rest is paid from the
+   *   wallet that paid first) or `rest_method_mismatch` (in the method that paid first).
    */
   requestQuote: () => Promise<CheckoutQuote | null>;
   /**
@@ -709,6 +708,19 @@ const quoteValid = (quote: CheckoutQuote | null, now: number): quote is Checkout
  */
 const OUTCOMES: ReadonlySet<string> = new Set([...FINAL, 'underpaid']);
 
+/**
+ * Whether the buyer stays on the payment step of the rest of an underpaid invoice: it stays underpaid during it, and
+ * the quote of the rest is itself an event. Only more money arriving makes the amounts of the quote old.
+ */
+function payingRest(phase: CheckoutPhase, quote: CheckoutQuote | null, event: CheckoutStatusEvent): boolean {
+  if (event.status !== 'underpaid') return false;
+  if (phase === 'quoting') return true;
+  if (phase !== 'awaitingPayment' && phase !== 'submitting') return false;
+  return (
+    Boolean(quote) && BigInt(quote!.cryptoAmountExpected) - BigInt(event.amountPaid ?? 0) === BigInt(quote!.amountDue)
+  );
+}
+
 /** The phase an invoice state stands for, once a payment is under way or over. */
 function phaseOfStatus(status: InvoiceStatus): CheckoutPhase {
   switch (status) {
@@ -746,7 +758,6 @@ const PHASE_OF_REFUSAL: Record<string, CheckoutPhase> = {
   invoice_processing: 'confirming',
   payer_mismatch: 'underpaid',
   rest_method_mismatch: 'underpaid',
-  rest_rate_expired: 'underpaid',
 };
 
 /** How a payment the store follows, or the latest one of a reopened page, ended without paying the invoice. */
@@ -1165,8 +1176,11 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       api
         .view()
         .then((view) => {
-          // The details only: the phase follows the events, and the buyer's quote stays as the actions left it
-          if (!destroyed) update({ checkout: view });
+          if (destroyed) return;
+          // The details only: the phase follows the events, and the buyer's quote stays as the actions left it. On an
+          // underpaid invoice what is left, and the method that paid, are Quasar's
+          const rest = view.invoice.status === 'underpaid' && view.quote;
+          update({ checkout: view, ...(rest ? { quote: rest, methodId: rest.methodId } : {}) });
         })
         .catch(() => {
           // The outcome stands; its details come with the next load
@@ -1324,7 +1338,7 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
         });
       } else if (event.status === 'open') {
         if (phase === 'loading') partial.phase = 'selectMethod';
-      } else {
+      } else if (!(previous === 'underpaid' && payingRest(phase, get().quote, event))) {
         partial.phase = phaseOfStatus(event.status);
       }
       if (followed && !ended) {
@@ -1657,8 +1671,14 @@ export function createCheckoutStore(options: CheckoutStoreOptions): CheckoutStor
       },
 
       setPayer: (payer) => {
-        const { quote, phase } = get();
+        const { quote, phase, invoiceStatus, checkout } = get();
         const drop = quote && quote.payer !== payer;
+        // The rest of an underpaid invoice has no methods to go back to, and its outcome reads the amounts of the quote
+        const rest = (invoiceStatus ?? checkout?.invoice.status) === 'underpaid';
+        if (drop && rest) {
+          update({ payer, phase: phase === 'awaitingPayment' ? 'underpaid' : phase });
+          return;
+        }
         update({
           payer,
           ...(drop ? { quote: null, phase: phase === 'awaitingPayment' ? 'selectMethod' : phase } : {}),

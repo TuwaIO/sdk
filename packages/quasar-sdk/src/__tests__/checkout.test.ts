@@ -74,6 +74,7 @@ const view = (overrides: Partial<CheckoutView> = {}): CheckoutView => ({
     cancelUrl: null,
     amountPaid: null,
     restPayable: false,
+    originWallet: null,
     review: null,
     refundedTotalMinor: null,
     replacedBy: null,
@@ -109,6 +110,7 @@ const QUOTE = {
   cryptoAmountExpected: '49000000',
   amountDue: '49000000',
   amountToSend: '49000000',
+  rateHeldUntil: null,
   transferFee: null,
   decimals: 6,
   symbol: 'USDC',
@@ -2750,28 +2752,6 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
     checkout.getState().destroy();
   });
 
-  it('stays on the underpaid outcome when the rate of the rest no longer holds', async () => {
-    answer(
-      {
-        invoice: { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'],
-        quote: QUOTE as never,
-      },
-      {
-        quote: () =>
-          json({ error: { code: 'rest_rate_expired', message: 'The rate of this invoice no longer holds' } }, 409),
-      },
-    );
-    const checkout = store({ EventSource: null });
-    await checkout.getState().load();
-    checkout.getState().setPayer(PAYER);
-    expect(await checkout.getState().requestQuote()).toBeNull();
-    expect(checkout.getState()).toMatchObject({
-      phase: 'underpaid',
-      error: { code: 'rest_rate_expired', status: 409 },
-    });
-    checkout.getState().destroy();
-  });
-
   it('goes back to the underpaid outcome from the quote of a rest, keeping what it says about the amounts', async () => {
     const rest = { ...QUOTE, amountDue: '48000000', amountToSend: '48000000' };
     const invoice = { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'];
@@ -2787,8 +2767,8 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
     checkout.getState().destroy();
   });
 
-  // The rate ended, or another wallet became active over the quote of the rest
-  it.each(['rest_rate_expired', 'payer_mismatch'])('leaves the payment step of a rest on %s', async (code) => {
+  // Another wallet became active over the quote of the rest, or the page chose another method
+  it.each(['payer_mismatch', 'rest_method_mismatch'])('leaves the payment step of a rest on %s', async (code) => {
     const invoice = { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'];
     fetchMock
       .mockResolvedValueOnce(json(view({ invoice, quote: QUOTE as never })))
@@ -2803,6 +2783,86 @@ describe('createCheckoutStore: the paying wallet confirms the invoice, held tran
     expect(await checkout.getState().requestQuote()).toBeNull();
     expect(checkout.getState()).toMatchObject({ phase: 'underpaid', error: { code } });
     checkout.getState().destroy();
+  });
+
+  // The rest of an underpaid invoice has a payment step, and the invoice stays underpaid during it
+  describe('on the payment step of a rest', () => {
+    const rest = { ...QUOTE, cryptoAmountExpected: '49000000', amountDue: '48000000', amountToSend: '48000000' };
+    const invoice = { ...view().invoice, status: 'underpaid', amountPaid: '1000000' } as CheckoutView['invoice'];
+    const event = (amountPaid: string, signals = {}) => ({
+      ...signal('underpaid', 7, signals),
+      amountPaid,
+    });
+
+    /** The page on the payment step of the rest, following the invoice by events. */
+    const onRest = async () => {
+      fetchMock.mockResolvedValueOnce(json(view({ invoice, quote: rest as never }))).mockResolvedValueOnce(json(rest));
+      const checkout = store();
+      await checkout.getState().load();
+      checkout.getState().setPayer(QUOTE.payer);
+      await checkout.getState().requestQuote();
+      expect(checkout.getState().phase).toBe('awaitingPayment');
+      return { checkout, events: FakeEventSource.instances.at(-1)! };
+    };
+
+    it('stays when the stream says nothing new: the quote of the rest is itself such an event', async () => {
+      const { checkout, events } = await onRest();
+      events.emit('status', event('1000000'));
+      expect(checkout.getState()).toMatchObject({ phase: 'awaitingPayment', quote: { amountDue: '48000000' } });
+      checkout.getState().destroy();
+    });
+
+    it('stays when a read says nothing new', async () => {
+      fetchMock
+        .mockResolvedValueOnce(json(view({ invoice, quote: rest as never })))
+        .mockResolvedValueOnce(json(rest))
+        .mockResolvedValueOnce(json(view({ invoice, quote: rest as never })));
+      vi.useFakeTimers();
+      const checkout = store({ EventSource: null });
+      await checkout.getState().load();
+      checkout.getState().setPayer(QUOTE.payer);
+      await checkout.getState().requestQuote();
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+      expect(checkout.getState().phase).toBe('awaitingPayment');
+      checkout.getState().destroy();
+    });
+
+    it('goes to the outcome when more arrived: the amounts of the quote are old', async () => {
+      const { checkout, events } = await onRest();
+      fetchMock.mockResolvedValueOnce(
+        json(view({ invoice: { ...invoice, amountPaid: '2000000' }, quote: rest as never })),
+      );
+      events.emit('status', event('2000000'));
+      expect(checkout.getState().phase).toBe('underpaid');
+      checkout.getState().destroy();
+    });
+
+    it('keeps the amounts and the outcome when another wallet becomes active', async () => {
+      const { checkout } = await onRest();
+      const another = 'eip155:8453:0x3333333333333333333333333333333333333333';
+      checkout.getState().setPayer(another);
+      expect(checkout.getState()).toMatchObject({
+        phase: 'underpaid',
+        quote: { amountDue: '48000000' },
+        payer: another,
+      });
+      checkout.getState().destroy();
+    });
+
+    it('takes the quote and the method of the rest when a part arrives under another lock', async () => {
+      const other = { ...QUOTE, methodId: 'ap_other' };
+      fetchMock
+        .mockResolvedValueOnce(json(view({ quote: other as never })))
+        .mockResolvedValueOnce(json(view({ invoice, quote: rest as never })));
+      const checkout = store();
+      await checkout.getState().load();
+      FakeEventSource.instances[0].emit('status', event('1000000'));
+      await vi.waitFor(() =>
+        expect(checkout.getState()).toMatchObject({ methodId: 'ap_1', quote: { amountDue: '48000000' } }),
+      );
+      checkout.getState().destroy();
+    });
   });
 
   // Quasar's word wins over a checkout read before the merchant changed the method

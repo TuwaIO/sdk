@@ -240,6 +240,9 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           methodId: z.string().nullable(),
           payer: z.string(),
           cryptoAmountExpected: z.string().nullable(),
+          amountDue: z.string().nullable().openapi({
+            description: 'What must still arrive: the whole price, or the rest of an `underpaid` invoice.',
+          }),
           amountToSend: z.string().nullable().openapi({
             description:
               'What the buyer sends: what must still arrive (the whole price, or the rest of an `underpaid` invoice), grossed up for a transfer fee.',
@@ -1208,6 +1211,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
           'What must still arrive, in base units: `cryptoAmountExpected`, or on an underpaid invoice what is left of it, at the same rate.',
       }),
       amountToSend: z.string().openapi({ description: '`amountDue` grossed up for a transfer fee, in base units.' }),
+      rateHeldUntil: z.string().nullable().openapi({
+        description:
+          'On the quote of a rest in an asset that moves against the invoice currency: until when its rate holds. A payment after this time waits for the merchant to accept or refund it (`review.reason` `quote_expired`).',
+      }),
       transferFee: z
         .object({ bps: z.number(), maxFee: z.string().nullable(), source: z.enum(['contract', 'method']) })
         .nullable(),
@@ -1321,7 +1328,10 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         amountPaid: z.string().nullable().openapi({ description: 'Base units of the quoted asset received so far.' }),
         restPayable: z.boolean().openapi({
           description:
-            'Whether the rest of an underpaid invoice can be quoted now: its method is on and its rate holds (a stablecoin of the invoice currency until the due date, any other asset as long as the quote that locked the rate).',
+            'Whether the rest of an underpaid invoice can be quoted now: its method is on, something is left and it is not past the due date.',
+        }),
+        originWallet: z.string().nullable().openapi({
+          description: 'The wallet that paid an underpaid invoice first, the only one that pays the rest.',
         }),
         review: z
           .object({ reason: z.enum(['screening', 'late', 'overpaid', 'quote_expired']) })
@@ -1499,7 +1509,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     'post',
     '/quote',
     'Lock a quote',
-    'Screens the payer (AML) and locks the price for the method; a new quote replaces the open one. On an underpaid invoice it quotes the rest instead (`amountDue`): only to the wallet and in the method that paid first, at the rate that payment was quoted, with no consent asked again and no gasless offer. A Solana Pay QR quote has no payer. An EVM payer must have confirmed the invoice first (`payer-proof`), checked before screening and pricing, unless the gasless relay may pay the method (`methods[].payerProof` `unless_relayed`).',
+    'Screens the payer (AML) and locks the price for the method; a new quote replaces the open one. On an underpaid invoice it quotes the rest instead (`amountDue`): only to the wallet and in the method that paid first, at the rate that payment was quoted, with no consent asked again and no gasless offer, in new quote windows up to the due date (`rateHeldUntil` says until when the rate of a moving asset holds). A Solana Pay QR quote has no payer. An EVM payer must have confirmed the invoice first (`payer-proof`), checked before screening and pricing, unless the gasless relay may pay the method (`methods[].payerProof` `unless_relayed`).',
     {
       request: {
         body: json(
@@ -1517,7 +1527,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
         200: { description: 'The quote and its payment instructions.', ...json(CheckoutQuote) },
         400: invalid('`payer_required`, `payer_chain_mismatch`'),
         409: refused(
-          '`rest_method_mismatch` (the rest of an underpaid invoice is paid with the method that paid first; `methodId` names it), `rest_rate_expired` (its rate no longer holds), `buyer_required`, `consent_required` (a required consent without `consentGiven: true`), `payer_proof_required` (the EVM wallet has not confirmed the invoice: `payer-proof` first; `payer` names it), `invoice_expired`, `invoice_processing`, `invoice_not_payable`, `amount_out_of_range`, `method_not_priced`.',
+          '`payer_mismatch` (the rest of an underpaid invoice is paid from the wallet that paid first; `originWallet` names it), `rest_method_mismatch` (and with the method that paid first; `methodId` names it), `buyer_required`, `consent_required` (a required consent without `consentGiven: true`), `payer_proof_required` (the EVM wallet has not confirmed the invoice: `payer-proof` first; `payer` names it), `invoice_expired`, `invoice_processing`, `invoice_not_payable`, `amount_out_of_range`, `method_not_priced`.',
         ),
         503: refused('`screening_unavailable` (AML in `block` mode while a source is down), `price_unavailable`.'),
         ...checkoutErrors,
