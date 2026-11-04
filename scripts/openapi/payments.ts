@@ -51,7 +51,7 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   // -------------------------------------------------------------------------
   const Currency = z.enum(['USD', 'EUR']).openapi('PaymentsCurrency', { description: 'Fiat currency.' });
   const Locale = z
-    .enum(['en', 'zh-CN', 'es', 'ru', 'uk', 'it'])
+    .enum(['en', 'zh-CN', 'es', 'de', 'uk', 'it'])
     .openapi('InvoiceLocale', { description: 'Language of the invoice, its documents and emails.' });
   const TaxCategory = z.enum(['S', 'Z', 'E', 'AE', 'K', 'G', 'O']).openapi('TaxCategory', {
     description:

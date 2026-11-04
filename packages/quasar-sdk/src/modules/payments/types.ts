@@ -7,7 +7,7 @@
 export type PaymentsCurrency = 'USD' | 'EUR';
 
 /** Language of an invoice, its documents and its emails. */
-export type InvoiceLocale = 'en' | 'zh-CN' | 'es' | 'ru' | 'uk' | 'it';
+export type InvoiceLocale = 'en' | 'zh-CN' | 'es' | 'de' | 'uk' | 'it';
 
 /**
  * VAT category of a line (EN 16931 UNCL5305): `S` standard rate, `Z` zero rated, `E` exempt (needs
