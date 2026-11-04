@@ -85,6 +85,35 @@ describe('createRefundStore', () => {
     });
   });
 
+  it('shows what a refund would send without asking for it', async () => {
+    const shown = {
+      amount: '10.00',
+      currency: 'EUR',
+      cryptoAmount: '12000000',
+      symbol: 'USDC',
+      decimals: 6,
+      received: '50000000',
+      atPaymentRate: '10000000',
+    };
+    const preview = vi.fn().mockResolvedValue(shown);
+    const request = vi.fn();
+    const store = createRefundStore({ request, preview, submit: vi.fn(), get: vi.fn() });
+    expect(await store.getState().preview('inv_1', { amount: '10.00', mode: 'fiat_value' })).toEqual(shown);
+    expect(preview).toHaveBeenCalledWith('inv_1', { amount: '10.00', mode: 'fiat_value' });
+    expect(request).not.toHaveBeenCalled();
+    expect(store.getState()).toMatchObject({ phase: 'idle', refund: null });
+
+    preview.mockRejectedValueOnce(
+      new QuasarSDKError('The amount exceeds what is left', 400, new Error('x'), { code: 'amount_exceeds_refundable' }),
+    );
+    expect(await store.getState().preview('inv_1', { amount: '999.00' })).toBeNull();
+    expect(store.getState().error?.code).toBe('amount_exceeds_refundable');
+
+    const without = createRefundStore({ request, submit: vi.fn(), get: vi.fn() });
+    expect(await without.getState().preview('inv_1')).toBeNull();
+    expect(without.getState().error).toBeNull();
+  });
+
   it('keeps the refusal of the server and lets the merchant try again', async () => {
     const refusal = new QuasarSDKError('[Quasar SDK] Request Failed (409): Already used', 409, new Error('x'), {
       code: 'transaction_already_used',

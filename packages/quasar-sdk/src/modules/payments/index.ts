@@ -32,6 +32,7 @@ import type {
   QuoteParams,
   Refund,
   RefundParams,
+  RefundPreview,
   RefundStart,
   SubmitRefundParams,
   Subscription,
@@ -264,6 +265,21 @@ export class PaymentsModule {
     return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/events`, {
       method: 'GET',
       query: query({ verify: params.verify ? 'true' : undefined, limit: params.limit, cursor: params.cursor }),
+    });
+  }
+
+  /**
+   * Shows what a refund would send, without asking for it (`POST /v1/payments/invoices/:id/refunds/preview`).
+   *
+   * @param invoiceId - The invoice.
+   * @param params - Amount (everything left when omitted), mode and reason, as for {@link PaymentsModule.refund}.
+   * @returns What it would send now, what the payment brought, and this amount at the rate of the payment.
+   * @throws {QuasarSDKError} What {@link PaymentsModule.refund} would be refused with, a timeout or a network error.
+   */
+  async previewRefund(invoiceId: string, params: RefundParams = {}): Promise<RefundPreview> {
+    return this.client.request(`${PAYMENTS_ENDPOINT}/invoices/${segment(invoiceId)}/refunds/preview`, {
+      method: 'POST',
+      body: params,
     });
   }
 

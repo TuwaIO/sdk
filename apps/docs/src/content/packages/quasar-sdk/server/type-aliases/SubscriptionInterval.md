@@ -2,6 +2,6 @@
 
 > **SubscriptionInterval** = `"day"` \| `"week"` \| `"month"` \| `"year"`
 
-Defined in: [modules/payments/types.ts:803](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L803)
+Defined in: [modules/payments/types.ts:825](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L825)
 
 The billing period unit of a subscription.

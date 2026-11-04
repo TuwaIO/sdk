@@ -5,7 +5,7 @@
 import { createStore, type StoreApi } from 'zustand/vanilla';
 
 import { QuasarSDKError } from '../core/errors';
-import type { Refund, RefundParams, RefundStart, SubmitRefundParams } from '../modules/payments/types';
+import type { Refund, RefundParams, RefundPreview, RefundStart, SubmitRefundParams } from '../modules/payments/types';
 import type { CheckoutError } from './store';
 
 /**
@@ -26,6 +26,14 @@ export interface RefundState {
   instructions: RefundStart['instructions'] | null;
   /** Why the last action failed; cleared by the next one. */
   error: CheckoutError | null;
+  /**
+   * What a refund would send, through the option `preview`: nothing is asked for.
+   *
+   * @param invoiceId - The paid or held invoice.
+   * @param params - Amount (everything left when omitted), mode and reason.
+   * @returns The preview; `null` without the option, or when it failed (`error` says why).
+   */
+  preview: (invoiceId: string, params?: RefundParams) => Promise<RefundPreview | null>;
   /**
    * Asks for a refund of an invoice through `request`.
    *
@@ -56,6 +64,8 @@ export interface RefundState {
 export interface RefundStoreOptions {
   /** Asks for the refund, for example a Server Action that calls `quasar.payments.refund`. */
   request: (invoiceId: string, params: RefundParams) => Promise<RefundStart>;
+  /** Shows what a refund would send, for example through `quasar.payments.previewRefund`. Optional. */
+  preview?: (invoiceId: string, params: RefundParams) => Promise<RefundPreview>;
   /** Hands over its transaction, for example through `quasar.payments.submitRefund`. */
   submit: (refundId: string, params: SubmitRefundParams) => Promise<Refund>;
   /** Reads the refund, for example through `quasar.payments.getRefund`. */
@@ -140,6 +150,17 @@ export function createRefundStore(options: RefundStoreOptions): RefundStore {
       refund: null,
       instructions: null,
       error: null,
+
+      preview: async (invoiceId, params = {}) => {
+        if (!options.preview) return null;
+        set({ error: null });
+        try {
+          return await options.preview(invoiceId, params);
+        } catch (error) {
+          set({ error: errorOf(error) });
+          return null;
+        }
+      },
 
       start: async (invoiceId, params = {}) => {
         stop();

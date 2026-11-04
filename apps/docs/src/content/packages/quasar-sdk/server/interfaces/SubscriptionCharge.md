@@ -1,6 +1,6 @@
 # SubscriptionCharge
 
-Defined in: [modules/payments/types.ts:917](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L917)
+Defined in: [modules/payments/types.ts:939](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L939)
 
 An automatic charge of a subscription period.
 
@@ -10,7 +10,7 @@ An automatic charge of a subscription period.
 
 > **amount**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:936](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L936)
+Defined in: [modules/payments/types.ts:958](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L958)
 
 Amount in base units.
 
@@ -20,7 +20,7 @@ Amount in base units.
 
 > **attempts**: `number`
 
-Defined in: [modules/payments/types.ts:934](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L934)
+Defined in: [modules/payments/types.ts:956](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L956)
 
 Attempts so far.
 
@@ -30,7 +30,7 @@ Attempts so far.
 
 > **chainId**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:938](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L938)
+Defined in: [modules/payments/types.ts:960](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L960)
 
 CAIP-2 chain.
 
@@ -40,7 +40,7 @@ CAIP-2 chain.
 
 > **createdAt**: `string`
 
-Defined in: [modules/payments/types.ts:948](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L948)
+Defined in: [modules/payments/types.ts:970](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L970)
 
 When it was scheduled.
 
@@ -50,7 +50,7 @@ When it was scheduled.
 
 > **finishedAt**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:946](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L946)
+Defined in: [modules/payments/types.ts:968](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L968)
 
 When it finished.
 
@@ -60,7 +60,7 @@ When it finished.
 
 > **id**: `string`
 
-Defined in: [modules/payments/types.ts:919](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L919)
+Defined in: [modules/payments/types.ts:941](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L941)
 
 Charge ID.
 
@@ -70,7 +70,7 @@ Charge ID.
 
 > **invoiceId**: `string`
 
-Defined in: [modules/payments/types.ts:923](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L923)
+Defined in: [modules/payments/types.ts:945](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L945)
 
 The invoice it pays.
 
@@ -80,7 +80,7 @@ The invoice it pays.
 
 > **notBefore**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:944](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L944)
+Defined in: [modules/payments/types.ts:966](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L966)
 
 Not before.
 
@@ -90,7 +90,7 @@ Not before.
 
 > **object**: `"subscription_charge"`
 
-Defined in: [modules/payments/types.ts:921](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L921)
+Defined in: [modules/payments/types.ts:943](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L943)
 
 Always `subscription_charge`.
 
@@ -100,7 +100,7 @@ Always `subscription_charge`.
 
 > **period**: `number` \| `null`
 
-Defined in: [modules/payments/types.ts:925](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L925)
+Defined in: [modules/payments/types.ts:947](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L947)
 
 The period.
 
@@ -110,7 +110,7 @@ The period.
 
 > **reason**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:932](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L932)
+Defined in: [modules/payments/types.ts:954](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L954)
 
 Why it failed (a stable code).
 
@@ -120,7 +120,7 @@ Why it failed (a stable code).
 
 > **status**: `"submitted"` \| `"failed"` \| `"canceled"` \| `"pending"` \| `"sending"`
 
-Defined in: [modules/payments/types.ts:930](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L930)
+Defined in: [modules/payments/types.ts:952](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L952)
 
 `pending` (waits for its window or a retry), `sending`, `submitted` (its transaction settles the invoice like any
 payment), `failed` or `canceled`.
@@ -131,7 +131,7 @@ payment), `failed` or `canceled`.
 
 > **txHash**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:942](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L942)
+Defined in: [modules/payments/types.ts:964](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L964)
 
 Its transaction.
 
@@ -141,6 +141,6 @@ Its transaction.
 
 > **userOpHash**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:940](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L940)
+Defined in: [modules/payments/types.ts:962](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L962)
 
 The user operation.

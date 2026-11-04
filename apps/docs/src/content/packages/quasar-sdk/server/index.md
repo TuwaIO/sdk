@@ -59,6 +59,7 @@ package; the browser helper for React apps is in `@tuwaio/quasar-sdk/react`.
 - [QuoteParams](/packages/quasar-sdk/server/interfaces/QuoteParams.md)
 - [Refund](/packages/quasar-sdk/server/interfaces/Refund.md)
 - [RefundParams](/packages/quasar-sdk/server/interfaces/RefundParams.md)
+- [RefundPreview](/packages/quasar-sdk/server/interfaces/RefundPreview.md)
 - [RefundStart](/packages/quasar-sdk/server/interfaces/RefundStart.md)
 - [SubmitRefundParams](/packages/quasar-sdk/server/interfaces/SubmitRefundParams.md)
 - [Subscription](/packages/quasar-sdk/server/interfaces/Subscription.md)

@@ -702,6 +702,28 @@ export interface RefundStart {
   };
 }
 
+/**
+ * What a refund would send, as {@link PaymentsModule.previewRefund} returns it. A requested refund holds its amount until
+ * it is sent, so look before asking: the same amount in the invoice currency sends a different number of tokens once a
+ * volatile asset has moved.
+ */
+export interface RefundPreview {
+  /** The amount in the invoice currency. */
+  amount: string;
+  /** The invoice currency. */
+  currency: string;
+  /** What the refund would send now, in base units. */
+  cryptoAmount: string;
+  /** Symbol of the token. */
+  symbol: string;
+  /** Decimals of the token. */
+  decimals: number;
+  /** What the payment brought, in base units. */
+  received: string | null;
+  /** What this amount was worth in tokens at the rate of the payment, in base units; `null` for `exact_received`. */
+  atPaymentRate: string | null;
+}
+
 /** What {@link PaymentsModule.submitRefund} takes. */
 export interface SubmitRefundParams {
   /** The refund transaction (hash or Solana signature). */

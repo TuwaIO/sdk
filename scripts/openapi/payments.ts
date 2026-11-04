@@ -24,6 +24,7 @@ import type {
   PaymentsList,
   PaymentWebhookEvent,
   Refund,
+  RefundPreview,
   RefundStart,
   Subscription,
   SubscriptionCharge,
@@ -510,6 +511,22 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _checkRefundStart: z.ZodType<RefundStart> = RefundStart;
 
+  const RefundPreview = z
+    .object({
+      amount: z.string(),
+      currency: z.string(),
+      cryptoAmount: z.string().openapi({ description: 'What the refund would send now, in base units.' }),
+      symbol: z.string(),
+      decimals: z.number(),
+      received: z.string().nullable().openapi({ description: 'What the payment brought, in base units.' }),
+      atPaymentRate: z.string().nullable().openapi({
+        description: 'This amount at the rate of the payment, in base units; `null` for `exact_received`.',
+      }),
+    })
+    .openapi('RefundPreview');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _checkRefundPreview: z.ZodType<RefundPreview> = RefundPreview;
+
   const HeldTransferStatus = z.enum(['held', 'refunding', 'refunded', 'voided']);
   const HeldTransfer = z
     .object({
@@ -962,6 +979,35 @@ export function registerPayments(registry: OpenAPIRegistry, secretKey: string): 
     {
       request: { params: z.object({ id: z.string(), ref: z.string() }) },
       responses: { 200: file('The file.'), 404: refused('`document_not_found`.'), ...common },
+    },
+  );
+  route(
+    'post',
+    '/invoices/{id}/refunds/preview',
+    'Refunds',
+    'See what a refund would send',
+    'Nothing is asked for. A requested refund holds its amount until it is sent, so look first: the same amount in the invoice currency sends a different number of tokens once a volatile asset has moved. Refused as the refund would be.',
+    {
+      request: {
+        params: idParam('id', 'Invoice ID.'),
+        body: json(
+          z.object({
+            amount: z
+              .string()
+              .optional()
+              .openapi({ description: 'In the invoice currency; everything left when omitted.' }),
+            mode: z.enum(['fiat_value', 'exact_received']).optional(),
+            reason: z.string().optional(),
+          }),
+        ),
+      },
+      responses: {
+        200: { description: 'What the refund would send.', ...json(RefundPreview) },
+        400: invalid('`amount_exceeds_refundable`, `held_refund_must_be_whole`'),
+        404: refused('`invoice_not_found`.'),
+        409: refused('`invoice_not_refundable`, `exact_refund_needs_whole_invoice`, `payment_unknown`.'),
+        ...common,
+      },
     },
   );
   route(

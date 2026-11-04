@@ -36,6 +36,36 @@ Where the refund stands.
 
 ***
 
+### preview
+
+> **preview**: (`invoiceId`, `params?`) => `Promise`\<[`RefundPreview`](/packages/quasar-sdk/server/interfaces/RefundPreview.md) \| `null`\>
+
+Defined in: [checkout/refundStore.ts:36](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L36)
+
+What a refund would send, through the option `preview`: nothing is asked for.
+
+#### Parameters
+
+##### invoiceId
+
+`string`
+
+The paid or held invoice.
+
+##### params?
+
+[`RefundParams`](/packages/quasar-sdk/server/interfaces/RefundParams.md)
+
+Amount (everything left when omitted), mode and reason.
+
+#### Returns
+
+`Promise`\<[`RefundPreview`](/packages/quasar-sdk/server/interfaces/RefundPreview.md) \| `null`\>
+
+The preview; `null` without the option, or when it failed (`error` says why).
+
+***
+
 ### refund
 
 > **refund**: [`Refund`](/packages/quasar-sdk/server/interfaces/Refund.md) \| `null`
@@ -50,7 +80,7 @@ The refund, once asked for.
 
 > **reset**: () => `void`
 
-Defined in: [checkout/refundStore.ts:52](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L52)
+Defined in: [checkout/refundStore.ts:60](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L60)
 
 Stops following and returns to `idle`.
 
@@ -64,7 +94,7 @@ Stops following and returns to `idle`.
 
 > **resume**: (`refund`, `instructions`) => `void`
 
-Defined in: [checkout/refundStore.ts:43](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L43)
+Defined in: [checkout/refundStore.ts:51](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L51)
 
 Continues a refund that waits for its transaction (asked for earlier, or through the API).
 
@@ -92,7 +122,7 @@ What to send, as `request` returned it.
 
 > **start**: (`invoiceId`, `params?`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/refundStore.ts:36](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L36)
+Defined in: [checkout/refundStore.ts:44](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L44)
 
 Asks for a refund of an invoice through `request`.
 
@@ -122,7 +152,7 @@ Whether it was asked for; `phase` is then `awaitingTransfer`.
 
 > **submit**: (`params`) => `Promise`\<`boolean`\>
 
-Defined in: [checkout/refundStore.ts:50](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L50)
+Defined in: [checkout/refundStore.ts:58](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/checkout/refundStore.ts#L58)
 
 Hands over the refund transaction through `submit`, then follows the refund through `get` until it is final.
 

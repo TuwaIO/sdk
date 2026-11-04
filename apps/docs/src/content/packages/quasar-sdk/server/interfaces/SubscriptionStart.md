@@ -1,6 +1,6 @@
 # SubscriptionStart
 
-Defined in: [modules/payments/types.ts:968](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L968)
+Defined in: [modules/payments/types.ts:990](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L990)
 
 A started or resumed subscription with the invoice of its period and that invoice's payment page.
 
@@ -10,7 +10,7 @@ A started or resumed subscription with the invoice of its period and that invoic
 
 > **checkoutToken**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:974](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L974)
+Defined in: [modules/payments/types.ts:996](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L996)
 
 That invoice's checkout token.
 
@@ -20,7 +20,7 @@ That invoice's checkout token.
 
 > **invoice**: [`Invoice`](/packages/quasar-sdk/server/interfaces/Invoice.md) \| `null`
 
-Defined in: [modules/payments/types.ts:972](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L972)
+Defined in: [modules/payments/types.ts:994](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L994)
 
 The invoice of its first (or resumed) period; `null` during a trial.
 
@@ -30,7 +30,7 @@ The invoice of its first (or resumed) period; `null` during a trial.
 
 > **payUrl**: `string` \| `null`
 
-Defined in: [modules/payments/types.ts:976](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L976)
+Defined in: [modules/payments/types.ts:998](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L998)
 
 That invoice's payment page.
 
@@ -40,6 +40,6 @@ That invoice's payment page.
 
 > **subscription**: [`Subscription`](/packages/quasar-sdk/server/interfaces/Subscription.md)
 
-Defined in: [modules/payments/types.ts:970](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L970)
+Defined in: [modules/payments/types.ts:992](https://github.com/TuwaIO/sdk/blob/main/packages/quasar-sdk/src/modules/payments/types.ts#L992)
 
 The subscription.
