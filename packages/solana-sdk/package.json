@@ -1,6 +1,6 @@
 {
   "name": "@tuwaio/solana-sdk",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "private": false,
   "author": "Oleksandr Tkach",
   "license": "Apache-2.0",
@@ -82,7 +82,7 @@
   ],
   "dependencies": {
     "@tuwaio/orbit-solana": "^0.7.2",
-    "@tuwaio/pulsar-solana": "^0.10.5",
+    "@tuwaio/pulsar-solana": "^0.11.0",
     "@tuwaio/satellite-solana": "^0.11.2",
     "@tuwaio/siwx-solana": "^0.7.1"
   },

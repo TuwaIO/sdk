@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     server: {
       deps: {
-        inline: [/@tuwaio\/.*/, /dayjs/],
+        inline: [/@tuwaio\/.*/],
       },
     },
   },
