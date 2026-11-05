@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.4](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.7.3...quasar-sdk-v0.7.4) (2026-11-05)
+
+
+### Bug Fixes
+
+* **deps:** Nova 0.11, Pulsar 0.12.1 and Satellite Connect EVM 0.10.3 — a speed-up stays one operation ([#67](https://github.com/TuwaIO/sdk/issues/67)) ([09aa712](https://github.com/TuwaIO/sdk/commit/09aa712465d9e17aa8bd1acfb741dd588181b78a))
+
 ## [0.7.3](https://github.com/TuwaIO/sdk/compare/quasar-sdk-v0.7.2...quasar-sdk-v0.7.3) (2026-10-28)
 
 
