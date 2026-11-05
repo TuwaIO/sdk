@@ -95,7 +95,7 @@
   },
   "peerDependencies": {
     "@tuwaio/satellite-core": ">=0.7",
-    "@tuwaio/sdk": ">=0.6",
+    "@tuwaio/sdk": ">=0.6.10",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
