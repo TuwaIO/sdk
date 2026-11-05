@@ -15,10 +15,6 @@
       "package-name": "@tuwaio/solana-sdk",
       "release-type": "node",
       "initial-version": "0.0.1"
-    },
-    "packages/quasar-sdk": {
-      "package-name": "@tuwaio/quasar-sdk",
-      "release-type": "node"
     }
   },
   "initial-version": "0.0.1"
