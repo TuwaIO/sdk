@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.6](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.5...solana-sdk-v0.6.6) (2026-11-05)
+
+
+### Bug Fixes
+
+* **deps:** Nova 0.11, Pulsar 0.12.1 and Satellite Connect EVM 0.10.3 — a speed-up stays one operation ([#67](https://github.com/TuwaIO/sdk/issues/67)) ([09aa712](https://github.com/TuwaIO/sdk/commit/09aa712465d9e17aa8bd1acfb741dd588181b78a))
+
 ## [0.6.5](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.4...solana-sdk-v0.6.5) (2026-10-28)
 
 
