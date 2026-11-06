@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.7](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.6...evm-sdk-v0.6.7) (2026-11-06)
+
+
+### Bug Fixes
+
+* **deps:** Nova Connect 0.11.1 and Pulsar EVM 0.12 — no crash with no wallet to list, and a spent nonce told from a free one ([#71](https://github.com/TuwaIO/sdk/issues/71)) ([91e9569](https://github.com/TuwaIO/sdk/commit/91e9569a68540cdde202c35dfaba55471f310732))
+
 ## [0.6.6](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.5...evm-sdk-v0.6.6) (2026-11-05)
 
 
