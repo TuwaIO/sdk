@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.12](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.11...sdk-v0.6.12) (2026-11-06)
+
+
+### Bug Fixes
+
+* **deps:** Nova 0.12 and Pulsar EVM 0.13 — a hash only the wallet holds is read through the wallet ([#73](https://github.com/TuwaIO/sdk/issues/73)) ([592e14b](https://github.com/TuwaIO/sdk/commit/592e14b6639ffa345b2fa3a25078e9910c9c82ec))
+
 ## [0.6.11](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.10...sdk-v0.6.11) (2026-11-06)
 
 
