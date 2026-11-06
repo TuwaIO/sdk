@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.9](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.8...evm-sdk-v0.6.9) (2026-11-06)
+
+
+### Bug Fixes
+
+* **deps:** Pulsar EVM 0.13.1 — a spent nonce is found from the sender's count, not by reading every block ([#75](https://github.com/TuwaIO/sdk/issues/75)) ([5c22ca3](https://github.com/TuwaIO/sdk/commit/5c22ca3faee21b2b40cf79e295859e07085dafc4))
+
 ## [0.6.8](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.7...evm-sdk-v0.6.8) (2026-11-06)
 
 
