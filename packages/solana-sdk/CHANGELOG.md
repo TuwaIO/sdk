@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.7](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.6...solana-sdk-v0.6.7) (2026-11-05)
+
+
+### Bug Fixes
+
+* **deps:** the SDK publishes without quasar-sdk, whose releases moved to quasar-client ([#69](https://github.com/TuwaIO/sdk/issues/69)) ([db6779f](https://github.com/TuwaIO/sdk/commit/db6779fe3c342c51dba3b2f1a660aca7c0d7ce3c))
+
 ## [0.6.6](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.5...solana-sdk-v0.6.6) (2026-11-05)
 
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.11](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.10...sdk-v0.6.11) (2026-11-06)
+
+
+### Bug Fixes
+
+* **deps:** Nova Connect 0.11.1 and Pulsar EVM 0.12 — no crash with no wallet to list, and a spent nonce told from a free one ([#71](https://github.com/TuwaIO/sdk/issues/71)) ([91e9569](https://github.com/TuwaIO/sdk/commit/91e9569a68540cdde202c35dfaba55471f310732))
+
+## [0.6.10](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.9...sdk-v0.6.10) (2026-11-05)
+
+
+### Bug Fixes
+
+* **deps:** the SDK publishes without quasar-sdk, whose releases moved to quasar-client ([#69](https://github.com/TuwaIO/sdk/issues/69)) ([db6779f](https://github.com/TuwaIO/sdk/commit/db6779fe3c342c51dba3b2f1a660aca7c0d7ce3c))
+
 ## [0.6.9](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.8...sdk-v0.6.9) (2026-11-05)
 
 
