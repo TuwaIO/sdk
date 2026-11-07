@@ -32,4 +32,13 @@ describe('the stylesheets of @tuwaio/sdk', () => {
   it('carry the license of the fonts along with the fonts', () => {
     expect(existsSync(path.join(stylesDir, 'fonts', 'OFL-Geist.txt'))).toBe(true);
   });
+
+  it('keep every Nova package on the mono font of TUWA', () => {
+    // Each Nova package builds Tailwind with its own prefix on the default mono, a system font. Nova Core maps them to
+    // --tuwa-font-mono, and these copies are taken at build time, so an app sees the mapping only of the version built here.
+    const all = readFileSync(path.join(stylesDir, 'all.css'), 'utf8').replace(/\s/g, '');
+
+    expect(all.includes('--novacon-font-mono:var(--tuwa-font-mono)')).toBe(true);
+    expect(all.includes('--novatx-font-mono:var(--tuwa-font-mono)')).toBe(true);
+  });
 });
