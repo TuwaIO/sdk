@@ -181,7 +181,7 @@
     "@radix-ui/react-select": "^2.4.1",
     "@tuwaio/nova-connect": "^0.13.0",
     "@tuwaio/nova-core": "^0.13.0",
-    "@tuwaio/nova-transactions": "^0.13.0",
+    "@tuwaio/nova-transactions": "^0.13.1",
     "@tuwaio/orbit-core": "^0.6.2",
     "@tuwaio/pulsar-core": "^0.12.4",
     "@tuwaio/pulsar-react": "^0.8.0",
