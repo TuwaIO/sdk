@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/TuwaIO/sdk/compare/sdk-v0.7.0...sdk-v0.7.1) (2026-11-07)
+
+
+### Bug Fixes
+
+* **deps:** the mono font of TUWA in the bundled Nova stylesheets ([#79](https://github.com/TuwaIO/sdk/issues/79)) ([57dd9bc](https://github.com/TuwaIO/sdk/commit/57dd9bc0e68069833b8582c0536da2eabddb10aa))
+
 ## [0.7.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.12...sdk-v0.7.0) (2026-11-07)
 
 
