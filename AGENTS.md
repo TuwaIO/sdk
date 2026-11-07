@@ -15,7 +15,7 @@
 - **Testing:** `vitest` v5 (per package, `pnpm test`). No DOM library.
 - **Frameworks:** `apps/docs`: Next.js 16, Nextra 4, Tailwind CSS v4, `@tuwaio/docs-ui`, Pagefind.
 - **Docs generation:** the page script in `apps/docs/package-pages/`.
-- **Build/Monorepo:** `tsup` for `packages/*` (ESM/CJS/DTS; `@tuwaio/sdk` then copies the Nova stylesheets with `scripts/bundle-styles.js`), `release-please` (stable releases from `main`) and `semantic-release` (`alpha.release.config.js`, prereleases).
+- **Build/Monorepo:** `tsup` for `packages/*` (ESM/CJS/DTS; `@tuwaio/sdk` then copies the Nova stylesheets and the fonts they name with `scripts/bundle-styles.js`), `release-please` (stable releases from `main`) and `semantic-release` (`alpha.release.config.js`, prereleases).
 
 ## 3. Architecture & Directory Structure
 
@@ -29,7 +29,7 @@ sdk/
 │       └── package-pages/             # packagePages.mjs, stripBadges.mjs, packages-overview.md, meta/ (sidebar labels)
 ├── packages/
 │   ├── sdk/                           # L8: one file per subpath in src/ (orbit.ts, pulsar.ts, satellite.ts, satellite-react.ts, siwx*.ts, nova-*.ts)
-│   │   └── scripts/bundle-styles.js   # Copies dist/index.css of the Nova packages to dist/styles/
+│   │   └── scripts/bundle-styles.js   # Copies dist/index.css of the Nova packages and the fonts of Nova Core to dist/styles/
 │   ├── evm-sdk/                       # L9: src/{orbit,pulsar,pulsar-safe,satellite,siwx,nova-connect}.ts
 │   └── solana-sdk/                    # L9: same subpaths for Solana
 └── package.json                       # Root scripts
@@ -63,7 +63,7 @@ sdk/
 
 ## 5. Key Workflows
 
-- **Build:** `pnpm build` (tsup in every package; `@tuwaio/sdk` then copies the Nova stylesheets). The tests of `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` import the built `@tuwaio/sdk`: rebuild it after changing it.
+- **Build:** `pnpm build` (tsup in every package; `@tuwaio/sdk` then copies the Nova stylesheets and fonts). The tests of `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` import the built `@tuwaio/sdk`: rebuild it after changing it.
 - **Test:** `pnpm test` (`vitest run` in every package).
 - **Lint/Format:** `pnpm lint` / `pnpm lint:fix` (ESLint) and `pnpm format` (Prettier; `CHANGELOG.md`, `next-env.d.ts`, `pnpm-lock.yaml` and the generated pages are ignored).
 - **Docs:** `pnpm docs:gen` (`packagePages.mjs` and the sidebar labels; also runs in the pre-commit hook). `pnpm --filter @tuwaio/sdk-docs dev` runs the site.

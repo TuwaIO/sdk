@@ -46,4 +46,11 @@ const allCss = [
 ].join('\n\n');
 
 fs.writeFileSync(path.resolve(distStylesDir, 'all.css'), allCss);
+
+// The stylesheet of Nova Core names its fonts relative to itself (`url(./fonts/...)`), so its copies need them next to
+// them: a bundler fails the build of the app on a url() it cannot resolve.
+if (coreCssPath) {
+  fs.cpSync(path.join(path.dirname(coreCssPath), 'fonts'), path.join(distStylesDir, 'fonts'), { recursive: true });
+}
+
 console.log(' Successfully bundled CSS files into dist/styles/');

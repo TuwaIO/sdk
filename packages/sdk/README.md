@@ -11,7 +11,7 @@
 
 - **One version to install:** the TUWA packages and the libraries they share (`zustand`, `immer`, `framer-motion`, Radix UI, `react-toastify`, `dayjs`) are dependencies of `@tuwaio/sdk`, so a release of the SDK pins a set of TUWA versions that work together. `react` and `react-dom` are peer dependencies: the app keeps one copy of React.
 - **Subpaths:** every subpath re-exports one entry point of a TUWA package, unchanged (see [Subpaths](#-subpaths)). Its reference is on the site of that package.
-- **Stylesheets:** `@tuwaio/sdk/styles/*.css` are copies of the compiled stylesheets of Nova Core, Nova Connect and Nova Transactions. The app does not need Tailwind CSS.
+- **Stylesheets:** `@tuwaio/sdk/styles/*.css` are copies of the compiled stylesheets of Nova Core, Nova Connect and Nova Transactions, with the fonts of Nova Core next to them in `dist/styles/fonts`. The app does not need Tailwind CSS.
 
 ---
 
