@@ -1,12 +1,10 @@
 // @ts-check
 /**
- * @file Writes the pages of `/packages` that TypeDoc does not generate.
+ * @file Writes the pages of `/packages`.
  *
- * TypeDoc documents only `@tuwaio/quasar-sdk` (into `packages/quasar-sdk`). `@tuwaio/sdk`, `@tuwaio/evm-sdk` and
- * `@tuwaio/solana-sdk` only re-export other TUWA packages, whose references live on the sites of those projects, so
- * their page is their README. This script writes the overview page and copies the three READMEs without their badges.
- * Side effect: writes
- * files under `apps/docs/src/content/packages`.
+ * `@tuwaio/sdk`, `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` only re-export other TUWA packages, whose references live
+ * on the sites of those projects, so their page is their README. This script writes the overview page and copies the
+ * three READMEs without their badges. Side effect: writes files under `apps/docs/src/content/packages`.
  */
 
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -19,7 +17,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const out = join(root, 'apps/docs/src/content/packages');
 
 mkdirSync(out, { recursive: true });
-copyFileSync(join(root, 'apps/docs/typedoc/packages-overview.md'), join(out, 'index.md'));
+copyFileSync(join(root, 'apps/docs/package-pages/packages-overview.md'), join(out, 'index.md'));
 
 for (const name of ['sdk', 'evm-sdk', 'solana-sdk']) {
   mkdirSync(join(out, name), { recursive: true });

@@ -11,6 +11,7 @@ import * as novaTransactionsProviders from '../nova-transactions-providers.js';
 import * as orbit from '../orbit.js';
 import * as pulsar from '../pulsar.js';
 import * as satellite from '../satellite.js';
+import * as satelliteReact from '../satellite-react.js';
 import * as siwxReact from '../siwx.js';
 import * as siwxCore from '../siwx-core.js';
 import * as siwxServer from '../siwx-server.js';
@@ -77,6 +78,11 @@ describe('Unified SDK Re-Exports', () => {
     expect(typeof novaConnect.NovaConnectProvider).toBe('function');
     expect(typeof novaConnectHooks.useNovaSiwx).toBe('function');
     expect(novaConnectComponents.ConnectButton).toBeDefined();
+  });
+
+  it('exports Satellite React with its own names from its own subpath, for the Payments module', () => {
+    expect(typeof satelliteReact.SatelliteConnectProvider).toBe('function');
+    expect(typeof satelliteReact.useSatelliteConnectStore).toBe('function');
   });
 
   it('exports transaction i18n labels from nova-transactions-i18n', () => {

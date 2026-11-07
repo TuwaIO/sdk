@@ -88,23 +88,23 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-evm": "^0.4.1",
-    "@tuwaio/pulsar-evm": "^0.13.1",
-    "@tuwaio/satellite-evm": "^0.10.3",
-    "@tuwaio/siwx-evm": "^0.5.3"
+    "@tuwaio/orbit-evm": "^0.4.2",
+    "@tuwaio/pulsar-evm": "^0.13.3",
+    "@tuwaio/satellite-evm": "^0.11.0",
+    "@tuwaio/siwx-evm": "^0.5.4"
   },
   "peerDependencies": {
     "@tuwaio/satellite-core": ">=0.7",
-    "@tuwaio/sdk": ">=0.6.10",
+    "@tuwaio/sdk": ">=0.7",
     "@wagmi/core": "3.x.x",
     "viem": "2.x.x"
   },
   "devDependencies": {
-    "@tuwaio/satellite-core": "^0.11.2",
+    "@tuwaio/satellite-core": "^0.12.0",
     "@tuwaio/sdk": "workspace:^",
-    "@wagmi/core": "^3.6.7",
+    "@wagmi/core": "^3.6.9",
     "tsup": "^9.0.0",
     "typescript": "6.0.3",
-    "viem": "^2.57.12"
+    "viem": "^2.57.16"
   }
 }

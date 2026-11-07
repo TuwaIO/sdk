@@ -8,6 +8,7 @@ export default defineConfig([
     entry: [
       './src/pulsar.ts',
       './src/satellite.ts',
+      './src/satellite-react.ts',
       './src/siwx.ts',
       './src/siwx-core.ts',
       './src/siwx-server.ts',

@@ -11,7 +11,7 @@
 
 - **One version to install:** the TUWA packages and the libraries they share (`zustand`, `immer`, `framer-motion`, Radix UI, `react-toastify`, `dayjs`) are dependencies of `@tuwaio/sdk`, so a release of the SDK pins a set of TUWA versions that work together. `react` and `react-dom` are peer dependencies: the app keeps one copy of React.
 - **Subpaths:** every subpath re-exports one entry point of a TUWA package, unchanged (see [Subpaths](#-subpaths)). Its reference is on the site of that package.
-- **Stylesheets:** `@tuwaio/sdk/styles/*.css` are copies of the compiled stylesheets of Nova Core, Nova Connect and Nova Transactions. The app does not need Tailwind CSS.
+- **Stylesheets:** `@tuwaio/sdk/styles/*.css` are copies of the compiled stylesheets of Nova Core, Nova Connect and Nova Transactions, with the fonts of Nova Core next to them in `dist/styles/fonts`. The app does not need Tailwind CSS.
 
 ---
 
@@ -69,6 +69,8 @@ Import the stylesheets once, for example in the global CSS file of the app:
 | `@tuwaio/sdk/styles/*.css`                | `dist/index.css` of the three Nova packages                                                                                                 | `all.css`, `nova-core.css`, `nova-connect.css`, `nova-transactions.css`                                                                                    |
 
 `@tuwaio/sdk/nova-connect/evm` and `@tuwaio/sdk/nova-connect/solana` re-export the chain entry points of Nova Connect for the add-ons; import them as `@tuwaio/evm-sdk/nova-connect` and `@tuwaio/solana-sdk/nova-connect`. They need the chain packages that the add-ons install, and going through `@tuwaio/sdk` makes their chain registration and types apply to the same copy of Nova Connect and Satellite React as the other subpaths.
+
+`@tuwaio/sdk/satellite/react` re-exports `@tuwaio/satellite-react` with its own names, for [`@tuwaio/payments-sdk`](https://payments.docs.tuwa.io/?path=/docs/packages-payments-sdk-overview--docs): the Payments module takes Nova, Satellite, Pulsar and Orbit from the subpaths of this package, so an app has one copy of each. Payments are not part of this package: apps without them install nothing of it.
 
 ---
 
