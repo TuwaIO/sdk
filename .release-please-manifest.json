@@ -1,5 +1,5 @@
 {
-  "packages/sdk": "0.6.12",
-  "packages/evm-sdk": "0.6.9",
-  "packages/solana-sdk": "0.6.7"
+  "packages/sdk": "0.7.0",
+  "packages/evm-sdk": "0.7.0",
+  "packages/solana-sdk": "0.7.0"
 }

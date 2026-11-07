@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.12...sdk-v0.7.0) (2026-11-07)
+
+
+### Features
+
+* stable Nova 0.13, the Satellite React subpath and no quasar-sdk ([#77](https://github.com/TuwaIO/sdk/issues/77)) ([9195c94](https://github.com/TuwaIO/sdk/commit/9195c9422783c57d804081190e3513042103ffbc))
+
 ## [0.6.12](https://github.com/TuwaIO/sdk/compare/sdk-v0.6.11...sdk-v0.6.12) (2026-11-06)
 
 
