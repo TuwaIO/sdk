@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/npm/l/@tuwaio/sdk.svg)](./LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/TuwaIO/sdk/release.yml?branch=main)](https://github.com/TuwaIO/sdk/actions)
 
-<img src="https://raw.githubusercontent.com/TuwaIO/workflows/refs/heads/main/preview/repos/sdk.png" alt="TUWA SDK" width="400" style="border-radius: 10px; text-align: center; margin-bottom: 20px; margin-top: 20px; margin-left: auto; margin-right: auto; display: block;" />
+<img src="https://tuwa.io/brand/sdk.png" alt="TUWA SDK" width="400" style="border-radius: 10px; text-align: center; margin-bottom: 20px; margin-top: 20px; margin-left: auto; margin-right: auto; display: block;" />
 
 The **TUWA SDK** is the shortest way to use TUWA in a React app. `@tuwaio/sdk` re-exports the client packages of Orbit Utils, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths, and its add-ons `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` add the chains your app uses. Payments are a module of their own on top of it, [`@tuwaio/payments-sdk`](https://payments.docs.tuwa.io/?path=/docs/packages-payments-sdk-overview--docs), in [Quasar Client](https://github.com/TuwaIO/quasar-client).
 
