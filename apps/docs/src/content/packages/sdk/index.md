@@ -38,7 +38,28 @@ Import the stylesheets once, for example in the global CSS file of the app:
 @import '@tuwaio/sdk/styles/all.css';
 ```
 
-`all.css` joins `nova-core.css` (the `--tuwa-*` theme variables), `nova-connect.css` and `nova-transactions.css`; import them one by one to leave one out.
+`all.css` joins `nova-core.css` (the `--tuwa-*` theme variables and the motions of the pixel icons), `nova-connect.css` and `nova-transactions.css`; import them one by one to leave one out.
+
+Nova draws the pixel icons of `@tuwaio/nova-icons` in its look of paper and ink. For its classic look with Heroicons, install `@heroicons/react` (an optional peer, needed only for this) and give the set to every Nova provider the app renders. A `NovaTransactionsProvider` outside `NovaConnectProvider` takes its own `icons`:
+
+```bash
+pnpm add @heroicons/react
+```
+
+```tsx
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { heroicons } from '@tuwaio/sdk/nova-core/heroicons';
+import { NovaTransactionsProvider } from '@tuwaio/sdk/nova-transactions/providers';
+import type { ComponentProps } from 'react';
+
+export function ClassicNovaConnect(props: ComponentProps<typeof NovaConnectProvider>) {
+  return <NovaConnectProvider {...props} icons={heroicons} />;
+}
+
+export function ClassicNovaTransactions(props: ComponentProps<typeof NovaTransactionsProvider>) {
+  return <NovaTransactionsProvider {...props} icons={heroicons} />;
+}
+```
 
 ---
 
@@ -55,6 +76,12 @@ Import the stylesheets once, for example in the global CSS file of the app:
 | `@tuwaio/sdk/siwx/server-next`            | `@tuwaio/siwx-server/next`                                                                                                                  | [siwx.docs.tuwa.io](https://siwx.docs.tuwa.io/packages/siwx-server/next)                                                                                   |
 | `@tuwaio/sdk/nova-core`                   | `@tuwaio/nova-core`                                                                                                                         | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-core-overview--docs)                                                                         |
 | `@tuwaio/sdk/nova-core/utils`             | `@tuwaio/nova-core/utils`: only the helpers (`cn`, `deepMerge`, `getChainName`, `textCenterEllipsis`…), without React, components and icons | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-core-overview--docs)                                                                         |
+| `@tuwaio/sdk/nova-core/heroicons`         | `@tuwaio/nova-core/heroicons`: the Heroicons set of the classic look (needs `@heroicons/react`)                                             | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-core-overview--docs)                                                                         |
+| `@tuwaio/sdk/nova-icons`                  | `@tuwaio/nova-icons`: the pixel icons and the helpers that draw them                                                                        | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-icons-overview--docs)                                                                        |
+| `@tuwaio/sdk/nova-icons/24/outline`       | `@tuwaio/nova-icons/24/outline`, the path of `@heroicons/react/24/outline`                                                                  | [Gallery](https://stories.tuwa.io/?path=/story/nova-icons-gallery--gallery)                                                                                |
+| `@tuwaio/sdk/nova-icons/24/solid`         | `@tuwaio/nova-icons/24/solid`, the path of `@heroicons/react/24/solid`                                                                      | [Gallery](https://stories.tuwa.io/?path=/story/nova-icons-gallery--gallery)                                                                                |
+| `@tuwaio/sdk/nova-icons/tuwa`             | `@tuwaio/nova-icons/tuwa`: the icons of TUWA's own                                                                                          | [Gallery](https://stories.tuwa.io/?path=/story/nova-icons-gallery--gallery)                                                                                |
+| `@tuwaio/sdk/nova-icons/brands`           | `@tuwaio/nova-icons/brands`: the pixel marks of brands                                                                                      | [Gallery](https://stories.tuwa.io/?path=/story/nova-icons-gallery--gallery)                                                                                |
 | `@tuwaio/sdk/nova-connect`                | `@tuwaio/nova-connect`                                                                                                                      | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-connect-overview--docs)                                                              |
 | `@tuwaio/sdk/nova-connect/components`     | `@tuwaio/nova-connect/components`                                                                                                           | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-components-overview--docs)                                                           |
 | `@tuwaio/sdk/nova-connect/hooks`          | `@tuwaio/nova-connect/hooks`                                                                                                                | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-hooks-overview--docs)                                                                |
@@ -118,7 +145,8 @@ The versions in this package go together: Nova UI Kit 0.11 shows a transaction s
 - `orbit-core:lastConnectedConnector`, `orbit-core:recentlyConnectedConnectorsListHelpers`: the last connection and the recent wallets, in `localStorage`, or in `sessionStorage` until the tab closes when `rememberWallet` of `SatelliteConnectProvider` is `false` or "Remember this wallet" of Nova Connect is unticked ([`@tuwaio/satellite-core`](https://satellite.docs.tuwa.io/packages/satellite-core), read by Nova Connect);
 - `satellite-connect:impersonatedAddress` in `localStorage`: the impersonated address ([`@tuwaio/satellite-core`](https://satellite.docs.tuwa.io/packages/satellite-core));
 - the `name` passed to `createPulsarStore` in `localStorage`: the tracked transactions ([`@tuwaio/pulsar-core`](https://pulsar.docs.tuwa.io/packages/pulsar-core));
-- `siwx-react:session` in `localStorage`: the SIWX session shown in the UI ([`@tuwaio/siwx-react`](https://siwx.docs.tuwa.io/packages/siwx-react)).
+- `siwx-react:session` in `localStorage`: the SIWX session shown in the UI ([`@tuwaio/siwx-react`](https://siwx.docs.tuwa.io/packages/siwx-react));
+- `nova-transactions:closedToasts` in `localStorage`: the keys of up to 50 pending transactions whose toast was closed, so it stays closed after a page load ([`@tuwaio/nova-transactions`](https://stories.tuwa.io/?path=/docs/packages-nova-transactions-transactions-overview--docs)).
 
 ## 🌐 External Services
 
