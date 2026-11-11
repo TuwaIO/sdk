@@ -1,10 +1,19 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import * as novaConnect from '../nova-connect.js';
 import * as novaConnectComponents from '../nova-connect-components.js';
 import * as novaConnectHooks from '../nova-connect-hooks.js';
 import * as novaCore from '../nova-core.js';
+import * as novaCoreHeroicons from '../nova-core-heroicons.js';
 import * as novaCoreUtils from '../nova-core-utils.js';
+import * as novaIcons from '../nova-icons.js';
+import * as novaIconsBrands from '../nova-icons-brands.js';
+import * as novaIconsOutline from '../nova-icons-outline.js';
+import * as novaIconsSolid from '../nova-icons-solid.js';
+import * as novaIconsTuwa from '../nova-icons-tuwa.js';
 import * as novaTransactions from '../nova-transactions.js';
 import * as novaTransactionsI18n from '../nova-transactions-i18n.js';
 import * as novaTransactionsProviders from '../nova-transactions-providers.js';
@@ -97,5 +106,30 @@ describe('Unified SDK Re-Exports', () => {
     expect(Object.keys(novaCoreUtils).sort()).toEqual(Object.keys(helpers).sort());
     expect(typeof novaCoreUtils.cn).toBe('function');
     expect('NetworkIcon' in novaCoreUtils).toBe(false);
+  });
+
+  // Nova 0.14 draws the pixel icons of @tuwaio/nova-icons; the SDK gives them under its own subpaths, the same copy Nova
+  // uses, with the import paths of Heroicons
+  it('exports the pixel icons of nova-icons under the paths of Heroicons', () => {
+    expect(typeof novaIconsOutline.XMarkIcon).toBe('function');
+    expect(typeof novaIconsSolid.CheckCircleIcon).toBe('function');
+    expect(typeof novaIconsTuwa.TransactionsIcon).toBe('function');
+    expect(typeof novaIconsBrands.GitHubIcon).toBe('function');
+    expect(typeof novaIcons.pixelFlight).toBe('function');
+    expect(novaIcons.XMarkIcon).toBe(novaIconsOutline.XMarkIcon);
+  });
+
+  // The classic look of Nova (Heroicons) is one import away and needs @heroicons/react, which an app installs only for it
+  it('gives the classic look of Nova without making Heroicons a dependency', () => {
+    expect(novaCoreHeroicons.heroicons.look).toBe('classic');
+    const pkg = JSON.parse(readFileSync(join(__dirname, '../../package.json'), 'utf8')) as {
+      dependencies: Record<string, string>;
+      peerDependencies: Record<string, string>;
+      peerDependenciesMeta: Record<string, { optional?: boolean }>;
+    };
+    expect(pkg.dependencies).not.toHaveProperty('@heroicons/react');
+    expect(pkg.peerDependencies).toHaveProperty('@heroicons/react');
+    expect(pkg.peerDependenciesMeta['@heroicons/react']?.optional).toBe(true);
+    expect(pkg.dependencies).toHaveProperty('@tuwaio/nova-icons');
   });
 });

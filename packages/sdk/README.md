@@ -41,7 +41,23 @@ Import the stylesheets once, for example in the global CSS file of the app:
 @import '@tuwaio/sdk/styles/all.css';
 ```
 
-`all.css` joins `nova-core.css` (the `--tuwa-*` theme variables), `nova-connect.css` and `nova-transactions.css`; import them one by one to leave one out.
+`all.css` joins `nova-core.css` (the `--tuwa-*` theme variables and the motions of the pixel icons), `nova-connect.css` and `nova-transactions.css`; import them one by one to leave one out.
+
+Nova draws the pixel icons of `@tuwaio/nova-icons` in its look of paper and ink. For its classic look with Heroicons, install `@heroicons/react` (an optional peer, needed only for this) and give the set to the Nova providers:
+
+```bash
+pnpm add @heroicons/react
+```
+
+```tsx
+import { NovaConnectProvider } from '@tuwaio/sdk/nova-connect';
+import { heroicons } from '@tuwaio/sdk/nova-core/heroicons';
+import type { ComponentProps } from 'react';
+
+export function ClassicNovaConnect(props: ComponentProps<typeof NovaConnectProvider>) {
+  return <NovaConnectProvider {...props} icons={heroicons} />;
+}
+```
 
 ---
 
@@ -58,6 +74,12 @@ Import the stylesheets once, for example in the global CSS file of the app:
 | `@tuwaio/sdk/siwx/server-next`            | `@tuwaio/siwx-server/next`                                                                                                                  | [siwx.docs.tuwa.io](https://siwx.docs.tuwa.io/packages/siwx-server/next)                                                                                   |
 | `@tuwaio/sdk/nova-core`                   | `@tuwaio/nova-core`                                                                                                                         | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-core-overview--docs)                                                                         |
 | `@tuwaio/sdk/nova-core/utils`             | `@tuwaio/nova-core/utils`: only the helpers (`cn`, `deepMerge`, `getChainName`, `textCenterEllipsis`…), without React, components and icons | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-core-overview--docs)                                                                         |
+| `@tuwaio/sdk/nova-core/heroicons`         | `@tuwaio/nova-core/heroicons`: the Heroicons set of the classic look (needs `@heroicons/react`)                                             | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-core-overview--docs)                                                                         |
+| `@tuwaio/sdk/nova-icons`                  | `@tuwaio/nova-icons`: the outline icons, those of TUWA and of brands, and `pixelFlight`                                                     | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-icons-overview--docs)                                                                        |
+| `@tuwaio/sdk/nova-icons/24/outline`       | `@tuwaio/nova-icons/24/outline`, the path of `@heroicons/react/24/outline`                                                                  | [Gallery](https://stories.tuwa.io/?path=/story/nova-icons-gallery--gallery)                                                                                |
+| `@tuwaio/sdk/nova-icons/24/solid`         | `@tuwaio/nova-icons/24/solid`, the path of `@heroicons/react/24/solid`                                                                      | [Gallery](https://stories.tuwa.io/?path=/story/nova-icons-gallery--gallery)                                                                                |
+| `@tuwaio/sdk/nova-icons/tuwa`             | `@tuwaio/nova-icons/tuwa`: the icons of TUWA's own                                                                                          | [Gallery](https://stories.tuwa.io/?path=/story/nova-icons-gallery--gallery)                                                                                |
+| `@tuwaio/sdk/nova-icons/brands`           | `@tuwaio/nova-icons/brands`: the marks of GitHub, X, Telegram, Discord and npm                                                              | [Gallery](https://stories.tuwa.io/?path=/story/nova-icons-gallery--gallery)                                                                                |
 | `@tuwaio/sdk/nova-connect`                | `@tuwaio/nova-connect`                                                                                                                      | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-connect-overview--docs)                                                              |
 | `@tuwaio/sdk/nova-connect/components`     | `@tuwaio/nova-connect/components`                                                                                                           | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-components-overview--docs)                                                           |
 | `@tuwaio/sdk/nova-connect/hooks`          | `@tuwaio/nova-connect/hooks`                                                                                                                | [Storybook](https://stories.tuwa.io/?path=/docs/packages-nova-connect-hooks-overview--docs)                                                                |
