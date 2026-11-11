@@ -90,7 +90,7 @@
   "dependencies": {
     "@tuwaio/orbit-evm": "^0.4.2",
     "@tuwaio/pulsar-evm": "^0.13.3",
-    "@tuwaio/satellite-evm": "^0.11.0",
+    "@tuwaio/satellite-evm": "^0.11.1",
     "@tuwaio/siwx-evm": "^0.5.4"
   },
   "peerDependencies": {

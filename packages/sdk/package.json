@@ -278,7 +278,7 @@
     "@solana/kit": "^8.6.0",
     "@tuwaio/orbit-evm": "^0.4.2",
     "@tuwaio/orbit-solana": "^0.7.4",
-    "@tuwaio/satellite-evm": "^0.11.0",
+    "@tuwaio/satellite-evm": "^0.11.1",
     "@tuwaio/satellite-solana": "^0.11.4",
     "@wagmi/core": "^3.6.9",
     "@wallet-standard/react": "^1.0.3",
