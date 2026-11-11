@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.7.0...evm-sdk-v0.8.0) (2026-11-11)
+
+
+### Features
+
+* **sdk:** Nova 0.14 with the pixel icons of @tuwaio/nova-icons, Heroicons as an optional peer ([#84](https://github.com/TuwaIO/sdk/issues/84)) ([9dbf7a2](https://github.com/TuwaIO/sdk/commit/9dbf7a209f809710cb6883b5c6d5fccd55c67665))
+
 ## [0.7.0](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.6.9...evm-sdk-v0.7.0) (2026-11-07)
 
 
