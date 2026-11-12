@@ -42,7 +42,7 @@
   ],
   "scripts": {
     "start": "tsup --watch",
-    "build": "tsup",
+    "build": "tsup && node ../../scripts/clean-declarations.mjs",
     "test": "vitest run"
   },
   "keywords": [

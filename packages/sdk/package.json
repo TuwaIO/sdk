@@ -151,7 +151,7 @@
   ],
   "scripts": {
     "start": "tsup --watch",
-    "build": "tsup && node scripts/bundle-styles.js",
+    "build": "tsup && node ../../scripts/clean-declarations.mjs && node scripts/bundle-styles.js",
     "test": "vitest run"
   },
   "keywords": [

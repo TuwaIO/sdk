@@ -15,7 +15,7 @@
 - **Testing:** `vitest` v5 (per package, `pnpm test`). No DOM library.
 - **Frameworks:** `apps/docs`: Next.js 16, Nextra 4, Tailwind CSS v4, `@tuwaio/docs-ui`, Pagefind.
 - **Docs generation:** the page script in `apps/docs/package-pages/`.
-- **Build/Monorepo:** `tsup` for `packages/*` (ESM/CJS/DTS; `@tuwaio/sdk` then copies the Nova stylesheets and the fonts they name with `scripts/bundle-styles.js`), `release-please` (stable releases from `main`) and `semantic-release` (`alpha.release.config.js`, prereleases).
+- **Build/Monorepo:** `tsup` for `packages/*` (ESM/CJS/DTS; every package then cleans its declarations with the root `scripts/clean-declarations.mjs`, and `@tuwaio/sdk` copies the Nova stylesheets and the fonts they name with `scripts/bundle-styles.js`), `release-please` (stable releases from `main`) and `semantic-release` (`alpha.release.config.js`, prereleases).
 
 ## 3. Architecture & Directory Structure
 
@@ -32,6 +32,7 @@ sdk/
 │   │   └── scripts/bundle-styles.js   # Copies dist/index.css of the Nova packages and the fonts of Nova Core to dist/styles/
 │   ├── evm-sdk/                       # L9: src/{orbit,pulsar,pulsar-safe,satellite,siwx,nova-connect}.ts
 │   └── solana-sdk/                    # L9: same subpaths for Solana
+├── scripts/clean-declarations.mjs     # Build step of every package: removes from dist/*.d.ts the imports their sources do not have
 └── package.json                       # Root scripts
 ```
 
@@ -63,7 +64,7 @@ sdk/
 
 ## 5. Key Workflows
 
-- **Build:** `pnpm build` (tsup in every package; `@tuwaio/sdk` then copies the Nova stylesheets and fonts). The tests of `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` import the built `@tuwaio/sdk`: rebuild it after changing it.
+- **Build:** `pnpm build` (tsup in every package, then `scripts/clean-declarations.mjs`; `@tuwaio/sdk` then copies the Nova stylesheets and fonts). The tests of `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` import the built `@tuwaio/sdk`: rebuild it after changing it.
 - **Test:** `pnpm test` (`vitest run` in every package).
 - **Lint/Format:** `pnpm lint` / `pnpm lint:fix` (ESLint) and `pnpm format` (Prettier; `CHANGELOG.md`, `next-env.d.ts`, `pnpm-lock.yaml` and the generated pages are ignored).
 - **Docs:** `pnpm docs:gen` (`packagePages.mjs` and the sidebar labels; also runs in the pre-commit hook). `pnpm --filter @tuwaio/sdk-docs dev` runs the site.
@@ -78,6 +79,7 @@ sdk/
 - **Peer Rule:** a package declares as peers only what it imports (check the built `dist`), plus the peers of its dependencies that the app must share. The TUWA packages are dependencies of the SDK packages; `react`, `react-dom`, `viem`, `@wagmi/core`, `@solana/kit` and the Wallet Standard packages are peers.
 - **Hallucination Check:**
   - Do **NOT** generate reference pages for the re-export packages.
+  - Do **NOT** take `scripts/clean-declarations.mjs` out of a `build` script, and do **NOT** publish what `tsup` alone builds. The entries only re-export, and Rollup (the declaration build of tsup) merges entries without code into the first of them, whose declaration then imports the modules of every other entry: `@tuwaio/sdk/nova-connect/components` loaded the types of both networks, so an app of one network got `appChains`, `solanaRPCUrls` and the connections typed for the other, whose packages it may not have. `declarations.test.ts` of each package checks the built `dist`.
   - Do **NOT** add `"sideEffects": false` to any package: importing `/nova-connect` of an add-on registers the chain helpers, and bundlers would drop it.
   - Do **NOT** import `@tuwaio/nova-connect/evm` or its `/solana` entry directly in the add-ons, and do **NOT** add `@tuwaio/nova-connect` or `@tuwaio/satellite-react` to their dependencies or peers: go through `@tuwaio/sdk/nova-connect/evm` (or `/solana`).
   - Do **NOT** import EVM or Solana packages in the `@tuwaio/sdk` subpaths other than `/nova-connect/evm` and `/nova-connect/solana`, or Solana packages in `@tuwaio/evm-sdk` (and the reverse).
