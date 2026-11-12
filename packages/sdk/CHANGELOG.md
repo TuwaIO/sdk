@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.8.0...sdk-v0.9.0) (2026-11-12)
+
+
+### Features
+
+* **sdk:** Nova 0.15, the TUWA orange in the light theme and the cyan of the logo in the dark one ([#86](https://github.com/TuwaIO/sdk/issues/86)) ([5a25b27](https://github.com/TuwaIO/sdk/commit/5a25b2759e218ae3e06e983a81873151d5bbfb80))
+
 ## [0.8.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.7.1...sdk-v0.8.0) (2026-11-11)
 
 
