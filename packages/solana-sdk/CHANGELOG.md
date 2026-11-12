@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.7.0...solana-sdk-v0.7.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **sdk:** Nova Transactions 0.15.1, and the types of an entry load only the modules it re-exports ([#89](https://github.com/TuwaIO/sdk/issues/89)) ([c1aba7f](https://github.com/TuwaIO/sdk/commit/c1aba7fa04cf32a3bc8c82e8bff18fdadefc7785))
+
 ## [0.7.0](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.6.7...solana-sdk-v0.7.0) (2026-11-07)
 
 
