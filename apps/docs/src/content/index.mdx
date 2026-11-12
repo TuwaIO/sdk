@@ -5,7 +5,7 @@
     src="https://tuwa.io/brand/sdk.png"
     alt="TUWA SDK"
     width="450"
-    style={{ borderRadius: '12px', margin: '24px auto', display: 'block' }}
+    style={{ margin: '24px auto', display: 'block' }}
   />
 </p>
 
@@ -39,11 +39,11 @@ The Stage 5 packages add no logic of their own: every subpath is one entry point
 
 ## 🧩 Packages
 
-| Package                                      | Layer | Provides                                                                                    | Peer dependencies                                                      |
-| -------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| [`@tuwaio/sdk`](/packages/sdk)               | L8    | Orbit, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths; the Nova stylesheets | `react`, `react-dom` (>=19.2.3)                                        |
-| [`@tuwaio/evm-sdk`](/packages/evm-sdk)       | L9    | The EVM packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect                 | `@tuwaio/sdk` ≥ 0.6, `@wagmi/core` 3.x, `viem` 2.x                     |
-| [`@tuwaio/solana-sdk`](/packages/solana-sdk) | L9    | The Solana packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect              | `@tuwaio/sdk` ≥ 0.6, `@solana/kit` ≥ 8.2, the Wallet Standard packages |
+| Package                                      | Layer | Provides                                                                                    | Peer dependencies                                                                                      |
+| -------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [`@tuwaio/sdk`](/packages/sdk)               | L8    | Orbit, Pulsar, Satellite Connect, SIWX and Nova UI Kit under subpaths; the Nova stylesheets | `react`, `react-dom` (>=19.2.3)                                                                        |
+| [`@tuwaio/evm-sdk`](/packages/evm-sdk)       | L9    | The EVM packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect                 | `@tuwaio/sdk` ≥ 0.7, `@tuwaio/satellite-core` ≥ 0.7, `@wagmi/core` 3.x, `viem` 2.x                     |
+| [`@tuwaio/solana-sdk`](/packages/solana-sdk) | L9    | The Solana packages of Orbit, Satellite Connect, Pulsar, SIWX and Nova Connect              | `@tuwaio/sdk` ≥ 0.7, `@tuwaio/satellite-core` ≥ 0.7, `@solana/kit` ≥ 8.2, the Wallet Standard packages |
 
 The pages of `@tuwaio/sdk`, `@tuwaio/evm-sdk` and `@tuwaio/solana-sdk` list their subpaths with a link to the reference of each re-exported package.
 
