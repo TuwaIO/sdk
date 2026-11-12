@@ -134,7 +134,7 @@ export function Header() {
 
 The full setup — EVM and Solana, transaction tracking with Pulsar and Nova Transactions, SIWX sign-in and Quasar sync — is the **[Full-Stack React guide](https://docs.tuwa.io/guides/full-stack-react)**. Ready-made apps are in the [starter templates](https://docs.tuwa.io/guides/starter-templates).
 
-The versions in this package go together: Nova UI Kit 0.11 shows a transaction sped up in the wallet as one operation, followed to its result, and needs `@tuwaio/pulsar-core` 0.12, which comes with it. An app with its own labels adds their new required keys: `actions.replacementFailed` in Nova Transactions, `cancelled` and `transactionCancelled` in Nova Connect.
+The versions in this package go together: Nova UI Kit 0.11 shows a transaction sped up in the wallet as one operation, followed to its result, and needs `@tuwaio/pulsar-core` 0.12, which comes with it. An app with its own labels adds their new required keys: `actions.replacementFailed` in Nova Transactions, `cancelled` and `transactionCancelled` in Nova Connect. Nova Transactions 0.15.1 names the two regions of its toasts for screen readers (the transaction toasts and the validation errors): an app with its own `toast` or `validationError` labels adds their `region` key.
 
 ---
 
