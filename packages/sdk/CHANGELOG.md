@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/TuwaIO/sdk/compare/sdk-v0.9.0...sdk-v0.9.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **sdk:** Nova Transactions 0.15.1, and the types of an entry load only the modules it re-exports ([#89](https://github.com/TuwaIO/sdk/issues/89)) ([c1aba7f](https://github.com/TuwaIO/sdk/commit/c1aba7fa04cf32a3bc8c82e8bff18fdadefc7785))
+
 ## [0.9.0](https://github.com/TuwaIO/sdk/compare/sdk-v0.8.0...sdk-v0.9.0) (2026-11-12)
 
 
