@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.3](https://github.com/TuwaIO/sdk/compare/sdk-v0.9.2...sdk-v0.9.3) (2026-11-13)
+
+
+### Bug Fixes
+
+* **sdk:** Nova Icons 0.1.2 — the speaker, with sound and muted ([#93](https://github.com/TuwaIO/sdk/issues/93)) ([a0b512e](https://github.com/TuwaIO/sdk/commit/a0b512e919810062fed59926323a8deea88744ab))
+
 ## [0.9.2](https://github.com/TuwaIO/sdk/compare/sdk-v0.9.1...sdk-v0.9.2) (2026-11-13)
 
 
