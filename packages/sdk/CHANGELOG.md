@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.4](https://github.com/TuwaIO/sdk/compare/sdk-v0.9.3...sdk-v0.9.4) (2026-11-13)
+
+
+### Bug Fixes
+
+* **sdk:** Nova Core 0.15.3 and Nova Icons 0.1.3 — a darker veil behind dialogs, the struck star of Sparkles ([#95](https://github.com/TuwaIO/sdk/issues/95)) ([5215ed3](https://github.com/TuwaIO/sdk/commit/5215ed39371b3e326ce1f897f656c3eec59df5af))
+
 ## [0.9.3](https://github.com/TuwaIO/sdk/compare/sdk-v0.9.2...sdk-v0.9.3) (2026-11-13)
 
 
