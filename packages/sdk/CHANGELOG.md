@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2](https://github.com/TuwaIO/sdk/compare/sdk-v0.9.1...sdk-v0.9.2) (2026-11-13)
+
+
+### Bug Fixes
+
+* **sdk:** Nova Icons 0.1.1 and Nova Core 0.15.2 — the power button, the spacecraft, and a Quasar mark that assembles ([#91](https://github.com/TuwaIO/sdk/issues/91)) ([ae14e67](https://github.com/TuwaIO/sdk/commit/ae14e67a87051d9c550547b0fdef1edf987e5080))
+
 ## [0.9.1](https://github.com/TuwaIO/sdk/compare/sdk-v0.9.0...sdk-v0.9.1) (2026-11-12)
 
 
