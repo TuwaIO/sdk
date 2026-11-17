@@ -29,6 +29,7 @@ minimumReleaseAgeExclude:
   - '@tailwindcss/postcss@4.3.5'
   - tailwindcss@4.3.5
   - zustand@5.1.0
+  - viem@2.58.0
 overrides:
   # nextra-theme-docs 4.6.1 validates its Layout props with zod; with zod 4.4 and newer the validation rejects them
   # ("expected nonoptional ... at children"). Scalar needs zod >= 4.4, so keep 4.3 for Nextra only.
