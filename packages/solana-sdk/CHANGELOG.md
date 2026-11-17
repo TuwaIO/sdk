@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.7.1...solana-sdk-v0.7.2) (2026-11-17)
+
+
+### Bug Fixes
+
+* **deps:** update Next.js to 16.4.6, @tuwaio/nova-* to 0.16.0, and latest ecosystem deps ([#97](https://github.com/TuwaIO/sdk/issues/97)) ([9f4733d](https://github.com/TuwaIO/sdk/commit/9f4733d8a99b2685836f71b81f7174f0391fc2c9))
+
 ## [0.7.1](https://github.com/TuwaIO/sdk/compare/solana-sdk-v0.7.0...solana-sdk-v0.7.1) (2026-11-12)
 
 
