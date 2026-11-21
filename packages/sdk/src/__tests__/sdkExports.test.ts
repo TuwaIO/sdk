@@ -89,6 +89,14 @@ describe('Unified SDK Re-Exports', () => {
     expect(novaConnectComponents.ConnectButton).toBeDefined();
   });
 
+  // Nova Connect tells a request declined in the wallet in its own words, and keeps its connect button quiet while
+  // Satellite restores the last wallet: apps that build their own wallet status read the same through the SDK
+  it('passes on what Nova Connect knows of a declined request and of a wallet being restored', () => {
+    expect(typeof novaConnect.isUserRejection).toBe('function');
+    expect(typeof novaConnectHooks.useWalletRestoring).toBe('function');
+    expect(novaConnectHooks.WALLET_RESTORE_WAIT_MS).toBeGreaterThan(0);
+  });
+
   it('exports Satellite React with its own names from its own subpath, for the Payments module', () => {
     expect(typeof satelliteReact.SatelliteConnectProvider).toBe('function');
     expect(typeof satelliteReact.useSatelliteConnectStore).toBe('function');
