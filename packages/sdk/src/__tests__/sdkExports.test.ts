@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import * as novaConnect from '../nova-connect.js';
 import * as novaConnectComponents from '../nova-connect-components.js';
 import * as novaConnectHooks from '../nova-connect-hooks.js';
+import * as novaConnectI18n from '../nova-connect-i18n.js';
 import * as novaCore from '../nova-core.js';
 import * as novaCoreHeroicons from '../nova-core-heroicons.js';
 import * as novaCoreUtils from '../nova-core-utils.js';
@@ -106,6 +107,18 @@ describe('Unified SDK Re-Exports', () => {
     expect(novaTransactionsI18n.defaultLabels).toBeDefined();
     expect(novaTransactionsI18n.chineseLabels).toBeDefined();
     expect(novaTransactionsI18n.ukrainianLabels).toBeDefined();
+  });
+
+  // A German, Spanish or Italian checkout of Nova Payments showed Nova's connect modal and toasts in English
+  it('exports the German, Spanish and Italian labels of Nova Connect and Nova Transactions', () => {
+    for (const i18n of [novaConnectI18n, novaTransactionsI18n]) {
+      expect(i18n.germanLabels).toBeDefined();
+      expect(i18n.spanishLabels).toBeDefined();
+      expect(i18n.italianLabels).toBeDefined();
+      expect(i18n.labelsForLocale('de')).toBe(i18n.germanLabels);
+      expect(i18n.labelsForLocale('es')).toBe(i18n.spanishLabels);
+      expect(i18n.labelsForLocale('it')).toBe(i18n.italianLabels);
+    }
   });
 
   it('exports only the helpers of nova-core from nova-core-utils, without components and icons', async () => {
