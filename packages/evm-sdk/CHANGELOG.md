@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.8.2...evm-sdk-v0.9.0) (2026-11-26)
+
+
+### Features
+
+* Nova 0.17 and the latest Orbit, Pulsar, Satellite and SIWX: several RPC URLs of a chain, German, Spanish and Italian labels ([#99](https://github.com/TuwaIO/sdk/issues/99)) ([81a26db](https://github.com/TuwaIO/sdk/commit/81a26db2e27716c9bdfcd3ef2c38dec4070937c3))
+
 ## [0.8.2](https://github.com/TuwaIO/sdk/compare/evm-sdk-v0.8.1...evm-sdk-v0.8.2) (2026-11-17)
 
 
