@@ -88,10 +88,10 @@
     }
   ],
   "dependencies": {
-    "@tuwaio/orbit-evm": "^0.4.3",
-    "@tuwaio/pulsar-evm": "^0.13.4",
-    "@tuwaio/satellite-evm": "^0.11.2",
-    "@tuwaio/siwx-evm": "^0.5.5"
+    "@tuwaio/orbit-evm": "^0.5.0",
+    "@tuwaio/pulsar-evm": "^0.13.5",
+    "@tuwaio/satellite-evm": "^0.12.0",
+    "@tuwaio/siwx-evm": "^0.5.6"
   },
   "peerDependencies": {
     "@tuwaio/satellite-core": ">=0.7",
