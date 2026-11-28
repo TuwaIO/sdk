@@ -150,7 +150,7 @@ The versions in this package go together: Nova UI Kit 0.11 shows a transaction s
 
 ## 🌐 External Services
 
-`@tuwaio/sdk` sends no requests itself. Of the packages it re-exports, only `@tuwaio/nova-core` does: it loads network and wallet icons that `@web3icons/common` does not have from `raw.githubusercontent.com` ([details](https://stories.tuwa.io/?path=/docs/packages-nova-core-overview--docs)). The chain requests (RPC endpoints, ENS, SNS, Pimlico, Safe Transaction Service) come from the chain packages of the add-ons: see [`@tuwaio/evm-sdk`](https://sdk.docs.tuwa.io/packages/evm-sdk) and [`@tuwaio/solana-sdk`](https://sdk.docs.tuwa.io/packages/solana-sdk). The SIWX endpoints are those of your server.
+`@tuwaio/sdk` sends no requests itself. Of the packages it re-exports, only `@tuwaio/nova-core` can: with `remoteFallback` it loads the network, wallet and token icons that `@web3icons` does not bundle from `raw.githubusercontent.com`, and without it they are placeholders and nothing is sent ([details](https://stories.tuwa.io/?path=/docs/packages-nova-core-overview--docs)). The chain requests (RPC endpoints, ENS, SNS, Pimlico, Safe Transaction Service) come from the chain packages of the add-ons: see [`@tuwaio/evm-sdk`](https://sdk.docs.tuwa.io/packages/evm-sdk) and [`@tuwaio/solana-sdk`](https://sdk.docs.tuwa.io/packages/solana-sdk). The SIWX endpoints are those of your server.
 
 ---
 

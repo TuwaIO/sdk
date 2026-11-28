@@ -72,7 +72,7 @@ The public `api.*.solana.com` endpoints are rate-limited; pass your own RPC URLs
 
 ## 🌐 External Services
 
-`@tuwaio/solana-sdk` sends no requests itself. The re-exported packages contact your `rpcUrls` (or the public endpoint of the cluster) for balances and signature tracking, and `sns-api.bonfida.com` and `image-api.bonfida.com` for SNS names and avatars; wallets are reached through the Wallet Standard. Each package page lists the hosts: [satellite-solana](https://satellite.docs.tuwa.io/packages/satellite-solana), [pulsar-solana](https://pulsar.docs.tuwa.io/packages/pulsar-solana), [orbit-solana](https://orbit.docs.tuwa.io/packages/orbit-solana), [siwx-solana](https://siwx.docs.tuwa.io/packages/siwx-solana).
+`@tuwaio/solana-sdk` sends no requests itself. The re-exported packages contact your `rpcUrls` (or the public endpoint of the cluster) for balances and signature tracking, and, only with `snsName` and `snsAvatar` of `satelliteSolanaAdapter`, `sns-api.bonfida.com` and `image-api.bonfida.com` for SNS names and pictures (by default a name is the address and an avatar an identicon drawn locally); wallets are reached through the Wallet Standard. Each package page lists the hosts: [satellite-solana](https://satellite.docs.tuwa.io/packages/satellite-solana), [pulsar-solana](https://pulsar.docs.tuwa.io/packages/pulsar-solana), [orbit-solana](https://orbit.docs.tuwa.io/packages/orbit-solana), [siwx-solana](https://siwx.docs.tuwa.io/packages/siwx-solana).
 
 ---
 

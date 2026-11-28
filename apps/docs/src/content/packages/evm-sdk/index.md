@@ -78,7 +78,7 @@ export function Providers({ children }: { children: ReactNode }) {
 
 ## 🌐 External Services
 
-`@tuwaio/evm-sdk` sends no requests itself. The re-exported packages contact the RPC transports of your wagmi config (balances, transaction tracking), the RPC of Ethereum Mainnet for ENS names and avatars, Pimlico or your bundler for ERC-4337 transactions, and the Safe Transaction Service for Safe transactions. Each package page lists the hosts: [satellite-evm](https://satellite.docs.tuwa.io/packages/satellite-evm), [pulsar-evm](https://pulsar.docs.tuwa.io/packages/pulsar-evm), [orbit-evm](https://orbit.docs.tuwa.io/packages/orbit-evm), [siwx-evm](https://siwx.docs.tuwa.io/packages/siwx-evm).
+`@tuwaio/evm-sdk` sends no requests itself. The re-exported packages contact the RPC transports of your wagmi config (balances, transaction tracking), the RPC of Ethereum Mainnet for ENS names (and, only with `ensAvatar` of `satelliteEVMAdapter`, the hosts that ENS avatar records point to), Pimlico or your bundler for ERC-4337 transactions, and the Safe Transaction Service for Safe transactions. Each package page lists the hosts: [satellite-evm](https://satellite.docs.tuwa.io/packages/satellite-evm), [pulsar-evm](https://pulsar.docs.tuwa.io/packages/pulsar-evm), [orbit-evm](https://orbit.docs.tuwa.io/packages/orbit-evm), [siwx-evm](https://siwx.docs.tuwa.io/packages/siwx-evm).
 
 ---
 
